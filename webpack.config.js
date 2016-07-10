@@ -16,6 +16,7 @@ module.exports = {
   entry: ENTRY_PATH,
   output: {
     path: BUILD_PATH,
+    publicPath: '/',
     filename: 'bundle.js'
   },
   plugins: [
@@ -46,6 +47,14 @@ module.exports = {
         test: /\.glsl$/,
         include: SHADER_PATH,
         loader: 'webpack-glsl'
+      },
+      {
+        test: /\.png$/,
+        loader: 'file?name=img/[name].[hash].[ext]'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
       }
     ]
   },
