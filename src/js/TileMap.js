@@ -48,11 +48,11 @@ export default class TileMap {
     const quadVerts = [
       //x  y  u  v
       -1, -1, 0, 1,
-        1, -1, 1, 1,
-        1,  1, 1, 0,
+       1, -1, 1, 1,
+       1,  1, 1, 0,
 
       -1, -1, 0, 1,
-        1,  1, 1, 0,
+       1,  1, 1, 0,
       -1,  1, 0, 0
     ];
 
@@ -112,17 +112,8 @@ export default class TileMap {
     image.src = src;
   }
 
-  setTileLayer(src, layerId, scrollScaleX, scrollScaleY) {
-    const layer = new TileMapLayer(this.gl);
-    layer.setTexture(src);
-    if(scrollScaleX) {
-      layer.scrollScaleX = scrollScaleX;
-    }
-    if(scrollScaleY) {
-      layer.scrollScaleY = scrollScaleY;
-    }
-
-    this.layers[layerId] = layer;
+  setTileLayer(src, layerId) {
+    this.layers[layerId] = new TileMapLayer(this.gl, src);
   }
 
   draw(x, y) {
@@ -157,9 +148,7 @@ export default class TileMap {
     for(let i = this.layers.length; i >= 0; --i) {
       const layer = this.layers[i];
       if(layer) {
-        gl.uniform2f(shader.uniform.viewOffset,
-          Math.floor(x * this.tileScale * layer.scrollScaleX),
-          Math.floor(y * this.tileScale * layer.scrollScaleY));
+        gl.uniform2f(shader.uniform.viewOffset, Math.floor(x), Math.floor(y));
 
         gl.uniform2fv(shader.uniform.inverseTileTextureSize, layer.inverseTextureSize);
 

@@ -26,6 +26,7 @@ import Stats from 'stats-js';
 import '../css/main.css';
 
 import Renderer from './Renderer.js';
+import TouchControls from './TouchControls.js';
 import GLContextHelper from './GLContextHelper.js';
 
 // Setup the canvas and GL context, initialize the scene
@@ -33,7 +34,12 @@ const canvas = document.getElementById("canvas");
 const contextHelper = new GLContextHelper(canvas, document.getElementById("content-frame"));
 const renderer = new Renderer(contextHelper.gl, canvas);
 const stats = new Stats();
+const touchControls = new TouchControls(canvas, renderer);
 document.body.appendChild(stats.domElement);
+
+renderer.scale(1);
+renderer.moveTo(0, 0);
+//renderer.moveTo(42*16, 34*16);
 
 // Get the render loop going
 contextHelper.start(renderer, stats);
