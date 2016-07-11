@@ -27,11 +27,14 @@ attribute vec2 texture;
 varying vec2 pixelCoord;
 varying vec2 texCoord;
 uniform vec2 viewOffset;
-uniform vec2 viewportSize;
-uniform vec2 inverseTileTextureSize;
-uniform float inverseTileSize;
+uniform vec2 inverseHalfViewportSize;
+uniform vec2 halfMapSize;
+uniform float scale;
 void main(void) {
-  pixelCoord = (texture * viewportSize) + viewOffset;
-  texCoord = pixelCoord * inverseTileTextureSize * inverseTileSize;
-  gl_Position = vec4(position, 0.0, 1.0);
+  pixelCoord = texture * halfMapSize * 2.0;
+  texCoord = texture;
+  vec2 mapSpace = position * halfMapSize * scale;
+  vec2 offsetPos = mapSpace + viewOffset;
+  vec2 clipSpace = offsetPos * inverseHalfViewportSize;
+  gl_Position = vec4(clipSpace, 0.0, 1.0);
 }

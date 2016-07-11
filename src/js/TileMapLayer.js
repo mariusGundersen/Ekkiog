@@ -24,9 +24,9 @@
 import {vec2} from 'gl-matrix';
 
 export default class TileMapLayer{
-  constructor(gl, src, repeat=false) {
+  constructor(gl, src, tileSize) {
     this.tileTexture = gl.createTexture();
-    this.inverseTextureSize = vec2.create();
+    this.halfMapSize = vec2.create();
 
     const image = new Image();
     image.addEventListener("load", () => {
@@ -37,16 +37,11 @@ export default class TileMapLayer{
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 
-      if(repeat) {
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-      } else {
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      }
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-      this.inverseTextureSize[0] = 1/image.width;
-      this.inverseTextureSize[1] = 1/image.height;
+      this.halfMapSize[0] = image.width * tileSize / 2;
+      this.halfMapSize[1] = image.height * tileSize / 2;
     });
     image.src = src;
   };

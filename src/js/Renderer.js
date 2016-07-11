@@ -78,7 +78,7 @@ export default class Renderer {
   draw (gl, timing) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     this.tileMap.draw(
-      (this.pos.x + this.pos.center.x)/this.pos.scale + 42*16/2,
-      (this.pos.y + this.pos.center.y)/this.pos.scale + 34*16/2);
+      this.pos.x,
+      this.pos.y);
   }
 }

@@ -26,7 +26,6 @@ varying vec2 pixelCoord;
 varying vec2 texCoord;
 uniform sampler2D tiles;
 uniform sampler2D sprites;
-uniform vec2 inverseTileTextureSize;
 uniform vec2 inverseSpriteTextureSize;
 uniform float tileSize;
 void main(void) {
