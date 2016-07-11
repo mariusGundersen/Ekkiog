@@ -26,15 +26,11 @@ attribute vec2 position;
 attribute vec2 texture;
 varying vec2 pixelCoord;
 varying vec2 texCoord;
-uniform vec2 viewOffset;
-uniform vec2 inverseHalfViewportSize;
+uniform mat3 matrix;
 uniform vec2 halfMapSize;
-uniform float scale;
 void main(void) {
   pixelCoord = texture * halfMapSize * 2.0;
   texCoord = texture;
-  vec2 mapSpace = position * halfMapSize * scale;
-  vec2 offsetPos = mapSpace + viewOffset;
-  vec2 clipSpace = offsetPos * inverseHalfViewportSize;
+  vec2 clipSpace = (matrix * vec3(position, 1)).xy;
   gl_Position = vec4(clipSpace, 0.0, 1.0);
 }

@@ -29,20 +29,14 @@ export default class Renderer {
   constructor(gl, canvas) {
     gl.clearColor(0.0, 0.0, 0.1, 1.0);
     gl.clearDepth(1.0);
-    //gl.enable(gl.DEPTH_TEST);
     this.tileMap = new TileMap(gl);
     this.tileMap.setSpriteSheet(tiles);
     this.tileMap.setTileLayer(map, 0);
-    //this.tileMap.setTileLayer("root/texture/spelunky1.png", 1, 0.6, 0.6, true);
     this.tileMap.tileSize = 16;
     this.tileMap.setTileScale(2);
     this.pos = {
       x: 0,
       y: 0,
-      center: {
-        x: 0,
-        y: 0,
-      },
       scale: 1
     }
   }
@@ -71,8 +65,6 @@ export default class Renderer {
   resize (gl, canvas) {
     gl.viewport(0, 0, canvas.width, canvas.height);
     this.tileMap.resizeViewport(canvas.width, canvas.height);
-    this.pos.center.x = -canvas.width/2;
-    this.pos.center.y = -canvas.height/2;
   }
 
   draw (gl, timing) {

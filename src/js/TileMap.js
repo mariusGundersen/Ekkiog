@@ -21,7 +21,7 @@
 *    distribution.
 */
 
-import {vec2} from 'gl-matrix';
+import {vec2, mat3} from 'gl-matrix';
 
 import ShaderWrapper from './ShaderWrapper.js';
 import TileMapLayer from './TileMapLayer.js';
@@ -32,12 +32,11 @@ import tilemapFS from '../shaders/fragment.glsl';
 export default class TileMap {
   constructor(gl) {
     this.gl = gl;
-    this.viewportSize = vec2.create();
     this.inverseHalfViewportSize = vec2.create();
-    this.inverseTileTextureSize = vec2.create();
     this.inverseSpriteTextureSize = vec2.create();
+    this.matrix = mat3.create();
 
-    this.tileScale = 1.0;
+    this.tileScale = vec2.create();
     this.tileSize = 16;
 
     this.filtered = false;
@@ -64,15 +63,12 @@ export default class TileMap {
   }
 
   resizeViewport(width, height) {
-    this.viewportSize[0] = width;
-    this.viewportSize[1] = height;
-
     this.inverseHalfViewportSize[0] = 2 / width;
     this.inverseHalfViewportSize[1] = 2 / height;
   }
 
   setTileScale(scale) {
-    this.tileScale = scale;
+    vec2.set(this.tileScale, scale, scale);
   }
 
   setFiltered(filtered) {
@@ -129,10 +125,8 @@ export default class TileMap {
     gl.vertexAttribPointer(shader.attribute.position, 2, gl.FLOAT, false, 16, 0);
     gl.vertexAttribPointer(shader.attribute.texture, 2, gl.FLOAT, false, 16, 8);
 
-    gl.uniform2fv(shader.uniform.inverseHalfViewportSize, this.inverseHalfViewportSize);
     gl.uniform2fv(shader.uniform.inverseSpriteTextureSize, this.inverseSpriteTextureSize);
     gl.uniform1f(shader.uniform.tileSize, this.tileSize);
-    gl.uniform1f(shader.uniform.scale, this.tileScale);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(shader.uniform.sprites, 0);
@@ -145,7 +139,12 @@ export default class TileMap {
     for(let i = this.layers.length; i >= 0; --i) {
       const layer = this.layers[i];
       if(layer) {
-        gl.uniform2f(shader.uniform.viewOffset, -Math.floor(x), Math.floor(y));
+        mat3.fromScaling(this.matrix, this.inverseHalfViewportSize);
+        mat3.translate(this.matrix, this.matrix, vec2.fromValues(-x, y));
+        mat3.scale(this.matrix, this.matrix, this.tileScale);
+        mat3.scale(this.matrix, this.matrix, layer.halfMapSize);
+
+        gl.uniformMatrix3fv(shader.uniform.matrix, false, this.matrix);
 
         gl.uniform2fv(shader.uniform.halfMapSize, layer.halfMapSize);
 

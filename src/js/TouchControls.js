@@ -9,13 +9,12 @@ export default class TouchControls{
   }
 
   touchStart(event){
-    for(const touch of event.changedTouches){
-      this.pointers.push({
-        x: touch.pageX,
-        y: touch.pageY,
-        id: touch.identifier
-      });
-    }
+    const touches = Array.from(event.targetTouches);
+    this.pointers = touches.map(touch => ({
+      x: touch.pageX,
+      y: touch.pageY,
+      id: touch.identifier
+    }));
     event.preventDefault();
   }
 

@@ -39,7 +39,6 @@ document.body.appendChild(stats.domElement);
 
 renderer.scale(1);
 renderer.moveTo(0, 0);
-//renderer.moveTo(42*16, 34*16);
 
 // Get the render loop going
 contextHelper.start(renderer, stats);
