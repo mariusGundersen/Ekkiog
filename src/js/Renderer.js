@@ -23,14 +23,20 @@
 
 import TileMap from './TileMap.js';
 import tiles from '../img/spelunky-tiles.png';
-import map from '../img/spelunky0.png';
+import initialMap from '../img/spelunky0.png';
+import loadImage from './loadImage.js';
 
 export default class Renderer {
   constructor(gl, canvas) {
     gl.clearColor(0.0, 0.0, 0.1, 1.0);
     gl.clearDepth(1.0);
+
+    const map = document.createElement('canvas');
+    this.mapCtx = map.getContext('2d');
+    loadImage(initialMap).then(image => this.mapCtx.drawImage(image, 0, 0));
+
     this.tileMap = new TileMap(gl);
-    this.tileMap.setSpriteSheet(tiles);
+    this.tileMap.setSpriteSheet(loadImage(tiles));
     this.tileMap.setTileLayer(map, 0);
     this.tileMap.tileSize = 16;
     this.tileMap.setTileScale(2);
@@ -47,7 +53,6 @@ export default class Renderer {
   }
 
   moveBy(dx=0, dy=0){
-    console.log('moveBy', dx, dy);
     this.pos.x+=dx;
     this.pos.y+=dy;
   }
@@ -65,6 +70,18 @@ export default class Renderer {
   resize (gl, canvas) {
     gl.viewport(0, 0, canvas.width, canvas.height);
     this.tileMap.resizeViewport(canvas.width, canvas.height);
+  }
+
+  tap(x, y){
+    const [tx, ty] = this.tileMap.viewportToMap(this.pos.x, this.pos.y, x, y);
+    const pixels = this.mapCtx.getImageData(tx, ty, 1, 1);
+
+    pixels.data[2] = (pixels.data[2] + 1) % 64;
+    pixels.data[0] = pixels.data[2] / 8;
+    pixels.data[1] = pixels.data[2] % 8;
+    pixels.data[3] = 255;
+
+    this.mapCtx.putImageData(pixels, tx, ty);
   }
 
   draw (gl, timing) {

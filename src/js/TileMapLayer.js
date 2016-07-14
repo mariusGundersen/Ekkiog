@@ -24,25 +24,32 @@
 import {vec2} from 'gl-matrix';
 
 export default class TileMapLayer{
-  constructor(gl, src, tileSize) {
+  constructor(gl, image, tileSize) {
     this.tileTexture = gl.createTexture();
     this.halfMapSize = vec2.create();
+    this.inverseHalfMapSize = vec2.create();
+    this.gl = gl;
+    this.image = image;
 
-    const image = new Image();
-    image.addEventListener("load", () => {
-      gl.bindTexture(gl.TEXTURE_2D, this.tileTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    this.render();
 
-      // MUST be filtered with NEAREST or tile lookup fails
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    // MUST be filtered with NEAREST or tile lookup fails
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-      this.halfMapSize[0] = image.width * tileSize / 2;
-      this.halfMapSize[1] = image.height * tileSize / 2;
-    });
-    image.src = src;
-  };
+    this.halfMapSize[0] = image.width * tileSize / 2;
+    this.halfMapSize[1] = image.height * tileSize / 2;
+
+    this.inverseHalfMapSize[0] = 1 / tileSize;
+    this.inverseHalfMapSize[1] = 1 / tileSize;
+  }
+
+  render(){
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.tileTexture);
+
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.image);
+  }
 }

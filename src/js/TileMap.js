@@ -32,11 +32,13 @@ import tilemapFS from '../shaders/fragment.glsl';
 export default class TileMap {
   constructor(gl) {
     this.gl = gl;
+    this.negativeHalfViewportSize = vec2.create();
     this.inverseHalfViewportSize = vec2.create();
     this.inverseSpriteTextureSize = vec2.create();
     this.matrix = mat3.create();
 
     this.tileScale = vec2.create();
+    this.inverseTileScale = vec2.create();
     this.tileSize = 16;
 
     this.filtered = false;
@@ -63,12 +65,15 @@ export default class TileMap {
   }
 
   resizeViewport(width, height) {
+    this.negativeHalfViewportSize[0] = -width / 2;
+    this.negativeHalfViewportSize[1] = -height / 2;
     this.inverseHalfViewportSize[0] = 2 / width;
     this.inverseHalfViewportSize[1] = 2 / height;
   }
 
   setTileScale(scale) {
     vec2.set(this.tileScale, scale, scale);
+    vec2.set(this.inverseTileScale, 1/scale, 1/scale);
   }
 
   setFiltered(filtered) {
@@ -86,9 +91,8 @@ export default class TileMap {
     }
   }
 
-  setSpriteSheet(src) {
-    const image = new Image();
-    image.addEventListener("load", () => {
+  setSpriteSheet(image) {
+    image.then(image => {
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.spriteSheet);
       this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
       if(!this.filtered) {
@@ -102,11 +106,22 @@ export default class TileMap {
       this.inverseSpriteTextureSize[0] = 1/image.width;
       this.inverseSpriteTextureSize[1] = 1/image.height;
     });
-    image.src = src;
   }
 
   setTileLayer(src, layerId) {
     this.layers[layerId] = new TileMapLayer(this.gl, src, this.tileSize);
+  }
+
+  viewportToMap(dx, dy, x, y, layer=0){
+    mat3.identity(this.matrix);
+    mat3.scale(this.matrix, this.matrix, this.layers[layer].inverseHalfMapSize);
+    mat3.translate(this.matrix, this.matrix, this.layers[layer].halfMapSize);
+    mat3.scale(this.matrix, this.matrix, this.inverseTileScale);
+    mat3.translate(this.matrix, this.matrix, vec2.fromValues(dx, dy));
+    mat3.translate(this.matrix, this.matrix, vec2.fromValues(x, y));
+    mat3.translate(this.matrix, this.matrix, this.negativeHalfViewportSize);
+
+    return [Math.floor(this.matrix[6]), Math.floor(this.matrix[7])];
   }
 
   draw(x, y) {
@@ -148,7 +163,7 @@ export default class TileMap {
 
         gl.uniform2fv(shader.uniform.halfMapSize, layer.halfMapSize);
 
-        gl.bindTexture(gl.TEXTURE_2D, layer.tileTexture);
+        layer.render();
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }

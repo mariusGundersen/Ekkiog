@@ -9,12 +9,13 @@ export default class TouchControls{
   }
 
   touchStart(event){
-    const touches = Array.from(event.targetTouches);
-    this.pointers = touches.map(touch => ({
+    const touches = Array.from(event.changedTouches);
+    this.pointers = this.pointers.concat(touches.map(touch => ({
       x: touch.pageX,
       y: touch.pageY,
-      id: touch.identifier
-    }));
+      id: touch.identifier,
+      moved: false
+    })));
     event.preventDefault();
   }
 
@@ -30,7 +31,8 @@ export default class TouchControls{
       py: pair.point.y,
       x: pair.touch.pageX,
       y: pair.touch.pageY,
-      id: pair.touch.identifier
+      id: pair.touch.identifier,
+      moved: pair.point.moved || !(pair.point.x == pair.touch.pageX && pair.point.y == pair.touch.pageY)
     }));
 
     this.pointers = delta;
@@ -50,25 +52,25 @@ export default class TouchControls{
       x: avg.x - point.x,
       y: avg.y - point.y
     })).reduce((radius, diff, i, c) => ({
-      old: radius.old + Math.sqrt(diff.px*diff.px + diff.py*diff.py)/c.length,
-      new: radius.new + Math.sqrt(diff.x*diff.x + diff.y*diff.y)/c.length
-    }), {old: 0, new: 0});
+      previous: radius.previous + Math.sqrt(diff.px*diff.px + diff.py*diff.py)/c.length,
+      next: radius.next + Math.sqrt(diff.x*diff.x + diff.y*diff.y)/c.length
+    }), {previous: 0, next: 0});
 
     this.renderer.moveBy(avg.dx, avg.dy);
-    if(radius.old != 0 && radius.new != 0){
-      this.renderer.scaleBy(radius.new/radius.old);
+    if(radius.previous != 0 && radius.next != 0){
+      this.renderer.scaleBy(radius.next/radius.previous);
     }
 
     event.preventDefault();
   }
 
   touchEnd(event){
-    const touches = Array.from(event.targetTouches);
-    this.pointers = touches.map(touch => ({
-      x: touch.pageX,
-      y: touch.pageY,
-      id: touch.identifier
-    }));
+    const touches = Array.from(event.changedTouches);
+    const pointersToRemove = touches.map(t => this.pointers.filter(pointer => pointer.id == t.identifier)[0]).filter(x => x);
+    this.pointers = this.pointers.filter(pointer => !pointersToRemove.some(touch => touch.id == pointer.id));
+    for(const tap of pointersToRemove.filter(p => !p.moved)){
+      this.renderer.tap(tap.x, tap.y);
+    }
     event.preventDefault();
   }
 }
