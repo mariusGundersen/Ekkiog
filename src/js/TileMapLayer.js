@@ -31,33 +31,7 @@ export default class TileMapLayer{
     this.image.height = map.height;
     this.ctx = this.image.getContext('2d');
     this.map.onChange((x, y) => {
-      const pixels = this.ctx.getImageData(x-1, y-1, 3, 3);
-      for(let i=-1; i<2; i++){
-        for(let j=-1; j<2; j++){
-          const value = this.map.map[(y+i)*this.image.width + (x+j)] || 0;
-          const index = ((i+1)*3+(j+1))*4;
-          if(value != 1){
-            pixels.data[index + 0] = 0;
-            pixels.data[index + 1] = 0;
-            pixels.data[index + 2] = 0;
-            pixels.data[index + 3] = 255;
-          }else{
-            const tx = 0
-              | (this.map.map[(y+i-1)*this.image.width + (x+j+0)]||0)<<0
-              | (this.map.map[(y+i+0)*this.image.width + (x+j+1)]||0)<<1;
-            const ty = 0
-              | (this.map.map[(y+i+1)*this.image.width + (x+j+0)]||0)<<0
-              | (this.map.map[(y+i+0)*this.image.width + (x+j-1)]||0)<<1;
-            console.log(x+j, y+i, value, tx, ty);
-            pixels.data[index + 0] = tx || ty ? tx : 3;
-            pixels.data[index + 1] = tx || ty ? ty : 3;
-            pixels.data[index + 2] = 0;
-            pixels.data[index + 3] = 255;
-          }
-        }
-      }
-      this.ctx.putImageData(pixels, x-1, y-1);
-
+      this.convolve(x-1, y-1, 3, 3);
       this.update();
     });
 
@@ -66,6 +40,7 @@ export default class TileMapLayer{
     this.inverseHalfMapSize = vec2.create();
     this.gl = gl;
 
+    this.convolve(0, 0, this.image.width, this.image.height);
     this.update();
 
     // MUST be filtered with NEAREST or tile lookup fails
@@ -80,6 +55,39 @@ export default class TileMapLayer{
 
     this.inverseHalfMapSize[0] = 1 / tileSize;
     this.inverseHalfMapSize[1] = 1 / tileSize;
+  }
+
+  convolve(x, y, w, h){
+    const pixels = this.ctx.getImageData(x, y, w, h);
+    for(let i=0; i<pixels.height; i++){
+      for(let j=0; j<pixels.width; j++){
+        const index = (i*pixels.height+j)*4;
+        this.prettify(pixels.data, index, x+j, y+i);
+      }
+    }
+    this.ctx.putImageData(pixels, x, y);
+  }
+
+  prettify(pixels, index, x, y){
+    const value = this.map.map[y*this.image.width + x] || 0;
+    if(value != 1){
+      pixels[index + 0] = 0;
+      pixels[index + 1] = 0;
+      pixels[index + 2] = 0;
+      pixels[index + 3] = 255;
+    }else{
+      const tx = 0
+        | (this.map.map[(y-1)*this.image.width + (x+0)]||0)<<0
+        | (this.map.map[(y+0)*this.image.width + (x+1)]||0)<<1;
+      const ty = 0
+        | (this.map.map[(y+1)*this.image.width + (x+0)]||0)<<0
+        | (this.map.map[(y+0)*this.image.width + (x-1)]||0)<<1;
+      console.log(x, y, value, tx, ty);
+      pixels[index + 0] = tx || ty ? tx : 3;
+      pixels[index + 1] = tx || ty ? ty : 3;
+      pixels[index + 2] = 0;
+      pixels[index + 3] = 255;
+    }
   }
 
   update(){

@@ -27,12 +27,12 @@ import tiles from '../img/tiles.png';
 import loadImage from './loadImage.js';
 
 export default class Renderer {
-  constructor(gl, canvas) {
+  constructor(gl, canvas, storage) {
     gl.clearColor(0.0, 0.0, 0.1, 1.0);
     gl.clearDepth(1.0);
 
-    this.map = new Map();
-
+    this.map = Map.from(storage.load());
+    this.storage = storage;
     this.tileMap = new TileMap(gl);
     this.tileMap.setSpriteSheet(loadImage(tiles));
     this.tileMap.setTileLayer(this.map, 0);
@@ -70,7 +70,10 @@ export default class Renderer {
 
   tap(x, y){
     const [tx, ty] = this.tileMap.viewportToMap(this.pos.x, this.pos.y, x, y);
-    window.requestAnimationFrame(() => this.map.toggle(tx, ty));
+    window.requestAnimationFrame(() => {
+      this.map.toggle(tx, ty);
+      this.storage.save(this.map.export());
+    });
   }
 
   draw (gl, timing) {

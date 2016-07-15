@@ -1,6 +1,11 @@
 export default class Map{
-  constructor(width=128, height=width){
+  constructor(width=128, height=width, data=[]){
     this.map = new Array(width*height);
+    for(let y=0; y<height; y++){
+      for(let x=0; x<width; x++){
+        this.map[y*width + x] = data[y*width + x] || 0;
+      }
+    }
     this.width = width;
     this.height = height;
     this.listener = () => {};
@@ -22,5 +27,17 @@ export default class Map{
 
   onChange(listener){
     this.listener = listener;
+  }
+
+  export(){
+    return {
+      width: this.width,
+      height: this.height,
+      data: this.map
+    };
+  }
+
+  static from(map = {}){
+    return new Map(map.width, map.height, map.data);
   }
 }
