@@ -6,7 +6,7 @@
   "scripts": {
     "build": "NODE_ENV=production webpack -p --progress --colors",
     "watch": "webpack --progress --colors --watch",
-    "dev": "webpack-dev-server --content-base dist/ --colors --hot --inline",
+    "dev": "webpack-dev-server --content-base dist/ --colors --hot --inline --host 0.0.0.0",
     "start": "node server.js"
   },
   "author": "",

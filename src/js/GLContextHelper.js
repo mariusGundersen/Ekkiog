@@ -29,8 +29,6 @@ export default class GLContextHelper {
     // Create gl context and start the render loop
     //
     this.canvas = canvas;
-    this.mobileDevice = false;
-    this.forceMobile = false;
     this.lastWidth = 0;
     this.renderer = null;
     this.canvasScale = 1.0;
@@ -95,16 +93,10 @@ export default class GLContextHelper {
 
     // We'll consider "mobile" and "screen deprived" to be the same thing :)
     this.lastWidth = window.innerWidth;
-    this.mobileDevice = this.forceMobile || (screen.width <= 960);
 
     // If we don't set this here, the rendering will be skewed
-    if(this.mobileDevice) {
-      this.canvas.width = window.innerWidth * window.devicePixelRatio;
-      this.canvas.height = window.innerHeight * window.devicePixelRatio;
-    } else {
-      this.canvas.width = this.canvas.offsetWidth;
-      this.canvas.height = this.canvas.offsetHeight;
-    }
+    this.canvas.width = this.canvas.offsetWidth * window.devicePixelRatio;
+    this.canvas.height = this.canvas.offsetHeight * window.devicePixelRatio;
 
     if(this.renderer && this.renderer.resize) {
       this.renderer.resize(this.gl, this.canvas);
