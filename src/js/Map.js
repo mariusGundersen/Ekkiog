@@ -22,7 +22,6 @@ export default class Map{
 
   toggle(x, y){
     this.set(x, y, this.get(x, y) ? 0 : 1);
-    this.listener(x, y);
   }
 
   onChange(listener){

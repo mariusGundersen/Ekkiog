@@ -27,6 +27,7 @@
     "express": "^4.14.0",
     "gl-matrix": "^2.3.2",
     "morgan": "^1.7.0",
+    "ndarray": "^1.0.18",
     "serve-favicon": "^2.3.0",
     "serve-static": "^1.11.1",
     "stats-js": "^1.0.0-alpha1"

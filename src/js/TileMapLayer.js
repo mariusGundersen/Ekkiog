@@ -22,15 +22,16 @@
 */
 
 import {vec2} from 'gl-matrix';
+import ndarray from 'ndarray';
 
 export default class TileMapLayer{
   constructor(gl, map, tileSize) {
-    this.map = map;
-    this.image = document.createElement('canvas');
-    this.image.width = map.width;
-    this.image.height = map.height;
-    this.ctx = this.image.getContext('2d');
-    this.map.onChange((x, y) => {
+    this.map = ndarray(map.map, [map.height, map.width]);
+    this.data = new Uint8Array(map.height*map.width*3);
+    this.image = ndarray(this.data, [map.height, map.width, 3]);
+    this.width = map.width;
+    this.height = map.height;
+    map.onChange((x, y) => {
       this.convolve(x-1, y-1, 3, 3);
       this.update();
     });
@@ -40,7 +41,7 @@ export default class TileMapLayer{
     this.inverseHalfMapSize = vec2.create();
     this.gl = gl;
 
-    this.convolve(0, 0, this.image.width, this.image.height);
+    this.convolve(1, 1, this.width-2, this.height-2);
     this.update();
 
     // MUST be filtered with NEAREST or tile lookup fails
@@ -50,49 +51,46 @@ export default class TileMapLayer{
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-    this.halfMapSize[0] = this.image.width * tileSize / 2;
-    this.halfMapSize[1] = this.image.height * tileSize / 2;
+    this.halfMapSize[0] = this.width * tileSize / 2;
+    this.halfMapSize[1] = this.height * tileSize / 2;
 
     this.inverseHalfMapSize[0] = 1 / tileSize;
     this.inverseHalfMapSize[1] = 1 / tileSize;
   }
 
   convolve(x, y, w, h){
-    const pixels = this.ctx.getImageData(x, y, w, h);
-    for(let i=0; i<pixels.height; i++){
-      for(let j=0; j<pixels.width; j++){
-        const index = (i*pixels.height+j)*4;
-        this.prettify(pixels.data, index, x+j, y+i);
+    const map = this.map.lo(y-1, x-1).hi(h, w);
+    const pixels = this.image.lo(y-1, x-1).hi(h, w);
+
+    for(let i=1; i<h+1; i++){
+      for(let j=1; j<w+1; j++){
+        this.prettify(pixels, map, j, i);
       }
     }
-    this.ctx.putImageData(pixels, x, y);
   }
 
-  prettify(pixels, index, x, y){
-    const value = this.map.map[y*this.image.width + x] || 0;
-    if(value != 1){
-      pixels[index + 0] = 0;
-      pixels[index + 1] = 0;
-      pixels[index + 2] = 0;
-      pixels[index + 3] = 255;
+  prettify(pixels, map, j, i){
+    const value = map.get(i, j);
+    if(value == 0){
+      pixels.set(i, j, 0, 0);
+      pixels.set(i, j, 1, 0);
+      pixels.set(i, j, 2, 0);
     }else{
       const tx = 0
-        | (this.map.map[(y-1)*this.image.width + (x+0)]||0)<<0
-        | (this.map.map[(y+0)*this.image.width + (x+1)]||0)<<1;
+        | (map.get(i-1, j+0) << 0)
+        | (map.get(i+0, j+1) << 1);
       const ty = 0
-        | (this.map.map[(y+1)*this.image.width + (x+0)]||0)<<0
-        | (this.map.map[(y+0)*this.image.width + (x-1)]||0)<<1;
-      console.log(x, y, value, tx, ty);
-      pixels[index + 0] = tx || ty ? tx : 3;
-      pixels[index + 1] = tx || ty ? ty : 3;
-      pixels[index + 2] = 0;
-      pixels[index + 3] = 255;
+        | (map.get(i+1, j+0) << 0)
+        | (map.get(i+0, j-1) << 1);
+      pixels.set(i, j, 0, tx || ty ? tx : 3);
+      pixels.set(i, j, 1, tx || ty ? ty : 3);
+      pixels.set(i, j, 2, 0);
     }
   }
 
   update(){
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.tileTexture);
 
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.image);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGB, this.width, this.height, 0, this.gl.RGB, this.gl.UNSIGNED_BYTE, this.data);
   }
 }
