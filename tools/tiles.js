@@ -16,13 +16,26 @@ ctx.strokeStyle = "2px black";
 ctx.lineWidth = 10;
 ctx.lineCap = 'square';
 ctx.fillStyle = 'white';
-ctx.fillRect(0, 0, TILE*4, TILE*4);
-ctx.translate(SIDE, SIDE);
-ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
-ctx.fillStyle = '#eee';
-ctx.fill();
-ctx.fillStyle = 'red'
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+for(let y=0; y<4; y++){
+  for(let x=0; x<4; x++){
+    ctx.save();
+    ctx.translate(SIDE + x*TILE, SIDE + y*TILE);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
+    ctx.fillStyle = '#eee';
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+ctx.translate(4*TILE + SIDE, SIDE);
+ctx.save();
+ctx.beginPath();
+ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
+ctx.fillStyle = '#000';
+ctx.fill();
 for(let y=0; y<4; y++){
   for(let x=0; x<4; x++){
     const index = y*4 + x;

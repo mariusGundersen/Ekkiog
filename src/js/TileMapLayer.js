@@ -71,21 +71,15 @@ export default class TileMapLayer{
 
   prettify(pixels, map, j, i){
     const value = map.get(i, j);
-    if(value == 0){
-      pixels.set(i, j, 0, 0);
-      pixels.set(i, j, 1, 0);
-      pixels.set(i, j, 2, 0);
-    }else{
-      const tx = 0
-        | (map.get(i-1, j+0) << 0)
-        | (map.get(i+0, j+1) << 1);
-      const ty = 0
-        | (map.get(i+1, j+0) << 0)
-        | (map.get(i+0, j-1) << 1);
-      pixels.set(i, j, 0, tx || ty ? tx : 3);
-      pixels.set(i, j, 1, tx || ty ? ty : 3);
-      pixels.set(i, j, 2, 0);
-    }
+    const tx = 0
+      | (map.get(i-1, j+0) << 0)
+      | (map.get(i+0, j+1) << 1);
+    const ty = 0
+      | (map.get(i+1, j+0) << 0)
+      | (map.get(i+0, j-1) << 1);
+    pixels.set(i, j, 0, tx + value*4);
+    pixels.set(i, j, 1, ty);
+    pixels.set(i, j, 2, 0);
   }
 
   update(){

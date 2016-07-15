@@ -26,8 +26,8 @@ import {vec2, mat3} from 'gl-matrix';
 import ShaderWrapper from './ShaderWrapper.js';
 import TileMapLayer from './TileMapLayer.js';
 
-import tilemapVS from '../shaders/vertex.glsl';
-import tilemapFS from '../shaders/fragment.glsl';
+import tilemapVS from '../shaders/tilemapVS.glsl';
+import tilemapFS from '../shaders/tilemapFS.glsl';
 
 export default class TileMap {
   constructor(gl) {
