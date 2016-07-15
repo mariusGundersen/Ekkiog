@@ -9,6 +9,7 @@ var JS_PATH = path.resolve(ROOT_PATH, 'src/js');
 var TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
 var SHADER_PATH = path.resolve(ROOT_PATH, 'src/shaders');
 var BUILD_PATH = path.resolve(ROOT_PATH, 'dist');
+var FAVICON_PATH = path.resolve(ROOT_PATH, 'src/favicon.ico');
 
 var debug = process.env.NODE_ENV !== 'production';
 
@@ -21,8 +22,9 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'Ekki',
-      template: TEMPLATE_PATH
+      title: 'Ekkiog',
+      template: TEMPLATE_PATH,
+      favicon: FAVICON_PATH
     }),
     new webpack.DefinePlugin({
       __DEV__: debug

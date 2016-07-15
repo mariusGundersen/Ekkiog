@@ -1,12 +1,13 @@
 {
-  "name": "ekki",
+  "name": "ekkiog",
   "version": "1.0.0",
   "description": "",
   "private": true,
   "scripts": {
     "build": "NODE_ENV=production webpack -p --progress --colors",
     "watch": "webpack --progress --colors --watch",
-    "dev": "webpack-dev-server --content-base dist/ --colors --hot --inline"
+    "dev": "webpack-dev-server --content-base dist/ --colors --hot --inline",
+    "start": "node server.js"
   },
   "author": "",
   "license": "MIT",
@@ -23,7 +24,11 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
+    "express": "^4.14.0",
     "gl-matrix": "^2.3.2",
+    "morgan": "^1.7.0",
+    "serve-favicon": "^2.3.0",
+    "serve-static": "^1.11.1",
     "stats-js": "^1.0.0-alpha1"
   }
 }

@@ -1,4 +1,4 @@
-const PATH = 'ekki[0.0.0].save';
+const PATH = 'ekkiog[0.0.0].save';
 
 export default class Storage{
   save(map){
@@ -7,7 +7,7 @@ export default class Storage{
 
   load(){
     try{
-      return JSON.parse(localStorage.getItem(PATH));
+      return JSON.parse(localStorage.getItem(PATH)) || undefined;
     }catch(e){
       return undefined;
     }
