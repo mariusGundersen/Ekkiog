@@ -83,6 +83,7 @@ export default class TileMap {
 
       this.inverseSpriteTextureSize[0] = 1/image.width;
       this.inverseSpriteTextureSize[1] = 1/image.height;
+      this.refreshMap();
     });
   }
 
@@ -100,6 +101,10 @@ export default class TileMap {
     mat3.translate(this.matrix, this.matrix, this.negativeHalfViewportSize);
 
     return [Math.floor(this.matrix[6]), Math.floor(this.matrix[7])];
+  }
+
+  refreshMap(){
+    this.layers[0].update();
   }
 
   draw(x, y) {
@@ -140,8 +145,6 @@ export default class TileMap {
         gl.uniformMatrix3fv(shader.uniform.matrix, false, this.matrix);
 
         gl.uniform2fv(shader.uniform.halfMapSize, layer.halfMapSize);
-
-        layer.render();
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }

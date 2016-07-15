@@ -22,8 +22,8 @@
 */
 
 import TileMap from './TileMap.js';
+import Map from './Map.js';
 import tiles from '../img/tiles.png';
-import initialMap from '../img/spelunky0.png';
 import loadImage from './loadImage.js';
 
 export default class Renderer {
@@ -31,15 +31,11 @@ export default class Renderer {
     gl.clearColor(0.0, 0.0, 0.1, 1.0);
     gl.clearDepth(1.0);
 
-    const map = document.createElement('canvas');
-    this.mapCtx = map.getContext('2d');
-    loadImage(initialMap).then(image => this.mapCtx.drawImage(image, 0, 0));
+    this.map = new Map();
 
     this.tileMap = new TileMap(gl);
     this.tileMap.setSpriteSheet(loadImage(tiles));
-    this.tileMap.setTileLayer(map, 0);
-    this.tileMap.tileSize = 64;
-    this.tileMap.setTileScale(2);
+    this.tileMap.setTileLayer(this.map, 0);
     this.pos = {
       x: 0,
       y: 0,
@@ -74,14 +70,7 @@ export default class Renderer {
 
   tap(x, y){
     const [tx, ty] = this.tileMap.viewportToMap(this.pos.x, this.pos.y, x, y);
-    const pixels = this.mapCtx.getImageData(tx, ty, 1, 1);
-
-    pixels.data[2] = (pixels.data[2] + 1) % 64;
-    pixels.data[0] = pixels.data[2] / 8;
-    pixels.data[1] = pixels.data[2] % 8;
-    pixels.data[3] = 255;
-
-    this.mapCtx.putImageData(pixels, tx, ty);
+    window.requestAnimationFrame(() => this.map.toggle(tx, ty));
   }
 
   draw (gl, timing) {
