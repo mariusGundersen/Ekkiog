@@ -39,9 +39,7 @@ export default class TileMap {
 
     this.tileScale = vec2.create();
     this.inverseTileScale = vec2.create();
-    this.tileSize = 16;
-
-    this.filtered = false;
+    this.tileSize = 64;
 
     this.spriteSheet = gl.createTexture();
     this.layers = [];
@@ -76,32 +74,12 @@ export default class TileMap {
     vec2.set(this.inverseTileScale, 1/scale, 1/scale);
   }
 
-  setFiltered(filtered) {
-    this.filtered = filtered;
-
-    // TODO: Cache currently bound texture?
-    gl.bindTexture(gl.TEXTURE_2D, this.spriteSheet);
-
-    if(filtered) {
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    } else {
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); // Worth it to mipmap here?
-    }
-  }
-
   setSpriteSheet(image) {
     image.then(image => {
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.spriteSheet);
       this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
-      if(!this.filtered) {
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-      } else {
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR); // Worth it to mipmap here?
-      }
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
 
       this.inverseSpriteTextureSize[0] = 1/image.width;
       this.inverseSpriteTextureSize[1] = 1/image.height;

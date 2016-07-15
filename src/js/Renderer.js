@@ -22,7 +22,7 @@
 */
 
 import TileMap from './TileMap.js';
-import tiles from '../img/spelunky-tiles.png';
+import tiles from '../img/tiles.png';
 import initialMap from '../img/spelunky0.png';
 import loadImage from './loadImage.js';
 
@@ -38,7 +38,7 @@ export default class Renderer {
     this.tileMap = new TileMap(gl);
     this.tileMap.setSpriteSheet(loadImage(tiles));
     this.tileMap.setTileLayer(map, 0);
-    this.tileMap.tileSize = 16;
+    this.tileMap.tileSize = 64;
     this.tileMap.setTileScale(2);
     this.pos = {
       x: 0,

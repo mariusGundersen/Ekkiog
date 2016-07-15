@@ -1,5 +1,5 @@
-const TILE = 16;
-const SIDE = 8;
+const TILE = 64;
+const SIDE = TILE/2;
 
 const SIDES = [
   {x:  0, y:  0, i:0},
@@ -13,11 +13,15 @@ var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 ctx.strokeStyle = "2px black";
-ctx.lineWidth = 1.5;
-ctx.lineCap = 'round';
+ctx.lineWidth = 10;
+ctx.lineCap = 'square';
 ctx.fillStyle = 'white';
 ctx.fillRect(0, 0, TILE*4, TILE*4);
 ctx.translate(SIDE, SIDE);
+ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
+ctx.fillStyle = '#eee';
+ctx.fill();
+ctx.fillStyle = 'red'
 
 for(let y=0; y<4; y++){
   for(let x=0; x<4; x++){
@@ -36,31 +40,38 @@ for(let y=0; y<4; y++){
 
     let lines = [];
     for(const f of edges){
-      for(const t of edges.filter((e, i) => i<edges.indexOf(f))){
         lines.push({
-          f: f,
-          t: t
+          f: SIDES[0],
+          t: f,
+          d: false,
+          s: f.i == 0
         });
-      }
     }
 
     if(edges.length == 3){
-      lines = lines.filter(l => (l.f.i + l.t.i)%5 > 0);
+      lines = lines.filter(l => !l.d || l.s);
     }
 
     if(edges.length > 3){
-      lines = lines.filter(l => (l.f.i + l.t.i)%5 == 0);
+      lines = lines.filter(l => !l.d);
     }
 
     ctx.save();
     ctx.translate(x*TILE, y*TILE);
+    ctx.beginPath();
+    //ctx.translate(0.5, 0.5);
     ctx.moveTo(-SIDE, -SIDE);
-    ctx.lineTo(-SIDE, TILE);
-    ctx.lineTo(TILE, TILE);
-    ctx.lineTo(TILE, -SIDE);
+    ctx.lineTo(-SIDE, SIDE);
+    ctx.lineTo(SIDE, SIDE);
+    ctx.lineTo(SIDE, -SIDE);
+    //(x%2)^(y%2) && ctx.fill();
     ctx.clip();
+    //ctx.translate(-0.5, -0.5);
     ctx.beginPath();
     for(const line of lines){
+      console.log(line);
+      ctx.lineWidth = line.d ? 10/Math.SQRT2 : 10;
+      ctx.lineCap = !line.d || line.s ? 'round' : 'square';
       ctx.moveTo(line.f.x*SIDE, line.f.y*SIDE);
       ctx.lineTo(line.t.x*SIDE, line.t.y*SIDE);
     }
