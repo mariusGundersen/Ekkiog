@@ -1,5 +1,5 @@
 export default class Map{
-  constructor(width=100, height=width){
+  constructor(width=128, height=width){
     this.map = new Array(width*height);
     this.width = width;
     this.height = height;
@@ -16,7 +16,7 @@ export default class Map{
   }
 
   toggle(x, y){
-    this.set(x, y, (this.get(x, y)+1)%16);
+    this.set(x, y, this.get(x, y) ? 0 : 1);
     this.listener(x, y);
   }
 

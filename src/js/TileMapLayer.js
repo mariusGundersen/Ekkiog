@@ -31,14 +31,32 @@ export default class TileMapLayer{
     this.image.height = map.height;
     this.ctx = this.image.getContext('2d');
     this.map.onChange((x, y) => {
-      const pixels = this.ctx.getImageData(x, y, 1, 1);
-      const value = this.map.map[y*this.image.width + x];
-      pixels.data[0] = value/4;
-      pixels.data[1] = value%4;
-      pixels.data[2] = 0;
-      pixels.data[3] = 255;
-
-      this.ctx.putImageData(pixels, x, y);
+      const pixels = this.ctx.getImageData(x-1, y-1, 3, 3);
+      for(let i=-1; i<2; i++){
+        for(let j=-1; j<2; j++){
+          const value = this.map.map[(y+i)*this.image.width + (x+j)] || 0;
+          const index = ((i+1)*3+(j+1))*4;
+          if(value != 1){
+            pixels.data[index + 0] = 0;
+            pixels.data[index + 1] = 0;
+            pixels.data[index + 2] = 0;
+            pixels.data[index + 3] = 255;
+          }else{
+            const tx = 0
+              | (this.map.map[(y+i-1)*this.image.width + (x+j+0)]||0)<<0
+              | (this.map.map[(y+i+0)*this.image.width + (x+j+1)]||0)<<1;
+            const ty = 0
+              | (this.map.map[(y+i+1)*this.image.width + (x+j+0)]||0)<<0
+              | (this.map.map[(y+i+0)*this.image.width + (x+j-1)]||0)<<1;
+            console.log(x+j, y+i, value, tx, ty);
+            pixels.data[index + 0] = tx || ty ? tx : 3;
+            pixels.data[index + 1] = tx || ty ? ty : 3;
+            pixels.data[index + 2] = 0;
+            pixels.data[index + 3] = 255;
+          }
+        }
+      }
+      this.ctx.putImageData(pixels, x-1, y-1);
 
       this.update();
     });
