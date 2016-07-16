@@ -24,7 +24,6 @@
 import {vec2, mat3} from 'gl-matrix';
 
 import ShaderWrapper from './ShaderWrapper.js';
-import TileMapLayer from './TileMapLayer.js';
 import Texture from './Texture.js';
 import Quadrangle from './Quadrangle.js';
 
@@ -65,19 +64,18 @@ export default class TileMap {
   }
 
   setSpriteSheet(image) {
-    image.then(image => {
+    return image.then(image => {
       this.spriteSheet.setImage(image);
-      this.refreshMap();
     });
   }
 
-  setTileLayer(src, layerId) {
-    this.layers[layerId] = new TileMapLayer(this.gl, src);
+  setTileLayer(texture, layerId) {
+    this.layers[layerId] = texture;
   }
 
   viewportToMap(dx, dy, x, y, layer=0){
     mat3.identity(this.matrix);
-    mat3.translate(this.matrix, this.matrix, this.layers[layer].texture.halfSize);
+    mat3.translate(this.matrix, this.matrix, this.layers[layer].halfSize);
     mat3.scale(this.matrix, this.matrix, this.inverseTileSize);
     mat3.scale(this.matrix, this.matrix, this.inverseTileScale);
     mat3.translate(this.matrix, this.matrix, vec2.fromValues(dx, dy));
@@ -85,10 +83,6 @@ export default class TileMap {
     mat3.translate(this.matrix, this.matrix, this.negativeHalfViewportSize);
 
     return [Math.floor(this.matrix[6]), Math.floor(this.matrix[7])];
-  }
-
-  refreshMap(){
-    this.layers[0].update();
   }
 
   draw(x, y) {
@@ -114,19 +108,19 @@ export default class TileMap {
     for(let i = this.layers.length; i >= 0; --i) {
       const layer = this.layers[i];
       if(layer) {
-        layer.texture.activate();
+        layer.activate();
         gl.uniform1i(shader.uniform.tiles, 1);
-        layer.texture.bind();
+        layer.bind();
 
         mat3.fromScaling(this.matrix, this.inverseHalfViewportSize);
         mat3.translate(this.matrix, this.matrix, vec2.fromValues(-x, y));
         mat3.scale(this.matrix, this.matrix, this.tileScale);
         mat3.scale(this.matrix, this.matrix, this.tileSize);
-        mat3.scale(this.matrix, this.matrix, layer.texture.halfSize);
+        mat3.scale(this.matrix, this.matrix, layer.halfSize);
 
         gl.uniformMatrix3fv(shader.uniform.matrix, false, this.matrix);
 
-        gl.uniform2fv(shader.uniform.mapTextureSize, layer.texture.size);
+        gl.uniform2fv(shader.uniform.mapTextureSize, layer.size);
 
         this.quadrangle.render();
       }

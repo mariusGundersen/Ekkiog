@@ -22,6 +22,7 @@
 */
 
 import TileMap from './TileMap.js';
+import TileMapLayer from './TileMapLayer.js';
 import Map from './Map.js';
 import tiles from '../img/tiles.png';
 import loadImage from './loadImage.js';
@@ -34,8 +35,10 @@ export default class Renderer {
     this.map = Map.from(storage.load());
     this.storage = storage;
     this.tileMap = new TileMap(gl);
-    this.tileMap.setSpriteSheet(loadImage(tiles));
-    this.tileMap.setTileLayer(this.map, 0);
+    this.tileMap.setSpriteSheet(loadImage(tiles))
+      .then(() => this.tileMapLayer.update());
+    this.tileMapLayer = new TileMapLayer(gl, this.map);
+    this.tileMap.setTileLayer(this.tileMapLayer.texture, 0)
     this.pos = {
       x: 0,
       y: 0,
