@@ -40,6 +40,7 @@ export default class TileMap {
     this.tileScale = vec2.create();
     this.inverseTileScale = vec2.create();
     this.tileSize = 64;
+    this.inverseTileSize = vec2.fromValues(1/this.tileSize, 1/this.tileSize);
 
     this.spriteSheet = new Texture(gl, gl.TEXTURE0);
     this.layers = [];
@@ -87,7 +88,7 @@ export default class TileMap {
 
   viewportToMap(dx, dy, x, y, layer=0){
     mat3.identity(this.matrix);
-    mat3.scale(this.matrix, this.matrix, this.layers[layer].inverseHalfMapSize);
+    mat3.scale(this.matrix, this.matrix, this.inverseTileSize);
     mat3.translate(this.matrix, this.matrix, this.layers[layer].halfMapSize);
     mat3.scale(this.matrix, this.matrix, this.inverseTileScale);
     mat3.translate(this.matrix, this.matrix, vec2.fromValues(dx, dy));
@@ -120,18 +121,18 @@ export default class TileMap {
     gl.uniform2fv(shader.uniform.inverseSpriteTextureSize, this.spriteSheet.inverseSize);
     gl.uniform1f(shader.uniform.tileSize, this.tileSize);
 
-    gl.activeTexture(this.spriteSheet.id);
+    this.spriteSheet.activate();
     gl.uniform1i(shader.uniform.sprites, 0);
-    gl.bindTexture(gl.TEXTURE_2D, this.spriteSheet.texture);
-
-    gl.activeTexture(gl.TEXTURE1);
-    gl.uniform1i(shader.uniform.tiles, 1);
+    this.spriteSheet.bind();
 
     // Draw each layer of the map
     for(let i = this.layers.length; i >= 0; --i) {
       const layer = this.layers[i];
       if(layer) {
-        gl.bindTexture(gl.TEXTURE_2D, layer.tileTexture);
+        layer.texture.activate();
+        gl.uniform1i(shader.uniform.tiles, 1);
+        layer.texture.bind();
+
         mat3.fromScaling(this.matrix, this.inverseHalfViewportSize);
         mat3.translate(this.matrix, this.matrix, vec2.fromValues(-x, y));
         mat3.scale(this.matrix, this.matrix, this.tileScale);

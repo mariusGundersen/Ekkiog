@@ -24,38 +24,31 @@
 import {vec2} from 'gl-matrix';
 import ndarray from 'ndarray';
 
+import Texture from './Texture.js';
+
 export default class TileMapLayer{
   constructor(gl, map, tileSize) {
     this.map = ndarray(map.map, [map.height, map.width]);
-    this.data = new Uint8Array(map.height*map.width*3);
-    this.image = ndarray(this.data, [map.height, map.width, 3]);
+    this.data = new Uint8Array(map.height*map.width*4);
+    this.image = ndarray(this.data, [map.height, map.width, 4]);
     this.width = map.width;
     this.height = map.height;
     map.onChange((x, y) => {
+      console.log(x, y);
       this.convolve(x-1, y-1, 3, 3);
       this.update();
     });
 
-    this.tileTexture = gl.createTexture();
+    this.texture = new Texture(gl, gl.TEXTURE1, {width: map.width, height: map.height});
     this.halfMapSize = vec2.create();
-    this.inverseHalfMapSize = vec2.create();
     this.gl = gl;
 
     this.convolve(1, 1, this.width-2, this.height-2);
     this.update();
 
-    // MUST be filtered with NEAREST or tile lookup fails
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
     this.halfMapSize[0] = this.width * tileSize / 2;
     this.halfMapSize[1] = this.height * tileSize / 2;
-
-    this.inverseHalfMapSize[0] = 1 / tileSize;
-    this.inverseHalfMapSize[1] = 1 / tileSize;
+    console.log(this.halfMapSize);
   }
 
   convolve(x, y, w, h){
@@ -83,8 +76,7 @@ export default class TileMapLayer{
   }
 
   update(){
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.tileTexture);
-
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGB, this.width, this.height, 0, this.gl.RGB, this.gl.UNSIGNED_BYTE, this.data);
+    console.log('udpate');
+    this.texture.setData(this.data);
   }
 }
