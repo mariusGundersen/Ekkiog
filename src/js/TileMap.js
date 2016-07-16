@@ -52,10 +52,8 @@ export default class TileMap {
   }
 
   resizeViewport(width, height) {
-    this.negativeHalfViewportSize[0] = -width / 2;
-    this.negativeHalfViewportSize[1] = -height / 2;
-    this.inverseHalfViewportSize[0] = 2 / width;
-    this.inverseHalfViewportSize[1] = 2 / height;
+    vec2.set(this.negativeHalfViewportSize, -width/2, -height/2);
+    vec2.set(this.inverseHalfViewportSize, 2/width, 2/height);
   }
 
   setTileScale(scale) {
@@ -94,8 +92,6 @@ export default class TileMap {
     const shader = this.tilemapShader;
 
     this.quadrangle.bindShader(shader);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.quadVertBuffer);
 
     gl.uniform2fv(shader.uniform.inverseSpriteTextureSize, this.spriteSheet.inverseSize);
     gl.uniform1f(shader.uniform.tileSize, TILE_SIZE);

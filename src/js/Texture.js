@@ -41,14 +41,9 @@ export default class Texture{
     this.width = image.width;
     this.height = image.height;
 
-    this.size[0] = image.width;
-    this.size[1] = image.height;
-
-    this.halfSize[0] = image.width/2;
-    this.halfSize[1] = image.height/2;
-
-    this.inverseSize[0] = 1/image.width;
-    this.inverseSize[1] = 1/image.height;
+    vec2.set(this.size, image.width, image.height);
+    vec2.set(this.halfSize, image.width/2, image.height/2);
+    vec2.set(this.inverseSize, 1/image.width, 1/image.height);
   }
 
   setData(data){
