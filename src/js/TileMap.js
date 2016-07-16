@@ -25,6 +25,7 @@ import {vec2, mat3} from 'gl-matrix';
 
 import ShaderWrapper from './ShaderWrapper.js';
 import TileMapLayer from './TileMapLayer.js';
+import Texture from './Texture.js';
 
 import tilemapVS from '../shaders/tilemapVS.glsl';
 import tilemapFS from '../shaders/tilemapFS.glsl';
@@ -34,14 +35,13 @@ export default class TileMap {
     this.gl = gl;
     this.negativeHalfViewportSize = vec2.create();
     this.inverseHalfViewportSize = vec2.create();
-    this.inverseSpriteTextureSize = vec2.create();
     this.matrix = mat3.create();
 
     this.tileScale = vec2.create();
     this.inverseTileScale = vec2.create();
     this.tileSize = 64;
 
-    this.spriteSheet = gl.createTexture();
+    this.spriteSheet = new Texture(gl, gl.TEXTURE0);
     this.layers = [];
 
     const quadVerts = [
@@ -76,13 +76,7 @@ export default class TileMap {
 
   setSpriteSheet(image) {
     image.then(image => {
-      this.gl.bindTexture(this.gl.TEXTURE_2D, this.spriteSheet);
-      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-
-      this.inverseSpriteTextureSize[0] = 1/image.width;
-      this.inverseSpriteTextureSize[1] = 1/image.height;
+      this.spriteSheet.setImage(image);
       this.refreshMap();
     });
   }
@@ -123,12 +117,12 @@ export default class TileMap {
     gl.vertexAttribPointer(shader.attribute.position, 2, gl.FLOAT, false, 16, 0);
     gl.vertexAttribPointer(shader.attribute.texture, 2, gl.FLOAT, false, 16, 8);
 
-    gl.uniform2fv(shader.uniform.inverseSpriteTextureSize, this.inverseSpriteTextureSize);
+    gl.uniform2fv(shader.uniform.inverseSpriteTextureSize, this.spriteSheet.inverseSize);
     gl.uniform1f(shader.uniform.tileSize, this.tileSize);
 
-    gl.activeTexture(gl.TEXTURE0);
+    gl.activeTexture(this.spriteSheet.id);
     gl.uniform1i(shader.uniform.sprites, 0);
-    gl.bindTexture(gl.TEXTURE_2D, this.spriteSheet);
+    gl.bindTexture(gl.TEXTURE_2D, this.spriteSheet.texture);
 
     gl.activeTexture(gl.TEXTURE1);
     gl.uniform1i(shader.uniform.tiles, 1);
@@ -137,6 +131,7 @@ export default class TileMap {
     for(let i = this.layers.length; i >= 0; --i) {
       const layer = this.layers[i];
       if(layer) {
+        gl.bindTexture(gl.TEXTURE_2D, layer.tileTexture);
         mat3.fromScaling(this.matrix, this.inverseHalfViewportSize);
         mat3.translate(this.matrix, this.matrix, vec2.fromValues(-x, y));
         mat3.scale(this.matrix, this.matrix, this.tileScale);
