@@ -34,7 +34,6 @@ export default class TileMapLayer{
     this.width = map.width;
     this.height = map.height;
     map.onChange((x, y) => {
-      console.log(x, y);
       this.convolve(x-1, y-1, 3, 3);
       this.update();
     });
@@ -48,7 +47,6 @@ export default class TileMapLayer{
 
     this.halfMapSize[0] = this.width * tileSize / 2;
     this.halfMapSize[1] = this.height * tileSize / 2;
-    console.log(this.halfMapSize);
   }
 
   convolve(x, y, w, h){
@@ -76,7 +74,6 @@ export default class TileMapLayer{
   }
 
   update(){
-    console.log('udpate');
     this.texture.setData(this.data);
   }
 }
