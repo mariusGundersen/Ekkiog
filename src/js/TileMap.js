@@ -44,11 +44,11 @@ export default class TileMap {
     this.tileSize = vec2.fromValues(TILE_SIZE, TILE_SIZE);
     this.inverseTileSize = vec2.fromValues(1/TILE_SIZE, 1/TILE_SIZE);
 
-    this.spriteSheet = new Texture(gl, gl.TEXTURE0);
+    this.spriteSheet = new Texture(gl, gl.TEXTURE2);
     this.quadrangle = new Quadrangle(gl);
     this.layers = [];
 
-    this.tilemapShader = ShaderWrapper.createFromSource(gl, tilemapVS, tilemapFS);
+    this.shader = ShaderWrapper.createFromSource(gl, tilemapVS, tilemapFS);
   }
 
   resizeViewport(width, height) {
@@ -89,7 +89,7 @@ export default class TileMap {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    const shader = this.tilemapShader;
+    const shader = this.shader;
 
     this.quadrangle.bindShader(shader);
 
@@ -97,7 +97,7 @@ export default class TileMap {
     gl.uniform1f(shader.uniform.tileSize, TILE_SIZE);
 
     this.spriteSheet.activate();
-    gl.uniform1i(shader.uniform.sprites, 0);
+    gl.uniform1i(shader.uniform.sprites, this.spriteSheet.sampler2D);
     this.spriteSheet.bind();
 
     // Draw each layer of the map
@@ -105,7 +105,7 @@ export default class TileMap {
       const layer = this.layers[i];
       if(layer) {
         layer.activate();
-        gl.uniform1i(shader.uniform.tiles, 1);
+        gl.uniform1i(shader.uniform.tiles, layer.sampler2D);
         layer.bind();
 
         mat3.fromScaling(this.matrix, this.inverseHalfViewportSize);

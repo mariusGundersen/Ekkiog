@@ -38,7 +38,7 @@ export default class Renderer {
     this.tileMap.setSpriteSheet(loadImage(tiles))
       .then(() => this.tileMapLayer.update());
     this.tileMapLayer = new TileMapLayer(gl, this.map);
-    this.tileMap.setTileLayer(this.tileMapLayer.texture, 0)
+    this.tileMap.setTileLayer(this.tileMapLayer.tileTexture, 0)
     this.pos = {
       x: 0,
       y: 0,
@@ -81,8 +81,7 @@ export default class Renderer {
 
   draw (gl, timing) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    this.tileMap.draw(
-      this.pos.x,
-      this.pos.y);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    this.tileMap.draw(this.pos.x, this.pos.y);
   }
 }

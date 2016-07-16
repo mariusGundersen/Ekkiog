@@ -32,6 +32,19 @@ export default class Texture{
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
   }
 
+  get sampler2D(){
+    switch(this.id){
+      case this.gl.TEXTURE0:
+        return 0;
+      case this.gl.TEXTURE1:
+        return 1;
+      case this.gl.TEXTURE2:
+        return 2;
+      default:
+        return -1;
+    }
+  }
+
   setImage(image){
     this.activate();
     this.bind();
