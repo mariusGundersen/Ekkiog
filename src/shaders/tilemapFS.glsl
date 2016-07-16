@@ -28,6 +28,7 @@ uniform sampler2D tiles;
 uniform sampler2D sprites;
 uniform vec2 inverseSpriteTextureSize;
 uniform float tileSize;
+
 void main(void) {
   vec4 tile = texture2D(tiles, texCoord);
   if(tile.x == 1.0 && tile.y == 1.0) { discard; }

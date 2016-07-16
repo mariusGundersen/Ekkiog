@@ -11,6 +11,7 @@ export default class Texture{
     this.height = size.height;
 
     this.size = vec2.fromValues(size.width, size.height);
+    this.halfSize = vec2.fromValues(size.width/2, size.height/2);
     this.inverseSize = vec2.fromValues(1/size.width, 1/size.height);
 
     this.activate();
@@ -42,6 +43,9 @@ export default class Texture{
 
     this.size[0] = image.width;
     this.size[1] = image.height;
+
+    this.halfSize[0] = image.width/2;
+    this.halfSize[1] = image.height/2;
 
     this.inverseSize[0] = 1/image.width;
     this.inverseSize[1] = 1/image.height;

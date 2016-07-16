@@ -27,9 +27,11 @@ attribute vec2 texture;
 varying vec2 pixelCoord;
 varying vec2 texCoord;
 uniform mat3 matrix;
-uniform vec2 halfMapSize;
+uniform vec2 mapTextureSize;
+uniform float tileSize;
+
 void main(void) {
-  pixelCoord = texture * halfMapSize * 2.0;
+  pixelCoord = texture * mapTextureSize * tileSize;
   texCoord = texture;
   vec2 clipSpace = (matrix * vec3(position, 1)).xy;
   gl_Position = vec4(clipSpace, 0.0, 1.0);

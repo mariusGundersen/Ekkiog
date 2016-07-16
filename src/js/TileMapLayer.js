@@ -27,7 +27,7 @@ import ndarray from 'ndarray';
 import Texture from './Texture.js';
 
 export default class TileMapLayer{
-  constructor(gl, map, tileSize) {
+  constructor(gl, map) {
     this.map = ndarray(map.map, [map.height, map.width]);
     this.data = new Uint8Array(map.height*map.width*4);
     this.image = ndarray(this.data, [map.height, map.width, 4]);
@@ -39,14 +39,10 @@ export default class TileMapLayer{
     });
 
     this.texture = new Texture(gl, gl.TEXTURE1, {width: map.width, height: map.height});
-    this.halfMapSize = vec2.create();
     this.gl = gl;
 
     this.convolve(1, 1, this.width-2, this.height-2);
     this.update();
-
-    this.halfMapSize[0] = this.width * tileSize / 2;
-    this.halfMapSize[1] = this.height * tileSize / 2;
   }
 
   convolve(x, y, w, h){
