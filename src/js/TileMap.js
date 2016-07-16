@@ -26,6 +26,7 @@ import {vec2, mat3} from 'gl-matrix';
 import ShaderWrapper from './ShaderWrapper.js';
 import TileMapLayer from './TileMapLayer.js';
 import Texture from './Texture.js';
+import Quadrangle from './Quadrangle.js';
 
 import tilemapVS from '../shaders/tilemapVS.glsl';
 import tilemapFS from '../shaders/tilemapFS.glsl';
@@ -43,22 +44,8 @@ export default class TileMap {
     this.inverseTileSize = vec2.fromValues(1/this.tileSize, 1/this.tileSize);
 
     this.spriteSheet = new Texture(gl, gl.TEXTURE0);
+    this.quadrangle = new Quadrangle(gl);
     this.layers = [];
-
-    const quadVerts = [
-      //x  y  u  v
-      -1, -1, 0, 1,
-       1, -1, 1, 1,
-       1,  1, 1, 0,
-
-      -1, -1, 0, 1,
-       1,  1, 1, 0,
-      -1,  1, 0, 0
-    ];
-
-    this.quadVertBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.quadVertBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quadVerts), gl.STATIC_DRAW);
 
     this.tilemapShader = ShaderWrapper.createFromSource(gl, tilemapVS, tilemapFS);
   }
@@ -109,14 +96,10 @@ export default class TileMap {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     const shader = this.tilemapShader;
-    gl.useProgram(shader.program);
+
+    this.quadrangle.bindShader(shader);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.quadVertBuffer);
-
-    gl.enableVertexAttribArray(shader.attribute.position);
-    gl.enableVertexAttribArray(shader.attribute.texture);
-    gl.vertexAttribPointer(shader.attribute.position, 2, gl.FLOAT, false, 16, 0);
-    gl.vertexAttribPointer(shader.attribute.texture, 2, gl.FLOAT, false, 16, 8);
 
     gl.uniform2fv(shader.uniform.inverseSpriteTextureSize, this.spriteSheet.inverseSize);
     gl.uniform1f(shader.uniform.tileSize, this.tileSize);
@@ -142,7 +125,7 @@ export default class TileMap {
 
         gl.uniform2fv(shader.uniform.halfMapSize, layer.halfMapSize);
 
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        this.quadrangle.render();
       }
     }
   }
