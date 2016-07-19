@@ -35,6 +35,7 @@ const TILE_SIZE = 64;
 export default class TileMap {
   constructor(gl) {
     this.gl = gl;
+    this.viewportSize = vec2.create();
     this.negativeHalfViewportSize = vec2.create();
     this.inverseHalfViewportSize = vec2.create();
     this.matrix = mat3.create();
@@ -52,6 +53,7 @@ export default class TileMap {
   }
 
   resizeViewport(width, height) {
+    vec2.set(this.viewportSize, width, height);
     vec2.set(this.negativeHalfViewportSize, -width/2, -height/2);
     vec2.set(this.inverseHalfViewportSize, 2/width, 2/height);
   }
@@ -85,6 +87,8 @@ export default class TileMap {
 
   draw(x, y) {
     const gl = this.gl;
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.viewport(0, 0, this.viewportSize[0], this.viewportSize[1]);
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

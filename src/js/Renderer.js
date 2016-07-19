@@ -71,7 +71,6 @@ export default class Renderer {
   }
 
   resize (gl, canvas) {
-    gl.viewport(0, 0, canvas.width, canvas.height);
     this.tileMap.resizeViewport(canvas.width, canvas.height);
   }
 
@@ -84,8 +83,6 @@ export default class Renderer {
   }
 
   draw (gl, timing) {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.viewport(0, 0, canvas.width, canvas.height);
     this.tileMap.draw(this.pos.x, this.pos.y);
   }
 }
