@@ -36,9 +36,13 @@ export default class Renderer {
     this.storage = storage;
     this.tileMap = new TileMap(gl);
     this.tileMap.setSpriteSheet(loadImage(tiles))
-      .then(() => this.tileMapLayer.update());
-    this.tileMapLayer = new TileMapLayer(gl, this.map);
-    this.tileMap.setTileLayer(this.tileMapLayer.tileTexture, 0)
+      .then(() => this.tileMapLayer.update(this.map.data));
+    this.tileMapLayer = new TileMapLayer(gl, this.map.width, this.map.height);
+    this.tileMap.setTileLayer(this.tileMapLayer.tileTexture, 0);
+
+    this.map.onChange((x, y) => {
+      this.tileMapLayer.update(this.map.data);
+    });
     this.pos = {
       x: 0,
       y: 0,

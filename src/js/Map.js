@@ -2,7 +2,8 @@ import ndarray from 'ndarray';
 
 export default class Map{
   constructor(width=128, height=width, data=[]){
-    this.map = ndarray(new Uint8Array(width*height*4), [height, width, 4]);
+    this.data = new Uint8Array(width*height*4);
+    this.map = ndarray(this.data, [height, width, 4]);
     for(let y=0; y<height; y++){
       for(let x=0; x<width; x++){
         this.map.set(y, x, 0, data[y*height + x]);

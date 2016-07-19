@@ -32,24 +32,20 @@ import tileVS from '../shaders/tileVS.glsl';
 import tileFS from '../shaders/tileFS.glsl';
 
 export default class TileMapLayer{
-  constructor(gl, map) {
+  constructor(gl, width, height) {
     this.gl = gl;
-    this.map = map.map;
     this.quadrangle = new Quadrangle(gl);
     this.shader = ShaderWrapper.createFromSource(gl, tileVS, tileFS);
 
-    this.width = map.width;
-    this.height = map.height;
-    map.onChange((x, y) => {
-      this.update();
-    });
+    this.width = width;
+    this.height = height;
 
-    this.mapTexture = new Texture(gl, gl.TEXTURE0, {width: map.width, height: map.height});
+    this.mapTexture = new Texture(gl, gl.TEXTURE0, {width: this.width, height: this.height});
 
     this.frameBuffer = gl.createFramebuffer();
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
 
-    this.tileTexture = new Texture(gl, gl.TEXTURE1, {width: map.width, height: map.height});
+    this.tileTexture = new Texture(gl, gl.TEXTURE1, {width: this.width, height: this.height});
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);;
 
     const renderBuffer = this.gl.createRenderbuffer();
@@ -57,19 +53,16 @@ export default class TileMapLayer{
     this.gl.renderbufferStorage(this.gl.RENDERBUFFER, this.gl.DEPTH_COMPONENT16, this.width, this.height);
     this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.tileTexture.texture, 0);
     this.gl.framebufferRenderbuffer(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.RENDERBUFFER, renderBuffer);
-
-    this.update();
   }
 
-  update(){
-    console.log('update');
+  update(data){
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
     this.gl.viewport(0, 0, this.width, this.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
     this.quadrangle.bindShader(this.shader);
 
-    this.mapTexture.setData(this.map.data);
+    this.mapTexture.setData(data);
 
     this.mapTexture.activate();
     this.mapTexture.bind();
