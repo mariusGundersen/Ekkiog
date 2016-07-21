@@ -30,7 +30,7 @@ import Quadrangle from './Quadrangle.js';
 import tilemapVS from '../shaders/tilemapVS.glsl';
 import tilemapFS from '../shaders/tilemapFS.glsl';
 
-const TILE_SIZE = 64;
+const TILE_SIZE = 16;
 
 export default class TileMap {
   constructor(gl) {

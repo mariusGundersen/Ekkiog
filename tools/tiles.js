@@ -1,5 +1,7 @@
-const TILE = 64;
+const TILE = 16;
 const SIDE = TILE/2;
+
+const GRID_COLOR = "#F0F";
 
 const SIDES = [
   {x:  0, y:  0, i:0},
@@ -12,8 +14,9 @@ const SIDES = [
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
-ctx.strokeStyle = "2px black";
-ctx.lineWidth = 10;
+ctx.mozImageSmoothingEnabled = false;
+ctx.strokeStyle = GRID_COLOR;
+ctx.lineWidth = 2;
 ctx.lineCap = 'square';
 ctx.fillStyle = 'white';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -23,7 +26,8 @@ for(let y=0; y<4; y++){
     ctx.save();
     ctx.translate(SIDE + x*TILE, SIDE + y*TILE);
     ctx.beginPath();
-    ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
+    ctx.rect(-1, -1, 2, 2);
+    //ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
     ctx.fillStyle = '#eee';
     ctx.fill();
     ctx.restore();
@@ -33,8 +37,9 @@ for(let y=0; y<4; y++){
 ctx.translate(4*TILE + SIDE, SIDE);
 ctx.save();
 ctx.beginPath();
-ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
-ctx.fillStyle = '#000';
+ctx.rect(-1, -1, 2, 2);
+//ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
+ctx.fillStyle = GRID_COLOR;
 ctx.fill();
 for(let y=0; y<4; y++){
   for(let x=0; x<4; x++){
@@ -83,8 +88,8 @@ for(let y=0; y<4; y++){
     ctx.beginPath();
     for(const line of lines){
       console.log(line);
-      ctx.lineWidth = line.d ? 10/Math.SQRT2 : 10;
-      ctx.lineCap = !line.d || line.s ? 'round' : 'square';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'square';
       ctx.moveTo(line.f.x*SIDE, line.f.y*SIDE);
       ctx.lineTo(line.t.x*SIDE, line.t.y*SIDE);
     }

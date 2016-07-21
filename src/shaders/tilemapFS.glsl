@@ -22,6 +22,7 @@
 */
 
 precision mediump float;
+
 varying vec2 pixelCoord;
 varying vec2 texCoord;
 uniform sampler2D tiles;
@@ -31,8 +32,13 @@ uniform float tileSize;
 
 void main(void) {
   vec4 tile = texture2D(tiles, texCoord);
-  if(tile.x == 1.0 && tile.y == 1.0) { discard; }
   vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;
   vec2 spriteCoord = mod(pixelCoord, tileSize);
-  gl_FragColor = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);
+  vec4 color = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);
+
+  if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  }else{
+    gl_FragColor = color;
+  }
 }

@@ -22,6 +22,7 @@
 */
 
 precision mediump float;
+
 attribute vec2 position;
 attribute vec2 texture;
 varying vec2 pixelCoord;
