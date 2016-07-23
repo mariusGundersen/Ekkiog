@@ -1,8 +1,10 @@
 export default class TouchControls{
-  constructor(element, renderer){
+  constructor(renderer){
     this.renderer = renderer;
     this.pointers = [];
+  }
 
+  listen(element){
     element.addEventListener('touchstart', event => this.touchStart(event), false);
     element.addEventListener('touchmove', event => this.touchMove(event), false);
     element.addEventListener('touchend', event => this.touchEnd(event), false);

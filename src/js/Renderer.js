@@ -29,21 +29,21 @@ import tiles from '../img/tiles.png';
 import loadImage from './loadImage.js';
 
 export default class Renderer {
-  constructor(gl, canvas, storage) {
-    gl.clearColor(0.0, 0.0, 0.1, 1.0);
-    gl.clearDepth(1.0);
-
+  constructor(storage) {
     this.map = Map.from(storage.load());
     this.storage = storage;
-    this.tileMapRenderer = new TileMapRenderer(gl, this.map.width, this.map.height);
     this.perspective = new Perspective(this.map.width, this.map.height, 16);
+  }
+
+  init(gl){
+    this.tileMapRenderer = new TileMapRenderer(gl, this.map.width, this.map.height);
     this.tileMap = new TileMap(gl, this.tileMapRenderer.tileTexture, this.perspective.mapToViewportMatrix);
     this.tileMap.setSpriteSheet(loadImage(tiles))
       .then(() => this.tileMapRenderer.update(this.map.data));
   }
 
-  resize (gl, canvas) {
-    this.perspective.setViewport(canvas.width, canvas.height);
+  resize (width, height) {
+    this.perspective.setViewport(width, height);
   }
 
   scaleBy(scale){
@@ -64,8 +64,7 @@ export default class Renderer {
     });
   }
 
-  draw (gl, timing) {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  draw(gl) {
     gl.viewport(0, 0, this.perspective.viewportSize[0], this.perspective.viewportSize[1]);
 
     this.tileMap.render();

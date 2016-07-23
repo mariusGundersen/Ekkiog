@@ -22,24 +22,32 @@
 */
 
 import Stats from 'stats-js';
+import WebGL from 'gl-now';
 
 import '../css/main.css';
 
 import Renderer from './Renderer.js';
 import TouchControls from './TouchControls.js';
-import GLContextHelper from './GLContextHelper.js';
 import Storage from './Storage.js';
 
-// Setup the canvas and GL context, initialize the scene
-const canvas = document.getElementById("canvas");
-const contextHelper = new GLContextHelper(canvas, document.getElementById("content-frame"));
+const shell = new WebGL();
 const storage = new Storage();
-const renderer = new Renderer(contextHelper.gl, canvas, storage);
+const renderer = new Renderer(storage);
 const stats = new Stats();
-const touchControls = new TouchControls(canvas, renderer);
-document.body.appendChild(stats.domElement);
+const touchControls = new TouchControls(renderer);
 
-renderer.scaleBy(2);
+shell.on('gl-init', () => {
+  renderer.init(shell.gl);
+  touchControls.listen(shell.canvas);
+  document.body.appendChild(stats.domElement);
+});
 
-// Get the render loop going
-contextHelper.start(renderer, stats);
+shell.on('gl-render', (t) => {
+  if(stats) { stats.begin(); }
+  renderer.draw(shell.gl);
+  if(stats) { stats.end(); }
+});
+
+shell.on('gl-resize', (w, h) => {
+  renderer.resize(w, h);
+});

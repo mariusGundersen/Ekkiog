@@ -22,8 +22,8 @@
 */
 
 import {vec2, mat3} from 'gl-matrix';
+import createShader from 'gl-shader';
 
-import ShaderWrapper from './ShaderWrapper.js';
 import Texture from './Texture.js';
 import Quadrangle from './Quadrangle.js';
 
@@ -41,7 +41,7 @@ export default class TileMap {
     this.quadrangle = new Quadrangle(gl);
     this.tileMapTexture = tileMapTexture;
 
-    this.shader = ShaderWrapper.createFromSource(gl, tilemapVS, tilemapFS);
+    this.shader = createShader(gl, tilemapVS, tilemapFS);
   }
 
   setSpriteSheet(image) {
@@ -60,20 +60,20 @@ export default class TileMap {
 
     this.quadrangle.bindShader(shader);
 
-    gl.uniform2fv(shader.uniform.inverseSpriteTextureSize, this.spriteSheet.inverseSize);
-    gl.uniform1f(shader.uniform.tileSize, TILE_SIZE);
+    shader.uniforms.inverseSpriteTextureSize = this.spriteSheet.inverseSize;
+    shader.uniforms.tileSize = TILE_SIZE;
 
     this.spriteSheet.activate();
-    gl.uniform1i(shader.uniform.sprites, this.spriteSheet.sampler2D);
+    shader.uniforms.sprites = this.spriteSheet.sampler2D;
     this.spriteSheet.bind();
 
     this.tileMapTexture.activate();
-    gl.uniform1i(shader.uniform.tiles, this.tileMapTexture.sampler2D);
+    shader.uniforms.tiles = this.tileMapTexture.sampler2D;
     this.tileMapTexture.bind();
 
-    gl.uniformMatrix3fv(shader.uniform.matrix, false, this.matrix);
+    shader.uniforms.matrix = this.matrix;
 
-    gl.uniform2fv(shader.uniform.mapTextureSize, this.tileMapTexture.size);
+    shader.uniforms.mapTextureSize = this.tileMapTexture.size;
 
     this.quadrangle.render();
   }

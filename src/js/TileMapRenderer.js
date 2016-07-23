@@ -23,9 +23,9 @@
 
 import {vec2} from 'gl-matrix';
 import ndarray from 'ndarray';
+import createShader from 'gl-shader';
 
 import Texture from './Texture.js';
-import ShaderWrapper from './ShaderWrapper.js';
 import Quadrangle from './Quadrangle.js';
 
 import tileVS from '../shaders/tileVS.glsl';
@@ -35,7 +35,7 @@ export default class TileMapRenderer{
   constructor(gl, width, height) {
     this.gl = gl;
     this.quadrangle = new Quadrangle(gl);
-    this.shader = ShaderWrapper.createFromSource(gl, tileVS, tileFS);
+    this.shader = createShader(gl, tileVS, tileFS);
 
     this.width = width;
     this.height = height;
@@ -66,9 +66,9 @@ export default class TileMapRenderer{
 
     this.mapTexture.activate();
     this.mapTexture.bind();
-    this.gl.uniform1i(this.shader.uniform.tilemap, this.mapTexture.sampler2D);
+    this.shader.uniforms.tilemap = this.mapTexture.sampler2D;
 
-    this.gl.uniform2fv(this.shader.uniform.inverseTileTextureSize, this.mapTexture.inverseSize);
+    this.shader.uniforms.inverseTileTextureSize = this.mapTexture.inverseSize;
 
     this.quadrangle.render();
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
