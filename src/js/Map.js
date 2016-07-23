@@ -4,19 +4,17 @@ export default class Map{
   constructor(width=128, height=width, data=[]){
     this.data = new Uint8Array(width*height*4);
     this.map = ndarray(this.data, [height, width, 4]);
+    this.width = width;
+    this.height = height;
     for(let y=0; y<height; y++){
       for(let x=0; x<width; x++){
         this.map.set(y, x, 0, data[y*height + x]);
       }
     }
-    this.width = width;
-    this.height = height;
-    this.listener = () => {};
   }
 
   set(x, y, v=1){
     this.map.set(y, x, 0, v);
-    this.listener(x, y);
   }
 
   get(x, y){
@@ -25,10 +23,6 @@ export default class Map{
 
   toggle(x, y){
     this.set(x, y, this.get(x, y) ? 0 : 1);
-  }
-
-  onChange(listener){
-    this.listener = listener;
   }
 
   export(){

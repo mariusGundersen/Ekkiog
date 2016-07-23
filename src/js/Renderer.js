@@ -39,10 +39,6 @@ export default class Renderer {
     this.tileMap.setSpriteSheet(loadImage(tiles))
       .then(() => this.tileMapRenderer.update(this.map.data));
 
-    this.map.onChange((x, y) => {
-      this.tileMapRenderer.update(this.map.data);
-    });
-
     this.pos = {
       x: 0,
       y: 0,
@@ -78,6 +74,7 @@ export default class Renderer {
     const [tx, ty] = this.tileMap.viewportToMap(this.pos.x, this.pos.y, x, y);
     window.requestAnimationFrame(() => {
       this.map.toggle(tx, ty);
+      this.tileMapRenderer.update(this.map.data);
       this.storage.save(this.map.export());
     });
   }
