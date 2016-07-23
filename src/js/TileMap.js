@@ -33,7 +33,7 @@ import tilemapFS from '../shaders/tilemapFS.glsl';
 const TILE_SIZE = 16;
 
 export default class TileMap {
-  constructor(gl) {
+  constructor(gl, tileMapTexture) {
     this.gl = gl;
     this.viewportSize = vec2.create();
     this.negativeHalfViewportSize = vec2.create();
@@ -47,7 +47,7 @@ export default class TileMap {
 
     this.spriteSheet = new Texture(gl, gl.TEXTURE2);
     this.quadrangle = new Quadrangle(gl);
-    this.layers = [];
+    this.tileMapTexture = tileMapTexture;
 
     this.shader = ShaderWrapper.createFromSource(gl, tilemapVS, tilemapFS);
   }
@@ -69,13 +69,9 @@ export default class TileMap {
     });
   }
 
-  setTileLayer(texture, layerId) {
-    this.layers[layerId] = texture;
-  }
-
-  viewportToMap(dx, dy, x, y, layer=0){
+  viewportToMap(dx, dy, x, y){
     mat3.identity(this.matrix);
-    mat3.translate(this.matrix, this.matrix, this.layers[layer].halfSize);
+    mat3.translate(this.matrix, this.matrix, this.tileMapTexture.halfSize);
     mat3.scale(this.matrix, this.matrix, this.inverseTileSize);
     mat3.scale(this.matrix, this.matrix, this.inverseTileScale);
     mat3.translate(this.matrix, this.matrix, vec2.fromValues(dx, dy));
@@ -104,26 +100,20 @@ export default class TileMap {
     gl.uniform1i(shader.uniform.sprites, this.spriteSheet.sampler2D);
     this.spriteSheet.bind();
 
-    // Draw each layer of the map
-    for(let i = this.layers.length; i >= 0; --i) {
-      const layer = this.layers[i];
-      if(layer) {
-        layer.activate();
-        gl.uniform1i(shader.uniform.tiles, layer.sampler2D);
-        layer.bind();
+    this.tileMapTexture.activate();
+    gl.uniform1i(shader.uniform.tiles, this.tileMapTexture.sampler2D);
+    this.tileMapTexture.bind();
 
-        mat3.fromScaling(this.matrix, this.inverseHalfViewportSize);
-        mat3.translate(this.matrix, this.matrix, vec2.fromValues(-x, y));
-        mat3.scale(this.matrix, this.matrix, this.tileScale);
-        mat3.scale(this.matrix, this.matrix, this.tileSize);
-        mat3.scale(this.matrix, this.matrix, layer.halfSize);
+    mat3.fromScaling(this.matrix, this.inverseHalfViewportSize);
+    mat3.translate(this.matrix, this.matrix, vec2.fromValues(-x, y));
+    mat3.scale(this.matrix, this.matrix, this.tileScale);
+    mat3.scale(this.matrix, this.matrix, this.tileSize);
+    mat3.scale(this.matrix, this.matrix, this.tileMapTexture.halfSize);
 
-        gl.uniformMatrix3fv(shader.uniform.matrix, false, this.matrix);
+    gl.uniformMatrix3fv(shader.uniform.matrix, false, this.matrix);
 
-        gl.uniform2fv(shader.uniform.mapTextureSize, layer.size);
+    gl.uniform2fv(shader.uniform.mapTextureSize, this.tileMapTexture.size);
 
-        this.quadrangle.render();
-      }
-    }
+    this.quadrangle.render();
   }
 }

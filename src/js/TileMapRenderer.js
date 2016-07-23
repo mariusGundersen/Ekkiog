@@ -31,7 +31,7 @@ import Quadrangle from './Quadrangle.js';
 import tileVS from '../shaders/tileVS.glsl';
 import tileFS from '../shaders/tileFS.glsl';
 
-export default class TileMapLayer{
+export default class TileMapRenderer{
   constructor(gl, width, height) {
     this.gl = gl;
     this.quadrangle = new Quadrangle(gl);
