@@ -39,8 +39,7 @@ const stats = new Stats();
 const touchControls = new TouchControls(canvas, renderer);
 document.body.appendChild(stats.domElement);
 
-renderer.scale(2);
-renderer.moveTo(0, 0);
+renderer.scaleBy(2);
 
 // Get the render loop going
 contextHelper.start(renderer, stats);

@@ -23,6 +23,7 @@
 
 import TileMap from './TileMap.js';
 import TileMapRenderer from './TileMapRenderer.js';
+import Perspective from './Perspective.js';
 import Map from './Map.js';
 import tiles from '../img/tiles.png';
 import loadImage from './loadImage.js';
@@ -35,43 +36,27 @@ export default class Renderer {
     this.map = Map.from(storage.load());
     this.storage = storage;
     this.tileMapRenderer = new TileMapRenderer(gl, this.map.width, this.map.height);
-    this.tileMap = new TileMap(gl, this.tileMapRenderer.tileTexture);
+    this.perspective = new Perspective(this.map.width, this.map.height, 16);
+    this.tileMap = new TileMap(gl, this.tileMapRenderer.tileTexture, this.perspective.mapToViewportMatrix);
     this.tileMap.setSpriteSheet(loadImage(tiles))
       .then(() => this.tileMapRenderer.update(this.map.data));
-
-    this.pos = {
-      x: 0,
-      y: 0,
-      scale: 1
-    }
-  }
-
-  moveTo(x, y){
-    this.pos.x = x;
-    this.pos.y = y;
-  }
-
-  moveBy(dx=0, dy=0){
-    this.pos.x+=dx;
-    this.pos.y+=dy;
-  }
-
-  scale(scale){
-    this.pos.scale = scale;
-    this.tileMap.setTileScale(this.pos.scale);
-  }
-
-  scaleBy(scale){
-    this.pos.scale*=scale;
-    this.tileMap.setTileScale(this.pos.scale);
   }
 
   resize (gl, canvas) {
-    this.tileMap.resizeViewport(canvas.width, canvas.height);
+    this.perspective.setViewport(canvas.width, canvas.height);
+  }
+
+  scaleBy(scale){
+    this.perspective.scaleBy(scale);
+  }
+
+  translateBy(x, y){
+    this.perspective.translateBy(x, y);
   }
 
   tap(x, y){
-    const [tx, ty] = this.tileMap.viewportToMap(this.pos.x, this.pos.y, x, y);
+    const [tx, ty] = this.perspective.viewportToMap(x, y);
+    console.log(x, y, tx, ty);
     window.requestAnimationFrame(() => {
       this.map.toggle(tx, ty);
       this.tileMapRenderer.update(this.map.data);
@@ -80,6 +65,9 @@ export default class Renderer {
   }
 
   draw (gl, timing) {
-    this.tileMap.draw(this.pos.x, this.pos.y);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.viewport(0, 0, this.perspective.viewportSize[0], this.perspective.viewportSize[1]);
+
+    this.tileMap.render();
   }
 }

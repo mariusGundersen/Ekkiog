@@ -56,7 +56,7 @@ export default class TouchControls{
       next: radius.next + Math.sqrt(diff.x*diff.x + diff.y*diff.y)/c.length
     }), {previous: 0, next: 0});
 
-    this.renderer.moveBy(avg.dx, avg.dy);
+    this.renderer.translateBy(avg.dx, avg.dy);
     if(radius.previous != 0 && radius.next != 0){
       this.renderer.scaleBy(radius.next/radius.previous);
     }
