@@ -25,17 +25,16 @@ import {vec2} from 'gl-matrix';
 import ndarray from 'ndarray';
 import createShader from 'gl-shader';
 
-import Texture from '../Texture.js';
 import Quadrangle from '../Quadrangle.js';
 
-import tileVS from './tileMapVS.glsl';
-import tileFS from './tileMapFS.glsl';
+import tileMapVS from './tileMapVS.glsl';
+import tileMapFS from './tileMapFS.glsl';
 
 export default class TileMapEngine{
   constructor(gl, context) {
     this.gl = gl;
     this.quadrangle = new Quadrangle(gl);
-    this.shader = createShader(gl, tileVS, tileFS);
+    this.shader = createShader(gl, tileMapVS, tileMapFS);
 
     this.width = context.width;
     this.height = context.height;

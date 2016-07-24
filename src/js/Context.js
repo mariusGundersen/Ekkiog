@@ -10,6 +10,8 @@ export default class Context{
     this.mapTexture = new DataTexture(gl, width, height);
     this.tileMapTexture = new DataTexture(gl, width, height);
     this.chargeMapTexture = new DataTexture(gl, width, height);
+    this.netMapTexture = new DataTexture(gl, width, height);
+    this.netChargeTexture = new DataTexture(gl, 256, 256);
   }
 
   import(data){
