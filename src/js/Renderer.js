@@ -37,32 +37,11 @@ export default class Renderer {
     this.context = new Context(gl, loaded.width, loaded.height, TILE_SIZE);
     this.context.import(loaded.data);
 
-    this.context.mapTexture.map.set(66, 63, 0, 0);
-    this.context.mapTexture.map.set(66, 63, 1, 4);
-    this.context.mapTexture.map.set(66, 64, 0, 1);
-    this.context.mapTexture.map.set(66, 64, 1, 4);
-    this.context.mapTexture.map.set(66, 65, 0, 2);
-    this.context.mapTexture.map.set(66, 65, 1, 4);
-    this.context.mapTexture.map.set(66, 66, 0, 3);
-    this.context.mapTexture.map.set(66, 66, 1, 4);
+    this.context.mapTexture.set(65, 66, 2);
 
-    this.context.mapTexture.map.set(67, 63, 0, 0);
-    this.context.mapTexture.map.set(67, 63, 1, 5);
-    this.context.mapTexture.map.set(67, 64, 0, 1);
-    this.context.mapTexture.map.set(67, 64, 1, 5);
-    this.context.mapTexture.map.set(67, 65, 0, 2);
-    this.context.mapTexture.map.set(67, 65, 1, 5);
-    this.context.mapTexture.map.set(67, 66, 0, 3);
-    this.context.mapTexture.map.set(67, 66, 1, 5);
+    this.context.mapTexture.set(70, 65, 2);
 
-    this.context.mapTexture.map.set(68, 63, 0, 0);
-    this.context.mapTexture.map.set(68, 63, 1, 6);
-    this.context.mapTexture.map.set(68, 64, 0, 1);
-    this.context.mapTexture.map.set(68, 64, 1, 6);
-    this.context.mapTexture.map.set(68, 65, 0, 2);
-    this.context.mapTexture.map.set(68, 65, 1, 6);
-    this.context.mapTexture.map.set(68, 66, 0, 3);
-    this.context.mapTexture.map.set(68, 66, 1, 6);
+    this.context.mapTexture.set(70, 69, 2);
 
     this.netChargeEngine = new NetChargeEngine(gl, this.context);
     this.netChargeEngine.render(0);
