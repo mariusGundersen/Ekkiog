@@ -14,8 +14,14 @@ canvas{
   flex: 1 0 100%;
 }
 
-#stats{
+#viewStats{
   position: absolute;
   top: 0;
   left: 0;
+}
+
+#engineStats{
+  position: absolute;
+  top: 0;
+  right: 0;
 }

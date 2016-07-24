@@ -37,22 +37,30 @@ const shell = createShell({
 shell.on('gl-init', () => {
   const storage = new Storage();
   const renderer = new Renderer(shell.gl, storage);
-  const stats = new Stats();
+  const viewStats = new Stats();
+  const engineStats = new Stats();
   const touchControls = new TouchControls(renderer);
 
+  viewStats.domElement.id = 'viewStats';
+  document.body.appendChild(viewStats.domElement);
+  engineStats.setMode(1);
+  engineStats.domElement.id = 'engineStats';
+  document.body.appendChild(engineStats.domElement);
+
   touchControls.listen(shell.canvas);
-  document.body.appendChild(stats.domElement);
   renderer.resize(shell.canvas.width, shell.canvas.height);
 
   shell.on('tick', () => {
     console.log('tick', shell.tickCount);
+    engineStats.begin();
     renderer.tick(shell.tickCount);
+    engineStats.end();
   });
 
   shell.on('gl-render', (t) => {
-    if(stats) { stats.begin(); }
+    viewStats.begin();
     renderer.draw(shell.gl);
-    if(stats) { stats.end(); }
+    viewStats.end();
   });
 
   shell.on('gl-resize', (w, h) => {
