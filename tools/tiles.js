@@ -21,21 +21,16 @@ ctx.lineCap = 'square';
 ctx.fillStyle = 'white';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-for(let y=0; y<4; y++){
-  for(let x=0; x<4; x++){
-    ctx.save();
-    ctx.translate(SIDE + x*TILE, SIDE + y*TILE);
-    ctx.beginPath();
-    ctx.rect(-1, -1, 2, 2);
-    //ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
-    ctx.fillStyle = '#eee';
-    ctx.fill();
-    ctx.restore();
-  }
-}
-
-ctx.translate(4*TILE + SIDE, SIDE);
 ctx.save();
+ctx.translate(SIDE, SIDE);
+ctx.beginPath();
+ctx.rect(-1, -1, 2, 2);
+ctx.fillStyle = '#eee';
+ctx.fill();
+ctx.restore();
+
+ctx.save();
+ctx.translate(TILE + SIDE, SIDE);
 ctx.beginPath();
 ctx.rect(-1, -1, 2, 2);
 //ctx.ellipse(0, 0, SIDE/4, SIDE/4, 0, 0, 2 * Math.PI);
@@ -97,3 +92,43 @@ for(let y=0; y<4; y++){
     ctx.restore();
   }
 }
+ctx.restore();
+
+ctx.save();
+ctx.translate(0, TILE*4);
+
+
+ctx.beginPath();
+ctx.strokeStyle = GRID_COLOR;
+ctx.moveTo(0, SIDE);
+ctx.lineTo(SIDE, SIDE);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.strokeStyle = GRID_COLOR;
+ctx.moveTo(0, TILE*2 + SIDE);
+ctx.lineTo(SIDE, TILE*2 + SIDE);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.strokeStyle = GRID_COLOR;
+ctx.moveTo(TILE*3 + TILE, TILE + SIDE);
+ctx.lineTo(TILE*3 + SIDE, TILE + SIDE);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.strokeStyle = "#000";
+ctx.moveTo(SIDE, SIDE/2);
+ctx.lineTo(SIDE, TILE*2 + SIDE*3/2);
+
+ctx.arc(TILE + SIDE*7/6, TILE + SIDE, TILE + SIDE/2, Math.PI/2, 0, true);
+ctx.arc(TILE*2 + SIDE*2 + SIDE/4, TILE + SIDE, SIDE/2, Math.PI, Math.PI*2, true);
+ctx.arc(TILE*2 + SIDE*2 + SIDE/4, TILE + SIDE, SIDE/2, Math.PI*2, Math.PI, true);
+ctx.arc(TILE + SIDE*7/6, TILE + SIDE, TILE + SIDE/2, 0, Math.PI*3/2, true);
+
+ctx.lineTo(SIDE, SIDE/2);
+ctx.stroke();
+
+
+
+ctx.restore();
