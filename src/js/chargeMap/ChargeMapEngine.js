@@ -12,17 +12,18 @@ export default class ChargeMapEngine{
     this.shader = createShader(gl, chargeMapVS, chargeMapFS);
 
     this.netMapTexture = context.netMapTexture;
-    this.netChargeTexture = context.netChargeTexture;
+    this.netChargeTextures = context.netChargeTextures;
     this.renderTexture = context.chargeMapTexture;
   }
 
-  render(){
+  render(tick){
     this.renderTexture.bindFramebuffer();
 
     this.quadrangle.bindShader(this.shader);
 
     this.shader.uniforms.netMap = this.netMapTexture.sampler2D(0);
-    this.shader.uniforms.netCharges = this.netChargeTexture.sampler2D(1);
+
+    this.shader.uniforms.netCharges = this.netChargeTextures[tick%2].sampler2D(1);
 
     this.quadrangle.render();
 

@@ -45,7 +45,8 @@ shell.on('gl-init', () => {
   renderer.resize(shell.canvas.width, shell.canvas.height);
 
   shell.on('tick', () => {
-    renderer.tick();
+    console.log('tick', shell.tickCount);
+    renderer.tick(shell.tickCount);
   });
 
   shell.on('gl-render', (t) => {

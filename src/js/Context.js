@@ -12,7 +12,11 @@ export default class Context{
     this.tileMapTexture = new RenderTexture(gl, width, height);
     this.chargeMapTexture = new RenderTexture(gl, width, height);
     this.netMapTexture = new DataTexture(gl, width, height);
-    this.netChargeTexture = new DataTexture(gl, 256, 256);
+    this.netChargeTextures = [
+      new RenderTexture(gl, 256, 256),
+      new RenderTexture(gl, 256, 256)
+    ];
+    this.gatesTexture = new DataTexture(gl, 256, 256);
   }
 
   import(data){
