@@ -13,8 +13,8 @@ export default class TouchControls{
   touchStart(event){
     const touches = Array.from(event.changedTouches);
     this.pointers = this.pointers.concat(touches.map(touch => ({
-      x: touch.pageX*window.devicePixelRatio,
-      y: touch.pageY*window.devicePixelRatio,
+      x: touch.pageX,
+      y: touch.pageY,
       id: touch.identifier,
       moved: false
     })));
@@ -27,14 +27,14 @@ export default class TouchControls{
       point,
       touch: touches.filter(t => t.identifier === point.id)[0] || {pageX: point.x, pageY: point.y}
     })).map(pair => ({
-      dx: pair.point.x - pair.touch.pageX*window.devicePixelRatio,
-      dy: pair.point.y - pair.touch.pageY*window.devicePixelRatio,
+      dx: pair.point.x - pair.touch.pageX,
+      dy: pair.point.y - pair.touch.pageY,
       px: pair.point.x,
       py: pair.point.y,
-      x: pair.touch.pageX*window.devicePixelRatio,
-      y: pair.touch.pageY*window.devicePixelRatio,
+      x: pair.touch.pageX,
+      y: pair.touch.pageY,
       id: pair.touch.identifier,
-      moved: pair.point.moved || !(pair.point.x == pair.touch.pageX*window.devicePixelRatio && pair.point.y == pair.touch.pageY*window.devicePixelRatio)
+      moved: pair.point.moved || !(pair.point.x == pair.touch.pageX && pair.point.y == pair.touch.pageY)
     }));
 
     this.pointers = delta;
