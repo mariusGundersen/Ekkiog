@@ -26,4 +26,15 @@ export default class RenderTexture extends Texture{
   unbindFramebuffer(){
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
   }
+
+  export(arrayBuffer){
+    this.bindFramebuffer();
+    this.gl.readPixels(0, 0, this.width, this.height, this.gl.RGBA, this.gl.UNSIGNED_BYTE, arrayBuffer);
+    this.unbindFramebuffer();
+  }
+
+  import(arrayBuffer){
+    this.bind();
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, arrayBuffer);
+  }
 }
