@@ -21,8 +21,8 @@
 *    distribution.
 */
 
-import TileMap from './TileMap.js';
-import TileMapRenderer from './TileMapRenderer.js';
+import ViewEngine from './view/ViewEngine.js';
+import TileMapEngine from './tileMap/TileMapEngine.js';
 import Perspective from './Perspective.js';
 import Map from './Map.js';
 import tiles from '../img/tiles.png';
@@ -36,10 +36,10 @@ export default class Renderer {
   }
 
   init(gl){
-    this.tileMapRenderer = new TileMapRenderer(gl, this.map.width, this.map.height);
-    this.tileMap = new TileMap(gl, this.tileMapRenderer.tileTexture, this.perspective.mapToViewportMatrix);
-    this.tileMap.setSpriteSheet(loadImage(tiles))
-      .then(() => this.tileMapRenderer.update(this.map.data));
+    this.tileMapEngine = new TileMapEngine(gl, this.map.width, this.map.height);
+    this.viewEngine = new ViewEngine(gl, this.tileMapEngine.tileTexture, this.perspective.mapToViewportMatrix);
+    this.viewEngine.setSpriteSheet(loadImage(tiles))
+      .then(() => this.tileMapEngine.update(this.map.data));
   }
 
   resize (width, height) {
@@ -59,7 +59,7 @@ export default class Renderer {
     console.log(x, y, tx, ty);
     window.requestAnimationFrame(() => {
       this.map.toggle(tx, ty);
-      this.tileMapRenderer.update(this.map.data);
+      this.tileMapEngine.update(this.map.data);
       this.storage.save(this.map.export());
     });
   }
@@ -67,6 +67,6 @@ export default class Renderer {
   draw(gl) {
     gl.viewport(0, 0, this.perspective.viewportSize[0], this.perspective.viewportSize[1]);
 
-    this.tileMap.render();
+    this.viewEngine.render();
   }
 }

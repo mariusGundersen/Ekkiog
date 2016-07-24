@@ -24,15 +24,15 @@
 import {vec2, mat3} from 'gl-matrix';
 import createShader from 'gl-shader';
 
-import Texture from './Texture.js';
-import Quadrangle from './Quadrangle.js';
+import Texture from '../Texture.js';
+import Quadrangle from '../Quadrangle.js';
 
-import tilemapVS from '../shaders/tilemapVS.glsl';
-import tilemapFS from '../shaders/tilemapFS.glsl';
+import tilemapVS from './viewVS.glsl';
+import tilemapFS from './viewFS.glsl';
 
 const TILE_SIZE = 16;
 
-export default class TileMap {
+export default class ViewEngine {
   constructor(gl, tileMapTexture, matrix) {
     this.gl = gl;
     this.matrix = matrix;

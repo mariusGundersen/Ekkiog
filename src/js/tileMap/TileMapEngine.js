@@ -25,13 +25,13 @@ import {vec2} from 'gl-matrix';
 import ndarray from 'ndarray';
 import createShader from 'gl-shader';
 
-import Texture from './Texture.js';
-import Quadrangle from './Quadrangle.js';
+import Texture from '../Texture.js';
+import Quadrangle from '../Quadrangle.js';
 
-import tileVS from '../shaders/tileVS.glsl';
-import tileFS from '../shaders/tileFS.glsl';
+import tileVS from './tileMapVS.glsl';
+import tileFS from './tileMapFS.glsl';
 
-export default class TileMapRenderer{
+export default class TileMapEngine{
   constructor(gl, width, height) {
     this.gl = gl;
     this.quadrangle = new Quadrangle(gl);
