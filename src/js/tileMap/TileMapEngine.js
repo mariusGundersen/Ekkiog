@@ -32,21 +32,20 @@ import tileVS from './tileMapVS.glsl';
 import tileFS from './tileMapFS.glsl';
 
 export default class TileMapEngine{
-  constructor(gl, width, height) {
+  constructor(gl, context) {
     this.gl = gl;
     this.quadrangle = new Quadrangle(gl);
     this.shader = createShader(gl, tileVS, tileFS);
 
-    this.width = width;
-    this.height = height;
+    this.width = context.width;
+    this.height = context.height;
 
-    this.mapTexture = new Texture(gl, {width: this.width, height: this.height});
+    this.mapTexture = context.mapTexture;
 
     this.frameBuffer = gl.createFramebuffer();
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
 
-    this.tileTexture = new Texture(gl, {width: this.width, height: this.height});
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);;
+    this.tileTexture = context.tileMapTexture;
 
     const renderBuffer = this.gl.createRenderbuffer();
     this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, renderBuffer);
@@ -55,14 +54,12 @@ export default class TileMapEngine{
     this.gl.framebufferRenderbuffer(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.RENDERBUFFER, renderBuffer);
   }
 
-  update(data){
+  render(){
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
     this.gl.viewport(0, 0, this.width, this.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
     this.quadrangle.bindShader(this.shader);
-
-    this.mapTexture.setData(data);
 
     this.shader.uniforms.tilemap = this.mapTexture.sampler2D(0);
 

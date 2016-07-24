@@ -22,7 +22,7 @@
 */
 
 import Stats from 'stats-js';
-import WebGL from 'gl-now';
+import createShell from 'gl-now';
 
 import '../css/main.css';
 
@@ -30,24 +30,25 @@ import Renderer from './Renderer.js';
 import TouchControls from './TouchControls.js';
 import Storage from './Storage.js';
 
-const shell = new WebGL();
-const storage = new Storage();
-const renderer = new Renderer(storage);
-const stats = new Stats();
-const touchControls = new TouchControls(renderer);
+const shell = createShell();
 
 shell.on('gl-init', () => {
-  renderer.init(shell.gl);
+  const storage = new Storage();
+  const renderer = new Renderer(shell.gl, storage);
+  const stats = new Stats();
+  const touchControls = new TouchControls(renderer);
+
   touchControls.listen(shell.canvas);
   document.body.appendChild(stats.domElement);
-});
+  renderer.resize(shell.canvas.width, shell.canvas.height);
 
-shell.on('gl-render', (t) => {
-  if(stats) { stats.begin(); }
-  renderer.draw(shell.gl);
-  if(stats) { stats.end(); }
-});
+  shell.on('gl-render', (t) => {
+    if(stats) { stats.begin(); }
+    renderer.draw(shell.gl);
+    if(stats) { stats.end(); }
+  });
 
-shell.on('gl-resize', (w, h) => {
-  renderer.resize(w, h);
+  shell.on('gl-resize', (w, h) => {
+    renderer.resize(w, h);
+  });
 });

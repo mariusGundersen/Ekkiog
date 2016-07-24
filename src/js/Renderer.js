@@ -24,22 +24,23 @@
 import ViewEngine from './view/ViewEngine.js';
 import TileMapEngine from './tileMap/TileMapEngine.js';
 import Perspective from './Perspective.js';
-import Map from './Map.js';
-import tiles from '../img/tiles.png';
-import loadImage from './loadImage.js';
+import Context from './Context.js';
+
+const TILE_SIZE = 16;
 
 export default class Renderer {
-  constructor(storage) {
-    this.map = Map.from(storage.load());
+  constructor(gl, storage) {
     this.storage = storage;
-    this.perspective = new Perspective(this.map.width, this.map.height, 16);
-  }
+    const loaded = storage.load();
+    this.context = new Context(gl, loaded.width, loaded.height, TILE_SIZE);
+    this.context.import(loaded.data);
 
-  init(gl){
-    this.tileMapEngine = new TileMapEngine(gl, this.map.width, this.map.height);
-    this.viewEngine = new ViewEngine(gl, this.tileMapEngine.tileTexture, this.perspective.mapToViewportMatrix);
-    this.viewEngine.setSpriteSheet(loadImage(tiles))
-      .then(() => this.tileMapEngine.update(this.map.data));
+    this.tileMapEngine = new TileMapEngine(gl, this.context);
+    this.context.mapTexture.update();
+    this.tileMapEngine.render();
+
+    this.perspective = new Perspective(this.context);
+    this.viewEngine = new ViewEngine(gl, this.context, this.perspective.mapToViewportMatrix);
   }
 
   resize (width, height) {
@@ -58,9 +59,10 @@ export default class Renderer {
     const [tx, ty] = this.perspective.viewportToMap(x, y);
     console.log(x, y, tx, ty);
     window.requestAnimationFrame(() => {
-      this.map.toggle(tx, ty);
-      this.tileMapEngine.update(this.map.data);
-      this.storage.save(this.map.export());
+      this.context.mapTexture.toggle(tx, ty);
+      this.context.mapTexture.update();
+      this.tileMapEngine.render();
+      this.storage.save(this.context.export());
     });
   }
 

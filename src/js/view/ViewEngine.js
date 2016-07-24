@@ -24,45 +24,41 @@
 import {vec2, mat3} from 'gl-matrix';
 import createShader from 'gl-shader';
 
-import Texture from '../Texture.js';
+import ImageTexture from '../ImageTexture.js';
 import Quadrangle from '../Quadrangle.js';
+import loadImage from '../loadImage.js';
+import tiles from '../../img/tiles.png';
 
 import tilemapVS from './viewVS.glsl';
 import tilemapFS from './viewFS.glsl';
 
-const TILE_SIZE = 16;
-
 export default class ViewEngine {
-  constructor(gl, tileMapTexture, matrix) {
+  constructor(gl, context, matrix) {
     this.gl = gl;
+    this.context = context;
     this.matrix = matrix;
 
     this.quadrangle = new Quadrangle(gl);
-    this.spriteSheetTexture = new Texture(gl);
-    this.tileMapTexture = tileMapTexture;
-    this.chargeMapTexture = new Texture(gl, {width: tileMapTexture.width, height: tileMapTexture.height});
-    this.chargeMapTexture.setData(new Uint8Array(tileMapTexture.width*tileMapTexture.height*4));
+    this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
+    this.tileMapTexture = context.tileMapTexture;
+    this.chargeMapTexture = context.chargeMapTexture;
 
     this.shader = createShader(gl, tilemapVS, tilemapFS);
   }
 
-  setSpriteSheet(image) {
-    return image.then(image => {
-      this.spriteSheetTexture.setImage(image);
-    });
-  }
-
   render() {
+    if(!this.spriteSheetTexture.ready) return;
+
     this.quadrangle.bindShader(this.shader);
 
     this.shader.uniforms.inverseSpriteTextureSize = this.spriteSheetTexture.inverseSize;
     this.shader.uniforms.mapTextureSize = this.tileMapTexture.size;
-    this.shader.uniforms.tileSize = TILE_SIZE;
+    this.shader.uniforms.tileSize = this.context.tileSize;
     this.shader.uniforms.matrix = this.matrix;
 
     this.shader.uniforms.spriteSheet = this.spriteSheetTexture.sampler2D(0);
-    this.shader.uniforms.chargeMap = this.chargeMapTexture.sampler2D(2);
-    this.shader.uniforms.tileMap = this.tileMapTexture.sampler2D(1);
+    this.shader.uniforms.chargeMap = this.chargeMapTexture.sampler2D(1);
+    this.shader.uniforms.tileMap = this.tileMapTexture.sampler2D(2);
 
     this.quadrangle.render();
   }

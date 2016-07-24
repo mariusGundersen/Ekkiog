@@ -1,10 +1,10 @@
 import {vec2, mat3} from 'gl-matrix';
 
 export default class Perspective{
-  constructor(mapWidth, mapHeight, tileSize){
+  constructor({width, height, tileSize}){
     this.matrix = mat3.create();
-    this.mapSize = vec2.fromValues(mapWidth, mapHeight);
-    this.halfMapSize = vec2.fromValues(mapWidth/2, mapHeight/2);
+    this.mapSize = vec2.fromValues(width, height);
+    this.halfMapSize = vec2.fromValues(width/2, height/2);
     this.tileSize = vec2.fromValues(tileSize, tileSize);
     this.inverseTileSize = vec2.fromValues(1/tileSize, 1/tileSize);
     this.viewportSize = vec2.fromValues(1, 1);
@@ -13,7 +13,9 @@ export default class Perspective{
     this.position = vec2.fromValues(0, 0);
     this.negativePosition = vec2.fromValues(0, 0);
     this.scale = vec2.fromValues(1, 1);
-    this.inverseScale = vec2.fromValues(1, 1);
+    this.inverseScale = vec2.fromValues(0.5, 0.5);
+
+    this.recalculate();
   }
 
   translateBy(x, y){
