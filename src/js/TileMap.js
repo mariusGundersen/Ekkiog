@@ -53,25 +53,16 @@ export default class TileMap {
   }
 
   render() {
-    const gl = this.gl;
+    this.quadrangle.bindShader(this.shader);
 
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    this.shader.uniforms.inverseSpriteTextureSize = this.spriteSheetTexture.inverseSize;
+    this.shader.uniforms.mapTextureSize = this.tileMapTexture.size;
+    this.shader.uniforms.tileSize = TILE_SIZE;
+    this.shader.uniforms.matrix = this.matrix;
 
-    const shader = this.shader;
-
-    this.quadrangle.bindShader(shader);
-
-    shader.uniforms.inverseSpriteTextureSize = this.spriteSheetTexture.inverseSize;
-    shader.uniforms.tileSize = TILE_SIZE;
-
-    shader.uniforms.spriteSheet = this.spriteSheetTexture.sampler2D(0);
-    shader.uniforms.tileMap = this.tileMapTexture.sampler2D(1);
-    shader.uniforms.chargeMap = this.chargeMapTexture.sampler2D(2);
-
-    shader.uniforms.matrix = this.matrix;
-
-    shader.uniforms.mapTextureSize = this.tileMapTexture.size;
+    this.shader.uniforms.spriteSheet = this.spriteSheetTexture.sampler2D(0);
+    this.shader.uniforms.chargeMap = this.chargeMapTexture.sampler2D(2);
+    this.shader.uniforms.tileMap = this.tileMapTexture.sampler2D(1);
 
     this.quadrangle.render();
   }
