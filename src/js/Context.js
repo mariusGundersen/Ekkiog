@@ -1,4 +1,5 @@
 import DataTexture from './DataTexture.js';
+import RenderTexture from './RenderTexture.js';
 
 export default class Context{
   constructor(gl, width, height, tileSize){
@@ -8,8 +9,8 @@ export default class Context{
     this.tileSize = tileSize;
 
     this.mapTexture = new DataTexture(gl, width, height);
-    this.tileMapTexture = new DataTexture(gl, width, height);
-    this.chargeMapTexture = new DataTexture(gl, width, height);
+    this.tileMapTexture = new RenderTexture(gl, width, height);
+    this.chargeMapTexture = new RenderTexture(gl, width, height);
     this.netMapTexture = new DataTexture(gl, width, height);
     this.netChargeTexture = new DataTexture(gl, 256, 256);
   }

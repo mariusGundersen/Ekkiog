@@ -36,35 +36,20 @@ export default class TileMapEngine{
     this.quadrangle = new Quadrangle(gl);
     this.shader = createShader(gl, tileMapVS, tileMapFS);
 
-    this.width = context.width;
-    this.height = context.height;
-
     this.mapTexture = context.mapTexture;
-
-    this.frameBuffer = gl.createFramebuffer();
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
-
-    this.tileTexture = context.tileMapTexture;
-
-    const renderBuffer = this.gl.createRenderbuffer();
-    this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, renderBuffer);
-    this.gl.renderbufferStorage(this.gl.RENDERBUFFER, this.gl.DEPTH_COMPONENT16, this.width, this.height);
-    this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.tileTexture.texture, 0);
-    this.gl.framebufferRenderbuffer(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.RENDERBUFFER, renderBuffer);
+    this.renderTexture = context.tileMapTexture;
   }
 
   render(){
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
-    this.gl.viewport(0, 0, this.width, this.height);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    this.renderTexture.bindFramebuffer();
 
     this.quadrangle.bindShader(this.shader);
 
     this.shader.uniforms.tilemap = this.mapTexture.sampler2D(0);
-
     this.shader.uniforms.inverseTileTextureSize = this.mapTexture.inverseSize;
 
     this.quadrangle.render();
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+    this.renderTexture.unbindFramebuffer();
   }
 }
