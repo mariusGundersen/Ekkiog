@@ -40,6 +40,8 @@ export default class Texture{
         return 1;
       case this.gl.TEXTURE2:
         return 2;
+      case this.gl.TEXTURE3:
+        return 3;
       default:
         return -1;
     }
