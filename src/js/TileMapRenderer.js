@@ -40,12 +40,12 @@ export default class TileMapRenderer{
     this.width = width;
     this.height = height;
 
-    this.mapTexture = new Texture(gl, gl.TEXTURE0, {width: this.width, height: this.height});
+    this.mapTexture = new Texture(gl, {width: this.width, height: this.height});
 
     this.frameBuffer = gl.createFramebuffer();
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
 
-    this.tileTexture = new Texture(gl, gl.TEXTURE1, {width: this.width, height: this.height});
+    this.tileTexture = new Texture(gl, {width: this.width, height: this.height});
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);;
 
     const renderBuffer = this.gl.createRenderbuffer();
@@ -64,9 +64,7 @@ export default class TileMapRenderer{
 
     this.mapTexture.setData(data);
 
-    this.mapTexture.activate();
-    this.mapTexture.bind();
-    this.shader.uniforms.tilemap = this.mapTexture.sampler2D;
+    this.shader.uniforms.tilemap = this.mapTexture.sampler2D(0);
 
     this.shader.uniforms.inverseTileTextureSize = this.mapTexture.inverseSize;
 

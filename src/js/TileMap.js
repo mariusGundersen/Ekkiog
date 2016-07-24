@@ -38,9 +38,9 @@ export default class TileMap {
     this.matrix = matrix;
 
     this.quadrangle = new Quadrangle(gl);
-    this.spriteSheetTexture = new Texture(gl, gl.TEXTURE2);
+    this.spriteSheetTexture = new Texture(gl);
     this.tileMapTexture = tileMapTexture;
-    this.chargeMapTexture = new Texture(gl, gl.TEXTURE3, {width: tileMapTexture.width, height: tileMapTexture.height});
+    this.chargeMapTexture = new Texture(gl, {width: tileMapTexture.width, height: tileMapTexture.height});
     this.chargeMapTexture.setData(new Uint8Array(tileMapTexture.width*tileMapTexture.height*4));
 
     this.shader = createShader(gl, tilemapVS, tilemapFS);
@@ -65,17 +65,9 @@ export default class TileMap {
     shader.uniforms.inverseSpriteTextureSize = this.spriteSheetTexture.inverseSize;
     shader.uniforms.tileSize = TILE_SIZE;
 
-    this.spriteSheetTexture.activate();
-    shader.uniforms.spriteSheet = this.spriteSheetTexture.sampler2D;
-    this.spriteSheetTexture.bind();
-
-    this.tileMapTexture.activate();
-    shader.uniforms.tileMap = this.tileMapTexture.sampler2D;
-    this.tileMapTexture.bind();
-
-    this.chargeMapTexture.activate();
-    shader.uniforms.chargeMap = this.chargeMapTexture.sampler2D;
-    this.chargeMapTexture.bind();
+    shader.uniforms.spriteSheet = this.spriteSheetTexture.sampler2D(0);
+    shader.uniforms.tileMap = this.tileMapTexture.sampler2D(1);
+    shader.uniforms.chargeMap = this.chargeMapTexture.sampler2D(2);
 
     shader.uniforms.matrix = this.matrix;
 
