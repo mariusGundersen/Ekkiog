@@ -23,6 +23,7 @@
 
 import ViewEngine from './view/ViewEngine.js';
 import TileMapEngine from './tileMap/TileMapEngine.js';
+import ChargeMapEngine from './chargeMap/ChargeMapEngine.js';
 import Perspective from './Perspective.js';
 import Context from './Context.js';
 
@@ -34,6 +35,9 @@ export default class Renderer {
     const loaded = storage.load();
     this.context = new Context(gl, loaded.width, loaded.height, TILE_SIZE);
     this.context.import(loaded.data);
+
+    this.chargeMapEngine = new ChargeMapEngine(gl, this.context);
+    this.chargeMapEngine.render();
 
     this.tileMapEngine = new TileMapEngine(gl, this.context);
     this.context.mapTexture.update();
@@ -64,6 +68,12 @@ export default class Renderer {
       this.tileMapEngine.render();
       this.storage.save(this.context.export());
     });
+  }
+
+  tick(gl){
+    this.context.netChargeTexture.toggle(0, 0);
+    this.context.netChargeTexture.update();
+    this.chargeMapEngine.render();
   }
 
   draw(gl) {

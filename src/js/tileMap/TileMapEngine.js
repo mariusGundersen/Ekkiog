@@ -21,8 +21,6 @@
 *    distribution.
 */
 
-import {vec2} from 'gl-matrix';
-import ndarray from 'ndarray';
 import createShader from 'gl-shader';
 
 import Quadrangle from '../Quadrangle.js';

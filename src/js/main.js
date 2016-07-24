@@ -30,7 +30,9 @@ import Renderer from './Renderer.js';
 import TouchControls from './TouchControls.js';
 import Storage from './Storage.js';
 
-const shell = createShell();
+const shell = createShell({
+  tickRate: 1000
+});
 
 shell.on('gl-init', () => {
   const storage = new Storage();
@@ -42,6 +44,10 @@ shell.on('gl-init', () => {
   document.body.appendChild(stats.domElement);
   renderer.resize(shell.canvas.width, shell.canvas.height);
 
+  shell.on('tick', () => {
+    renderer.tick();
+  });
+
   shell.on('gl-render', (t) => {
     if(stats) { stats.begin(); }
     renderer.draw(shell.gl);
@@ -51,4 +57,8 @@ shell.on('gl-init', () => {
   shell.on('gl-resize', (w, h) => {
     renderer.resize(w, h);
   });
+
+  shell.on('gl-error', e => {
+    console.log(e);
+  })
 });

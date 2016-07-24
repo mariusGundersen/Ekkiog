@@ -39,7 +39,7 @@ void main(void) {
 
   if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, texCoord);
-    gl_FragColor = vec4(charge.x, charge.x, charge.x, 1.0);
+    gl_FragColor = vec4(charge.x, charge.x*0.75, 0.0, 1.0);
   }else{
     gl_FragColor = color;
   }
