@@ -1,5 +1,7 @@
 import unique from 'array-unique';
 
+import floodFill from './floodFill.js';
+
 const EMPTY = 0;
 const WIRE = 1;
 const GATE = 2;
@@ -12,11 +14,16 @@ export default class Editor{
   drawWire(x, y){
     if(this.isGate(x, y)) return;
 
-    var neighbouringNets = this.getNeighbouringNets(x, y);
+    const neighbouringNets = this.getNeighbouringNets(x, y);
     if(neighbouringNets.length > 1) return;
 
     this.context.mapTexture.set(x, y, WIRE);
-    this.context.netMapTexture.set(x, y, neighbouringNets[0] || 0);
+    if(neighbouringNets.length == 1){
+      const net = neighbouringNets[0];
+      floodFill(x, y,
+        (x, y) => this.isWire(x, y) && this.context.netMapTexture.get16(x, y) === 0,
+        (x, y) => this.context.netMapTexture.set(x, y, net));
+    }
 
     this.context.mapTexture.update();
     this.context.netMapTexture.update();
@@ -53,7 +60,7 @@ export default class Editor{
   }
 
   getNeighbouringNets(x, y){
-    var nets = [
+    const nets = [
       this.context.netMapTexture.get16(x+1, y+0),
       this.context.netMapTexture.get16(x-1, y+0),
       this.context.netMapTexture.get16(x+0, y+1),

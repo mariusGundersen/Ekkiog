@@ -27,7 +27,7 @@ import ChargeMapEngine from './chargeMap/ChargeMapEngine.js';
 import NetChargeEngine from './netCharges/NetChargeEngine.js';
 import Perspective from './Perspective.js';
 import Context from './Context.js';
-import Editor from './Editor.js';
+import Editor from './editing/Editor.js';
 
 import fill from 'ndarray-fill';
 
