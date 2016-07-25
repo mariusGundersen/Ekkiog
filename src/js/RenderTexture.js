@@ -20,7 +20,6 @@ export default class RenderTexture extends Texture{
   bindFramebuffer(){
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
     this.gl.viewport(0, 0, this.width, this.height);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
 
   unbindFramebuffer(){
