@@ -58,7 +58,7 @@ export default class TouchControls{
       next: radius.next + Math.sqrt(diff.x*diff.x + diff.y*diff.y)/c.length
     }), {previous: 0, next: 0});
 
-    this.renderer.translateBy(avg.dx, avg.dy);
+    this.renderer.translateBy(avg.dx*window.devicePixelRatio, avg.dy*window.devicePixelRatio);
     if(radius.previous != 0 && radius.next != 0){
       this.renderer.scaleBy(radius.next/radius.previous);
     }
@@ -71,7 +71,7 @@ export default class TouchControls{
     const pointersToRemove = touches.map(t => this.pointers.filter(pointer => pointer.id == t.identifier)[0]).filter(x => x);
     this.pointers = this.pointers.filter(pointer => !pointersToRemove.some(touch => touch.id == pointer.id));
     for(const tap of pointersToRemove.filter(p => !p.moved)){
-      this.renderer.tap(tap.x, tap.y);
+      this.renderer.tap(tap.x*window.devicePixelRatio, tap.y*window.devicePixelRatio);
     }
     event.preventDefault();
   }
