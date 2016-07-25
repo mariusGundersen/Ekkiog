@@ -22,7 +22,7 @@ export default class Context{
   import(data){
     for(let y=0; y<this.height; y++){
       for(let x=0; x<this.width; x++){
-        this.mapTexture.set(x, y, data[y*this.height + x]);
+        this.mapTexture.set(x, y, data[y*this.height + x] || 0);
       }
     }
 

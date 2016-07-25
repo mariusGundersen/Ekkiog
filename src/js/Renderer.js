@@ -11,7 +11,7 @@ const TILE_SIZE = 16;
 export default class Renderer {
   constructor(gl, storage) {
     this.storage = storage;
-    const loaded = storage.load();
+    const loaded = storage.load() || {width: 128, height: 128, data: []};
     this.context = new Context(gl, loaded.width, loaded.height, TILE_SIZE);
     this.editor = new Editor(this.context);
     this.context.import(loaded.data);
