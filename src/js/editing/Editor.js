@@ -41,6 +41,7 @@ export default class Editor{
 
   drawGate(x, y){
     if(!this.query.canPlaceGateHere(x, y)) return;
+    if(!this.query.isGroundNet(x+1, y)) return;
 
     const nextNet = this.query.getNextNet();
 
@@ -54,12 +55,19 @@ export default class Editor{
     this.context.mapTexture.set(x, y, GATE);
     this.context.netMapTexture.set16(x, y, nextNet);
 
-    const [netX, netY] = this.split(nextNet);
+    this.context.netMapTexture.set16(x-3, y-1, this.query.getNet(x-4, y-1));
+    this.context.netMapTexture.set16(x-3, y+1, this.query.getNet(x-4, y+1));
 
-    this.context.gatesTexture.set(netY, netX, 0, 0);
-    this.context.gatesTexture.set(netY, netX, 1, 0);
-    this.context.gatesTexture.set(netY, netX, 2, 0);
-    this.context.gatesTexture.set(netY, netX, 3, 0);
+    this.updateGate(x, y);
+
+    floodFill(x, y, this.context.width, this.context.height,
+      (x, y) => (this.query.isWire(x, y) || this.query.isGateInput(x, y) || this.query.isGateOutput(x, y)),
+      (x, y) => {
+        this.context.netMapTexture.set(x, y, nextNet);
+        if(this.query.isGateInput(x, y)){
+          this.updateGate(...this.query.getGateForInput(x, y));
+        }
+      });
 
     this.context.netMapTexture.update();
     this.context.gatesTexture.update();
@@ -68,6 +76,16 @@ export default class Editor{
 
   clearGate(x, y){
     const [netX, netY] = this.split(this.query.getNet(x, y));
+
+    floodFill(x, y, this.context.width, this.context.height,
+      (x, y) => (this.query.isWire(x, y) || this.query.isGateInput(x, y) || this.query.isGateOutput(x, y)),
+      (x, y) => {
+        this.context.netMapTexture.set(x, y, GROUND);
+        if(this.query.isGateInput(x, y)){
+          this.updateGate(...this.query.getGateForInput(x, y));
+        }
+      });
+
     this.context.mapTexture.set(x, y, EMPTY);
     this.context.netMapTexture.set16(x, y, GROUND);
 
