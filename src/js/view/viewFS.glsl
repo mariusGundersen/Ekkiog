@@ -9,6 +9,10 @@ uniform vec2 inverseSpriteTextureSize;
 uniform float tileSize;
 
 void main(void) {
+  if(texCoord.x > 1.0 || texCoord.y > 1.0){
+    discard;
+  }
+
   vec4 tile = texture2D(tileMap, texCoord);
   vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;
   vec2 spriteCoord = mod(pixelCoord, tileSize);

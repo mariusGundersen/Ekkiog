@@ -12,6 +12,7 @@ body{
 
 canvas{
   flex: 1 0 100%;
+  background: black;
 }
 
 .toolbar{
@@ -31,6 +32,7 @@ canvas{
   border: none;
   font-family: sans-serif;
   font-size: 2em;
+  border-radius: 0;
 }
 
 .toolbar>button.selected{
