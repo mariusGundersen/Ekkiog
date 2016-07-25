@@ -27,6 +27,7 @@ import ChargeMapEngine from './chargeMap/ChargeMapEngine.js';
 import NetChargeEngine from './netCharges/NetChargeEngine.js';
 import Perspective from './Perspective.js';
 import Context from './Context.js';
+import Editor from './Editor.js';
 
 import fill from 'ndarray-fill';
 
@@ -37,6 +38,7 @@ export default class Renderer {
     this.storage = storage;
     const loaded = storage.load();
     this.context = new Context(gl, loaded.width, loaded.height, TILE_SIZE);
+    this.editor = new Editor(this.context);
     this.context.import(loaded.data);
 
     this.context.mapTexture.set(65, 66, 2);
@@ -84,8 +86,7 @@ export default class Renderer {
     const [tx, ty] = this.perspective.viewportToMap(x, y);
     console.log(x, y, tx, ty);
     window.requestAnimationFrame(() => {
-      this.context.mapTexture.toggle(tx, ty);
-      this.context.mapTexture.update();
+      this.editor.drawWire(tx, ty);
       this.tileMapEngine.render();
       this.storage.save(this.context.export());
     });
