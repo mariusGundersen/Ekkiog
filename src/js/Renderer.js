@@ -10,6 +10,7 @@ const TILE_SIZE = 16;
 
 export default class Renderer {
   constructor(gl, storage) {
+    this.tool = 'wire';
     this.storage = storage;
     const loaded = storage.load() || {width: 128, height: 128, data: []};
     this.context = new Context(gl, loaded.width, loaded.height, TILE_SIZE);
@@ -53,14 +54,24 @@ export default class Renderer {
     this.perspective.translateBy(x, y);
   }
 
+  setSelectedTool(tool){
+    this.tool = tool;
+  }
+
   tap(x, y){
     const [tx, ty] = this.perspective.viewportToMap(x, y);
     console.log(x, y, tx, ty);
     window.requestAnimationFrame(() => {
-      if(this.editor.query.isWire(tx, ty)){
-        this.editor.clear(tx, ty);
+      if(this.tool == 'wire'){
+        if(this.editor.query.isWire(tx, ty)){
+          this.editor.clearWire(tx, ty);
+        }else{
+          this.editor.drawWire(tx, ty);
+        }
+      }else if(this.tool == 'gate'){
+        this.editor.drawGate(tx, ty);
       }else{
-        this.editor.drawWire(tx, ty);
+        this.editor.clear(tx, ty);
       }
       this.tileMapEngine.render();
       this.storage.save(this.context.export());

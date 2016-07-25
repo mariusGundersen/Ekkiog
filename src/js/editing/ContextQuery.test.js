@@ -87,3 +87,54 @@ test('getNetSource', t => {
   t.deepEqual(cq.getNetSource(1), [10, 7]);
   t.deepEqual(cq.getNetSource(0), [-1, -1]);
 });
+
+test('canPlaceGateHere', t => {
+  //Gate at 10, 7
+  t.false(cq.canPlaceGateHere(7, 5));
+  t.false(cq.canPlaceGateHere(7, 6));
+  t.false(cq.canPlaceGateHere(7, 7));
+  t.false(cq.canPlaceGateHere(7, 8));
+  t.false(cq.canPlaceGateHere(7, 9));
+
+  t.false(cq.canPlaceGateHere(8, 5));
+  t.false(cq.canPlaceGateHere(8, 6));
+  t.false(cq.canPlaceGateHere(8, 7));
+  t.false(cq.canPlaceGateHere(8, 8));
+  t.false(cq.canPlaceGateHere(8, 9));
+
+  t.false(cq.canPlaceGateHere(9, 5));
+  t.false(cq.canPlaceGateHere(9, 6));
+  t.false(cq.canPlaceGateHere(9, 7));
+  t.false(cq.canPlaceGateHere(9, 8));
+  t.false(cq.canPlaceGateHere(9, 9));
+
+  t.false(cq.canPlaceGateHere(10, 5));
+  t.false(cq.canPlaceGateHere(10, 6));
+  t.false(cq.canPlaceGateHere(10, 7));
+  t.false(cq.canPlaceGateHere(10, 8));
+  t.false(cq.canPlaceGateHere(10, 9));
+
+  t.false(cq.canPlaceGateHere(11, 5));
+  t.false(cq.canPlaceGateHere(11, 6));
+  t.false(cq.canPlaceGateHere(11, 7));
+  t.false(cq.canPlaceGateHere(11, 8));
+  t.false(cq.canPlaceGateHere(11, 9));
+
+  t.false(cq.canPlaceGateHere(12, 5));
+  t.false(cq.canPlaceGateHere(12, 6));
+  t.false(cq.canPlaceGateHere(12, 7));
+  t.false(cq.canPlaceGateHere(12, 8));
+  t.false(cq.canPlaceGateHere(12, 9));
+
+  t.false(cq.canPlaceGateHere(13, 5));
+  t.false(cq.canPlaceGateHere(13, 6));
+  t.false(cq.canPlaceGateHere(13, 7));
+  t.false(cq.canPlaceGateHere(13, 8));
+  t.false(cq.canPlaceGateHere(13, 9));
+
+  t.true(cq.canPlaceGateHere(14, 7));
+});
+
+test('getNextNet', t => {
+  t.is(cq.getNextNet(), 2);
+});

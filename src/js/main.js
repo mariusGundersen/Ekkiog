@@ -24,6 +24,15 @@ shell.on('gl-init', () => {
   engineStats.domElement.id = 'engineStats';
   document.body.appendChild(engineStats.domElement);
 
+  const buttons = Array.from(document.querySelectorAll('.toolbar>button'));
+  for(const button of buttons){
+    button.addEventListener('click', e => {
+      buttons.forEach(b => b.className = '');
+      button.className = 'selected';
+      renderer.setSelectedTool(button.dataset.type);
+    });
+  }
+
   touchControls.listen(shell.canvas);
   renderer.resize(shell.canvas.width, shell.canvas.height);
 

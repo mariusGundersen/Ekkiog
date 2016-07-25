@@ -40,15 +40,48 @@ export default class Editor{
   }
 
   drawGate(x, y){
-    if(this.query.isGate(x, y)) return;
+    if(!this.query.canPlaceGateHere(x, y)) return;
+
+    const nextNet = this.query.getNextNet();
+
+    for(let cy=y-1; cy<=y+1; cy++){
+      for(let cx=x-3; cx<=x; cx++){
+        this.context.mapTexture.set(cx, cy, EMPTY);
+        this.context.netMapTexture.set(cx, cy, GROUND);
+      }
+    }
 
     this.context.mapTexture.set(x, y, GATE);
+    this.context.netMapTexture.set16(x, y, nextNet);
+
+    const [netX, netY] = this.split(nextNet);
+
+    this.context.gatesTexture.set(netY, netX, 0, 0);
+    this.context.gatesTexture.set(netY, netX, 1, 0);
+    this.context.gatesTexture.set(netY, netX, 2, 0);
+    this.context.gatesTexture.set(netY, netX, 3, 0);
+
+    this.context.netMapTexture.update();
+    this.context.gatesTexture.update();
     this.context.mapTexture.update();
   }
 
-  clear(x, y){
-    if(this.query.isGate(x, y)) return;
+  clearGate(x, y){
+    const [netX, netY] = this.split(this.query.getNet(x, y));
+    this.context.mapTexture.set(x, y, EMPTY);
+    this.context.netMapTexture.set16(x, y, GROUND);
 
+    this.context.gatesTexture.set(netY, netX, 0, 0);
+    this.context.gatesTexture.set(netY, netX, 1, 0);
+    this.context.gatesTexture.set(netY, netX, 2, 0);
+    this.context.gatesTexture.set(netY, netX, 3, 0);
+
+    this.context.netMapTexture.update();
+    this.context.gatesTexture.update();
+    this.context.mapTexture.update();
+  }
+
+  clearWire(x, y){
     const net = this.query.getNet(x, y);
 
     floodFill(x, y, this.context.width, this.context.height,
@@ -77,6 +110,15 @@ export default class Editor{
     this.context.mapTexture.update();
     this.context.netMapTexture.update();
     this.context.gatesTexture.update();
+  }
+
+  clear(x, y){
+    if(this.query.isGate(x, y)){
+      const [gateX, gateY] = this.query.getGateOutput(x, y);
+      this.clearGate(gateX, gateY);
+    }else if(this.query.isWire(x, y)){
+      this.cloarWire(x, y);
+    }
   }
 
   updateGate(x, y){

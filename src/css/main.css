@@ -14,6 +14,29 @@ canvas{
   flex: 1 0 100%;
 }
 
+.toolbar{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+}
+
+.toolbar>button{
+  flex: 1 0 auto;
+  height: 2em;
+  background: black;
+  color: white;
+  border: none;
+  font-family: sans-serif;
+  font-size: 2em;
+}
+
+.toolbar>button.selected{
+  box-shadow: 0 0 1em 0 red inset;
+}
+
 #viewStats{
   position: absolute;
   top: 0;
