@@ -14,6 +14,7 @@ export default class Perspective{
     this.negativePosition = vec2.fromValues(0, 0);
     this.scale = vec2.fromValues(1, 1);
     this.inverseScale = vec2.fromValues(0.5, 0.5);
+    this.flip = vec2.fromValues(1, -1);
 
     this.recalculate();
   }
@@ -57,6 +58,7 @@ export default class Perspective{
   recalculate(){
     mat3.fromScaling(this.matrix, this.inverseHalfViewportSize);
     mat3.translate(this.matrix, this.matrix, this.negativePosition);
+    mat3.scale(this.matrix, this.matrix, this.flip);
     mat3.scale(this.matrix, this.matrix, this.scale);
     mat3.scale(this.matrix, this.matrix, this.mapSize);
     mat3.scale(this.matrix, this.matrix, this.tileSize);

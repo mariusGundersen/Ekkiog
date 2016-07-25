@@ -22,8 +22,7 @@
 */
 
 import createShader from 'gl-shader';
-
-import Quadrangle from '../Quadrangle.js';
+import fillScreen from 'a-big-triangle';
 
 import tileMapVS from './tileMapVS.glsl';
 import tileMapFS from './tileMapFS.glsl';
@@ -31,7 +30,6 @@ import tileMapFS from './tileMapFS.glsl';
 export default class TileMapEngine{
   constructor(gl, context) {
     this.gl = gl;
-    this.quadrangle = new Quadrangle(gl);
     this.shader = createShader(gl, tileMapVS, tileMapFS);
 
     this.mapTexture = context.mapTexture;
@@ -41,12 +39,12 @@ export default class TileMapEngine{
   render(){
     this.renderTexture.bindFramebuffer();
 
-    this.quadrangle.bindShader(this.shader);
+    this.shader.bind();
 
     this.shader.uniforms.tilemap = this.mapTexture.sampler2D(0);
     this.shader.uniforms.inverseTileTextureSize = this.mapTexture.inverseSize;
 
-    this.quadrangle.render();
+    fillScreen(this.gl);
 
     this.renderTexture.unbindFramebuffer();
   }

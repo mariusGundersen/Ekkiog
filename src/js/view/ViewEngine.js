@@ -23,9 +23,9 @@
 
 import {vec2, mat3} from 'gl-matrix';
 import createShader from 'gl-shader';
+import fillScreen from 'a-big-triangle';
 
 import ImageTexture from '../ImageTexture.js';
-import Quadrangle from '../Quadrangle.js';
 import loadImage from '../loadImage.js';
 import tiles from '../../img/tiles.png';
 
@@ -38,7 +38,6 @@ export default class ViewEngine {
     this.context = context;
     this.matrix = matrix;
 
-    this.quadrangle = new Quadrangle(gl);
     this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
     this.tileMapTexture = context.tileMapTexture;
     this.chargeMapTexture = context.chargeMapTexture;
@@ -49,7 +48,7 @@ export default class ViewEngine {
   render() {
     if(!this.spriteSheetTexture.ready) return;
 
-    this.quadrangle.bindShader(this.shader);
+    this.shader.bind();
 
     this.shader.uniforms.inverseSpriteTextureSize = this.spriteSheetTexture.inverseSize;
     this.shader.uniforms.mapTextureSize = this.tileMapTexture.size;
@@ -60,6 +59,6 @@ export default class ViewEngine {
     this.shader.uniforms.chargeMap = this.chargeMapTexture.sampler2D(1);
     this.shader.uniforms.tileMap = this.tileMapTexture.sampler2D(2);
 
-    this.quadrangle.render();
+    fillScreen(this.gl);
   }
 }

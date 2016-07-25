@@ -1,6 +1,5 @@
 import createShader from 'gl-shader';
-
-import Quadrangle from '../Quadrangle.js';
+import fillScreen from 'a-big-triangle';
 
 import netChargesVS from './netChargesVS.glsl';
 import netChargesFS from './netChargesFS.glsl';
@@ -8,7 +7,6 @@ import netChargesFS from './netChargesFS.glsl';
 export default class NetChargeEngine{
   constructor(gl, context) {
     this.gl = gl;
-    this.quadrangle = new Quadrangle(gl);
     this.shader = createShader(gl, netChargesVS, netChargesFS);
 
     this.netChargeTextures = context.netChargeTextures;
@@ -21,13 +19,13 @@ export default class NetChargeEngine{
 
     outputTexture.bindFramebuffer();
 
-    this.quadrangle.bindShader(this.shader);
+    this.shader.bind();
 
     this.shader.uniforms.gates = this.gatesTexture.sampler2D(0);
 
     this.shader.uniforms.netCharges = inputTexture.sampler2D(1);
 
-    this.quadrangle.render();
+    fillScreen(this.gl);
 
     outputTexture.unbindFramebuffer();
   }
