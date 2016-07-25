@@ -28,6 +28,8 @@ import NetChargeEngine from './netCharges/NetChargeEngine.js';
 import Perspective from './Perspective.js';
 import Context from './Context.js';
 
+import fill from 'ndarray-fill';
+
 const TILE_SIZE = 16;
 
 export default class Renderer {
@@ -39,14 +41,23 @@ export default class Renderer {
 
     this.context.mapTexture.set(65, 66, 2);
 
-    this.context.mapTexture.set(70, 65, 2);
+    this.context.netMapTexture.set(62, 67, 2);
 
-    this.context.mapTexture.set(70, 69, 2);
+    this.context.netMapTexture.set(62, 65, 2);
+
+    this.context.netMapTexture.set(65, 66, 2);
+    this.context.netMapTexture.set(66, 66, 2);
+    this.context.netMapTexture.set(67, 66, 2);
+
+    this.context.gatesTexture.map.set(0, 2, 0, 2);
+    this.context.gatesTexture.map.set(0, 2, 2, 2);
 
     this.netChargeEngine = new NetChargeEngine(gl, this.context);
+    this.context.gatesTexture.update();
     this.netChargeEngine.render(0);
 
     this.chargeMapEngine = new ChargeMapEngine(gl, this.context);
+    this.context.netMapTexture.update();
     this.chargeMapEngine.render(0);
 
     this.tileMapEngine = new TileMapEngine(gl, this.context);
