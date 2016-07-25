@@ -27,10 +27,12 @@ export default class RenderTexture extends Texture{
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
   }
 
-  export(arrayBuffer){
+  export(){
+    const arrayBuffer = new Uint8Array(this.width*this.height*4);
     this.bindFramebuffer();
     this.gl.readPixels(0, 0, this.width, this.height, this.gl.RGBA, this.gl.UNSIGNED_BYTE, arrayBuffer);
     this.unbindFramebuffer();
+    return arrayBuffer;
   }
 
   import(arrayBuffer){

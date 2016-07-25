@@ -12,19 +12,9 @@ export default class Renderer {
   constructor(gl, storage) {
     this.tool = 'wire';
     this.storage = storage;
-    const loaded = storage.load() || {width: 128, height: 128, data: []};
-    this.context = new Context(gl, loaded.width, loaded.height, TILE_SIZE);
+    const loaded = storage.load() || {width: 128, height: 128};
+    this.context = new Context(gl, loaded, TILE_SIZE);
     this.editor = new Editor(this.context);
-    this.context.import(loaded.data);
-
-    this.context.mapTexture.set(65, 66, 2);
-    this.context.netMapTexture.set(65, 66, 2);
-
-    this.context.mapTexture.set(75, 60, 2);
-    this.context.netMapTexture.set(75, 60, 3);
-
-    this.context.mapTexture.set(75, 66, 2);
-    this.context.netMapTexture.set(75, 66, 4);
 
     this.netChargeEngine = new NetChargeEngine(gl, this.context);
     this.context.gatesTexture.update();

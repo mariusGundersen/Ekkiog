@@ -1,47 +1,44 @@
+import {encode as encodeArray, decode as decodeArary} from 'base64-arraybuffer';
+
 import DataTexture from './DataTexture.js';
 import RenderTexture from './RenderTexture.js';
 
 export default class Context{
-  constructor(gl, width, height, tileSize){
+  constructor(gl, data, tileSize){
     this.gl = gl;
-    this.width = width;
-    this.height = height;
+    this.width = data.width;
+    this.height = data.height;
     this.tileSize = tileSize;
 
-    this.mapTexture = new DataTexture(gl, width, height);
-    this.tileMapTexture = new RenderTexture(gl, width, height);
-    this.chargeMapTexture = new RenderTexture(gl, width, height);
-    this.netMapTexture = new DataTexture(gl, width, height);
+    this.mapTexture = new DataTexture(gl, this.width, this.height);
+    this.tileMapTexture = new RenderTexture(gl, this.width, this.height);
+    this.chargeMapTexture = new RenderTexture(gl, this.width, this.height);
+    this.netMapTexture = new DataTexture(gl, this.width, this.height);
     this.netChargeTextures = [
       new RenderTexture(gl, 256, 256),
       new RenderTexture(gl, 256, 256)
     ];
     this.gatesTexture = new DataTexture(gl, 256, 256);
+
+    this.import(data);
   }
 
   import(data){
-    for(let y=0; y<this.height; y++){
-      for(let x=0; x<this.width; x++){
-        this.mapTexture.set(x, y, data[y*this.height + x] || 0);
-      }
-    }
-
-    this.mapTexture.update();
+    if(data.map) this.mapTexture.import(new Uint8Array(decodeArary(data.map)));
+    if(data.netMap) this.netMapTexture.import(new Uint8Array(decodeArary(data.netMap)));
+    if(data.gates) this.gatesTexture.import(new Uint8Array(decodeArary(data.gates)));
+    if(data.netCharges) this.netChargeTextures[0].import(new Uint8Array(decodeArary(data.netCharges)));
+    if(data.netCharges) this.netChargeTextures[1].import(new Uint8Array(decodeArary(data.netCharges)));
   }
 
   export(){
-    const data = [];
-
-    for(let y=0; y<this.height; y++){
-      for(let x=0; x<this.width; x++){
-        data[y*this.height + x] = this.mapTexture.get(x, y);
-      }
-    }
-
     return {
       width: this.width,
       height: this.height,
-      data: data
+      map: encodeArray(this.mapTexture.export()),
+      netMap: encodeArray(this.netMapTexture.export()),
+      gates: encodeArray(this.gatesTexture.export()),
+      netCharges: encodeArray(this.netChargeTextures[0].export()),
     };
   }
 }
