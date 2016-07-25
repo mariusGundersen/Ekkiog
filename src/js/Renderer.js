@@ -19,19 +19,13 @@ export default class Renderer {
     this.context.import(loaded.data);
 
     this.context.mapTexture.set(65, 66, 2);
-
-    this.context.netMapTexture.set(62, 67, 2);
-
-    this.context.netMapTexture.set(62, 65, 2);
-
     this.context.netMapTexture.set(65, 66, 2);
-    this.context.netMapTexture.set(66, 66, 2);
-    this.context.netMapTexture.set(67, 66, 2);
 
-    this.context.netMapTexture.set(69, 66, 3);
+    this.context.mapTexture.set(75, 60, 2);
+    this.context.netMapTexture.set(75, 60, 3);
 
-    this.context.gatesTexture.map.set(0, 2, 0, 2);
-    this.context.gatesTexture.map.set(0, 2, 2, 2);
+    this.context.mapTexture.set(75, 66, 2);
+    this.context.netMapTexture.set(75, 66, 4);
 
     this.netChargeEngine = new NetChargeEngine(gl, this.context);
     this.context.gatesTexture.update();
@@ -65,7 +59,7 @@ export default class Renderer {
     const [tx, ty] = this.perspective.viewportToMap(x, y);
     console.log(x, y, tx, ty);
     window.requestAnimationFrame(() => {
-      if(this.editor.isWire(tx, ty)){
+      if(this.editor.query.isWire(tx, ty)){
         this.editor.clear(tx, ty);
       }else{
         this.editor.drawWire(tx, ty);
