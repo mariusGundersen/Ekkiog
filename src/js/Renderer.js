@@ -6,8 +6,6 @@ import Perspective from './Perspective.js';
 import Context from './Context.js';
 import Editor from './editing/Editor.js';
 
-import fill from 'ndarray-fill';
-
 const TILE_SIZE = 16;
 
 export default class Renderer {
