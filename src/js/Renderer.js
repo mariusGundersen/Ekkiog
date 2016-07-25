@@ -51,6 +51,8 @@ export default class Renderer {
     this.context.netMapTexture.set(66, 66, 2);
     this.context.netMapTexture.set(67, 66, 2);
 
+    this.context.netMapTexture.set(69, 66, 3);
+
     this.context.gatesTexture.map.set(0, 2, 0, 2);
     this.context.gatesTexture.map.set(0, 2, 2, 2);
 
@@ -86,7 +88,11 @@ export default class Renderer {
     const [tx, ty] = this.perspective.viewportToMap(x, y);
     console.log(x, y, tx, ty);
     window.requestAnimationFrame(() => {
-      this.editor.drawWire(tx, ty);
+      if(this.editor.isWire(tx, ty)){
+        this.editor.clear(tx, ty);
+      }else{
+        this.editor.drawWire(tx, ty);
+      }
       this.tileMapEngine.render();
       this.storage.save(this.context.export());
     });
