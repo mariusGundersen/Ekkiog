@@ -17,16 +17,48 @@ export default class Perspective{
     mat3.invert(this.reverseMatrix, this.matrix);
   }
 
-  panZoom(previous, next){
-    const previousCoord = this.viewportToMap(previous.x, previous.y);
-    const nextCoord = this.viewportToMap(next.x, next.y);
+  get scale(){
+    return this.matrix[0];
+  }
 
-    mat3.translate(this.matrix, this.matrix, [nextCoord[0], nextCoord[1]]);
+  set scale(scale){
+    this.scaleBy(scale/this.matrix[0]);
+  }
+
+  scaleBy(r){
+    this.panZoomInMapSpace({
+      x: 0,
+      y: 0,
+      r: 1
+    },{
+      x: 0,
+      y: 0,
+      r: r
+    });
+  }
+
+  panZoom(previous, next){
+    const previousCoord = this.viewportToMapCenter(previous.x, previous.y);
+    const nextCoord = this.viewportToMapCenter(next.x, next.y);
+
+    this.panZoomInMapSpace({
+      x: previousCoord[0],
+      y: previousCoord[1],
+      r: previous.r
+    },{
+      x: nextCoord[0],
+      y: nextCoord[1],
+      r: next.r
+    });
+  }
+
+  panZoomInMapSpace(previous, next){
+    mat3.translate(this.matrix, this.matrix, [next.x, next.y]);
     mat3.scale(this.matrix, this.matrix, this.viewportAspectRatio);
     mat3.scale(this.matrix, this.matrix, [1/previous.r, 1/previous.r]);
     mat3.scale(this.matrix, this.matrix, [next.r, next.r]);
     mat3.scale(this.matrix, this.matrix, this.inverseViewportAspectRatio);
-    mat3.translate(this.matrix, this.matrix, [-previousCoord[0], -previousCoord[1]]);
+    mat3.translate(this.matrix, this.matrix, [-previous.x, -previous.y]);
 
     mat3.invert(this.reverseMatrix, this.matrix);
   }
@@ -47,7 +79,7 @@ export default class Perspective{
   }
 
   viewportToTile(x, y){
-    const pos = this.viewportToMap(x, y);
+    const pos = this.viewportToMapCenter(x, y);
 
     vec2.add(pos, pos, [1, 1]);
     vec2.multiply(pos, pos, this.halfMapSize);
@@ -55,7 +87,7 @@ export default class Perspective{
     return [Math.floor(pos[0]), Math.floor(pos[1])];
   }
 
-  viewportToMap(x, y){
+  viewportToMapCenter(x, y){
     const pos = this.toClipSpace(x, y);
     vec2.transformMat3(pos, pos, this.reverseMatrix);
     return pos;

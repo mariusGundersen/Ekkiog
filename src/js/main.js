@@ -35,7 +35,6 @@ for(const button of buttons){
 }
 
 touchControls.listen(shell.canvas);
-renderer.resize(shell.canvas.width, shell.canvas.height);
 
 shell.tick((tickCount) => {
   engineStats.begin();
