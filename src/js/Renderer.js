@@ -36,18 +36,6 @@ export default class Renderer {
     this.perspective.setViewport(width, height);
   }
 
-  scaleBy(scale){
-    this.perspective.scaleBy(scale);
-  }
-
-  translateBy(x, y){
-    this.perspective.translateBy(x, y);
-  }
-
-  setCenter(x, y){
-    this.perspective.setCenter(x, y);
-  }
-
   panZoom(previous, next){
     this.perspective.panZoom(previous, next);
   }
