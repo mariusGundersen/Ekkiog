@@ -44,12 +44,16 @@ export default class Renderer {
     this.perspective.translateBy(x, y);
   }
 
+  setCenter(x, y){
+    this.perspective.setCenter(x, y);
+  }
+
   setSelectedTool(tool){
     this.tool = tool;
   }
 
   tap(x, y){
-    const [tx, ty] = this.perspective.viewportToMap(x, y);
+    const [tx, ty] = this.perspective.viewportToTile(x, y);
     console.log(x, y, tx, ty);
     window.requestAnimationFrame(() => {
       if(this.tool == 'wire'){
