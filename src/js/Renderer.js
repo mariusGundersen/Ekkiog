@@ -48,6 +48,10 @@ export default class Renderer {
     this.perspective.setCenter(x, y);
   }
 
+  panZoom(previous, next){
+    this.perspective.panZoom(previous, next);
+  }
+
   setSelectedTool(tool){
     this.tool = tool;
   }

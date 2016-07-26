@@ -19,12 +19,12 @@ export default class TouchControls{
       moved: false
     })));
 
-    const avg = this.pointers.reduce((sum, touch, i, c) => ({
-      x: sum.x + touch.x/c.length,
-      y: sum.y + touch.y/c.length
-    }), {x:0, y:0});
+    //const avg = this.pointers.reduce((sum, touch, i, c) => ({
+    //  x: sum.x + touch.x/c.length,
+    //  y: sum.y + touch.y/c.length
+    //}), {x:0, y:0});
 
-    this.renderer.setCenter(avg.x*window.devicePixelRatio, avg.y*window.devicePixelRatio);
+    //this.renderer.setCenter(avg.x*window.devicePixelRatio, avg.y*window.devicePixelRatio);
 
     event.preventDefault();
   }
@@ -64,12 +64,24 @@ export default class TouchControls{
     })).reduce((radius, diff, i, c) => ({
       previous: radius.previous + Math.sqrt(diff.px*diff.px + diff.py*diff.py)/c.length,
       next: radius.next + Math.sqrt(diff.x*diff.x + diff.y*diff.y)/c.length
-    }), {previous: 0, next: 0});
+    }), {previous: 1, next: 1});
 
-    this.renderer.translateBy(-avg.dx*window.devicePixelRatio, -avg.dy*window.devicePixelRatio);
-    if(radius.previous != 0 && radius.next != 0){
-      this.renderer.scaleBy(radius.next/radius.previous);
-    }
+    const radiusRatio = radius.previous == 0 || radius.next == 0 ? 1 : radius.next/radius.previous;
+
+    //this.renderer.translateBy(-avg.dx*window.devicePixelRatio, -avg.dy*window.devicePixelRatio);
+    //if(radius.previous != 0 && radius.next != 0){
+    //  this.renderer.scaleBy(radius.next/radius.previous);
+    //}
+
+    this.renderer.panZoom({
+      x: avg.px*window.devicePixelRatio,
+      y: avg.py*window.devicePixelRatio,
+      r: radius.previous
+    },{
+      x: avg.x*window.devicePixelRatio,
+      y: avg.y*window.devicePixelRatio,
+      r: radius.next
+    });
 
     event.preventDefault();
   }
@@ -79,14 +91,15 @@ export default class TouchControls{
     const pointersToRemove = touches.map(t => this.pointers.filter(pointer => pointer.id == t.identifier)[0]).filter(x => x);
     this.pointers = this.pointers.filter(pointer => !pointersToRemove.some(touch => touch.id == pointer.id));
 
-    if(this.pointers.length > 0){
+    /*if(this.pointers.length > 0){
       const avg = this.pointers.reduce((sum, touch, i, c) => ({
         x: sum.x + touch.x/c.length,
         y: sum.y + touch.y/c.length
       }), {x:0, y:0});
 
       this.renderer.setCenter(avg.x*window.devicePixelRatio, avg.y*window.devicePixelRatio);
-    }
+    }*/
+
     for(const tap of pointersToRemove.filter(p => !p.moved)){
       this.renderer.tap(tap.x*window.devicePixelRatio, tap.y*window.devicePixelRatio);
     }
