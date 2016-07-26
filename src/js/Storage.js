@@ -1,4 +1,4 @@
-const PATH = 'ekkiog[0.0.1].save';
+const PATH = 'ekkiog[0.0.2].save';
 
 export default class Storage{
   save(map){
