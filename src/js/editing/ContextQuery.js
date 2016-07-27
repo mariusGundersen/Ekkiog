@@ -1,15 +1,22 @@
+import unique from 'array-unique';
 
-const EMPTY = 0;
-const WIRE = 1;
-const GATE = 2;
+import {EMPTY, WIRE, GATE, UNDERPASS} from './tileConstants.js';
 
 export default class ContextQuery{
   constructor(context){
     this.context = context;
   }
 
+  getTileType(x, y){
+    return this.context.mapTexture.map.get(y, x, 0);
+  }
+
   isWire(x, y){
     return this.context.mapTexture.map.get(y, x, 0) === WIRE;
+  }
+
+  isUnderpass(x, y){
+    return this.context.mapTexture.map.get(y, x, 0) === UNDERPASS;
   }
 
   isGate(tx, ty){
@@ -102,5 +109,62 @@ export default class ContextQuery{
     }
 
     return sortedNets[sortedNets.length-1]+1;
+  }
+
+  getNeighbouringNets(x, y, type){
+    const searchDirections = [...this.getSearchDirections(x, y, type)];
+    const nets = searchDirections
+      .map(([dx, dy]) => ([x+dx, y+dy]))
+      .map(([x, y]) => this.getNet(x, y))
+      .filter(net => net !=0);
+    return unique(nets);
+  }
+
+  *getSearchDirections(x, y, type){
+    const w = this.context.width;
+    const h = this.context.height;
+    if(type == WIRE){
+      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y))){
+        yield [-1, 0];
+      }
+      if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
+        yield [1, 0];
+      }
+      if(y > 0 && this.isWire(x, y-1)){
+        yield [0, -1];
+      }
+      if(y > 1 && this.isUnderpass(x, y-1)){
+        let skip = 1;
+        while(y-skip > 1 && this.isUnderpass(x, y-1-skip)){
+          skip++;
+        }
+        if(this.isWire(x, y-1-skip)){
+          yield [0, -1-skip];
+        }
+      }
+      if(y+1 < h && this.isWire(x, y+1)){
+        yield [0, 1];
+      }
+      if(y+2 < h && this.isUnderpass(x, y+1)){
+        let skip = 1;
+        while(y+skip+2 < h && this.isUnderpass(x, y+1+skip)){
+          skip++;
+        }
+        if(this.isWire(x, y+1+skip)){
+          yield [0, 1+skip];
+        }
+      }
+    }else if(type == UNDERPASS){
+      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y))){
+        yield [-1, 0];
+      }
+      if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
+        yield [1, 0];
+      }
+    }else if(type == GATE){
+      if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
+        yield [1, 0];
+      }
+    }
   }
 }

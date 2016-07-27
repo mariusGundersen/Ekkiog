@@ -1,12 +1,6 @@
-import unique from 'array-unique';
-
 import ContextQuery from './ContextQuery.js';
 import floodFill from './floodFill.js';
-
-const EMPTY = 0;
-const WIRE = 1;
-const GATE = 2;
-const UNDERPASS = 3;
+import {EMPTY, WIRE, GATE, UNDERPASS} from './tileConstants.js';
 
 const GROUND = 0;
 
@@ -19,14 +13,14 @@ export default class Editor{
   drawWire(x, y){
     if(this.query.isGate(x, y)) return;
 
-    const neighbouringNets = this.getNeighbouringNets(x, y);
+    const neighbouringNets = this.query.getNeighbouringNets(x, y, WIRE);
     if(neighbouringNets.length > 1) return;
 
     this.context.mapTexture.set(x, y, WIRE);
     if(neighbouringNets.length == 1){
       const net = neighbouringNets[0];
       floodFill(x, y, this.context.width, this.context.height,
-        (x, y) => (this.query.isWire(x, y) || this.query.isGateInput(x, y)),
+        (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
         (x, y) => {
           this.context.netMapTexture.set(x, y, net);
           if(this.query.isGateInput(x, y)){
@@ -62,7 +56,7 @@ export default class Editor{
     this.updateGate(x, y);
 
     floodFill(x, y, this.context.width, this.context.height,
-      (x, y) => (this.query.isWire(x, y) || this.query.isGateInput(x, y) || this.query.isGateOutput(x, y)),
+      (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
       (x, y) => {
         this.context.netMapTexture.set(x, y, nextNet);
         if(this.query.isGateInput(x, y)){
@@ -78,14 +72,32 @@ export default class Editor{
   drawUnderpass(x, y){
     if(this.query.isGate(x, y)) return;
 
+    const neighbouringNets = this.query.getNeighbouringNets(x, y, UNDERPASS);
+    if(neighbouringNets.length > 1) return;
+
     this.context.mapTexture.set(x, y, UNDERPASS);
+    if(neighbouringNets.length == 1){
+      const net = neighbouringNets[0];
+      floodFill(x, y, this.context.width, this.context.height,
+        (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
+        (x, y) => {
+          this.context.netMapTexture.set(x, y, net);
+          if(this.query.isGateInput(x, y)){
+            this.updateGate(...this.query.getGateForInput(x, y));
+          }
+        });
+    }
+
+    this.context.mapTexture.update();
+    this.context.netMapTexture.update();
+    this.context.gatesTexture.update();
   }
 
   clearGate(x, y){
     const [netX, netY] = this.split(this.query.getNet(x, y));
 
     floodFill(x, y, this.context.width, this.context.height,
-      (x, y) => (this.query.isWire(x, y) || this.query.isGateInput(x, y) || this.query.isGateOutput(x, y)),
+      (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
       (x, y) => {
         this.context.netMapTexture.set(x, y, GROUND);
         if(this.query.isGateInput(x, y)){
@@ -107,13 +119,16 @@ export default class Editor{
   }
 
   clearWire(x, y){
+    console.log('---------');
+    console.log('clearWire', x, y);
     const net = this.query.getNet(x, y);
 
     floodFill(x, y, this.context.width, this.context.height,
-      (x, y) => (this.query.isWire(x, y) || this.query.isGateInput(x, y)),
+      (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
       (x, y) => {
         this.context.netMapTexture.set(x, y, GROUND);
         if(this.query.isGateInput(x, y)){
+          console.log('clearWire', x, y, 'GROUND');
           this.updateGate(...this.query.getGateForInput(x, y));
         }
       });
@@ -122,12 +137,14 @@ export default class Editor{
     this.context.netMapTexture.set(x, y, 0);
 
     const [sx, sy] = this.query.getNetSource(net);
+    console.log('clearWire - source (', net, ')', sx, sy);
 
     floodFill(sx, sy, this.context.width, this.context.height,
-      (x, y) => (this.query.isWire(x, y) || this.query.isGateInput(x, y) || this.query.isGateOutput(x, y)),
+      (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
       (x, y) => {
         this.context.netMapTexture.set(x, y, net);
         if(this.query.isGateInput(x, y)){
+          console.log('clearWire', x, y, 'net:', net);
           this.updateGate(...this.query.getGateForInput(x, y));
         }
       });
@@ -142,7 +159,7 @@ export default class Editor{
       const [gateX, gateY] = this.query.getGateOutput(x, y);
       this.clearGate(gateX, gateY);
     }else if(this.query.isWire(x, y)){
-      this.cloarWire(x, y);
+      //this.clearWire(x, y);
     }
   }
 
@@ -167,14 +184,17 @@ export default class Editor{
     ];
   }
 
-  getNeighbouringNets(x, y){
-    const nets = [
-      this.query.getNet(x+1, y+0),
-      this.query.getNet(x-1, y+0),
-      this.query.getNet(x+0, y+1),
-      this.query.getNet(x+0, y-1),
-    ].filter(net => net != 0);
-
-    return unique(nets);
+  canFloodFill(x, y){
+    if(this.query.isGateInput(x, y)){
+      return px < x;
+    }else if(this.query.isGateInput(px, py)){
+      return px > x;
+    }else{
+      if(px == x){
+        return this.query.isWire(x, y) && this.query.isWire(px, py);
+      }else{
+        return this.query.isWire(x, y) || this.query.isUnderpass(x, y);
+      }
+    }
   }
 }

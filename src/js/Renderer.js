@@ -18,6 +18,7 @@ export default class Renderer {
 
     this.editor.drawUnderpass(68, 70);
     this.editor.drawUnderpass(69, 70);
+    this.editor.drawUnderpass(69, 69);
     this.editor.drawUnderpass(69, 68);
 
     this.netChargeEngine = new NetChargeEngine(gl, this.context);
