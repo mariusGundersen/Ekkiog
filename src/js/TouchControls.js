@@ -13,6 +13,8 @@ export default class TouchControls{
   touchStart(event){
     const touches = Array.from(event.changedTouches);
     this.pointers = this.pointers.concat(touches.map(touch => ({
+      px: touch.pageX,
+      py: touch.pageY,
       x: touch.pageX,
       y: touch.pageY,
       id: touch.identifier,
@@ -28,8 +30,6 @@ export default class TouchControls{
       point,
       touch: touches.filter(t => t.identifier === point.id)[0] || {pageX: point.x, pageY: point.y}
     })).map(pair => ({
-      dx: pair.point.x - pair.touch.pageX,
-      dy: pair.point.y - pair.touch.pageY,
       px: pair.point.x,
       py: pair.point.y,
       x: pair.touch.pageX,
@@ -41,13 +41,11 @@ export default class TouchControls{
     this.pointers = delta;
 
     const avg = delta.reduce((sum, pair, i, c) => ({
-      dx: sum.dx + pair.dx/c.length,
-      dy: sum.dy + pair.dy/c.length,
       px: sum.px + pair.px/c.length,
       py: sum.py + pair.py/c.length,
       x: sum.x + pair.x/c.length,
       y: sum.y + pair.y/c.length
-    }), {dx: 0, dy: 0, px: 0, py: 0, x: 0, y: 0});
+    }), {px: 0, py: 0, x: 0, y: 0});
 
     const radius = delta.map(point => ({
       px: avg.px - point.px,
