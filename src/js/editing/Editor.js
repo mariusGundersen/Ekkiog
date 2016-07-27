@@ -6,6 +6,7 @@ import floodFill from './floodFill.js';
 const EMPTY = 0;
 const WIRE = 1;
 const GATE = 2;
+const UNDERPASS = 3;
 
 const GROUND = 0;
 
@@ -72,6 +73,12 @@ export default class Editor{
     this.context.netMapTexture.update();
     this.context.gatesTexture.update();
     this.context.mapTexture.update();
+  }
+
+  drawUnderpass(x, y){
+    if(this.query.isGate(x, y)) return;
+
+    this.context.mapTexture.set(x, y, UNDERPASS);
   }
 
   clearGate(x, y){

@@ -16,6 +16,10 @@ export default class Renderer {
     this.context = new Context(gl, loaded, TILE_SIZE);
     this.editor = new Editor(this.context);
 
+    this.editor.drawUnderpass(68, 70);
+    this.editor.drawUnderpass(69, 70);
+    this.editor.drawUnderpass(69, 68);
+
     this.netChargeEngine = new NetChargeEngine(gl, this.context);
     this.context.gatesTexture.update();
     this.netChargeEngine.render(0);
