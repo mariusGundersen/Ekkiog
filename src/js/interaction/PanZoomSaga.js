@@ -17,10 +17,6 @@ export default class PanZoomSaga{
       if(!pointers.has(data.pointer)) return;
 
       pointers.set(data.pointer, data);
-      delayCall(handleMove);
-    });
-
-    function handleMove(){
       const current = [...pointers.values()];
 
       if(current.length == 0) return;
@@ -34,7 +30,7 @@ export default class PanZoomSaga{
         previous: getXYR(previous),
         current: getXYR(current)
       });
-    };
+    });
 
     eventEmitter.on('pointer-up', function(data){
       if(!pointers.has(data.pointer)) return;
@@ -60,15 +56,4 @@ function getXYR(pointers){
     y: avg.y,
     r: radius || 1
   };
-}
-
-function delayCall(func){
-  if(func.timeout != undefined){
-    clearTimeout(func.timeout, 1);
-  }
-
-  setTimeout(() => {
-    func.timeout = undefined;
-    func();
-  });
 }
