@@ -20,11 +20,7 @@ void main(void) {
 
   if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, texCoord);
-    if(charge.x == 1.0){
-      gl_FragColor = vec4(1.0, 0.25, 0.25, 1.0);
-    }else{
-      gl_FragColor = vec4(0.5, 0.0, 0.0, 1.0);
-    }
+    gl_FragColor = charge;
   }else{
     gl_FragColor = color;
   }
