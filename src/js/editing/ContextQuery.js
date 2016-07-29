@@ -124,7 +124,7 @@ export default class ContextQuery{
     const w = this.context.width;
     const h = this.context.height;
     if(type == WIRE){
-      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y))){
+      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y))){
         yield [-1, 0];
       }
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
@@ -155,7 +155,7 @@ export default class ContextQuery{
         }
       }
     }else if(type == UNDERPASS){
-      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y))){
+      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y))){
         yield [-1, 0];
       }
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){

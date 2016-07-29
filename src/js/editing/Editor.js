@@ -22,6 +22,7 @@ export default class Editor{
       floodFill(x, y, this.context.width, this.context.height,
         (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
         (x, y) => {
+          if(this.query.isGateOutput(x, y)) return;
           this.context.netMapTexture.set(x, y, net);
           if(this.query.isGateInput(x, y)){
             this.updateGate(...this.query.getGateForInput(x, y));
@@ -58,6 +59,7 @@ export default class Editor{
     floodFill(x, y, this.context.width, this.context.height,
       (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
       (x, y) => {
+        if(this.query.isGateOutput(x, y)) return;
         this.context.netMapTexture.set(x, y, nextNet);
         if(this.query.isGateInput(x, y)){
           this.updateGate(...this.query.getGateForInput(x, y));
@@ -81,6 +83,7 @@ export default class Editor{
       floodFill(x, y, this.context.width, this.context.height,
         (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
         (x, y) => {
+          if(this.query.isGateOutput(x, y)) return;
           this.context.netMapTexture.set(x, y, net);
           if(this.query.isGateInput(x, y)){
             this.updateGate(...this.query.getGateForInput(x, y));
@@ -99,6 +102,7 @@ export default class Editor{
     floodFill(x, y, this.context.width, this.context.height,
       (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
       (x, y) => {
+        if(this.query.isGateOutput(x, y)) return;
         this.context.netMapTexture.set(x, y, GROUND);
         if(this.query.isGateInput(x, y)){
           this.updateGate(...this.query.getGateForInput(x, y));
@@ -126,6 +130,7 @@ export default class Editor{
     floodFill(x, y, this.context.width, this.context.height,
       (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
       (x, y) => {
+        if(this.query.isGateOutput(x, y)) return;
         this.context.netMapTexture.set(x, y, GROUND);
         if(this.query.isGateInput(x, y)){
           console.log('clearWire', x, y, 'GROUND');
@@ -142,6 +147,7 @@ export default class Editor{
     floodFill(sx, sy, this.context.width, this.context.height,
       (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
       (x, y) => {
+        if(this.query.isGateOutput(x, y)) return;
         this.context.netMapTexture.set(x, y, net);
         if(this.query.isGateInput(x, y)){
           console.log('clearWire', x, y, 'net:', net);
