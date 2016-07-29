@@ -47,7 +47,7 @@ export default class Renderer {
 
   tap(x, y){
     const [tx, ty] = this.perspective.viewportToTile(x, y);
-    console.log(x, y, tx, ty);
+
     window.requestAnimationFrame(() => {
       if(this.tool == 'wire'){
         if(this.editor.query.isWire(tx, ty)){
@@ -62,6 +62,24 @@ export default class Renderer {
       }else{
         this.editor.clear(tx, ty);
       }
+      this.tileMapEngine.render();
+      this.storage.save(this.context.export());
+    });
+  }
+
+  longPress(x, y){
+    const [tx, ty] = this.perspective.viewportToTile(x, y);
+
+    window.requestAnimationFrame(() => {
+      if(this.editor.query.isGate(tx, ty)){
+        const [gateX, gateY] = this.editor.query.getGateOutput(tx, ty);
+        this.editor.clearGate(gateX, gateY);
+      }else if(this.editor.query.isWire(tx, ty)){
+        this.editor.drawUnderpass(tx, ty);
+      }else if(this.editor.query.isUnderpass(tx, ty)){
+        this.editor.drawWire(tx, ty);
+      }
+
       this.tileMapEngine.render();
       this.storage.save(this.context.export());
     });

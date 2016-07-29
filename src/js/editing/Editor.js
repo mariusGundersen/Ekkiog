@@ -134,8 +134,6 @@ export default class Editor{
   }
 
   clearWire(x, y){
-    console.log('---------');
-    console.log('clearWire', x, y);
     const net = this.query.getNet(x, y);
 
     const gatesToUpdateToGround = this.floodFiller.floodFill(x, y, GROUND);
@@ -147,7 +145,6 @@ export default class Editor{
     this.context.netMapTexture.set(x, y, 0);
 
     const [sx, sy] = this.query.getNetSource(net);
-    console.log('clearWire - source (', net, ')', sx, sy);
 
     const gatesToUpdateToNet = this.floodFiller.floodFill(sx, sy, net);
     for(let [gateX, gateY] of gatesToUpdateToNet){
@@ -164,18 +161,14 @@ export default class Editor{
       const [gateX, gateY] = this.query.getGateOutput(x, y);
       this.clearGate(gateX, gateY);
     }else if(this.query.isWire(x, y)){
-      //this.clearWire(x, y);
+      this.clearWire(x, y);
     }
   }
 
   updateGate(x, y){
-    console.log('updateGate', x, y);
     const [outputX, outputY] = this.split(this.query.getNet(x, y));
     const [inputA0, inputA1] = this.split(this.query.getNet(x-3, y-1));
     const [inputB0, inputB1] = this.split(this.query.getNet(x-3, y+1));
-    console.log('gateA', inputA0, inputA1);
-    console.log('gateB', inputB0, inputB1);
-    console.log('gate', outputX, outputY);
     this.context.gatesTexture.map.set(outputY, outputX, 0, inputA0);
     this.context.gatesTexture.map.set(outputY, outputX, 1, inputA1);
     this.context.gatesTexture.map.set(outputY, outputX, 2, inputB0);

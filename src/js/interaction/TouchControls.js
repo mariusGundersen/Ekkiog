@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 import EventSaga from 'event-saga';
 
 import TouchSaga from './TouchSaga.js';
-import PointerSaga from './PointerSaga.js';
+import PanZoomSaga from './PanZoomSaga.js';
 
 export default class TouchControls{
   constructor(renderer){
@@ -10,10 +10,14 @@ export default class TouchControls{
     this.pointers = [];
     this.emitter = new EventEmitter();
     const touchSaga = new TouchSaga(this.emitter);
-    const pointerSaga = new PointerSaga(this.emitter);
+    const panZoomSaga = new PanZoomSaga(this.emitter);
 
     this.emitter.on('tap', data => {
       this.renderer.tap(data.x, data.y);
+    });
+
+    this.emitter.on('longPress', data => {
+      this.renderer.longPress(data.x, data.y);
     });
 
     this.emitter.on('panZoom', data => {

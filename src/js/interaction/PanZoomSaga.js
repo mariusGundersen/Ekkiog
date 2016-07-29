@@ -1,11 +1,10 @@
 import EventSaga from 'event-saga';
 
-export default class PointerSaga{
+export default class PanZoomSaga{
   constructor(eventEmitter){
-    const saga = new EventSaga(eventEmitter);
     const pointers = new Map();
 
-    saga.createOn('pointer-down', function(data){
+    eventEmitter.on('pointer-down', function(data){
       pointers.set(data.pointer, {
         x: data.x,
         y: data.y,
@@ -14,12 +13,14 @@ export default class PointerSaga{
       });
     });
 
-    saga.on('pointer-move', function(data){
+    eventEmitter.on('pointer-move', function(data){
+      if(!pointers.has(data.pointer)) return;
+
       pointers.set(data.pointer, data);
-      this.setTimeout('pointers-moved', 1);
+      delayCall(handleMove);
     });
 
-    saga.on('pointers-moved', function(){
+    function handleMove(){
       const current = [...pointers.values()];
 
       if(current.length == 0) return;
@@ -29,13 +30,15 @@ export default class PointerSaga{
         y: p.y - p.dy
       }));
 
-      this.emit('panZoom', {
+      eventEmitter.emit('panZoom', {
         previous: getXYR(previous),
         current: getXYR(current)
       });
-    });
+    };
 
-    saga.on('pointer-up', function(data){
+    eventEmitter.on('pointer-up', function(data){
+      if(!pointers.has(data.pointer)) return;
+
       pointers.delete(data.pointer);
     });
   }
@@ -57,4 +60,15 @@ function getXYR(pointers){
     y: avg.y,
     r: radius || 1
   };
+}
+
+function delayCall(func){
+  if(func.timeout != undefined){
+    clearTimeout(func.timeout, 1);
+  }
+
+  setTimeout(() => {
+    func.timeout = undefined;
+    func();
+  });
 }
