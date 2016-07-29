@@ -40,11 +40,11 @@ const cq = new ContextQuery({
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
       0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0
+      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8 0 0 0 0
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 5 0 0 0 0
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 6 0 0 0 0
-      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0
+      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 0 0 0 0
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -172,6 +172,11 @@ test('getUnderpassTerminalBelow', t => {
   t.is(cq.getUnderpassTerminalBelow(15, 2), 3);
   t.is(cq.getUnderpassTerminalBelow(15, 10), 13);
 });
+
+test('getUnderpassTerminalNets', t => {
+  t.deepEqual(cq.getUnderpassTerminalNets(15, 2), []);
+  t.deepEqual(cq.getUnderpassTerminalNets(15, 11), [8,7]);
+})
 
 function makeMapTexture(t){
   const lines = t.split('\n').map(l => l.replace(/\s/g, '')).filter(l => l.length != 0);

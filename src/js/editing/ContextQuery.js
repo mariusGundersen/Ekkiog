@@ -115,7 +115,17 @@ export default class ContextQuery{
     const searchDirections = [...this.getSearchDirections(x, y, type)];
     const nets = searchDirections
       .map(([x, y]) => this.getNet(x, y))
-      .filter(net => net !=0);
+      .filter(net => net != 0);
+    return unique(nets);
+  }
+
+  getUnderpassTerminalNets(x, y){
+    const above = this.getUnderpassTerminalAbove(x, y);
+    const below = this.getUnderpassTerminalBelow(x, y);
+
+    const nets = [[x, above], [x, below]]
+      .map(([x, y]) => this.getNet(x, y))
+      .filter(net => net != 0);
     return unique(nets);
   }
 
@@ -162,6 +172,7 @@ export default class ContextQuery{
   }
 
   getUnderpassTerminalAbove(x, y){
+    y--;
     while(y-1 >= 0 && this.isUnderpass(x, y)){
       y--;
     }
@@ -171,7 +182,7 @@ export default class ContextQuery{
 
   getUnderpassTerminalBelow(x, y){
     const h = this.context.height;
-
+    y++;
     while(y+1 < h && this.isUnderpass(x, y)){
       y++;
     }

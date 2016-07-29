@@ -1,4 +1,5 @@
 import ContextQuery from './ContextQuery.js';
+import Validator from './Validator.js';
 import floodFill from './floodFill.js';
 import {EMPTY, WIRE, GATE, UNDERPASS} from './tileConstants.js';
 
@@ -8,13 +9,13 @@ export default class Editor{
   constructor(context){
     this.context = context;
     this.query = new ContextQuery(context);
+    this.validate = new Validator(this.query);
   }
 
   drawWire(x, y){
-    if(this.query.isGate(x, y)) return;
+    if(!this.validate.canPlaceWireHere(x, y)) return;
 
     const neighbouringNets = this.query.getNeighbouringNets(x, y, WIRE);
-    if(neighbouringNets.length > 1) return;
 
     this.context.mapTexture.set(x, y, WIRE);
     if(neighbouringNets.length == 1){
@@ -36,8 +37,7 @@ export default class Editor{
   }
 
   drawGate(x, y){
-    if(!this.query.canPlaceGateHere(x, y)) return;
-    if(!this.query.isGroundNet(x+1, y)) return;
+    if(!this.validate.canPlaceGateHere(x, y)) return;
 
     const nextNet = this.query.getNextNet();
 
@@ -72,10 +72,9 @@ export default class Editor{
   }
 
   drawUnderpass(x, y){
-    if(this.query.isGate(x, y)) return;
+    if(!this.validate.canPlaceUnderpassHere(x, y)) return;
 
     const neighbouringNets = this.query.getNeighbouringNets(x, y, UNDERPASS);
-    if(neighbouringNets.length > 1) return;
 
     this.context.mapTexture.set(x, y, UNDERPASS);
     if(neighbouringNets.length == 1){
