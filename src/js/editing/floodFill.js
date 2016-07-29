@@ -9,11 +9,11 @@ export default function floodFill(x, y, w, h, getNeighbours, fill){
       visited.set(x, y, 1);
       fill(x, y);
 
-      for(let [dx, dy] of getNeighbours(x, y)){
-        if(visited.get(x+dx, y+dy) == 1) continue;
-        if(x+dx < w-1 && x+dx > 0
-        && y+dy < h-1 && y+dy > 0){
-          tcoQueue.push({x: x+dx, y: y+dy});
+      for(let [x, y] of getNeighbours(x, y)){
+        if(visited.get(x, y) == 1) continue;
+        if(x < w-1 && x > 0
+        && y < h-1 && y > 0){
+          tcoQueue.push({x: x, y: y});
         }
       }
     }

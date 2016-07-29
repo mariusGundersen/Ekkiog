@@ -189,18 +189,4 @@ export default class Editor{
       (v>>8)&0xff
     ];
   }
-
-  canFloodFill(x, y){
-    if(this.query.isGateInput(x, y)){
-      return px < x;
-    }else if(this.query.isGateInput(px, py)){
-      return px > x;
-    }else{
-      if(px == x){
-        return this.query.isWire(x, y) && this.query.isWire(px, py);
-      }else{
-        return this.query.isWire(x, y) || this.query.isUnderpass(x, y);
-      }
-    }
-  }
 }

@@ -57,8 +57,8 @@ export default class ContextQuery{
   }
 
   getNetSource(net){
-    for(let y=0; y<=this.context.height; y++){
-      for(let x=0; x<=this.context.width; x++){
+    for(let y=0; y<this.context.height; y++){
+      for(let x=0; x<this.context.width; x++){
         if(this.isGateOutput(x, y) && this.getNet(x, y) == net){
           return [x, y];
         }
@@ -89,8 +89,8 @@ export default class ContextQuery{
 
   getNextNet(){
     const nets = [];
-    for(let y=0; y<=this.context.height; y++){
-      for(let x=0; x<=this.context.width; x++){
+    for(let y=0; y<this.context.height; y++){
+      for(let x=0; x<this.context.width; x++){
         if(this.isGateOutput(x, y)){
           nets.push(this.getNet(x, y));
         }
@@ -114,7 +114,6 @@ export default class ContextQuery{
   getNeighbouringNets(x, y, type){
     const searchDirections = [...this.getSearchDirections(x, y, type)];
     const nets = searchDirections
-      .map(([dx, dy]) => ([x+dx, y+dy]))
       .map(([x, y]) => this.getNet(x, y))
       .filter(net => net !=0);
     return unique(nets);
@@ -125,46 +124,58 @@ export default class ContextQuery{
     const h = this.context.height;
     if(type == WIRE){
       if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y))){
-        yield [-1, 0];
+        yield [x-1, y];
       }
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
-        yield [1, 0];
+        yield [x+1, y];
       }
       if(y > 0 && this.isWire(x, y-1)){
-        yield [0, -1];
+        yield [x, y-1];
       }
       if(y > 1 && this.isUnderpass(x, y-1)){
-        let skip = 1;
-        while(y-skip > 1 && this.isUnderpass(x, y-1-skip)){
-          skip++;
-        }
-        if(this.isWire(x, y-1-skip)){
-          yield [0, -1-skip];
+        const terminalY = this.getUnderpassTerminalAbove(x, y-1);
+        if(this.isWire(x, terminalY)){
+          yield [x, terminalY];
         }
       }
       if(y+1 < h && this.isWire(x, y+1)){
-        yield [0, 1];
+        yield [x, y+1];
       }
       if(y+2 < h && this.isUnderpass(x, y+1)){
-        let skip = 1;
-        while(y+skip+2 < h && this.isUnderpass(x, y+1+skip)){
-          skip++;
-        }
-        if(this.isWire(x, y+1+skip)){
-          yield [0, 1+skip];
+        const terminalY = this.getUnderpassTerminalBelow(x, y+1);
+        if(this.isWire(x, terminalY)){
+          yield [x, terminalY];
         }
       }
     }else if(type == UNDERPASS){
       if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y))){
-        yield [-1, 0];
+        yield [x-1, y];
       }
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
-        yield [1, 0];
+        yield [x+1, y];
       }
     }else if(type == GATE){
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
-        yield [1, 0];
+        yield [x+1, y];
       }
     }
+  }
+
+  getUnderpassTerminalAbove(x, y){
+    while(y-1 > 0 && this.isUnderpass(x, y)){
+      y--;
+    }
+
+    return y;
+  }
+
+  getUnderpassTerminalBelow(x, y){
+    const h = this.context.height;
+
+    while(y+1 < h && this.isUnderpass(x, y)){
+      y++;
+    }
+
+    return y;
   }
 }
