@@ -60,6 +60,12 @@ test('isWire', t => {
   t.false(cq.isWire(1,2));
 });
 
+test('isEmpty', t => {
+  t.true(cq.isEmpty(1,1));
+  t.false(cq.isEmpty(2,1));
+  t.false(cq.isEmpty(10, 6));
+});
+
 test('isGateOutput', t => {
   t.true(cq.isGateOutput(10, 7));
   t.false(cq.isGateOutput(10, 8));

@@ -52,7 +52,7 @@ export default class Editor{
 
     this.updateGate(x, y);
 
-    const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
+    const gatesToUpdate = this.floodFiller.floodFill(x, y, nextNet);
     for(let [gateX, gateY] of gatesToUpdate){
       this.updateGate(gateX, gateY);
     }
@@ -99,6 +99,14 @@ export default class Editor{
       }
     }
 
+    if(this.query.isEmpty(x, terminalAbove)){
+      this.drawWire(x, terminalAbove);
+    }
+
+    if(this.query.isEmpty(x, terminalBelow)){
+      this.drawWire(x, terminalBelow);
+    }
+
     this.context.mapTexture.update();
     this.context.netMapTexture.update();
     this.context.gatesTexture.update();
@@ -107,7 +115,7 @@ export default class Editor{
   clearGate(x, y){
     const [netX, netY] = this.split(this.query.getNet(x, y));
 
-    const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
+    const gatesToUpdate = this.floodFiller.floodFill(x, y, GROUND);
     for(let [gateX, gateY] of gatesToUpdate){
       this.updateGate(gateX, gateY);
     }

@@ -11,6 +11,11 @@ export default class ContextQuery{
     return this.context.mapTexture.map.get(y, x, 0);
   }
 
+  isEmpty(x, y){
+    return this.context.mapTexture.map.get(y, x, 0) === 0
+        && !this.isGate(x, y);
+  }
+
   isWire(x, y){
     return this.context.mapTexture.map.get(y, x, 0) === WIRE;
   }
