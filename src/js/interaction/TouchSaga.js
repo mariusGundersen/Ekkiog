@@ -35,17 +35,13 @@ export default class saga{
     });
 
     saga.on('touchMove', function(data){
-      const dx = data.x - this.data.x;
-      const dy = data.y - this.data.y;
       this.data.x = data.x;
       this.data.y = data.y;
 
       this.emit('pointer-move', {
         pointer: this.id,
         x: data.x,
-        y: data.y,
-        dx,
-        dy
+        y: data.y
       });
 
       if(!this.data.moved){

@@ -4,33 +4,48 @@ export default class PanZoomSaga{
   constructor(eventEmitter){
     const pointers = new Map();
 
+    requestAnimationFrame(function doRAF(){
+      requestAnimationFrame(doRAF);
+      processPointers();
+    });
+
     eventEmitter.on('pointer-down', function(data){
       pointers.set(data.pointer, {
         x: data.x,
         y: data.y,
-        dx: 0,
-        dy: 0
+        ox: data.x,
+        oy: data.y
       });
     });
 
     eventEmitter.on('pointer-move', function(data){
       if(!pointers.has(data.pointer)) return;
 
-      pointers.set(data.pointer, data);
+      const pointer = pointers.get(data.pointer);
+      pointer.x = data.x;
+      pointer.y = data.y;
+    });
+
+    function processPointers(){
       const current = [...pointers.values()];
 
-      if(current.length == 0) return;
+      if(current.filter(p => p.ox != p.x || p.oy != p.y).length == 0) return;
 
       const previous = current.map(p => ({
-        x: p.x - p.dx,
-        y: p.y - p.dy
+        x: p.ox,
+        y: p.oy
       }));
+
+      for(let pointer of current){
+        pointer.ox = pointer.x;
+        pointer.oy = pointer.y;
+      }
 
       eventEmitter.emit('panZoom', {
         previous: getXYR(previous),
         current: getXYR(current)
       });
-    });
+    };
 
     eventEmitter.on('pointer-up', function(data){
       if(!pointers.has(data.pointer)) return;
