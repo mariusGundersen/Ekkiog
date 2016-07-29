@@ -1,6 +1,6 @@
 import ContextQuery from './ContextQuery.js';
 import Validator from './Validator.js';
-import floodFill from './floodFill.js';
+import FloodFiller from './FloodFiller.js';
 import {EMPTY, WIRE, GATE, UNDERPASS} from './tileConstants.js';
 
 const GROUND = 0;
@@ -8,7 +8,8 @@ const GROUND = 0;
 export default class Editor{
   constructor(context){
     this.context = context;
-    this.query = new ContextQuery(context);
+    this.query = new ContextQuery(this.context);
+    this.floodFiller = new FloodFiller(this.context, this.query);
     this.validate = new Validator(this.query);
   }
 
@@ -20,15 +21,10 @@ export default class Editor{
     this.context.mapTexture.set(x, y, WIRE);
     if(neighbouringNets.length == 1){
       const net = neighbouringNets[0];
-      floodFill(x, y, this.context.width, this.context.height,
-        (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
-        (x, y) => {
-          if(this.query.isGateOutput(x, y)) return;
-          this.context.netMapTexture.set(x, y, net);
-          if(this.query.isGateInput(x, y)){
-            this.updateGate(...this.query.getGateForInput(x, y));
-          }
-        });
+      const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
+      for(let [gateX, gateY] of gatesToUpdate){
+        this.updateGate(gateX, gateY);
+      }
     }
 
     this.context.mapTexture.update();
@@ -56,15 +52,10 @@ export default class Editor{
 
     this.updateGate(x, y);
 
-    floodFill(x, y, this.context.width, this.context.height,
-      (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
-      (x, y) => {
-        if(this.query.isGateOutput(x, y)) return;
-        this.context.netMapTexture.set(x, y, nextNet);
-        if(this.query.isGateInput(x, y)){
-          this.updateGate(...this.query.getGateForInput(x, y));
-        }
-      });
+    const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
+    for(let [gateX, gateY] of gatesToUpdate){
+      this.updateGate(gateX, gateY);
+    }
 
     this.context.netMapTexture.update();
     this.context.gatesTexture.update();
@@ -79,15 +70,10 @@ export default class Editor{
     this.context.mapTexture.set(x, y, UNDERPASS);
     if(neighbouringNets.length == 1){
       const net = neighbouringNets[0];
-      floodFill(x, y, this.context.width, this.context.height,
-        (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
-        (x, y) => {
-          if(this.query.isGateOutput(x, y)) return;
-          this.context.netMapTexture.set(x, y, net);
-          if(this.query.isGateInput(x, y)){
-            this.updateGate(...this.query.getGateForInput(x, y));
-          }
-        });
+      const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
+      for(let [gateX, gateY] of gatesToUpdate){
+        this.updateGate(gateX, gateY);
+      }
     }
 
     this.context.mapTexture.update();
@@ -98,15 +84,10 @@ export default class Editor{
   clearGate(x, y){
     const [netX, netY] = this.split(this.query.getNet(x, y));
 
-    floodFill(x, y, this.context.width, this.context.height,
-      (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
-      (x, y) => {
-        if(this.query.isGateOutput(x, y)) return;
-        this.context.netMapTexture.set(x, y, GROUND);
-        if(this.query.isGateInput(x, y)){
-          this.updateGate(...this.query.getGateForInput(x, y));
-        }
-      });
+    const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
+    for(let [gateX, gateY] of gatesToUpdate){
+      this.updateGate(gateX, gateY);
+    }
 
     this.context.mapTexture.set(x, y, EMPTY);
     this.context.netMapTexture.set16(x, y, GROUND);
@@ -126,16 +107,10 @@ export default class Editor{
     console.log('clearWire', x, y);
     const net = this.query.getNet(x, y);
 
-    floodFill(x, y, this.context.width, this.context.height,
-      (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
-      (x, y) => {
-        if(this.query.isGateOutput(x, y)) return;
-        this.context.netMapTexture.set(x, y, GROUND);
-        if(this.query.isGateInput(x, y)){
-          console.log('clearWire', x, y, 'GROUND');
-          this.updateGate(...this.query.getGateForInput(x, y));
-        }
-      });
+    const gatesToUpdateToGround = this.floodFiller.floodFill(x, y, GROUND);
+    for(let [gateX, gateY] of gatesToUpdateToGround){
+      this.updateGate(gateX, gateY);
+    }
 
     this.context.mapTexture.set(x, y, EMPTY);
     this.context.netMapTexture.set(x, y, 0);
@@ -143,16 +118,10 @@ export default class Editor{
     const [sx, sy] = this.query.getNetSource(net);
     console.log('clearWire - source (', net, ')', sx, sy);
 
-    floodFill(sx, sy, this.context.width, this.context.height,
-      (x, y) => this.query.getSearchDirections(x, y, this.query.getTileType(x, y)),
-      (x, y) => {
-        if(this.query.isGateOutput(x, y)) return;
-        this.context.netMapTexture.set(x, y, net);
-        if(this.query.isGateInput(x, y)){
-          console.log('clearWire', x, y, 'net:', net);
-          this.updateGate(...this.query.getGateForInput(x, y));
-        }
-      });
+    const gatesToUpdateToNet = this.floodFiller.floodFill(sx, sy, net);
+    for(let [gateX, gateY] of gatesToUpdateToNet){
+      this.updateGate(gateX, gateY);
+    }
 
     this.context.mapTexture.update();
     this.context.netMapTexture.update();
