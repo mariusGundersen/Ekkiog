@@ -163,6 +163,16 @@ test('getNextNet', t => {
   t.is(cq.getNextNet(), 2);
 });
 
+test('getUnderpassTerminalAbove', t => {
+  t.is(cq.getUnderpassTerminalAbove(15, 2), 1);
+  t.is(cq.getUnderpassTerminalAbove(15, 12), 9);
+});
+
+test('getUnderpassTerminalBelow', t => {
+  t.is(cq.getUnderpassTerminalBelow(15, 2), 3);
+  t.is(cq.getUnderpassTerminalBelow(15, 10), 13);
+});
+
 function makeMapTexture(t){
   const lines = t.split('\n').map(l => l.replace(/\s/g, '')).filter(l => l.length != 0);
   return {

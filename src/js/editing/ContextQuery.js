@@ -162,7 +162,7 @@ export default class ContextQuery{
   }
 
   getUnderpassTerminalAbove(x, y){
-    while(y-1 > 0 && this.isUnderpass(x, y)){
+    while(y-1 >= 0 && this.isUnderpass(x, y)){
       y--;
     }
 
