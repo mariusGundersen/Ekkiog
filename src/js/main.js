@@ -3,7 +3,7 @@ import Stats from 'stats-js';
 import '../css/main.css';
 
 import Renderer from './Renderer.js';
-import TouchControls from './TouchControls.js';
+import TouchControls from './interaction/TouchControls.js';
 import Storage from './Storage.js';
 import WebGL from './WebGL.js';
 
