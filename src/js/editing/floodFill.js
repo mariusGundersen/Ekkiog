@@ -9,7 +9,8 @@ export default function floodFill(x, y, w, h, getNeighbours, fill){
       visited.set(x, y, 1);
       fill(x, y);
 
-      for(let [x, y] of getNeighbours(x, y)){
+      const neighbours = getNeighbours(x, y);
+      for(let [x, y] of neighbours){
         if(visited.get(x, y) == 1) continue;
         if(x < w-1 && x > 0
         && y < h-1 && y > 0){
