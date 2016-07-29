@@ -65,12 +65,35 @@ export default class Editor{
   drawUnderpass(x, y){
     if(!this.validate.canPlaceUnderpassHere(x, y)) return;
 
+    if(this.query.isWire(x, y)){
+      this.clearWire(x, y);
+    }
+
     const neighbouringNets = this.query.getNeighbouringNets(x, y, UNDERPASS);
 
     this.context.mapTexture.set(x, y, UNDERPASS);
     if(neighbouringNets.length == 1){
       const net = neighbouringNets[0];
       const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
+      for(let [gateX, gateY] of gatesToUpdate){
+        this.updateGate(gateX, gateY);
+      }
+    }
+
+    const terminalAbove = this.query.getUnderpassTerminalAbove(x, y);
+    const terminalBelow = this.query.getUnderpassTerminalBelow(x, y);
+    const netAbove = this.query.getNet(x, terminalAbove);
+    const netBelow = this.query.getNet(x, terminalBelow);
+
+    if(netAbove > 0){
+      const gatesToUpdate = this.floodFiller.floodFill(x, terminalAbove, netAbove);
+      for(let [gateX, gateY] of gatesToUpdate){
+        this.updateGate(gateX, gateY);
+      }
+    }
+
+    if(netBelow > 0){
+      const gatesToUpdate = this.floodFiller.floodFill(x, terminalBelow, netBelow);
       for(let [gateX, gateY] of gatesToUpdate){
         this.updateGate(gateX, gateY);
       }
