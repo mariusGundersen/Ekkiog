@@ -10,7 +10,7 @@ export default class TouchControls{
     this.pointers = [];
     this.emitter = new EventEmitter();
     const touchSaga = new TouchSaga(this.emitter);
-    const panZoomSaga = new PanZoomSaga(this.emitter);
+    this.panZoomSaga = new PanZoomSaga(this.emitter);
 
     this.emitter.on('tap', data => {
       this.renderer.tap(data.x, data.y);
@@ -19,16 +19,19 @@ export default class TouchControls{
     this.emitter.on('longPress', data => {
       this.renderer.longPress(data.x, data.y);
     });
-
-    this.emitter.on('panZoom', data => {
-      this.renderer.panZoom(data.previous, data.current);
-    });
   }
 
   listen(element){
     element.addEventListener('touchstart', emitTouchEvents(this.emitter, 'touchStart'), false);
     element.addEventListener('touchmove', emitTouchEvents(this.emitter, 'touchMove'), false);
     element.addEventListener('touchend', emitTouchEvents(this.emitter, 'touchEnd'), false);
+  }
+
+  panZoom(){
+    const result = this.panZoomSaga.process();
+    if(result !== null){
+      this.renderer.panZoom(result.previous, result.current);
+    }
   }
 }
 

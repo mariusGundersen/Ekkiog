@@ -44,6 +44,7 @@ shell.tick((tickCount) => {
 
 shell.render(() => {
   viewStats.begin();
+  touchControls.panZoom();
   renderer.draw(shell.gl);
   viewStats.end();
 });

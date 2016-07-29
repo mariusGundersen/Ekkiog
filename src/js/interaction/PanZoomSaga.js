@@ -3,11 +3,7 @@ import EventSaga from 'event-saga';
 export default class PanZoomSaga{
   constructor(eventEmitter){
     const pointers = new Map();
-
-    requestAnimationFrame(function doRAF(){
-      requestAnimationFrame(doRAF);
-      processPointers();
-    });
+    this.pointers = pointers;
 
     eventEmitter.on('pointer-down', function(data){
       pointers.set(data.pointer, {
@@ -26,32 +22,32 @@ export default class PanZoomSaga{
       pointer.y = data.y;
     });
 
-    function processPointers(){
-      const current = [...pointers.values()];
-
-      if(current.filter(p => p.ox != p.x || p.oy != p.y).length == 0) return;
-
-      const previous = current.map(p => ({
-        x: p.ox,
-        y: p.oy
-      }));
-
-      for(let pointer of current){
-        pointer.ox = pointer.x;
-        pointer.oy = pointer.y;
-      }
-
-      eventEmitter.emit('panZoom', {
-        previous: getXYR(previous),
-        current: getXYR(current)
-      });
-    };
-
     eventEmitter.on('pointer-up', function(data){
       if(!pointers.has(data.pointer)) return;
 
       pointers.delete(data.pointer);
     });
+  }
+
+  process(){
+    const current = [...this.pointers.values()];
+
+    if(current.filter(p => p.ox != p.x || p.oy != p.y).length == 0) return null;
+
+    const previous = current.map(p => ({
+      x: p.ox,
+      y: p.oy
+    }));
+
+    for(let pointer of current){
+      pointer.ox = pointer.x;
+      pointer.oy = pointer.y;
+    }
+
+    return {
+      previous: getXYR(previous),
+      current: getXYR(current)
+    };
   }
 }
 
