@@ -3,15 +3,18 @@ import React from 'react';
 import PieSector from './PieSector.jsx';
 
 export default class App extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      show: false
-    };
+  state = {
+    show: false,
+    selectedTool: 'wire'
   }
 
   toggleShow = () => {
     this.setState({show: !this.state.show});
+  }
+
+  setTool = tool => {
+    this.props.setTool(tool);
+    this.setState({selectedTool: tool});
   }
 
   render () {
@@ -39,7 +42,8 @@ export default class App extends React.Component {
             turnFractionCenter={item.center}
             turnFractionSection={0.15}
             gap={2}
-            onClick={() => this.props.setTool(item.tool)} />
+            selected={this.state.selectedTool == item.tool}
+            onClick={() => this.setTool(item.tool)} />
         ))}
       </svg>
     );

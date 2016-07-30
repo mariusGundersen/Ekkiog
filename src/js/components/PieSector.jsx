@@ -5,10 +5,10 @@ export default class PieSector extends React.Component {
     const cx = this.props.cx;
     const cy = this.props.cy;
     const innerRadius = this.props.innerRadius;
-    const outerRadius = this.props.outerRadius;
+    const outerRadius = this.props.outerRadius + (this.props.selected ? 10 : 0);
     const turnFractionCenter = this.props.turnFractionCenter;
     const turnFractionSection = this.props.turnFractionSection;
-    const gap = this.props.gap;
+    const gap = this.props.gap * (this.props.selected ? 0 : 1);
 
     const radiansStart = (turnFractionCenter*2 - turnFractionSection)*Math.PI;
     const radiansEnd = (turnFractionCenter*2 + turnFractionSection)*Math.PI;
