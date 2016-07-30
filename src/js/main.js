@@ -1,13 +1,19 @@
 import Stats from 'stats-js';
+import {render} from 'react-dom';
+import React from 'react';
 
 import '../css/main.css';
 
 import Renderer from './Renderer.js';
-import TouchControls from './interaction/TouchControls.js';
 import Storage from './Storage.js';
 import WebGL from './WebGL.js';
 
+import TouchControls from './interaction/TouchControls.js';
+import App from './components/App.jsx';
+
+
 const canvas = document.querySelector('canvas');
+const reactApp = document.querySelector('.react-app');
 
 const shell = new WebGL(canvas, {
   tickInterval: 1000
@@ -24,15 +30,6 @@ document.body.appendChild(viewStats.domElement);
 engineStats.setMode(1);
 engineStats.domElement.id = 'engineStats';
 document.body.appendChild(engineStats.domElement);
-
-const buttons = Array.from(document.querySelectorAll('.toolbar>button'));
-for(const button of buttons){
-  button.addEventListener('click', e => {
-    buttons.forEach(b => b.className = '');
-    button.className = 'selected';
-    renderer.setSelectedTool(button.dataset.type);
-  });
-}
 
 touchControls.listen(shell.canvas);
 
@@ -51,4 +48,9 @@ shell.render(() => {
 
 shell.resize((w, h) => {
   renderer.resize(w, h);
+  render(<App
+    width={w/window.devicePixelRatio}
+    height={h/window.devicePixelRatio}
+    setTool={tool => renderer.setSelectedTool(tool)} />,
+    reactApp);
 });
