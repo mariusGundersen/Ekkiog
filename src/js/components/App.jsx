@@ -23,11 +23,11 @@ export default class App extends React.Component {
     const cx = this.props.width - radius - gap;
     const cy = this.props.height - radius - gap;
 
-    const items = this.state.show ? [
-      {center: 0.475, tool: 'wire'},
-      {center: 0.625, tool: 'underpass'},
-      {center: 0.775, tool: 'gate'}
-    ] : [];
+    const items = [
+      {center: this.state.show ? 0.475 : 0, tool: 'wire'},
+      {center: this.state.show ? 0.625 : 0, tool: 'underpass'},
+      {center: this.state.show ? 0.775 : 0, tool: 'gate'}
+    ];
 
     return (
       <svg width={this.props.width} height={this.props.height} viewBox={`0 0 ${this.props.width} ${this.props.height}`}>

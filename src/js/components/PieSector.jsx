@@ -10,19 +10,26 @@ export default class PieSector extends React.Component {
     const turnFractionSection = this.props.turnFractionSection;
     const gap = this.props.gap * (this.props.selected ? 0 : 1);
 
-    const radiansStart = (turnFractionCenter*2 - turnFractionSection)*Math.PI;
-    const radiansEnd = (turnFractionCenter*2 + turnFractionSection)*Math.PI;
+    const radiansStart = -turnFractionSection*Math.PI;
+    const radiansEnd = turnFractionSection*Math.PI;
+    const degreesRotate = turnFractionCenter*360;
 
     const path = [
-      `M${cx+innerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${cy+innerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}`,
-      `A${innerRadius},${innerRadius} 0 0,1 ${cx+innerRadius*Math.cos(radiansEnd)+gap*Math.sin(radiansEnd)},${cy+innerRadius*Math.sin(radiansEnd)-gap*Math.cos(radiansEnd)}`,
-      `L${cx+outerRadius*Math.cos(radiansEnd)+gap*Math.sin(radiansEnd)},${cy+outerRadius*Math.sin(radiansEnd)-gap*Math.cos(radiansEnd)}`,
-      `A${outerRadius},${outerRadius} 0 0,0 ${cx+outerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${cy+outerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}`,
+      `M${innerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${innerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}`,
+      `A${innerRadius},${innerRadius} 0 0,1 ${innerRadius*Math.cos(radiansEnd)+gap*Math.sin(radiansEnd)},${innerRadius*Math.sin(radiansEnd)-gap*Math.cos(radiansEnd)}`,
+      `L${outerRadius*Math.cos(radiansEnd)+gap*Math.sin(radiansEnd)},${outerRadius*Math.sin(radiansEnd)-gap*Math.cos(radiansEnd)}`,
+      `A${outerRadius},${outerRadius} 0 0,0 ${outerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${outerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}`,
       'z'
     ].join(' ');
 
     return (
-      <path fill="white" stroke="black" strokeWidth="2" d={path} onClick={this.props.onClick} />
+      <path
+        style={{transform: `translate(${cx}px, ${cy}px) rotate(${degreesRotate}deg)`}}
+        fill="white"
+        stroke="black"
+        strokeWidth="2"
+        d={path}
+        onClick={this.props.onClick} />
     );
   }
 }

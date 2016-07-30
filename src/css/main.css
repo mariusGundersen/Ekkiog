@@ -32,6 +32,9 @@ canvas{
 .react-app path{
   pointer-events: painted;
 }
+.react-app path{
+  transition: transform 0.5s, d 0.5s;
+}
 
 #viewStats{
   position: absolute;
