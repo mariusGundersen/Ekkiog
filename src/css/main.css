@@ -25,21 +25,12 @@ canvas{
   bottom: 0;
   z-index: 2;
   display: flex;
+  pointer-events: none;
 }
 
-.toolbar>button{
-  flex: 1 0 auto;
-  height: 2em;
-  background: black;
-  color: white;
-  border: none;
-  font-family: sans-serif;
-  font-size: 2em;
-  border-radius: 0;
-}
-
-.toolbar>button.selected{
-  box-shadow: 0 0 1em 0 red inset;
+.react-app circle,
+.react-app path{
+  pointer-events: painted;
 }
 
 #viewStats{

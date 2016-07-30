@@ -25,8 +25,6 @@ const viewStats = new Stats();
 const engineStats = new Stats();
 const touchControls = new TouchControls(renderer);
 
-render(<App width={0} height={0}/>, reactApp);
-
 viewStats.domElement.id = 'viewStats';
 document.body.appendChild(viewStats.domElement);
 engineStats.setMode(1);
@@ -35,7 +33,6 @@ document.body.appendChild(engineStats.domElement);
 
 touchControls.listen(shell.canvas);
 
-/*
 shell.tick((tickCount) => {
   engineStats.begin();
   renderer.tick(tickCount);
@@ -47,9 +44,13 @@ shell.render(() => {
   touchControls.panZoom();
   renderer.draw(shell.gl);
   viewStats.end();
-});*/
+});
 
 shell.resize((w, h) => {
   renderer.resize(w, h);
-  render(<App width={w} height={h}/>, reactApp);
+  render(<App
+    width={w/window.devicePixelRatio}
+    height={h/window.devicePixelRatio}
+    setTool={tool => renderer.setSelectedTool(tool)} />,
+    reactApp);
 });
