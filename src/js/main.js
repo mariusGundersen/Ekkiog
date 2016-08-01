@@ -13,7 +13,7 @@ import WebGL from './WebGL.js';
 import TouchControls from './interaction/TouchControls.js';
 import App from './components/App.jsx';
 
-offline.install();
+if(!__DEV__) offline.install();
 
 const canvas = document.querySelector('canvas');
 const reactApp = document.querySelector('.react-app');
