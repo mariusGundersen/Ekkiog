@@ -20,7 +20,7 @@ void main(void) {
 
   if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, texCoord);
-    gl_FragColor = charge;
+    gl_FragColor = texture2D(spriteSheet, vec2(charge.x, tileSize + charge.y * 255.0) * inverseSpriteTextureSize);
   }else{
     gl_FragColor = color;
   }
