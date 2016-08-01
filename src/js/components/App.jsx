@@ -39,7 +39,7 @@ export default class App extends React.Component {
           </clipPath>
         </defs>
 
-        <circle cx={cx} cy={cy} r={radius} fill="white" stroke="black" strokeWidth="2" onClick={this.toggleShow} />
+        <circle cx={cx} cy={cy} r={radius} fill="#555555" stroke="black" strokeWidth="2" onClick={this.toggleShow} />
         <g clipPath="url(#radialClipPath)">
           {items.map(item => (
             <PieSector

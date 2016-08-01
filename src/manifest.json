@@ -28,5 +28,5 @@
   "display": "fullscreen",
   "orientation": "portrait",
   "theme_color": "black",
-  "background_color": "white"
+  "background_color": "#2d2d2d"
 }
