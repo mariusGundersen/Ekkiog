@@ -28,7 +28,7 @@
     "html-webpack-plugin": "^2.8.1",
     "offline-plugin": "^3.4.2",
     "style-loader": "^0.13.1",
-    "w3c-manifest-loader": "^1.0.0",
+    "w3c-manifest-loader": "^1.1.0",
     "webpack": "^1.12.4",
     "webpack-dev-server": "^1.12.1",
     "webpack-glsl-loader": "^1.0.1"
