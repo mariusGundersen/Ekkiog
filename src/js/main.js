@@ -4,6 +4,8 @@ import React from 'react';
 
 import '../css/main.css';
 
+import '../manifest.json';
+
 import Renderer from './Renderer.js';
 import Storage from './Storage.js';
 import WebGL from './WebGL.js';

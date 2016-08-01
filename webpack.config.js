@@ -9,7 +9,7 @@ var JS_PATH = path.resolve(ROOT_PATH, 'src/js');
 var TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
 var SHADER_PATH = path.resolve(ROOT_PATH, 'src/shaders');
 var BUILD_PATH = path.resolve(ROOT_PATH, 'dist');
-var FAVICON_PATH = path.resolve(ROOT_PATH, 'src/favicon.ico');
+var FAVICON_PATH = path.resolve(ROOT_PATH, 'src/icons/favicon.ico');
 
 var debug = process.env.NODE_ENV !== 'production';
 
@@ -54,7 +54,11 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        loader: 'style!css'
+      },
+      {
+        test: /manifest\.json$/,
+        loader: 'w3c-manifest?name=[name].[hash].[ext]&legacyAppleSupport=true'
       }
     ]
   },
