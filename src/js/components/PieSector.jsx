@@ -25,7 +25,7 @@ export default class PieSector extends React.Component {
     return (
       <path
         style={{transform: `translate(${cx}px, ${cy}px) rotate(${degreesRotate}deg)`}}
-        fill="white"
+        fill="#555555"
         stroke="black"
         strokeWidth="2"
         d={path}
