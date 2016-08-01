@@ -3,8 +3,8 @@ import {render} from 'react-dom';
 import React from 'react';
 
 import '../css/main.css';
-
 import '../manifest.json';
+import offline from 'offline-plugin/runtime';
 
 import Renderer from './Renderer.js';
 import Storage from './Storage.js';
@@ -13,6 +13,7 @@ import WebGL from './WebGL.js';
 import TouchControls from './interaction/TouchControls.js';
 import App from './components/App.jsx';
 
+offline.install();
 
 const canvas = document.querySelector('canvas');
 const reactApp = document.querySelector('.react-app');

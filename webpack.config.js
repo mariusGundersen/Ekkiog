@@ -1,6 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var OfflinePlugin = require('offline-plugin');
 
 var ROOT_PATH = path.resolve(__dirname);
 var ENTRY_PATH = path.resolve(ROOT_PATH, 'src/js/main.js');
@@ -28,6 +29,9 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       __DEV__: debug
+    }),
+    new OfflinePlugin({
+      caches: 'all'
     })
   ],
   resolve: {
