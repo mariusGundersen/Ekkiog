@@ -34,7 +34,7 @@ export default class Renderer {
 
   resize (width, height) {
     this.perspective.setViewport(width, height);
-    this.perspective.scale = TILE_SIZE*this.context.width/width;
+    this.perspective.scale = TILE_SIZE*this.context.width/width*window.devicePixelRatio;
   }
 
   panZoom(previous, next){

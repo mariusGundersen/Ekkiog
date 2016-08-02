@@ -50,10 +50,12 @@ shell.render(() => {
 });
 
 shell.resize((w, h) => {
-  renderer.resize(w, h);
+  const screenWidth = w/window.devicePixelRatio;
+  const screenHeight = h/window.devicePixelRatio;
+  renderer.resize(w, h, screenWidth, screenHeight);
   render(<App
-    width={w/window.devicePixelRatio}
-    height={h/window.devicePixelRatio}
+    width={screenWidth}
+    height={screenHeight}
     setTool={tool => renderer.setSelectedTool(tool)} />,
     reactApp);
 });
