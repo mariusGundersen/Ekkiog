@@ -2,6 +2,11 @@ import React from 'react';
 
 import PieSector from './PieSector.jsx';
 
+import IconWire from './IconWire.jsx';
+import IconUnderpass from './IconUnderpass.jsx';
+import IconGate from './IconGate.jsx';
+import IconReturn from './IconReturn.jsx';
+
 export default class App extends React.Component {
   state = {
     show: false,
@@ -24,9 +29,9 @@ export default class App extends React.Component {
     const cy = this.props.height - radius - gap;
 
     const items = [
-      {center: this.state.show ? 0.475 : 1/8, tool: 'wire'},
-      {center: this.state.show ? 0.625 : 1/8, tool: 'underpass'},
-      {center: this.state.show ? 0.775 : 1/8, tool: 'gate'}
+      {center: this.state.show ? 0.475 : 1/8, tool: 'wire', icon: <IconWire />},
+      {center: this.state.show ? 0.625 : 1/8, tool: 'underpass', icon: <IconUnderpass />},
+      {center: this.state.show ? 0.775 : 1/8, tool: 'gate', icon: <IconGate />}
     ];
 
     return (
@@ -39,7 +44,15 @@ export default class App extends React.Component {
           </clipPath>
         </defs>
 
-        <circle cx={cx} cy={cy} r={radius} fill="#555555" stroke="black" strokeWidth="2" onClick={this.toggleShow} />
+        <g transform={`translate(${cx}, ${cy})`} onClick={this.toggleShow}>
+          <circle cx={0} cy={0} r={radius} fill="#555555" stroke="black" strokeWidth="2" />
+
+          {this.state.show ? <IconReturn /> :
+            this.state.selectedTool == 'wire' ? <IconWire /> :
+            this.state.selectedTool == 'underpass' ? <IconUnderpass /> :
+            this.state.selectedTool == 'gate' ? <IconGate /> : ''}
+        </g>
+
         <g clipPath="url(#radialClipPath)">
           {items.map(item => (
             <PieSector
@@ -52,7 +65,9 @@ export default class App extends React.Component {
               turnFractionSection={0.15}
               gap={2}
               selected={this.state.selectedTool == item.tool}
-              onClick={() => this.setTool(item.tool)} />
+              onClick={() => this.setTool(item.tool)}>
+                {item.icon}
+              </PieSector>
           ))}
         </g>
       </svg>

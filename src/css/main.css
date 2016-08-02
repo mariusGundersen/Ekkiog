@@ -29,10 +29,10 @@ canvas{
 }
 
 .react-app circle,
-.react-app path{
+.react-app g{
   pointer-events: painted;
 }
-.react-app path{
+.react-app g{
   transition: transform 0.5s, d 0.5s;
 }
 
