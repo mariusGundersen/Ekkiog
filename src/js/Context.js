@@ -43,7 +43,8 @@ export default class Context{
   }
 }
 
-function serialize(array){
+function serialize(inputArray){
+  const array = new Uint32Array(inputArray.buffer);
   const content = [];
   for(let i=0; i<array.length; i++){
     let repeats = 1;
@@ -58,12 +59,14 @@ function serialize(array){
       content.push(value.toString(16));
     }
   }
-  return `${array.length.toString(16)}:${content.join(',')}`
+  return `(32)${array.length.toString(16)}:${content.join(',')}`
 }
 
 function deserialize(string){
-  const [length, content] = string.split(':');
-  const output = new Uint8Array(parseInt(length, 16));
+  const [sizeAndLength, content] = string.split(':');
+  const output = sizeAndLength.match(/\(32\)\d+/)
+    ? new Uint32Array(parseInt(/\(32\)(\d+)/.exec(sizeAndLength)[1], 16))
+    : new Uint8Array(parseInt(sizeAndLength, 16));
   let i=0;
   for(let item of content.split(',')){
     if(item[0] == '#'){
@@ -81,5 +84,5 @@ function deserialize(string){
       output[i++] = parseInt(item, 16);
     }
   }
-  return output;
+  return new Uint8Array(output.buffer);
 }
