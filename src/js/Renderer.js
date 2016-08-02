@@ -32,9 +32,9 @@ export default class Renderer {
     this.viewEngine = new ViewEngine(gl, this.context, this.perspective.mapToViewportMatrix);
   }
 
-  resize (width, height) {
+  resize (width, height, screenWidth, screenHeight) {
     this.perspective.setViewport(width, height);
-    this.perspective.scale = TILE_SIZE*this.context.width/width*window.devicePixelRatio;
+    this.perspective.scale = TILE_SIZE*this.context.width/screenWidth;
   }
 
   panZoom(previous, next){
