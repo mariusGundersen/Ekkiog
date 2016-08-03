@@ -2,10 +2,6 @@ import {vec2, mat3} from 'gl-matrix';
 import createShader from 'gl-shader';
 import fillScreen from 'a-big-triangle';
 
-import ImageTexture from '../ImageTexture.js';
-import loadImage from '../loadImage.js';
-import tiles from '../../img/tiles.png';
-
 import tilemapVS from './viewVS.glsl';
 import tilemapFS from './viewFS.glsl';
 
@@ -15,7 +11,7 @@ export default class ViewEngine {
     this.context = context;
     this.matrix = matrix;
 
-    this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
+    this.spriteSheetTexture = context.spriteSheetTexture;
     this.tileMapTexture = context.tileMapTexture;
     this.chargeMapTexture = context.chargeMapTexture;
 

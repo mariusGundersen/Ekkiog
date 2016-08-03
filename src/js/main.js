@@ -19,7 +19,7 @@ const canvas = document.querySelector('canvas');
 const reactApp = document.querySelector('.react-app');
 
 const shell = new WebGL(canvas, {
-  tickInterval: 1000
+  tickInterval: 500
 });
 
 const storage = new Storage();

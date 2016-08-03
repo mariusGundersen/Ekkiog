@@ -3,6 +3,11 @@ import {encode as encodeArray, decode as decodeArary} from 'base64-arraybuffer';
 import DataTexture from './DataTexture.js';
 import RenderTexture from './RenderTexture.js';
 
+import ImageTexture from './ImageTexture.js';
+import loadImage from './loadImage.js';
+import tiles from '../img/tiles.png';
+
+
 export default class Context{
   constructor(gl, data, tileSize){
     this.gl = gl;
@@ -10,6 +15,7 @@ export default class Context{
     this.height = data.height;
     this.tileSize = tileSize;
 
+    this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
     this.mapTexture = new DataTexture(gl, this.width, this.height);
     this.tileMapTexture = new RenderTexture(gl, this.width, this.height);
     this.chargeMapTexture = new RenderTexture(gl, this.width, this.height);
