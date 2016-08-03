@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default props => (
-  <g>
+  <g transform="scale(1.2, 1.2)">
     <path
       stroke="#f58e8e"
       strokeWidth="2"
