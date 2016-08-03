@@ -45,7 +45,7 @@ export default class App extends React.Component {
         </defs>
 
         <g transform={`translate(${cx}, ${cy})`} onClick={this.toggleShow}>
-          <circle cx={0} cy={0} r={radius} fill="#555555" stroke="black" strokeWidth="2" />
+          <circle cx={0} cy={0} r={radius} fill="#2a2d30" stroke="#446364" strokeWidth="2" />
 
           {this.state.show ? <IconReturn /> :
             this.state.selectedTool == 'wire' ? <IconWire /> :
@@ -63,7 +63,7 @@ export default class App extends React.Component {
               outerRadius={100}
               turnFractionCenter={item.center}
               turnFractionSection={0.15}
-              gap={2}
+              gap={5}
               selected={this.state.selectedTool == item.tool}
               onClick={() => this.setTool(item.tool)}>
                 {item.icon}

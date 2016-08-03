@@ -28,8 +28,8 @@ export default props => {
       onClick={props.onClick}
       style={{transform: `translate(${cx}px, ${cy}px) rotate(${degreesRotate}deg)`}}>
       <path
-        fill="#555555"
-        stroke="black"
+        fill="#2a2d30"
+        stroke="#446364"
         strokeWidth="2"
         d={path}/>
         <g transform={`translate(${averageRadius}, 0) rotate(${-degreesRotate})`} >
