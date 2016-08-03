@@ -10,6 +10,7 @@ const TILE_SIZE = 16;
 
 export default class Renderer {
   constructor(gl, storage) {
+    this.currentTick = 0;
     this.tool = 'wire';
     this.storage = storage;
     const loaded = storage.load() || {width: 128, height: 128};
@@ -64,6 +65,7 @@ export default class Renderer {
       }
       this.tileMapEngine.render();
       this.storage.save(this.context.export());
+      this.chargeMapEngine.render(this.currentTick);
     });
   }
 
@@ -82,10 +84,12 @@ export default class Renderer {
 
       this.tileMapEngine.render();
       this.storage.save(this.context.export());
+      this.chargeMapEngine.render(this.currentTick);
     });
   }
 
   tick(tick){
+    this.currentTick = tick;
     this.netChargeEngine.render(tick);
     this.chargeMapEngine.render(tick);
   }

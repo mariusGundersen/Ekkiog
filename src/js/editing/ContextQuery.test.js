@@ -63,7 +63,7 @@ test('isWire', t => {
 test('isEmpty', t => {
   t.true(cq.isEmpty(1,1));
   t.false(cq.isEmpty(2,1));
-  t.false(cq.isEmpty(10, 6));
+  t.false(cq.isEmpty(9, 6));
 });
 
 test('isGateOutput', t => {
@@ -90,9 +90,9 @@ test('isGate', t => {
   t.true(cq.isGate(9, 7));
   t.true(cq.isGate(9, 8));
 
-  t.true(cq.isGate(10, 6));
+  t.false(cq.isGate(10, 6));
   t.true(cq.isGate(10, 7));
-  t.true(cq.isGate(10, 8));
+  t.false(cq.isGate(10, 8));
 
   t.false(cq.isGate(11, 7));
 });
@@ -120,11 +120,11 @@ test('getNetSource', t => {
 
 test('canPlaceGateHere', t => {
   //Gate at 10, 7
-  t.false(cq.canPlaceGateHere(7, 5));
+  t.true(cq.canPlaceGateHere(7, 5));
   t.false(cq.canPlaceGateHere(7, 6));
   t.false(cq.canPlaceGateHere(7, 7));
   t.false(cq.canPlaceGateHere(7, 8));
-  t.false(cq.canPlaceGateHere(7, 9));
+  t.true(cq.canPlaceGateHere(7, 9));
 
   t.false(cq.canPlaceGateHere(8, 5));
   t.false(cq.canPlaceGateHere(8, 6));
@@ -156,11 +156,11 @@ test('canPlaceGateHere', t => {
   t.false(cq.canPlaceGateHere(12, 8));
   t.false(cq.canPlaceGateHere(12, 9));
 
-  t.false(cq.canPlaceGateHere(13, 5));
+  t.true(cq.canPlaceGateHere(13, 5));
   t.false(cq.canPlaceGateHere(13, 6));
   t.false(cq.canPlaceGateHere(13, 7));
   t.false(cq.canPlaceGateHere(13, 8));
-  t.false(cq.canPlaceGateHere(13, 9));
+  t.true(cq.canPlaceGateHere(13, 9));
 
   t.true(cq.canPlaceGateHere(14, 7));
 });

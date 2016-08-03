@@ -37,10 +37,10 @@ export default class Editor{
 
     const nextNet = this.query.getNextNet();
 
+    this.clear(x, y);
     for(let cy=y-1; cy<=y+1; cy++){
-      for(let cx=x-3; cx<=x; cx++){
-        this.context.mapTexture.set(cx, cy, EMPTY);
-        this.context.netMapTexture.set(cx, cy, GROUND);
+      for(let cx=x-3; cx<x; cx++){
+        this.clear(cx, cy);
       }
     }
 

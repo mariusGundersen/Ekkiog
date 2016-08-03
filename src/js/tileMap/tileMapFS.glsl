@@ -42,8 +42,8 @@ void main() {
     gl_FragColor = gateTile(1.0, 0.0);
   }else if(lookup(1.0, 1.0) == GATE){
     gl_FragColor = gateTile(2.0, 0.0);
-  }else if(lookup(0.0, 1.0) == GATE){
-    gl_FragColor = gateTile(3.0, 0.0);
+  //}else if(lookup(0.0, 1.0) == GATE){
+  //  gl_FragColor = gateTile(3.0, 0.0);
   }else if(lookup(3.0, 0.0) == GATE){
     gl_FragColor = gateTile(0.0, 1.0);
   }else if(lookup(2.0, 0.0) == GATE){
@@ -58,8 +58,8 @@ void main() {
     gl_FragColor = gateTile(1.0, 2.0);
   }else if(lookup(1.0, -1.0) == GATE){
     gl_FragColor = gateTile(2.0, 2.0);
-  }else if(lookup(0.0, -1.0) == GATE){
-    gl_FragColor = gateTile(3.0, 2.0);
+  //}else if(lookup(0.0, -1.0) == GATE){
+  //  gl_FragColor = gateTile(3.0, 2.0);
 
   //Empty
   }else{

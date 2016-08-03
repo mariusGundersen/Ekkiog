@@ -26,20 +26,20 @@ export default class ContextQuery{
 
   isGate(tx, ty){
     for(let y=ty-1; y<=ty+1; y++){
-      for(let x=tx; x<=tx+3; x++){
+      for(let x=tx+1; x<=tx+3; x++){
         if(this.isGateOutput(x, y)) return true;
       }
     }
-    return false;
+    return this.isGateOutput(tx, ty);
   }
 
   canPlaceGateHere(tx, ty){
     for(let y=ty-1; y<=ty+1; y++){
-      for(let x=tx-3; x<=tx; x++){
+      for(let x=tx-3; x<tx; x++){
         if(this.isGate(x, y)) return false;
       }
     }
-    return true;
+    return !this.isGate(tx, ty);
   }
 
   isGateInput(x, y){
@@ -85,11 +85,11 @@ export default class ContextQuery{
 
   getGateOutput(tx, ty){
     for(let y=ty-1; y<=ty+1; y++){
-      for(let x=tx; x<=tx+3; x++){
+      for(let x=tx+1; x<=tx+3; x++){
         if(this.isGateOutput(x, y)) return [x, y];
       }
     }
-    return null;
+    return this.isGateOutput(tx, ty) ? [x, y] : null;
   }
 
   getNextNet(){
