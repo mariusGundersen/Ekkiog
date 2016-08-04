@@ -27,6 +27,6 @@
   "start_url": "/index.html",
   "display": "fullscreen",
   "orientation": "portrait",
-  "theme_color": "black",
-  "background_color": "#2d2d2d"
+  "theme_color": "#2a2d30",
+  "background_color": "#2a2d30"
 }
