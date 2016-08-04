@@ -51,26 +51,38 @@ export default class Renderer {
 
     window.requestAnimationFrame(() => {
       if(this.editor.query.isButton(tx, ty)){
-        this.editor.toggleButton(tx, ty);
+        const [netX, netY] = this.editor.toggleButton(tx, ty);
         this.context.gatesTexture.update();
-      }else if(this.tool == 'wire'){
-        if(this.editor.query.isWire(tx, ty)){
-          this.editor.clearWire(tx, ty);
-        }else{
-          this.editor.drawWire(tx, ty);
-        }
-      }else if(this.tool == 'underpass'){
-        this.editor.drawUnderpass(tx, ty);
-      }else if(this.tool == 'gate'){
-        this.editor.drawGate(tx, ty);
-      }else if(this.tool == 'button'){
-        this.editor.drawButton(tx, ty);
+        const netCharges = this.context.netChargeTextures[this.currentTick%2].export();
+        netCharges[(0 + netY*4)*this.context.width + netX] = 0xff;
+        netCharges[(1 + netY*4)*this.context.width + netX] = 0xff;
+        netCharges[(2 + netY*4)*this.context.width + netX] = 0xff;
+        netCharges[(3 + netY*4)*this.context.width + netX] = 0xff;
+        this.context.netChargeTextures[this.currentTick%2].import(netCharges);
+        this.netChargeEngine.render(this.currentTick);
+        this.chargeMapEngine.render(this.currentTick);
+        this.storage.save(this.context.export());
       }else{
-        this.editor.clear(tx, ty);
+        if(this.tool == 'wire'){
+          if(this.editor.query.isWire(tx, ty)){
+            this.editor.clearWire(tx, ty);
+          }else{
+            this.editor.drawWire(tx, ty);
+          }
+        }else if(this.tool == 'underpass'){
+          this.editor.drawUnderpass(tx, ty);
+        }else if(this.tool == 'gate'){
+          this.editor.drawGate(tx, ty);
+        }else if(this.tool == 'button'){
+          this.editor.drawButton(tx, ty);
+        }else{
+          this.editor.clear(tx, ty);
+        }
+
+        this.tileMapEngine.render();
+        this.storage.save(this.context.export());
+        this.chargeMapEngine.render(this.currentTick);
       }
-      this.tileMapEngine.render();
-      this.storage.save(this.context.export());
-      this.chargeMapEngine.render(this.currentTick);
     });
   }
 

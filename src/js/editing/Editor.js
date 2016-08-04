@@ -132,6 +132,8 @@ export default class Editor{
     this.context.mapTexture.set(x, y, BUTTON);
     this.context.netMapTexture.set16(x, y, nextNet);
     this.context.netMapTexture.set16(x-1, y, nextNet);
+    const [netX, netY] = this.split(nextNet);
+    this.context.gatesTexture.set32(netX, netY, (1<<16) | (1<<0));
 
     const gatesToUpdate = this.floodFiller.floodFill(x, y, nextNet);
     for(let [gateX, gateY] of gatesToUpdate){
@@ -235,6 +237,7 @@ export default class Editor{
     const [outputX, outputY] = this.split(this.query.getNet(buttonX, buttonY));
     const button = this.context.gatesTexture.get32(outputX, outputY);
     this.context.gatesTexture.set32(outputX, outputY, button === 0 ? ((1<<16) | (1<<0)) : 0);
+    return [outputX, outputY];
   }
 
   split(v){
