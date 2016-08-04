@@ -2,6 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var OfflinePlugin = require('offline-plugin');
+var autoprefixer = require('autoprefixer');
 
 var ROOT_PATH = path.resolve(__dirname);
 var ENTRY_PATH = path.resolve(ROOT_PATH, 'src/js/main.js');
@@ -58,7 +59,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style!css'
+        loader: 'style!css!postcss'
       },
       {
         test: /manifest\.json$/,
@@ -67,5 +68,8 @@ module.exports = {
     ]
   },
   debug: debug,
-  devtool: debug ? 'eval-source-map' : 'source-map'
+  devtool: debug ? 'eval-source-map' : 'source-map',
+  postcss: function () {
+    return [autoprefixer({ browsers: ['iOS 9'] })];
+  }
 };

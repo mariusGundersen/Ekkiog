@@ -37,7 +37,7 @@ export default class TouchControls{
 
 function emitTouchEvents(emitter, type){
   return event => {
-    for(let touch of event.changedTouches){
+    for(let touch of Array.from(event.changedTouches)){
       emitter.emit(type, {
         id: touch.identifier,
         x: touch.pageX*window.devicePixelRatio,
