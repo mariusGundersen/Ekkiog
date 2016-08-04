@@ -1,6 +1,12 @@
 import unique from 'array-unique';
 
-import {EMPTY, WIRE, GATE, UNDERPASS} from './tileConstants.js';
+import {
+  EMPTY,
+  WIRE,
+  GATE,
+  UNDERPASS,
+  BUTTON
+} from './tileConstants.js';
 
 export default class ContextQuery{
   constructor(context){
@@ -12,16 +18,30 @@ export default class ContextQuery{
   }
 
   isEmpty(x, y){
-    return this.context.mapTexture.map.get(y, x, 0) === 0
-        && !this.isGate(x, y);
+    return this.getTileType(x, y) === EMPTY
+        && !this.isGate(x, y)
+        && !this.isButton(x, y);
   }
 
   isWire(x, y){
-    return this.context.mapTexture.map.get(y, x, 0) === WIRE;
+    return this.getTileType(x, y) === WIRE;
   }
 
   isUnderpass(x, y){
-    return this.context.mapTexture.map.get(y, x, 0) === UNDERPASS;
+    return this.getTileType(x, y) === UNDERPASS;
+  }
+
+  isGateOutput(x, y){
+    return this.getTileType(x, y) === GATE;
+  }
+
+  isGateInput(x, y){
+    return this.isGateOutput(x+3, y+1)
+        || this.isGateOutput(x+3, y-1);
+  }
+
+  isButtonOutput(x, y){
+    return this.getTileType(x, y) === BUTTON;
   }
 
   isGate(tx, ty){
@@ -33,27 +53,43 @@ export default class ContextQuery{
     return this.isGateOutput(tx, ty);
   }
 
+  isButton(tx, ty){
+    for(let y=ty-1; y<=ty+1; y++){
+      for(let x=tx; x<=tx+2; x++){
+        if(this.isButtonOutput(x, y)) return true;
+      }
+    }
+    return false;
+  }
+
   canPlaceGateHere(tx, ty){
     for(let y=ty-1; y<=ty+1; y++){
       for(let x=tx-3; x<tx; x++){
         if(this.isGate(x, y)) return false;
+        if(this.isButton(x, y)) return false;
       }
     }
-    return !this.isGate(tx, ty);
+    return !this.isGate(tx, ty)
+        && !this.isButton(tx, ty);
   }
 
-  isGateInput(x, y){
-    return this.isGateOutput(x+3, y+1)
-        || this.isGateOutput(x+3, y-1);
+  canPlaceButtonHere(tx, ty){
+    for(let y=ty-1; y<=ty+1; y++){
+      for(let x=tx-2; x<=tx; x++){
+        if(this.isGate(x, y)) return false;
+        if(this.isButton(x, y)) return false;
+      }
+    }
+    return true;
   }
 
-  isGateOutput(x, y){
-    return this.context.mapTexture.map.get(y, x, 0) === GATE;
+  isNetSource(x, y){
+    const type = this.getTileType(x, y);
+    return type === GATE || type === BUTTON;
   }
 
   isGroundNet(x, y){
-    return this.context.netMapTexture.map.get(y, x, 0) === 0
-        && this.context.netMapTexture.map.get(y, x, 1) === 0;
+    return this.getNet(x, y) === 0;
   }
 
   getNet(x, y){
@@ -64,7 +100,7 @@ export default class ContextQuery{
   getNetSource(net){
     for(let y=0; y<this.context.height; y++){
       for(let x=0; x<this.context.width; x++){
-        if(this.isGateOutput(x, y) && this.getNet(x, y) == net){
+        if(this.isNetSource(x, y) && this.getNet(x, y) == net){
           return [x, y];
         }
       }
@@ -92,18 +128,27 @@ export default class ContextQuery{
     return this.isGateOutput(tx, ty) ? [x, y] : null;
   }
 
+  getButtonOutput(tx, ty){
+    for(let y=ty-1; y<=ty+1; y++){
+      for(let x=tx; x<=tx+2; x++){
+        if(this.isButtonOutput(x, y)) return [x, y];
+      }
+    }
+    return null;
+  }
+
   getNextNet(){
     const nets = [];
     for(let y=0; y<this.context.height; y++){
       for(let x=0; x<this.context.width; x++){
-        if(this.isGateOutput(x, y)){
+        if(this.isNetSource(x, y)){
           nets.push(this.getNet(x, y));
         }
       }
     }
 
     if(nets.length === 0){
-      return 1;
+      return 2;
     }
 
     const sortedNets = nets.sort((a,b) => a-b);
@@ -138,7 +183,7 @@ export default class ContextQuery{
     const w = this.context.width;
     const h = this.context.height;
     if(type == WIRE){
-      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y))){
+      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y) || this.isButtonOutput(x-1, y))){
         yield [x-1, y];
       }
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
@@ -163,13 +208,17 @@ export default class ContextQuery{
         }
       }
     }else if(type == UNDERPASS){
-      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y))){
+      if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y) || this.isButtonOutput(x-1, y))){
         yield [x-1, y];
       }
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
         yield [x+1, y];
       }
     }else if(type == GATE){
+      if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
+        yield [x+1, y];
+      }
+    }else if(type == BUTTON){
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
         yield [x+1, y];
       }

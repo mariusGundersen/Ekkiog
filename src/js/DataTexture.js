@@ -19,6 +19,13 @@ export default class DataTexture extends Texture{
     this.map.set(y, x, 1, (v>>8)&0xff);
   }
 
+  set32(x, y, v=0){
+    this.map.set(y, x, 0, (v>>0)&0xff)
+    this.map.set(y, x, 1, (v>>8)&0xff);
+    this.map.set(y, x, 2, (v>>16)&0xff);
+    this.map.set(y, x, 3, (v>>24)&0xff);
+  }
+
   get(x, y){
     return this.map.get(y, x, 0);
   }
@@ -26,6 +33,13 @@ export default class DataTexture extends Texture{
   get16(x, y){
     return (this.map.get(y, x, 0)<<0)
          | (this.map.get(y, x, 1)<<8);
+  }
+
+  get32(x, y){
+    return (this.map.get(y, x, 0)<<0)
+         | (this.map.get(y, x, 1)<<8)
+         | (this.map.get(y, x, 2)<<16)
+         | (this.map.get(y, x, 3)<<32);
   }
 
   toggle(x, y){

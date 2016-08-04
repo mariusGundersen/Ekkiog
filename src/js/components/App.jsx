@@ -30,7 +30,7 @@ export default class App extends React.Component {
 
     const items = [
       {center: this.state.show ? 0.475 : 1/8, tool: 'wire', icon: <IconWire />},
-      {center: this.state.show ? 0.625 : 1/8, tool: 'underpass', icon: <IconUnderpass />},
+      {center: this.state.show ? 0.625 : 1/8, tool: 'button', icon: <IconUnderpass />},
       {center: this.state.show ? 0.775 : 1/8, tool: 'gate', icon: <IconGate />}
     ];
 
@@ -49,7 +49,7 @@ export default class App extends React.Component {
 
           {this.state.show ? <IconReturn /> :
             this.state.selectedTool == 'wire' ? <IconWire /> :
-            this.state.selectedTool == 'underpass' ? <IconUnderpass /> :
+            this.state.selectedTool == 'button' ? <IconUnderpass /> :
             this.state.selectedTool == 'gate' ? <IconGate /> : ''}
         </g>
 

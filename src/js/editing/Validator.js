@@ -32,4 +32,11 @@ export default class Validator{
 
     return true;
   }
+
+  canPlaceButtonHere(x, y){
+    if(!this.query.canPlaceButtonHere(x, y)) return false;
+    if(!this.query.isGroundNet(x+1, y)) return false;
+
+    return true;
+  }
 }

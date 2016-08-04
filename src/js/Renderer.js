@@ -50,7 +50,10 @@ export default class Renderer {
     const [tx, ty] = this.perspective.viewportToTile(x, y);
 
     window.requestAnimationFrame(() => {
-      if(this.tool == 'wire'){
+      if(this.editor.query.isButton(tx, ty)){
+        this.editor.toggleButton(tx, ty);
+        this.context.gatesTexture.update();
+      }else if(this.tool == 'wire'){
         if(this.editor.query.isWire(tx, ty)){
           this.editor.clearWire(tx, ty);
         }else{
@@ -60,6 +63,8 @@ export default class Renderer {
         this.editor.drawUnderpass(tx, ty);
       }else if(this.tool == 'gate'){
         this.editor.drawGate(tx, ty);
+      }else if(this.tool == 'button'){
+        this.editor.drawButton(tx, ty);
       }else{
         this.editor.clear(tx, ty);
       }
@@ -76,6 +81,9 @@ export default class Renderer {
       if(this.editor.query.isGate(tx, ty)){
         const [gateX, gateY] = this.editor.query.getGateOutput(tx, ty);
         this.editor.clearGate(gateX, gateY);
+      }else if(this.editor.query.isButton(tx, ty)){
+        const [buttonX, buttonY] = this.editor.query.getButtonOutput(tx, ty);
+        this.editor.clearButton(buttonX, buttonY);
       }else if(this.editor.query.isWire(tx, ty)){
         this.editor.drawUnderpass(tx, ty);
       }else if(this.editor.query.isUnderpass(tx, ty)){

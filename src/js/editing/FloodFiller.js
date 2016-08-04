@@ -15,7 +15,7 @@ export default class FloodFiller{
       const {x, y} = tcoQueue.shift();
       if(this.visitedMap.get(x, y) == 0){
         this.visitedMap.set(x, y, 1);
-        if(!this.query.isGateOutput(x, y)){
+        if(!this.query.isNetSource(x, y)){
           this.context.netMapTexture.set(x, y, net);
           if(this.query.isGateInput(x, y)){
             gatesToUpdate.push(this.query.getGateForInput(x, y));

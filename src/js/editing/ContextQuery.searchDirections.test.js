@@ -1,6 +1,12 @@
 import test from 'ava';
 
-import {WIRE, GATE, UNDERPASS} from './tileConstants.js';
+import {
+  EMPTY,
+  WIRE,
+  GATE,
+  UNDERPASS,
+  BUTTON
+} from './tileConstants.js';
 import ContextQuery from './ContextQuery.js';
 
 function getSearchDirections(t, map, start, expected){
@@ -86,6 +92,15 @@ test(
   [[0,1],[2,1]]);
 
 test(
+  'wire next to button',
+  getSearchDirections,
+  `000
+   4x0
+   000`,
+  [1, 1, WIRE],
+  [[0,1]]);
+
+test(
   'wire below underpass',
   getSearchDirections,
   `010
@@ -159,6 +174,15 @@ test(
   [[0,2],[2,2]]);
 
 test(
+  'underpass next to button',
+  getSearchDirections,
+  `000
+   4x0
+   000`,
+  [1, 1, UNDERPASS],
+  [[0,1]]);
+
+test(
   'underpass with inputB and output',
   getSearchDirections,
   `000000
@@ -220,6 +244,43 @@ test(
    000000`,
   [1, 1, GATE],
   [[2,1]]);
+
+test(
+  'button feeding into wire',
+  getSearchDirections,
+  `000
+   0x1
+   000`,
+  [1, 1, BUTTON],
+  [[2,1]]);
+
+test(
+  'button feeding into underpass',
+  getSearchDirections,
+  `000
+   0x3
+   000`,
+  [1, 1, BUTTON],
+  [[2,1]]);
+
+test(
+  'button feeding into gate below',
+  getSearchDirections,
+  `000000
+   0x0000
+   000002`,
+  [1, 1, BUTTON],
+  [[2,1]]);
+
+test(
+  'button feeding into gate above',
+  getSearchDirections,
+  `000002
+   0x0000
+   000000`,
+  [1, 1, BUTTON],
+  [[2,1]]);
+
 
 function makeContext(t){
   const lines = t.split('\n').map(l => l.replace(/\s/g, '')).filter(l => l.length != 0);

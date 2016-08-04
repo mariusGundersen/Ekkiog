@@ -3,6 +3,7 @@ precision mediump float;
 const float TILE = 1.0;
 const float GATE = 2.0;
 const float UNDERPASS = 3.0;
+const float BUTTON = 4.0;
 
 uniform sampler2D tilemap;
 uniform vec2 inverseTileTextureSize;
@@ -10,6 +11,7 @@ varying vec2 texCoord;
 
 float lookup(float x, float y);
 vec4 gateTile(float x, float y);
+vec4 buttonTile(float x, float y);
 
 void main() {
   float value = lookup(0.0, 0.0);
@@ -26,7 +28,7 @@ void main() {
     float down = value == TILE
       ? float(tileDown == TILE) + float(tileDown == UNDERPASS)*4.0
       : float(tileDown == TILE || tileDown == UNDERPASS)*5.0;
-    float left = float(tileLeft == TILE || tileLeft == UNDERPASS || tileLeft == GATE);
+    float left = float(tileLeft == TILE || tileLeft == UNDERPASS || tileLeft == GATE || tileLeft == BUTTON);
     float right = float(tileRight == TILE || tileRight == UNDERPASS || lookup(4.0, 1.0) == GATE || lookup(4.0, -1.0) == GATE);
 
     vec2 tile = vec2(
@@ -61,6 +63,27 @@ void main() {
   //}else if(lookup(0.0, -1.0) == GATE){
   //  gl_FragColor = gateTile(3.0, 2.0);
 
+
+  //Button
+  }else if(lookup(2.0, 1.0) == BUTTON){
+    gl_FragColor = buttonTile(0.0, 0.0);
+  }else if(lookup(1.0, 1.0) == BUTTON){
+    gl_FragColor = buttonTile(1.0, 0.0);
+  }else if(lookup(0.0, 1.0) == BUTTON){
+    gl_FragColor = buttonTile(2.0, 0.0);
+  }else if(lookup(2.0, 0.0) == BUTTON){
+    gl_FragColor = buttonTile(0.0, 1.0);
+  }else if(lookup(1.0, 0.0) == BUTTON){
+    gl_FragColor = buttonTile(1.0, 1.0);
+  }else if(lookup(0.0, 0.0) == BUTTON){
+    gl_FragColor = buttonTile(2.0, 1.0);
+  }else if(lookup(2.0, -1.0) == BUTTON){
+    gl_FragColor = buttonTile(0.0, 2.0);
+  }else if(lookup(1.0, -1.0) == BUTTON){
+    gl_FragColor = buttonTile(1.0, 2.0);
+  }else if(lookup(0.0, -1.0) == BUTTON){
+    gl_FragColor = buttonTile(2.0, 2.0);
+
   //Empty
   }else{
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -73,4 +96,8 @@ float lookup(float x, float y) {
 
 vec4 gateTile(float x, float y){
   return vec4((9.0+x)/255.0, (4.0+y)/255.0, 0.0, 1.0);
+}
+
+vec4 buttonTile(float x, float y){
+  return vec4((9.0+x)/255.0, (0.0+y)/255.0, 0.0, 1.0);
 }
