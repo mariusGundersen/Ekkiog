@@ -15,6 +15,11 @@ const WebGLCanvas = connect(
   componentDidMount(){
     const gl = getContext(this.canvas);
 
+    // The react event system is too slow, so using the native events
+    this.canvas.addEventListener('touchstart', emitTouchEvents(this.props.emitter, 'touchStart'), false)
+    this.canvas.addEventListener('touchmove', emitTouchEvents(this.props.emitter, 'touchMove'), false);
+    this.canvas.addEventListener('touchend', emitTouchEvents(this.props.emitter, 'touchEnd'), false);
+
     this.props.dispatch({
       type: GL,
       gl
@@ -29,9 +34,6 @@ const WebGLCanvas = connect(
   render(){
     return (
       <canvas
-        onTouchStart={emitTouchEvents(this.props.emitter, 'touchStart')}
-        onTouchMove={emitTouchEvents(this.props.emitter, 'touchMove')}
-        onTouchEnd={emitTouchEvents(this.props.emitter, 'touchEnd')}
         ref={c => this.canvas = c}
         width={this.props.width}
         height={this.props.height} />
