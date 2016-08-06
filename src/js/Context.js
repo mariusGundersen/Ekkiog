@@ -1,15 +1,18 @@
 import {encode as encodeArray, decode as decodeArary} from 'base64-arraybuffer';
 
-import DataTexture from './DataTexture.js';
-import RenderTexture from './RenderTexture.js';
+import serialize from './storage/serialize.js';
+import deserialize from './storage/deserialize.js';
 
-import ImageTexture from './ImageTexture.js';
+import DataTexture from './textures/DataTexture.js';
+import RenderTexture from './textures/RenderTexture.js';
+
+import ImageTexture from './textures/ImageTexture.js';
 import loadImage from './loadImage.js';
 import tiles from '../img/tiles.png';
 
 
 export default class Context{
-  constructor(gl, data, tileSize){
+  constructor(gl, data, tileSize=16){
     this.gl = gl;
     this.width = data.width;
     this.height = data.height;
@@ -47,48 +50,4 @@ export default class Context{
       netCharges: serialize(this.netChargeTextures[0].export()),
     };
   }
-}
-
-function serialize(inputArray){
-  const array = new Uint32Array(inputArray.buffer);
-  const content = [];
-  for(let i=0; i<array.length; i++){
-    let repeats = 1;
-    const value = array[i];
-    while(i+1 < array.length && array[i+1] === value){
-      i++;
-      repeats++;
-    }
-    if(repeats>1){
-      content.push(`#${repeats.toString(16)}x${value.toString(16)}`);
-    }else{
-      content.push(value.toString(16));
-    }
-  }
-  return `(32)${array.length.toString(16)}:${content.join(',')}`
-}
-
-function deserialize(string){
-  const [sizeAndLength, content] = string.split(':');
-  const output = sizeAndLength.match(/\(32\)\d+/)
-    ? new Uint32Array(parseInt(/\(32\)(\d+)/.exec(sizeAndLength)[1], 16))
-    : new Uint8Array(parseInt(sizeAndLength, 16));
-  let i=0;
-  for(let item of content.split(',')){
-    if(item[0] == '#'){
-      const [_, repeatString, valueString] = /#([0-9a-f]+)x([0-9a-f]+)/.exec(item);
-      const value = parseInt(valueString, 16);
-      const repeats = parseInt(repeatString, 16);
-      if(value === '0'){
-        i+= repeats;
-      }else{
-        for(let r=0; r<repeats; r++, i++){
-          output[i] = value;
-        }
-      }
-    }else{
-      output[i++] = parseInt(item, 16);
-    }
-  }
-  return new Uint8Array(output.buffer);
 }

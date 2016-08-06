@@ -5,24 +5,21 @@ import tileMapVS from './tileMapVS.glsl';
 import tileMapFS from './tileMapFS.glsl';
 
 export default class TileMapEngine{
-  constructor(gl, context) {
+  constructor(gl) {
     this.gl = gl;
     this.shader = createShader(gl, tileMapVS, tileMapFS);
-
-    this.mapTexture = context.mapTexture;
-    this.renderTexture = context.tileMapTexture;
   }
 
-  render(){
-    this.renderTexture.bindFramebuffer();
+  render(context){
+    context.tileMapTexture.bindFramebuffer();
 
     this.shader.bind();
 
-    this.shader.uniforms.tilemap = this.mapTexture.sampler2D(0);
-    this.shader.uniforms.inverseTileTextureSize = this.mapTexture.inverseSize;
+    this.shader.uniforms.tilemap = context.mapTexture.sampler2D(0);
+    this.shader.uniforms.inverseTileTextureSize = context.mapTexture.inverseSize;
 
     fillScreen(this.gl);
 
-    this.renderTexture.unbindFramebuffer();
+    context.tileMapTexture.unbindFramebuffer();
   }
 }

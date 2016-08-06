@@ -20,7 +20,7 @@ export default class Editor{
   }
 
   drawWire(x, y){
-    if(!this.validate.canPlaceWireHere(x, y)) return;
+    if(!this.validate.canPlaceWireHere(x, y)) return false;
 
     const neighbouringNets = this.query.getNeighbouringNets(x, y, WIRE);
 
@@ -33,13 +33,11 @@ export default class Editor{
       }
     }
 
-    this.context.mapTexture.update();
-    this.context.netMapTexture.update();
-    this.context.gatesTexture.update();
+    return true;
   }
 
   drawGate(x, y){
-    if(!this.validate.canPlaceGateHere(x, y)) return;
+    if(!this.validate.canPlaceGateHere(x, y)) return false;
 
     const nextNet = this.query.getNextNet();
 
@@ -51,10 +49,10 @@ export default class Editor{
     }
 
     this.context.mapTexture.set(x, y, GATE);
-    this.context.netMapTexture.set16(x, y, nextNet);
+    this.context.netMapTexture.set(x, y, nextNet);
 
-    this.context.netMapTexture.set16(x-3, y-1, this.query.getNet(x-4, y-1));
-    this.context.netMapTexture.set16(x-3, y+1, this.query.getNet(x-4, y+1));
+    this.context.netMapTexture.set(x-3, y-1, this.query.getNet(x-4, y-1));
+    this.context.netMapTexture.set(x-3, y+1, this.query.getNet(x-4, y+1));
 
     this.updateGate(x, y);
 
@@ -63,13 +61,11 @@ export default class Editor{
       this.updateGate(gateX, gateY);
     }
 
-    this.context.netMapTexture.update();
-    this.context.gatesTexture.update();
-    this.context.mapTexture.update();
+    return true;
   }
 
   drawUnderpass(x, y){
-    if(!this.validate.canPlaceUnderpassHere(x, y)) return;
+    if(!this.validate.canPlaceUnderpassHere(x, y)) return false;
 
     if(this.query.isWire(x, y)){
       this.clearWire(x, y);
@@ -113,13 +109,11 @@ export default class Editor{
       this.drawWire(x, terminalBelow);
     }
 
-    this.context.mapTexture.update();
-    this.context.netMapTexture.update();
-    this.context.gatesTexture.update();
+    return true;
   }
 
   drawButton(x, y){
-    if(!this.validate.canPlaceButtonHere(x, y)) return;
+    if(!this.validate.canPlaceButtonHere(x, y)) return false;
 
     const nextNet = this.query.getNextNet();
 
@@ -130,19 +124,17 @@ export default class Editor{
     }
 
     this.context.mapTexture.set(x, y, BUTTON);
-    this.context.netMapTexture.set16(x, y, nextNet);
-    this.context.netMapTexture.set16(x-1, y, nextNet);
+    this.context.netMapTexture.set(x, y, nextNet);
+    this.context.netMapTexture.set(x-1, y, nextNet);
     const [netX, netY] = this.split(nextNet);
-    this.context.gatesTexture.set32(netX, netY, (1<<16) | (1<<0));
+    this.context.gatesTexture.set(netX, netY, (1<<16) | (1<<0));
 
     const gatesToUpdate = this.floodFiller.floodFill(x, y, nextNet);
     for(let [gateX, gateY] of gatesToUpdate){
       this.updateGate(gateX, gateY);
     }
 
-    this.context.netMapTexture.update();
-    this.context.gatesTexture.update();
-    this.context.mapTexture.update();
+    return true;
   }
 
   clearGate(x, y){
@@ -154,13 +146,11 @@ export default class Editor{
     }
 
     this.context.mapTexture.set(x, y, EMPTY);
-    this.context.netMapTexture.set16(x, y, GROUND);
+    this.context.netMapTexture.set(x, y, GROUND);
 
-    this.context.gatesTexture.set32(netX, netY, 0);
+    this.context.gatesTexture.set(netX, netY, 0);
 
-    this.context.netMapTexture.update();
-    this.context.gatesTexture.update();
-    this.context.mapTexture.update();
+    return true;
   }
 
   clearWire(x, y){
@@ -181,9 +171,7 @@ export default class Editor{
       this.updateGate(gateX, gateY);
     }
 
-    this.context.mapTexture.update();
-    this.context.netMapTexture.update();
-    this.context.gatesTexture.update();
+    return true;
   }
 
   clearButton(x, y){
@@ -195,24 +183,65 @@ export default class Editor{
     }
 
     this.context.mapTexture.set(x, y, EMPTY);
-    this.context.netMapTexture.set16(x, y, GROUND);
+    this.context.netMapTexture.set(x, y, GROUND);
 
-    this.context.gatesTexture.set32(netX, netY, 0);
+    this.context.gatesTexture.set(netX, netY, 0);
 
-    this.context.netMapTexture.update();
-    this.context.gatesTexture.update();
-    this.context.mapTexture.update();
+    return true;
   }
 
   clear(x, y){
     if(this.query.isGate(x, y)){
       const [gateX, gateY] = this.query.getGateOutput(x, y);
-      this.clearGate(gateX, gateY);
+      return this.clearGate(gateX, gateY);
     }else if(this.query.isButton(x, y)){
       const [buttonX, buttonY] = this.query.getButtonOutput(x, y);
-      this.clearButton(buttonX, buttonY);
+      return this.clearButton(buttonX, buttonY);
     }else if(this.query.isWire(x, y)){
-      this.clearWire(x, y);
+      return this.clearWire(x, y);
+    }
+  }
+
+  edit(x, y, tool){
+    if(tool == 'wire'){
+      if(this.query.isWire(x, y)){
+        return this.clearWire(x, y);
+      }else{
+        return this.drawWire(x, y);
+      }
+    }else if(tool == 'underpass'){
+      return this.drawUnderpass(x, y);
+    }else if(tool == 'gate'){
+      return this.drawGate(x, y);
+    }else if(tool == 'button'){
+      return this.drawButton(x, y);
+    }else{
+      return this.clear(x, y);
+    }
+  }
+
+  longPress(x, y){
+    switch(this.query.getTileType(x, y)){
+      case WIRE:
+        this.drawUnderpass(x, y);
+        return true;
+      case UNDERPASS:
+        this.drawWire(x, y);
+        return true;
+      case EMPTY:
+        if(this.query.isGate(x, y)){
+          const [gateX, gateY] = this.query.getGateOutput(x, y);
+          this.clearGate(gateX, gateY);
+          return true;
+        }else if(this.query.isButton(x, y)){
+          const [buttonX, buttonY] = this.query.getButtonOutput(x, y);
+          this.clearButton(buttonX, buttonY);
+          return true;
+        }else{
+          return false;
+        }
+      default:
+        return false;
     }
   }
 
@@ -224,20 +253,19 @@ export default class Editor{
 
   getGateInput(x, y){
     const [outputX, outputY] = this.split(this.query.getNet(x, y));
-    return this.context.gatesTexture.get32(outputX, outputY);
+    return this.context.gatesTexture.get(outputX, outputY);
   }
 
   setGateInput(x, y, a, b){
     const [outputX, outputY] = this.split(this.query.getNet(x, y));
-    this.context.gatesTexture.set32(outputX, outputY, (a<<16) | (b<<0));
+    this.context.gatesTexture.set(outputX, outputY, (a<<16) | (b<<0));
   }
 
   toggleButton(x, y){
     const [buttonX, buttonY] = this.query.getButtonOutput(x, y);
     const [outputX, outputY] = this.split(this.query.getNet(buttonX, buttonY));
-    const button = this.context.gatesTexture.get32(outputX, outputY);
-    this.context.gatesTexture.set32(outputX, outputY, button === 0 ? ((1<<16) | (1<<0)) : 0);
-    return [outputX, outputY];
+    const button = this.context.gatesTexture.get(outputX, outputY);
+    this.context.gatesTexture.set(outputX, outputY, button === 0 ? ((1<<16) | (1<<0)) : 0);
   }
 
   split(v){

@@ -1,59 +1,132 @@
-import Stats from 'stats-js';
-import {render} from 'react-dom';
 import React from 'react';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 
 import '../css/main.css';
 import '../manifest.json';
 import offline from 'offline-plugin/runtime';
 
+import Shell from './Shell.js';
+import Editor from './editing/Editor.js';
+import Storage from './storage/Storage.js';
+import Context from './Context.js';
 import Renderer from './Renderer.js';
-import Storage from './Storage.js';
-import WebGL from './WebGL.js';
-
+import Perspective from './Perspective.js';
 import TouchControls from './interaction/TouchControls.js';
+
+import {
+  RESIZE
+} from './actions.js';
+import reducers from './reducers.js';
 import App from './components/App.jsx';
+
+const TILE_SIZE = 16;
 
 if(!__DEV__) offline.install();
 
-const canvas = document.querySelector('canvas');
-const reactApp = document.querySelector('.react-app');
+const store = createStore(reducers);
+initialize(store, ({global}) => {
+  const gl = global.gl;
 
-const shell = new WebGL(canvas, {
-  tickInterval: 500
+  const renderer = new Renderer(gl);
+  const touchControls = new TouchControls(global.emitter);
+
+  const perspective = new Perspective();
+  const context = new Context(gl, {width: 128, height: 128}, TILE_SIZE);
+
+  const storage = new Storage();
+  context.import(storage.load());
+  renderer.renderMap(context);
+
+  const editor = new Editor(context);
+
+  global.emitter.on('tap', ({x, y}) => {
+    const [tx, ty] = perspective.viewportToTile(x, y);
+
+    window.requestAnimationFrame(() => {
+      if(editor.query.isButton(tx, ty)){
+        editor.toggleButton(tx, ty);
+
+        context.gatesTexture.update();
+
+        renderer.simulateTick(context, renderer.currentTick);
+
+        storage.save(context.export());
+      }else{
+        const tool = store.getState().editor.selectedTool;
+        if(editor.edit(tx, ty, tool)){
+          context.mapTexture.update();
+          context.netMapTexture.update();
+          context.gatesTexture.update();
+
+          renderer.renderMap(context);
+
+          storage.save(context.export());
+        }
+      }
+    });
+  });
+
+  global.emitter.on('longPress', ({x, y}) => {
+    const [tx, ty] = perspective.viewportToTile(x, y);
+
+    window.requestAnimationFrame(() => {
+      if(editor.longPress(tx, ty)){
+        context.mapTexture.update();
+        context.netMapTexture.update();
+        context.gatesTexture.update();
+
+        renderer.renderMap(context);
+
+        storage.save(context.export());
+      }
+    });
+  });
+
+  const shell = new Shell({
+    tickInterval: 500,
+    tick(tickCount) {
+      //engineStats.begin();
+      renderer.simulateTick(context, tickCount);
+      //engineStats.end();
+    },
+
+    render() {
+      //viewStats.begin();
+      touchControls.panZoom(perspective);
+      renderer.renderView(context, perspective);
+      //viewStats.end();
+    },
+
+    resize(pixelWidth, pixelHeight, screenWidth, screenHeight) {
+      perspective.setViewport(pixelWidth, pixelHeight);
+      perspective.scale = context.tileSize * context.width / screenWidth;
+      store.dispatch({
+        type: RESIZE,
+        pixelWidth,
+        pixelHeight,
+        screenWidth,
+        screenHeight
+      });
+    }
+  });
 });
 
-const storage = new Storage();
-const renderer = new Renderer(shell.gl, storage);
-const viewStats = new Stats();
-const engineStats = new Stats();
-const touchControls = new TouchControls(renderer);
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.querySelector('.react-app')
+)
 
-viewStats.domElement.id = 'viewStats';
-document.body.appendChild(viewStats.domElement);
-engineStats.setMode(1);
-engineStats.domElement.id = 'engineStats';
-document.body.appendChild(engineStats.domElement);
-
-touchControls.listen(shell.canvas);
-
-shell.tick((tickCount) => {
-  engineStats.begin();
-  renderer.tick(tickCount);
-  engineStats.end();
-});
-
-shell.render(() => {
-  viewStats.begin();
-  touchControls.panZoom();
-  renderer.draw(shell.gl);
-  viewStats.end();
-});
-
-shell.resize((width, height, screenWidth, screenHeight) => {
-  renderer.resize(width, height, screenWidth, screenHeight);
-  render(<App
-    width={screenWidth}
-    height={screenHeight}
-    setTool={tool => renderer.setSelectedTool(tool)} />,
-    reactApp);
-});
+function initialize(store, listener){
+  const unsubscribe = store.subscribe(() => {
+    const state = store.getState();
+    const gl = state.global.gl;
+    if(gl != null){
+      unsubscribe();
+      listener(state);
+    }
+  });
+}

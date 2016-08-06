@@ -14,7 +14,7 @@ export default class ContextQuery{
   }
 
   getTileType(x, y){
-    return this.context.mapTexture.map.get(y, x, 0);
+    return this.context.mapTexture.get(x, y);
   }
 
   isEmpty(x, y){
@@ -93,8 +93,7 @@ export default class ContextQuery{
   }
 
   getNet(x, y){
-    return (this.context.netMapTexture.map.get(y, x, 0)<<0)
-         | (this.context.netMapTexture.map.get(y, x, 1)<<8);
+    return this.context.netMapTexture.get(x, y);
   }
 
   getNetSource(net){

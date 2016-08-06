@@ -5,23 +5,20 @@ import netChargesVS from './netChargesVS.glsl';
 import netChargesFS from './netChargesFS.glsl';
 
 export default class NetChargeEngine{
-  constructor(gl, context) {
+  constructor(gl) {
     this.gl = gl;
     this.shader = createShader(gl, netChargesVS, netChargesFS);
-
-    this.netChargeTextures = context.netChargeTextures;
-    this.gatesTexture = context.gatesTexture;
   }
 
-  render(tick){
-    const inputTexture = this.netChargeTextures[(tick+1)%2];
-    const outputTexture = this.netChargeTextures[tick%2];
+  render(context, tick){
+    const inputTexture = context.netChargeTextures[(tick+1)%2];
+    const outputTexture = context.netChargeTextures[tick%2];
 
     outputTexture.bindFramebuffer();
 
     this.shader.bind();
 
-    this.shader.uniforms.gates = this.gatesTexture.sampler2D(0);
+    this.shader.uniforms.gates = context.gatesTexture.sampler2D(0);
 
     this.shader.uniforms.netCharges = inputTexture.sampler2D(1);
 

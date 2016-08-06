@@ -1,12 +1,12 @@
 import {vec2, mat3} from 'gl-matrix';
 
 export default class Perspective{
-  constructor({width, height}){
+  constructor(){
     this.matrix = mat3.create();
     this.reverseMatrix = mat3.create();
 
-    this.mapSize = vec2.fromValues(width, height);
-    this.halfMapSize = vec2.fromValues(width/2, height/2);
+    this.mapSize = vec2.fromValues(128, 128);
+    this.halfMapSize = vec2.fromValues(64, 64);
 
     this.viewportSize = vec2.fromValues(1, 1);
     this.viewportAspectRatio = vec2.fromValues(1, 1);
@@ -72,6 +72,11 @@ export default class Perspective{
     vec2.set(this.viewportAspectRatio, 1, height/width);
 
     mat3.invert(this.reverseMatrix, this.matrix);
+  }
+
+  setMapSize(width, height){
+    vec2.set(this.mapSize, width, height);
+    vec2.set(this.halfMapSize, width/2, height/2);
   }
 
   get mapToViewportMatrix(){

@@ -9,19 +9,40 @@ body{
   flex-direction: column;
   align-items: stretch;
   touch-action: none;
+  overflow: hidden; /* prevent scrollbars */
+}
+
+.react-app{
+  display: flex;
+  flex: 1 0 100%;
+}
+
+.root{
+  flex: 1 0 100%;
 }
 
 svg{
-  user-select: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  user-select: none; /* prevent firefox on android bug */
+  z-index: 2;
+  pointer-events: none; /* touch through the svg down to the canvas below */
 }
 
 canvas{
-  flex: 1 0 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: black;
   touch-action: none;
 }
 
-.react-app{
+.react-app-2{
   position: absolute;
   top: 0;
   left: 0;

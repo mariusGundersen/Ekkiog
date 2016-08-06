@@ -288,11 +288,9 @@ function makeContext(t){
     width: lines[0].length,
     height: lines.length,
     mapTexture: {
-      map: {
-        get(y, x, c){
-          if(y<0 || x<0) return 0;
-          return c == 0 ? lines[y][x]*1 : 0;
-        }
+      get(x, y){
+        if(y<0 || x<0) return 0;
+        return lines[y][x]*1;
       }
     }
   };
