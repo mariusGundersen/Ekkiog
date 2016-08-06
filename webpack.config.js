@@ -29,7 +29,8 @@ module.exports = {
       favicon: FAVICON_PATH
     }),
     new webpack.DefinePlugin({
-      __DEV__: debug
+      '__DEV__': debug,
+      'NODE_ENV': debug ? '"production"' : '"development"'
     }),
     new OfflinePlugin({
       caches: 'all'
