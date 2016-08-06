@@ -25,9 +25,9 @@ export default class WebGL{
 
   resize(resize){
     const onResizeRequest = e => {
-      this.canvas.width = this.canvas.offsetWidth*window.devicePixelRatio;
-      this.canvas.height = this.canvas.offsetHeight*window.devicePixelRatio;
-      resize(this.canvas.width, this.canvas.height);
+      this.canvas.width = window.document.body.clientWidth*window.devicePixelRatio;
+      this.canvas.height = window.document.body.clientHeight*window.devicePixelRatio;
+      resize(this.canvas.width, this.canvas.height, window.document.body.clientWidth, window.document.body.clientHeight);
     };
     window.addEventListener('resize', onResizeRequest)
     onResizeRequest();

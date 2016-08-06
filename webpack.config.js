@@ -71,6 +71,6 @@ module.exports = {
   debug: debug,
   devtool: debug ? 'eval-source-map' : 'source-map',
   postcss: function () {
-    return [autoprefixer({ browsers: ['iOS 9'] })];
+    return [autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] })];
   }
 };

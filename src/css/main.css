@@ -11,6 +11,10 @@ body{
   touch-action: none;
 }
 
+svg{
+  user-select: none;
+}
+
 canvas{
   flex: 1 0 100%;
   background: black;

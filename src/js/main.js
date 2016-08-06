@@ -49,10 +49,8 @@ shell.render(() => {
   viewStats.end();
 });
 
-shell.resize((w, h) => {
-  const screenWidth = w/window.devicePixelRatio;
-  const screenHeight = h/window.devicePixelRatio;
-  renderer.resize(w, h, screenWidth, screenHeight);
+shell.resize((width, height, screenWidth, screenHeight) => {
+  renderer.resize(width, height, screenWidth, screenHeight);
   render(<App
     width={screenWidth}
     height={screenHeight}
