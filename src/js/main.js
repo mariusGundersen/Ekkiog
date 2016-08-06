@@ -34,6 +34,7 @@ initialize(store, ({global}) => {
 
   const perspective = new Perspective();
   const context = new Context(gl, {width: 128, height: 128}, TILE_SIZE);
+  perspective.setMapSize(context.width, context.height);
 
   const storage = new Storage();
   context.import(storage.load());
@@ -100,8 +101,6 @@ initialize(store, ({global}) => {
     },
 
     resize(pixelWidth, pixelHeight, screenWidth, screenHeight) {
-      perspective.setViewport(pixelWidth, pixelHeight);
-      perspective.scale = context.tileSize * context.width / screenWidth;
       store.dispatch({
         type: RESIZE,
         pixelWidth,
@@ -109,6 +108,8 @@ initialize(store, ({global}) => {
         screenWidth,
         screenHeight
       });
+      perspective.setViewport(pixelWidth, pixelHeight);
+      perspective.scale = context.tileSize * context.width / screenWidth;
     }
   });
 });

@@ -18,10 +18,10 @@ const Menu = connect(
     selectedTool: editor.selectedTool
   })
 )(({dispatch, ...props}) => (
-  <svg width={props.screenWidth} height={props.screenHeight} viewBox={`0 0 ${props.pixelWidth} ${props.pixelHeight}`}>
+  <svg width={props.screenWidth} height={props.screenHeight} viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
     <RadialMenu
-      screenWidth={props.pixelWidth}
-      screenHeight={props.pixelHeight}
+      screenWidth={props.screenWidth}
+      screenHeight={props.screenHeight}
       showMenu={props.showMainMenu}
       selectedTool={props.selectedTool}
       onToolSelected={tool => dispatch({

@@ -5,8 +5,8 @@ export default class Perspective{
     this.matrix = mat3.create();
     this.reverseMatrix = mat3.create();
 
-    this.mapSize = vec2.fromValues(128, 128);
-    this.halfMapSize = vec2.fromValues(64, 64);
+    this.mapSize = vec2.fromValues(1, 1);
+    this.halfMapSize = vec2.fromValues(0.5, 0.5);
 
     this.viewportSize = vec2.fromValues(1, 1);
     this.viewportAspectRatio = vec2.fromValues(1, 1);
