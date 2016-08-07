@@ -9,7 +9,14 @@ import IconButton from './icons/IconButton.jsx';
 import IconGate from './icons/IconGate.jsx';
 import IconReturn from './icons/IconReturn.jsx';
 
-import {setSelectedTool, toggleMainMenu} from '../actions.js';
+import {
+  wireMenuItem,
+  buttonMenuItem,
+  gateMenuItem,
+  underpassMenuItem
+} from './radialMenu/menuItems.js';
+
+import {toggleMainMenu} from '../actions.js';
 
 const MainMenu = connect()(({
   cx,
@@ -42,31 +49,12 @@ const MainMenu = connect()(({
           fromTurnFraction: 3/8,
           toTurnFraction: 7/8,
           show: showMenu,
+          ringKey: 0,
           menuItems: [
-            {
-              tool: 'wire',
-              selected: selectedTool === 'wire',
-              onClick: () => dispatch(setSelectedTool('wire')),
-              icon: <IconWire />
-            },
-            {
-              tool: 'button',
-              selected: selectedTool === 'button',
-              onClick: () => dispatch(setSelectedTool('button')),
-              icon: <IconButton />
-            },
-            {
-              tool: 'gate',
-              selected: selectedTool === 'gate',
-              onClick: () => dispatch(setSelectedTool('gate')),
-              icon: <IconGate />
-            },
-            {
-              tool: 'underpass',
-              selected: selectedTool === 'underpass',
-              onClick: () => dispatch(setSelectedTool('underpass')),
-              icon: <IconUnderpass />
-            }
+            wireMenuItem(selectedTool, dispatch),
+            buttonMenuItem(selectedTool, dispatch),
+            gateMenuItem(selectedTool, dispatch),
+            underpassMenuItem(selectedTool, dispatch)
           ]
         }
       ]} />

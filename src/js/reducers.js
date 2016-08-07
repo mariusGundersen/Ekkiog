@@ -1,4 +1,3 @@
-import {EventEmitter} from 'events';
 import { combineReducers } from 'redux';
 
 import {
@@ -9,7 +8,8 @@ import {
   START_LONG_PRESS,
   SHOW_CONTEXT_MENU,
   CANCEL_LONG_PRESS,
-  PAN_ZOOM
+  HIDE_CONTEXT_MENU,
+  PAN_ZOOM,
 } from './actions.js';
 
 function view(state={
@@ -33,7 +33,6 @@ function view(state={
 }
 
 function global(state={
-  emitter: new EventEmitter(),
   gl: null
 }, action){
   switch(action.type){
@@ -71,7 +70,9 @@ function contextMenu(state={
   loading: false,
   show: false,
   x: 0,
-  y: 0
+  y: 0,
+  tx: 0,
+  ty: 0
 }, action){
   switch(action.type){
     case START_LONG_PRESS:
@@ -87,6 +88,8 @@ function contextMenu(state={
         ...state,
         loading: false,
         show: true,
+        tx: action.tx,
+        ty: action.ty
       };
     case CANCEL_LONG_PRESS:
       return state.loading ? {
@@ -100,6 +103,13 @@ function contextMenu(state={
         x: state.x + action.dx,
         y: state.y + action.dy
       } : state;
+    case HIDE_CONTEXT_MENU:
+      return {
+        loading: false,
+        show: false,
+        x: 0,
+        y: 0
+      };
     default:
       return state;
   }

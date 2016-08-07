@@ -8,14 +8,15 @@ export default ({
   radius,
   width,
   show,
-  menuItems
+  menuItems,
+  ringKey
 }) => {
   const sectionTurnFraction = (toTurnFraction-fromTurnFraction)/menuItems.length;
   return (
-    <g key={radius}>
+    <g key={ringKey}>
       {menuItems.map((item, index) => (
         <PieSector
-          key={item.tool}
+          key={item.itemKey}
           innerRadius={radius}
           outerRadius={radius+width + (item.selected ? 10 : 0)}
           selected={false}

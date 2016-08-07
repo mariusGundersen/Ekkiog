@@ -8,7 +8,7 @@ export default ({
   turnFractionCenter,
   turnFractionSection,
   gap,
-  tool,
+  itemKey,
   onClick,
   icon
 }) => {
@@ -28,7 +28,7 @@ export default ({
 
   return (
     <g
-      key={tool}
+      key={itemKey}
       onClick={onClick}
       className="trans-trans clickable"
       style={{transform: `rotate(${degreesRotate}deg)`}}>

@@ -18,7 +18,7 @@ export default ({
 
       {center != null ? <PieCenter {...center} /> : null}
 
-      {menuTree.map(ring => <PieRing key={ring.radius} {...ring} />)}
+      {menuTree.map(ring => <PieRing key={ring.ringKey} {...ring} />)}
 
     </g>
   );

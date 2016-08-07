@@ -1,7 +1,8 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import {EventEmitter} from 'events';
 
 import '../css/main.css';
 import '../manifest.json';
@@ -12,6 +13,7 @@ import Editor from './editing/Editor.js';
 import Storage from './storage/Storage.js';
 import Context from './Context.js';
 import Renderer from './Renderer.js';
+import toEmitter from './toEmitter.js';
 import Perspective from './Perspective.js';
 import TouchControls from './interaction/TouchControls.js';
 
@@ -20,7 +22,8 @@ import {
   START_LONG_PRESS,
   SHOW_CONTEXT_MENU,
   CANCEL_LONG_PRESS,
-  PAN_ZOOM
+  PAN_ZOOM,
+  hideContextMenu
 } from './actions.js';
 import reducers from './reducers.js';
 import App from './components/App.jsx';
@@ -29,12 +32,16 @@ const TILE_SIZE = 16;
 
 if(!__DEV__) offline.install();
 
-const store = createStore(reducers);
+const emitter = new EventEmitter();
+
+const store = createStore(reducers, {
+  global: { emitter }
+}, applyMiddleware(toEmitter(emitter)));
 initialize(store, ({global}) => {
   const gl = global.gl;
 
   const renderer = new Renderer(gl);
-  const touchControls = new TouchControls(global.emitter);
+  const touchControls = new TouchControls(emitter);
 
   const perspective = new Perspective();
   const context = new Context(gl, {width: 128, height: 128}, TILE_SIZE);
@@ -46,7 +53,7 @@ initialize(store, ({global}) => {
 
   const editor = new Editor(context);
 
-  global.emitter.on('tap', ({x, y}) => {
+  emitter.on('tap', ({x, y}) => {
     const [tx, ty] = perspective.viewportToTile(x, y);
 
     window.requestAnimationFrame(() => {
@@ -73,7 +80,7 @@ initialize(store, ({global}) => {
     });
   });
 
-  global.emitter.on('potentialLongPress', ({x, y}) => {
+  emitter.on('potentialLongPress', ({x, y}) => {
     console.log('load', x, y);
     store.dispatch({
       type: START_LONG_PRESS,
@@ -82,7 +89,7 @@ initialize(store, ({global}) => {
     });
   });
 
-  global.emitter.on('potentialLongPressCancel', ({x, y}) => {
+  emitter.on('potentialLongPressCancel', ({x, y}) => {
     store.dispatch({
       type: CANCEL_LONG_PRESS,
       x: x/window.devicePixelRatio,
@@ -90,25 +97,29 @@ initialize(store, ({global}) => {
     });
   });
 
-  global.emitter.on('longPress', ({x, y}) => {
+  emitter.on('longPress', ({x, y}) => {
+    const [tx, ty] = perspective.viewportToTile(x, y);
     store.dispatch({
       type: SHOW_CONTEXT_MENU,
       x: x/window.devicePixelRatio,
-      y: y/window.devicePixelRatio
+      y: y/window.devicePixelRatio,
+      tx,
+      ty
     });
-    const [tx, ty] = perspective.viewportToTile(x, y);
+  });
 
-    window.requestAnimationFrame(() => {
-      if(editor.longPress(tx, ty)){
-        context.mapTexture.update();
-        context.netMapTexture.update();
-        context.gatesTexture.update();
+  emitter.on('removeTileAt', ({x, y}) => {
+    if(editor.clear(x, y)){
+      context.mapTexture.update();
+      context.netMapTexture.update();
+      context.gatesTexture.update();
 
-        renderer.renderMap(context);
+      renderer.renderMap(context);
 
-        storage.save(context.export());
-      }
-    });
+      storage.save(context.export());
+    }
+
+    store.dispatch(hideContextMenu());
   });
 
   const shell = new Shell({

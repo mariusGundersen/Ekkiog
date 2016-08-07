@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux';
 
 import Loading from './radialMenu/Loading.jsx';
 import RadialMenu from './RadialMenu.jsx';
@@ -9,18 +10,24 @@ import IconButton from './icons/IconButton.jsx';
 import IconGate from './icons/IconGate.jsx';
 import IconReturn from './icons/IconReturn.jsx';
 
-const selectedTool = '';
+import {
+  acceptMenuItem,
+  removeMenuItem
+} from './radialMenu/menuItems.js';
 
-export default ({
+const ContextMenu = connect()(({
   x,
   y,
+  tx,
+  ty,
   loading,
   show,
   radius,
-  width
+  width,
+  dispatch
 }) => (
   <g transform={`translate(${x} ${y})`}>
-    {loading ? <Loading radius={radius} width={width+2} /> : ''}
+    {loading ? <Loading radius={radius} width={width+2} /> : null}
     {show ? <RadialMenu
       cx={0}
       cy={0}
@@ -28,38 +35,29 @@ export default ({
       center={null}
       menuTree={[
         {
+          ringKey: 1,
           radius: radius,
           width: width,
-          fromTurnFraction: 3/8,
-          toTurnFraction: 9/8,
+          fromTurnFraction: 5/8,
+          toTurnFraction: 7/8,
           show: true,
           menuItems: [
-            {
-              tool: 'wire',
-              selected: selectedTool === 'wire',
-              onClick: () => dispatch(setSelectedTool('wire')),
-              icon: <IconWire />
-            },
-            {
-              tool: 'button',
-              selected: selectedTool === 'button',
-              onClick: () => dispatch(setSelectedTool('button')),
-              icon: <IconButton />
-            },
-            {
-              tool: 'gate',
-              selected: selectedTool === 'gate',
-              onClick: () => dispatch(setSelectedTool('gate')),
-              icon: <IconGate />
-            },
-            {
-              tool: 'underpass',
-              selected: selectedTool === 'underpass',
-              onClick: () => dispatch(setSelectedTool('underpass')),
-              icon: <IconUnderpass />
-            }
+            removeMenuItem(dispatch, tx, ty)
+          ]
+        },
+        {
+          ringKey: 2,
+          radius: radius,
+          width: width,
+          fromTurnFraction: 1/8,
+          toTurnFraction: 3/8,
+          show: true,
+          menuItems: [
+            acceptMenuItem(dispatch)
           ]
         }
       ]} /> : null}
   </g>
-);
+));
+
+export default ContextMenu;

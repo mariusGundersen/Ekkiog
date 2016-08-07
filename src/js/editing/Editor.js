@@ -174,6 +174,61 @@ export default class Editor{
     return true;
   }
 
+  clearUnderpass(x, y){
+    const net = this.query.getNet(x, y);
+
+    const terminalAbove = this.query.getUnderpassTerminalAbove(x, y);
+    const terminalBelow = this.query.getUnderpassTerminalBelow(x, y);
+
+    const netAbove = this.query.getNet(x, terminalAbove);
+    const netBelow = this.query.getNet(x, terminalBelow);
+
+    const gatesToUpdateToGround = this.floodFiller.floodFill(x, y, GROUND);
+    for(let [gateX, gateY] of gatesToUpdateToGround){
+      this.updateGate(gateX, gateY);
+    }
+
+    this.context.mapTexture.set(x, y, EMPTY);
+    this.context.netMapTexture.set(x, y, 0);
+
+    const [sx, sy] = this.query.getNetSource(net);
+
+    const gatesToUpdateToNet = this.floodFiller.floodFill(sx, sy, net);
+    for(let [gateX, gateY] of gatesToUpdateToNet){
+      this.updateGate(gateX, gateY);
+    }
+
+    if(netAbove > 0){
+      const gatesToUpdateToGround = this.floodFiller.floodFill(x, terminalAbove, GROUND);
+      for(let [gateX, gateY] of gatesToUpdateToGround){
+        this.updateGate(gateX, gateY);
+      }
+
+      const [sx, sy] = this.query.getNetSource(netAbove);
+
+      const gatesToUpdateToNet = this.floodFiller.floodFill(sx, sy, netAbove);
+      for(let [gateX, gateY] of gatesToUpdateToNet){
+        this.updateGate(gateX, gateY);
+      }
+    }
+
+    if(netBelow > 0){
+      const gatesToUpdateToGround = this.floodFiller.floodFill(x, terminalBelow, GROUND);
+      for(let [gateX, gateY] of gatesToUpdateToGround){
+        this.updateGate(gateX, gateY);
+      }
+
+      const [sx, sy] = this.query.getNetSource(netBelow);
+
+      const gatesToUpdateToNet = this.floodFiller.floodFill(sx, sy, netBelow);
+      for(let [gateX, gateY] of gatesToUpdateToNet){
+        this.updateGate(gateX, gateY);
+      }
+    }
+
+    return true;
+  }
+
   clearButton(x, y){
     const [netX, netY] = this.split(this.query.getNet(x, y));
 
@@ -199,6 +254,8 @@ export default class Editor{
       return this.clearButton(buttonX, buttonY);
     }else if(this.query.isWire(x, y)){
       return this.clearWire(x, y);
+    }else if(this.query.isUnderpass(x, y)){
+      return this.clearUnderpass(x, y);
     }
   }
 
