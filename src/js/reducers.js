@@ -5,7 +5,10 @@ import {
   RESIZE,
   GL,
   SET_SELECTED_TOOL,
-  TOGGLE_MAIN_MENU
+  TOGGLE_MAIN_MENU,
+  START_LONG_PRESS,
+  SHOW_CONTEXT_MENU,
+  CANCEL_LONG_PRESS
 } from './actions.js';
 
 function view(state={
@@ -63,10 +66,43 @@ function editor(state={
   }
 }
 
+function contextMenu(state={
+  loading: false,
+  show: false,
+  x: 0,
+  y: 0
+}, action){
+  switch(action.type){
+    case START_LONG_PRESS:
+      return {
+        ...state,
+        x: action.x,
+        y: action.y,
+        loading: true,
+        show: false,
+      };
+    case SHOW_CONTEXT_MENU:
+      return {
+        ...state,
+        loading: false,
+        show: true,
+      };
+    case CANCEL_LONG_PRESS:
+      return {
+        ...state,
+        loading: false,
+        show: false
+      };
+    default:
+      return state;
+  }
+}
+
 const ekkiogApp = combineReducers({
   view,
   global,
-  editor
+  editor,
+  contextMenu
 });
 
 export default ekkiogApp;

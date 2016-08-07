@@ -12,6 +12,7 @@ export default class saga{
       this.data = {
         moved: false,
         maybeTap: true,
+        longPress: false,
         start: {
           x: data.x,
           y: data.y
@@ -49,15 +50,31 @@ export default class saga{
                        || Math.abs(data.y - this.data.start.y) > MAX_UNMOVED_DISTANCE;
         if(this.data.moved){
           this.clearTimeout('touchLong');
+          if(!this.data.maybeTap && !this.data.longPress){
+            this.emit('potentialLongPressCancel', {
+              pointer: this.id,
+              x: data.x,
+              y: data.y
+            });
+          }
         }
       }
     });
 
     saga.on('tapTooSlow', function(data){
       this.data.maybeTap = false;
+      if(this.data.moved == false){
+        this.emit('potentialLongPress', {
+          pointer: this.id,
+          x: this.data.x,
+          y: this.data.y,
+          time: MIN_LONG_TOUCH_TIME - MAX_TAP_TIME
+        });
+      }
     });
 
     saga.on('touchLong', function (data) {
+      this.data.longPress = true;
       this.emit('pointer-up', {
         pointer: this.id,
         x: data.x,
@@ -74,6 +91,14 @@ export default class saga{
     saga.on('touchEnd', function(data){
       if(this.data.maybeTap && !this.data.moved){
         this.emit('tap', {
+          x: data.x,
+          y: data.y
+        });
+      }
+
+      if(!this.data.maybeTap && !this.data.longPress){
+        this.emit('potentialLongPressCancel', {
+          pointer: this.id,
           x: data.x,
           y: data.y
         });

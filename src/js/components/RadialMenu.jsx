@@ -16,7 +16,7 @@ export default ({
   return (
     <g transform={`translate(${cx}, ${cy})`}>
 
-      <PieCenter {...center} />
+      {center != null ? <PieCenter {...center} /> : null}
 
       {menuTree.map(ring => <PieRing key={ring.radius} {...ring} />)}
 

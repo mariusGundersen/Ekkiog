@@ -16,7 +16,10 @@ import Perspective from './Perspective.js';
 import TouchControls from './interaction/TouchControls.js';
 
 import {
-  RESIZE
+  RESIZE,
+  START_LONG_PRESS,
+  SHOW_CONTEXT_MENU,
+  CANCEL_LONG_PRESS
 } from './actions.js';
 import reducers from './reducers.js';
 import App from './components/App.jsx';
@@ -69,7 +72,28 @@ initialize(store, ({global}) => {
     });
   });
 
+  global.emitter.on('potentialLongPress', ({x, y}) => {
+    store.dispatch({
+      type: START_LONG_PRESS,
+      x,
+      y
+    });
+  });
+
+  global.emitter.on('potentialLongPressCancel', ({x, y}) => {
+    store.dispatch({
+      type: CANCEL_LONG_PRESS,
+      x,
+      y
+    });
+  });
+
   global.emitter.on('longPress', ({x, y}) => {
+    store.dispatch({
+      type: SHOW_CONTEXT_MENU,
+      x,
+      y
+    });
     const [tx, ty] = perspective.viewportToTile(x, y);
 
     window.requestAnimationFrame(() => {

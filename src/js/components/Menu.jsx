@@ -7,15 +7,17 @@ import {
 } from '../actions.js';
 
 import MainMenu from './MainMenu.jsx';
+import ContextMenu from './ContextMenu.jsx';
 
 const Menu = connect(
-  ({view, editor}) => ({
+  ({view, editor, contextMenu}) => ({
     pixelWidth: view.pixelWidth,
     pixelHeight: view.pixelHeight,
     screenWidth: view.screenWidth,
     screenHeight: view.screenHeight,
     showMainMenu: editor.showMainMenu,
-    selectedTool: editor.selectedTool
+    selectedTool: editor.selectedTool,
+    contextMenu: contextMenu
   })
 )(({dispatch, ...props}) => {
   const radius = 40;
@@ -26,6 +28,7 @@ const Menu = connect(
   return (
     <svg width={props.screenWidth} height={props.screenHeight} viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
       <MainMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} showMenu={props.showMainMenu} selectedTool={props.selectedTool} />
+      <ContextMenu radius={radius+gap} width={radius+gap} {...props.contextMenu} />
     </svg>
   )
 });
