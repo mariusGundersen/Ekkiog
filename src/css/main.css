@@ -44,23 +44,12 @@ canvas{
   touch-action: none;
 }
 
-.react-app-2{
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  display: flex;
-  pointer-events: none;
-}
-
-.react-app circle,
-.react-app g{
+.clickable{
   pointer-events: painted;
 }
-.react-app g{
-  transition: transform 0.5s, d 0.5s;
+
+.trans-trans{
+  transition: transform 0.5s;
 }
 
 #viewStats{

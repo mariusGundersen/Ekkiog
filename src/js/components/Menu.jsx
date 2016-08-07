@@ -6,7 +6,7 @@ import {
   TOGGLE_MAIN_MENU
 } from '../actions.js';
 
-import RadialMenu from './RadialMenu.jsx';
+import MainMenu from './MainMenu.jsx';
 
 const Menu = connect(
   ({view, editor}) => ({
@@ -17,22 +17,17 @@ const Menu = connect(
     showMainMenu: editor.showMainMenu,
     selectedTool: editor.selectedTool
   })
-)(({dispatch, ...props}) => (
-  <svg width={props.screenWidth} height={props.screenHeight} viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
-    <RadialMenu
-      screenWidth={props.screenWidth}
-      screenHeight={props.screenHeight}
-      showMenu={props.showMainMenu}
-      selectedTool={props.selectedTool}
-      onToolSelected={tool => dispatch({
-        type: SET_SELECTED_TOOL,
-        tool
-      })}
-      onClick={() => dispatch({
-        type: TOGGLE_MAIN_MENU
-      })}
-    />
-  </svg>
-));
+)(({dispatch, ...props}) => {
+  const radius = 40;
+  const gap = 10;
+  const cx = props.screenWidth - radius - gap;
+  const cy = props.screenHeight - radius - gap;
+
+  return (
+    <svg width={props.screenWidth} height={props.screenHeight} viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
+      <MainMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} showMenu={props.showMainMenu} selectedTool={props.selectedTool} />
+    </svg>
+  )
+});
 
 export default Menu;
