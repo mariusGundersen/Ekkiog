@@ -39,10 +39,10 @@ export default class PanZoomSaga{
       y: p.oy
     }));
 
-    for(let pointer of current){
+    current.forEach(pointer => {
       pointer.ox = pointer.x;
       pointer.oy = pointer.y;
-    }
+    });
 
     return {
       previous: getXYR(previous),
@@ -52,19 +52,20 @@ export default class PanZoomSaga{
 }
 
 function getXYR(pointers){
-  const avg = pointers.reduce((sum, pair, i, c) => ({
-    x: sum.x + pair.x/c.length,
-    y: sum.y + pair.y/c.length
-  }), {x: 0, y: 0});
+  const avgX = pointers.reduce((sum, pair, i, c) => sum + pair.x/c.length, 0);
+  const avgY = pointers.reduce((sum, pair, i, c) => sum + pair.y/c.length, 0);
 
-  const radius = pointers.map(point => ({
-    x: avg.x - point.x,
-    y: avg.y - point.y
-  })).reduce((radius, {x, y}, i, c) => radius + Math.sqrt(x*x + y*y)/c.length, 0);
+  const deltaX = pointers.map(point => (avgX - point.x)*(avgX - point.x));
+  const deltaY = pointers.map(point => (avgY - point.y)*(avgY - point.y));
+
+  let radius = 0;
+  for(let i=0; i<deltaX.length; i++){
+    radius += Math.sqrt(deltaX[i] + deltaY[i])/pointers.length;
+  }
 
   return {
-    x: avg.x,
-    y: avg.y,
+    x: avgX,
+    y: avgY,
     r: radius || 1
   };
 }

@@ -50,7 +50,8 @@ function getContext(canvas) {
 
 function emitTouchEvents(emitter, type){
   return event => {
-    for(let touch of Array.from(event.changedTouches)){
+    for(let i=0; i < event.changedTouches.length; i++){
+      let touch = event.changedTouches[i];
       emitter.emit(type, {
         id: touch.identifier,
         x: touch.pageX*window.devicePixelRatio,
