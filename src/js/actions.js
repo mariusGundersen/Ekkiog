@@ -11,6 +11,8 @@ export const HIDE_CONTEXT_MENU = 'hideContextMenu';
 export const PAN_ZOOM = 'panZoom';
 
 export const REMOVE_TILE_AT = 'removeTileAt';
+export const TO_UNDERPASS = 'toUnderpass';
+export const TO_WIRE = 'toWire';
 
 export function setSelectedTool(tool){
   return {
@@ -31,13 +33,35 @@ export function hideContextMenu(){
   };
 }
 
-export function removeTileAt(x, y){
+export function removeTileAt(tx, ty){
   return {
     type: REMOVE_TILE_AT,
     meta: {
       emit: 'removeTileAt'
     },
-    x,
-    y
+    tx,
+    ty
+  };
+}
+
+export function toUnderpass(tx, ty){
+  return {
+    type: TO_UNDERPASS,
+    meta: {
+      emit: 'toUnderpass'
+    },
+    tx,
+    ty
+  };
+}
+
+export function toWire(tx, ty){
+  return {
+    type: TO_WIRE,
+    meta: {
+      emit: 'toWire'
+    },
+    tx,
+    ty
   };
 }

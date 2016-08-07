@@ -88,6 +88,7 @@ function contextMenu(state={
         ...state,
         loading: false,
         show: true,
+        tile: action.tile,
         tx: action.tx,
         ty: action.ty
       };

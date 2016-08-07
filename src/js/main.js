@@ -99,17 +99,47 @@ initialize(store, ({global}) => {
 
   emitter.on('longPress', ({x, y}) => {
     const [tx, ty] = perspective.viewportToTile(x, y);
+    const tile = editor.getTileAt(tx, ty);
     store.dispatch({
       type: SHOW_CONTEXT_MENU,
       x: x/window.devicePixelRatio,
       y: y/window.devicePixelRatio,
+      tile,
       tx,
       ty
     });
   });
 
-  emitter.on('removeTileAt', ({x, y}) => {
-    if(editor.clear(x, y)){
+  emitter.on('removeTileAt', ({tx, ty}) => {
+    if(editor.clear(tx, ty)){
+      context.mapTexture.update();
+      context.netMapTexture.update();
+      context.gatesTexture.update();
+
+      renderer.renderMap(context);
+
+      storage.save(context.export());
+    }
+
+    store.dispatch(hideContextMenu());
+  });
+
+  emitter.on('toUnderpass', ({tx, ty}) => {
+    if(editor.drawUnderpass(tx, ty)){
+      context.mapTexture.update();
+      context.netMapTexture.update();
+      context.gatesTexture.update();
+
+      renderer.renderMap(context);
+
+      storage.save(context.export());
+    }
+
+    store.dispatch(hideContextMenu());
+  });
+
+  emitter.on('toWire', ({tx, ty}) => {
+    if(editor.drawWire(tx, ty)){
       context.mapTexture.update();
       context.netMapTexture.update();
       context.gatesTexture.update();

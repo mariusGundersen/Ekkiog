@@ -3,7 +3,9 @@ import React from 'react';
 import {
   setSelectedTool,
   hideContextMenu,
-  removeTileAt
+  removeTileAt,
+  toUnderpass,
+  toWire
 } from '../../actions.js';
 
 import IconWire from '../icons/IconWire.jsx';
@@ -29,8 +31,15 @@ export function underpassMenuItem(selectedTool, dispatch){
   return toolMenuItem('underpass', <IconUnderpass />, selectedTool, dispatch);
 }
 
-export function removeMenuItem(dispatch, x, y){
-  return menuItem('remove', <IconRemove />, () => dispatch(removeTileAt(x, y)), false);
+export function removeMenuItem(dispatch, tx, ty){
+  return menuItem('remove', <IconRemove />, () => dispatch(removeTileAt(tx, ty)), false);
+}
+
+export function toUnderpassMenuItem(dispatch, tx, ty){
+  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(toUnderpass(tx, ty)), false);
+}
+export function toWireMenuItem(dispatch, tx, ty){
+  return menuItem('toWire', <IconWire />, () => dispatch(toWire(tx, ty)), false);
 }
 
 export function acceptMenuItem(dispatch){

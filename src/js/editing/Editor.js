@@ -277,6 +277,29 @@ export default class Editor{
     }
   }
 
+  getTileAt(x, y){
+    switch(this.query.getTileType(x, y)){
+      case WIRE:
+        return 'wire';
+      case UNDERPASS:
+        return 'underpass';
+      case GATE:
+        return 'gate';
+      case BUTTON:
+        return 'button';
+      case EMPTY:
+        if(this.query.isGate(x, y)){
+          return 'gate';
+        }else if(this.query.isButton(x, y)){
+          return 'button';
+        }else{
+          return 'empty';
+        }
+      default:
+        return 'empty';
+    }
+  }
+
   longPress(x, y){
     switch(this.query.getTileType(x, y)){
       case WIRE:

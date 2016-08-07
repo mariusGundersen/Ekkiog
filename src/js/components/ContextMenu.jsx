@@ -12,7 +12,9 @@ import IconReturn from './icons/IconReturn.jsx';
 
 import {
   acceptMenuItem,
-  removeMenuItem
+  removeMenuItem,
+  toUnderpassMenuItem,
+  toWireMenuItem
 } from './radialMenu/menuItems.js';
 
 const ContextMenu = connect()(({
@@ -20,6 +22,7 @@ const ContextMenu = connect()(({
   y,
   tx,
   ty,
+  tile,
   loading,
   show,
   radius,
@@ -34,17 +37,9 @@ const ContextMenu = connect()(({
       showMenu={true}
       center={null}
       menuTree={[
-        {
-          ringKey: 1,
-          radius: radius,
-          width: width,
-          fromTurnFraction: 5/8,
-          toTurnFraction: 7/8,
-          show: true,
-          menuItems: [
-            removeMenuItem(dispatch, tx, ty)
-          ]
-        },
+        createRing(radius, width, [
+          ...tileMenuItems(tile, tx, ty, dispatch)
+        ]),
         {
           ringKey: 2,
           radius: radius,
@@ -61,3 +56,27 @@ const ContextMenu = connect()(({
 ));
 
 export default ContextMenu;
+
+function createRing(radius, width, items){
+  return {
+    ringKey: 1,
+    radius: radius,
+    width: width,
+    fromTurnFraction: (6-items.length)/8,
+    toTurnFraction: (6+items.length)/8,
+    show: true,
+    menuItems: items
+  };
+}
+
+function *tileMenuItems(tile, tx, ty, dispatch){
+  if(tile == 'wire'){
+    yield toUnderpassMenuItem(dispatch, tx, ty);
+  }
+  if(tile == 'underpass'){
+    yield toWireMenuItem(dispatch, tx, ty);
+  }
+  if(tile != 'empty'){
+    yield removeMenuItem(dispatch, tx, ty);
+  }
+}
