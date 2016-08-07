@@ -70,9 +70,7 @@ initialize(store, ({global}) => {
       const result = touchControls.panZoomSaga.process();
       if(result !== null){
         perspective.panZoom(result.previous, result.current);
-        store.dispatch(panZoom(
-          (result.current.x - result.previous.x)/window.devicePixelRatio,
-          (result.current.y - result.previous.y)/window.devicePixelRatio));
+        store.dispatch(panZoom(perspective.tileToViewportMatrix));
       }
       renderer.renderView(context, perspective);
       //viewStats.end();
@@ -82,6 +80,7 @@ initialize(store, ({global}) => {
       store.dispatch(resize(pixelWidth, pixelHeight, screenWidth, screenHeight));
       perspective.setViewport(pixelWidth, pixelHeight);
       perspective.scale = context.tileSize * context.width / screenWidth;
+      store.dispatch(panZoom(perspective.tileToViewportMatrix));
     }
   });
 });

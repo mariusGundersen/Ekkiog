@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { vec2 } from 'gl-matrix';
 
 import {
   RESIZE,
@@ -99,10 +100,12 @@ function contextMenu(state={
         show: false
       } : state;
     case PAN_ZOOM:
+      const pos = [state.tx+.5, state.ty+.5];
+      vec2.transformMat3(pos, pos, action.matrix);
       return state.loading || state.show ? {
         ...state,
-        x: state.x + action.dx,
-        y: state.y + action.dy
+        x: pos[0]/window.devicePixelRatio,
+        y: pos[1]/window.devicePixelRatio
       } : state;
     case HIDE_CONTEXT_MENU:
       return {

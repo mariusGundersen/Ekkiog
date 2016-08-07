@@ -1,6 +1,4 @@
 import {
-  resize,
-  panZoom,
   startLongPress,
   cancelLongPress,
   showContextMenu,

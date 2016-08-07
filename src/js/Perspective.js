@@ -2,8 +2,12 @@ import {vec2, mat3} from 'gl-matrix';
 
 export default class Perspective{
   constructor(){
-    this.matrix = mat3.create();
-    this.reverseMatrix = mat3.create();
+    this.mapToViewportMatrix = mat3.create();
+
+    this.toClipSpaceMatrix = mat3.create();
+    this.viewportToMapCenterMatrix = mat3.create();
+    this.viewportToTileMatrix = mat3.create();
+    this.tileToViewportMatrix = mat3.create();
 
     this.mapSize = vec2.fromValues(1, 1);
     this.halfMapSize = vec2.fromValues(0.5, 0.5);
@@ -12,103 +16,126 @@ export default class Perspective{
     this.viewportAspectRatio = vec2.fromValues(1, 1);
     this.inverseViewportAspectRatio = vec2.fromValues(1, 1);
 
-    mat3.scale(this.matrix, this.matrix, this.viewportAspectRatio);
+    scaleSelf(this.mapToViewportMatrix, this.viewportAspectRatio);
 
-    mat3.invert(this.reverseMatrix, this.matrix);
+    this.recalculateViewportToMapCenterMatrix();
   }
 
   get scale(){
-    return this.matrix[0];
+    return this.mapToViewportMatrix[0];
   }
 
   set scale(scale){
-    this.scaleBy(scale/this.matrix[0]);
+    this.scaleBy(scale/this.mapToViewportMatrix[0]);
   }
 
   scaleBy(r){
     this.panZoomInMapSpace({
-      x: 0,
-      y: 0,
+      pos: [0,0],
       r: 1
     },{
-      x: 0,
-      y: 0,
+      pos: [0,0],
       r: r
     });
   }
 
   panZoom(previous, next){
-    const previousCoord = this.viewportToMapCenter(previous.x, previous.y);
-    const nextCoord = this.viewportToMapCenter(next.x, next.y);
+    const previousCoord = transformPos(this.viewportToMapCenterMatrix, previous.x, previous.y);
+    const nextCoord = transformPos(this.viewportToMapCenterMatrix, next.x, next.y);
 
     this.panZoomInMapSpace({
-      x: previousCoord[0],
-      y: previousCoord[1],
+      pos: previousCoord,
       r: previous.r
     },{
-      x: nextCoord[0],
-      y: nextCoord[1],
+      pos: nextCoord,
       r: next.r
     });
   }
 
   panZoomInMapSpace(previous, next){
-    mat3.translate(this.matrix, this.matrix, [next.x, next.y]);
-    mat3.scale(this.matrix, this.matrix, this.viewportAspectRatio);
-    mat3.scale(this.matrix, this.matrix, [1/previous.r, 1/previous.r]);
-    mat3.scale(this.matrix, this.matrix, [next.r, next.r]);
-    mat3.scale(this.matrix, this.matrix, this.inverseViewportAspectRatio);
-    mat3.translate(this.matrix, this.matrix, [-previous.x, -previous.y]);
+    translateSelf(this.mapToViewportMatrix, next.pos);
+    scaleSelf(this.mapToViewportMatrix, this.viewportAspectRatio);
+    scaleSelfByInverseScalar(this.mapToViewportMatrix, previous.r);
+    scaleSelfByScalar(this.mapToViewportMatrix, next.r);
+    scaleSelf(this.mapToViewportMatrix, this.inverseViewportAspectRatio);
+    translateSelfNegative(this.mapToViewportMatrix, previous.pos);
 
-    mat3.invert(this.reverseMatrix, this.matrix);
+    this.recalculateViewportToMapCenterMatrix();
   }
 
   setViewport(width, height){
     vec2.set(this.viewportSize, width, height);
 
+    mat3.fromTranslation(this.toClipSpaceMatrix, [-1, -1]);
+    scaleSelf(this.toClipSpaceMatrix, [2/width, 2/height]);
+
     vec2.set(this.inverseViewportAspectRatio, 1, width/height);
-    mat3.scale(this.matrix, this.matrix, this.viewportAspectRatio);
-    mat3.scale(this.matrix, this.matrix, this.inverseViewportAspectRatio);
+    scaleSelf(this.mapToViewportMatrix, this.viewportAspectRatio);
+    scaleSelf(this.mapToViewportMatrix, this.inverseViewportAspectRatio);
     vec2.set(this.viewportAspectRatio, 1, height/width);
 
-    mat3.invert(this.reverseMatrix, this.matrix);
+    this.recalculateViewportToMapCenterMatrix();
   }
 
   setMapSize(width, height){
     vec2.set(this.mapSize, width, height);
     vec2.set(this.halfMapSize, width/2, height/2);
+
+    this.recalculateViewportToTileMatrix();
   }
 
-  get mapToViewportMatrix(){
-    return this.matrix;
+  tileToViewport(...pos){
+    return vec2.transformMat3(pos, pos, this.tileToViewportMatrix);
   }
 
-  viewportToTile(x, y){
-    const pos = this.viewportToMapCenter(x, y);
-
-    vec2.add(pos, pos, [1, 1]);
-    vec2.multiply(pos, pos, this.halfMapSize);
-
+  viewportToTile(...pos){
+    vec2.transformMat3(pos, pos, this.viewportToTileMatrix);
     return [Math.floor(pos[0]), Math.floor(pos[1])];
   }
 
-  viewportToMapCenter(x, y){
-    const pos = this.toClipSpace(x, y);
-    vec2.transformMat3(pos, pos, this.reverseMatrix);
-    return pos;
+  recalculateViewportToMapCenterMatrix(){
+    mat3.invert(this.viewportToMapCenterMatrix, this.mapToViewportMatrix);
+    mat3.multiply(this.viewportToMapCenterMatrix, this.viewportToMapCenterMatrix, this.toClipSpaceMatrix);
+
+    this.recalculateViewportToTileMatrix();
   }
 
-  toClipSpace(x, y){
-    return [
-      x/this.viewportSize[0]*2 - 1,
-      y/this.viewportSize[1]*2 - 1
-    ];
+  recalculateViewportToTileMatrix(){
+    mat3.copy(this.viewportToTileMatrix, this.viewportToMapCenterMatrix);
+    this.viewportToTileMatrix[6] += 1;
+    this.viewportToTileMatrix[7] += 1;
+    scaleSelf(this.viewportToTileMatrix, this.halfMapSize);
+    this.viewportToTileMatrix[6] *= this.halfMapSize[0];
+    this.viewportToTileMatrix[7] *= this.halfMapSize[1];
+
+    this.recalculateTileToViewportMatrix();
   }
 
-  fromClipSpace(x, y){
-    return [
-      (x+1)*this.viewportSize[0]/2,
-      (y+1)*this.viewportSize[1]/2
-    ]
+  recalculateTileToViewportMatrix(){
+    mat3.invert(this.tileToViewportMatrix, this.viewportToTileMatrix);
   }
+}
+
+function transformPos(matrix, ...pos){
+  return vec2.transformMat3(pos, pos, matrix);
+}
+
+function translateSelf(matrix, pos){
+  return mat3.translate(matrix, matrix, pos);
+}
+
+function translateSelfNegative(matrix, [x, y]){
+  return mat3.translate(matrix, matrix, [-x, -y]);
+}
+
+function scaleSelf(matrix, scale){
+  return mat3.scale(matrix, matrix, scale);
+}
+
+function scaleSelfByScalar(matrix, r){
+  return mat3.scale(matrix, matrix, [r, r]);
+}
+
+function scaleSelfByInverseScalar(matrix, r){
+  return mat3.scale(matrix, matrix, [1/r, 1/r]);
 }

@@ -22,10 +22,9 @@ export const resize = (pixelWidth, pixelHeight, screenWidth, screenHeight) => ({
   screenHeight
 });
 
-export const panZoom = (dx, dy) => ({
+export const panZoom = (matrix) => ({
   type: PAN_ZOOM,
-  dx,
-  dy
+  matrix
 });
 
 export const setSelectedTool = (tool) => ({
