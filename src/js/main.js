@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from 'react-dom';
+import reactDom from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import {EventEmitter} from 'events';
@@ -13,18 +13,19 @@ import Editor from './editing/Editor.js';
 import Storage from './storage/Storage.js';
 import Context from './Context.js';
 import Renderer from './Renderer.js';
-import toEmitter from './toEmitter.js';
 import Perspective from './Perspective.js';
 import TouchControls from './interaction/TouchControls.js';
 
 import {
-  RESIZE,
-  START_LONG_PRESS,
-  SHOW_CONTEXT_MENU,
-  CANCEL_LONG_PRESS,
-  PAN_ZOOM,
-  hideContextMenu
+  toEmitterMiddleware,
+  fromEmitter
+} from './emitterRedux.js';
+
+import {
+  resize,
+  panZoom
 } from './actions.js';
+
 import reducers from './reducers.js';
 import App from './components/App.jsx';
 
@@ -36,7 +37,8 @@ const emitter = new EventEmitter();
 
 const store = createStore(reducers, {
   global: { emitter }
-}, applyMiddleware(toEmitter(emitter)));
+}, applyMiddleware(toEmitterMiddleware(emitter)));
+
 initialize(store, ({global}) => {
   const gl = global.gl;
 
@@ -53,104 +55,7 @@ initialize(store, ({global}) => {
 
   const editor = new Editor(context);
 
-  emitter.on('tap', ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTile(x, y);
-
-    window.requestAnimationFrame(() => {
-      if(editor.query.isButton(tx, ty)){
-        editor.toggleButton(tx, ty);
-
-        context.gatesTexture.update();
-
-        renderer.simulateTick(context, renderer.currentTick);
-
-        storage.save(context.export());
-      }else{
-        const tool = store.getState().editor.selectedTool;
-        if(editor.edit(tx, ty, tool)){
-          context.mapTexture.update();
-          context.netMapTexture.update();
-          context.gatesTexture.update();
-
-          renderer.renderMap(context);
-
-          storage.save(context.export());
-        }
-      }
-    });
-  });
-
-  emitter.on('potentialLongPress', ({x, y}) => {
-    console.log('load', x, y);
-    store.dispatch({
-      type: START_LONG_PRESS,
-      x: x/window.devicePixelRatio,
-      y: y/window.devicePixelRatio
-    });
-  });
-
-  emitter.on('potentialLongPressCancel', ({x, y}) => {
-    store.dispatch({
-      type: CANCEL_LONG_PRESS,
-      x: x/window.devicePixelRatio,
-      y: y/window.devicePixelRatio
-    });
-  });
-
-  emitter.on('longPress', ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTile(x, y);
-    const tile = editor.getTileAt(tx, ty);
-    store.dispatch({
-      type: SHOW_CONTEXT_MENU,
-      x: x/window.devicePixelRatio,
-      y: y/window.devicePixelRatio,
-      tile,
-      tx,
-      ty
-    });
-  });
-
-  emitter.on('removeTileAt', ({tx, ty}) => {
-    if(editor.clear(tx, ty)){
-      context.mapTexture.update();
-      context.netMapTexture.update();
-      context.gatesTexture.update();
-
-      renderer.renderMap(context);
-
-      storage.save(context.export());
-    }
-
-    store.dispatch(hideContextMenu());
-  });
-
-  emitter.on('toUnderpass', ({tx, ty}) => {
-    if(editor.drawUnderpass(tx, ty)){
-      context.mapTexture.update();
-      context.netMapTexture.update();
-      context.gatesTexture.update();
-
-      renderer.renderMap(context);
-
-      storage.save(context.export());
-    }
-
-    store.dispatch(hideContextMenu());
-  });
-
-  emitter.on('toWire', ({tx, ty}) => {
-    if(editor.drawWire(tx, ty)){
-      context.mapTexture.update();
-      context.netMapTexture.update();
-      context.gatesTexture.update();
-
-      renderer.renderMap(context);
-
-      storage.save(context.export());
-    }
-
-    store.dispatch(hideContextMenu());
-  });
+  fromEmitter(emitter, editor, perspective, context, renderer, storage, store);
 
   const shell = new Shell({
     tickInterval: 500,
@@ -165,31 +70,23 @@ initialize(store, ({global}) => {
       const result = touchControls.panZoomSaga.process();
       if(result !== null){
         perspective.panZoom(result.previous, result.current);
-        store.dispatch({
-          type: PAN_ZOOM,
-          dx: (result.current.x - result.previous.x)/window.devicePixelRatio,
-          dy: (result.current.y - result.previous.y)/window.devicePixelRatio
-        });
+        store.dispatch(panZoom(
+          (result.current.x - result.previous.x)/window.devicePixelRatio,
+          (result.current.y - result.previous.y)/window.devicePixelRatio));
       }
       renderer.renderView(context, perspective);
       //viewStats.end();
     },
 
     resize(pixelWidth, pixelHeight, screenWidth, screenHeight) {
-      store.dispatch({
-        type: RESIZE,
-        pixelWidth,
-        pixelHeight,
-        screenWidth,
-        screenHeight
-      });
+      store.dispatch(resize(pixelWidth, pixelHeight, screenWidth, screenHeight));
       perspective.setViewport(pixelWidth, pixelHeight);
       perspective.scale = context.tileSize * context.width / screenWidth;
     }
   });
 });
 
-render(
+reactDom.render(
   <Provider store={store}>
     <App />
   </Provider>,

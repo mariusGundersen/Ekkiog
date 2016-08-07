@@ -70,10 +70,10 @@ function createRing(radius, width, items){
 }
 
 function *tileMenuItems(tile, tx, ty, dispatch){
-  if(tile == 'wire'){
+  if(tile == 'wire' || tile == 'empty'){
     yield toUnderpassMenuItem(dispatch, tx, ty);
   }
-  if(tile == 'underpass'){
+  if(tile == 'underpass' || tile == 'empty'){
     yield toWireMenuItem(dispatch, tx, ty);
   }
   if(tile != 'empty'){
