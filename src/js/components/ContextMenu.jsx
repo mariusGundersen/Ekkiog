@@ -38,7 +38,7 @@ const ContextMenu = connect()(({
       center={null}
       menuTree={[
         createRing(radius, width, [
-          ...tileMenuItems(tile, tx, ty, dispatch)
+          ...tileMenuItems(tile, Math.floor(tx), Math.floor(ty), dispatch)
         ]),
         {
           ringKey: 2,

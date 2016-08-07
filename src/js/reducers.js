@@ -100,13 +100,10 @@ function contextMenu(state={
         show: false
       } : state;
     case PAN_ZOOM:
-      const pos = [state.tx+.5, state.ty+.5];
-      vec2.transformMat3(pos, pos, action.matrix);
-      return state.loading || state.show ? {
-        ...state,
-        x: pos[0]/window.devicePixelRatio,
-        y: pos[1]/window.devicePixelRatio
-      } : state;
+      return (state.loading || state.show) ? {
+          ...state,
+          ...transform(action.matrix, state.tx, state.ty)
+        } : state;
     case HIDE_CONTEXT_MENU:
       return {
         loading: false,
@@ -127,3 +124,11 @@ const ekkiogApp = combineReducers({
 });
 
 export default ekkiogApp;
+
+function transform(matrix, ...pos){
+  vec2.transformMat3(pos, pos, matrix);
+  return {
+    x: pos[0]/window.devicePixelRatio,
+    y: pos[1]/window.devicePixelRatio
+  };
+}

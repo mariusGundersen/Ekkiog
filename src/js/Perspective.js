@@ -89,7 +89,11 @@ export default class Perspective{
   }
 
   viewportToTile(...pos){
-    vec2.transformMat3(pos, pos, this.viewportToTileMatrix);
+    return vec2.transformMat3(pos, pos, this.viewportToTileMatrix);
+  }
+
+  viewportToTileFloored(...pos){
+    pos = viewportToTile(...pos);
     return [Math.floor(pos[0]), Math.floor(pos[1])];
   }
 

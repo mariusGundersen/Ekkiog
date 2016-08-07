@@ -71,10 +71,8 @@ export function removeTileAt(editor, context, renderer, storage, dispatch){
 export function longPress(editor, perspective, dispatch){
   return ({x, y}) => {
     const [tx, ty] = perspective.viewportToTile(x, y);
-    const tile = editor.getTileAt(tx, ty);
+    const tile = editor.getTileAt(Math.floor(tx), Math.floor(ty));
     dispatch(showContextMenu(
-      x/window.devicePixelRatio,
-      y/window.devicePixelRatio,
       tile,
       tx,
       ty));
@@ -83,7 +81,7 @@ export function longPress(editor, perspective, dispatch){
 
 export function tap(editor, perspective, context, renderer, storage, dispatch, store){
   return ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTile(x, y);
+    const [tx, ty] = perspective.viewportToTileFloored(x, y);
 
     window.requestAnimationFrame(() => {
       if(editor.query.isButton(tx, ty)){

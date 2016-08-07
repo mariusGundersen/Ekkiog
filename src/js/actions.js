@@ -46,10 +46,8 @@ export const cancelLongPress = () => ({
   type: CANCEL_LONG_PRESS
 });
 
-export const showContextMenu = (x, y, tile, tx, ty) => ({
+export const showContextMenu = (tile, tx, ty) => ({
   type: SHOW_CONTEXT_MENU,
-  x,
-  y,
   tile,
   tx,
   ty
