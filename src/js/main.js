@@ -19,7 +19,8 @@ import {
   RESIZE,
   START_LONG_PRESS,
   SHOW_CONTEXT_MENU,
-  CANCEL_LONG_PRESS
+  CANCEL_LONG_PRESS,
+  PAN_ZOOM
 } from './actions.js';
 import reducers from './reducers.js';
 import App from './components/App.jsx';
@@ -73,26 +74,27 @@ initialize(store, ({global}) => {
   });
 
   global.emitter.on('potentialLongPress', ({x, y}) => {
+    console.log('load', x, y);
     store.dispatch({
       type: START_LONG_PRESS,
-      x,
-      y
+      x: x/window.devicePixelRatio,
+      y: y/window.devicePixelRatio
     });
   });
 
   global.emitter.on('potentialLongPressCancel', ({x, y}) => {
     store.dispatch({
       type: CANCEL_LONG_PRESS,
-      x,
-      y
+      x: x/window.devicePixelRatio,
+      y: y/window.devicePixelRatio
     });
   });
 
   global.emitter.on('longPress', ({x, y}) => {
     store.dispatch({
       type: SHOW_CONTEXT_MENU,
-      x,
-      y
+      x: x/window.devicePixelRatio,
+      y: y/window.devicePixelRatio
     });
     const [tx, ty] = perspective.viewportToTile(x, y);
 
@@ -119,7 +121,15 @@ initialize(store, ({global}) => {
 
     render() {
       //viewStats.begin();
-      touchControls.panZoom(perspective);
+      const result = touchControls.panZoomSaga.process();
+      if(result !== null){
+        perspective.panZoom(result.previous, result.current);
+        store.dispatch({
+          type: PAN_ZOOM,
+          dx: (result.current.x - result.previous.x)/window.devicePixelRatio,
+          dy: (result.current.y - result.previous.y)/window.devicePixelRatio
+        });
+      }
       renderer.renderView(context, perspective);
       //viewStats.end();
     },

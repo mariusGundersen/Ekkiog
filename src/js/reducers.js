@@ -8,7 +8,8 @@ import {
   TOGGLE_MAIN_MENU,
   START_LONG_PRESS,
   SHOW_CONTEXT_MENU,
-  CANCEL_LONG_PRESS
+  CANCEL_LONG_PRESS,
+  PAN_ZOOM
 } from './actions.js';
 
 function view(state={
@@ -74,13 +75,13 @@ function contextMenu(state={
 }, action){
   switch(action.type){
     case START_LONG_PRESS:
-      return {
+      return state.show == false ? {
         ...state,
         x: action.x,
         y: action.y,
         loading: true,
         show: false,
-      };
+      } : state;
     case SHOW_CONTEXT_MENU:
       return {
         ...state,
@@ -88,11 +89,17 @@ function contextMenu(state={
         show: true,
       };
     case CANCEL_LONG_PRESS:
-      return {
+      return state.loading ? {
         ...state,
         loading: false,
         show: false
-      };
+      } : state;
+    case PAN_ZOOM:
+      return state.loading || state.show ? {
+        ...state,
+        x: state.x + action.dx,
+        y: state.y + action.dy
+      } : state;
     default:
       return state;
   }

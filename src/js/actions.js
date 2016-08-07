@@ -7,6 +7,8 @@ export const START_LONG_PRESS = 'startLongPress';
 export const SHOW_CONTEXT_MENU = 'showContextMenu';
 export const CANCEL_LONG_PRESS = 'cancelLongPress';
 
+export const PAN_ZOOM = 'panZoom';
+
 export function setSelectedTool(tool){
   return {
     type: SET_SELECTED_TOOL,

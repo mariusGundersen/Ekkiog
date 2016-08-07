@@ -6,11 +6,4 @@ export default class TouchControls{
     const touchSaga = new TouchSaga(emitter);
     this.panZoomSaga = new PanZoomSaga(emitter);
   }
-
-  panZoom(perspective){
-    const result = this.panZoomSaga.process();
-    if(result !== null){
-      perspective.panZoom(result.previous, result.current);
-    }
-  }
 }
