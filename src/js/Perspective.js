@@ -93,7 +93,7 @@ export default class Perspective{
   }
 
   viewportToTileFloored(...pos){
-    pos = viewportToTile(...pos);
+    pos = this.viewportToTile(...pos);
     return [Math.floor(pos[0]), Math.floor(pos[1])];
   }
 
