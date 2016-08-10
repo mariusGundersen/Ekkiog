@@ -1,5 +1,6 @@
 import createShader from 'gl-shader';
-import fillScreen from 'a-big-triangle';
+
+import * as triangle from '../triangle.js';
 
 import tileMapVS from './tileMapVS.glsl';
 import tileMapFS from './tileMapFS.glsl';
@@ -18,7 +19,7 @@ export default class TileMapEngine{
     this.shader.uniforms.tilemap = context.mapTexture.sampler2D(0);
     this.shader.uniforms.inverseTileTextureSize = context.mapTexture.inverseSize;
 
-    fillScreen(this.gl);
+    triangle.draw();
 
     context.tileMapTexture.unbindFramebuffer();
   }

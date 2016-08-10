@@ -1,6 +1,7 @@
 import {vec2, mat3} from 'gl-matrix';
 import createShader from 'gl-shader';
-import fillScreen from 'a-big-triangle';
+
+import * as triangle from '../triangle.js';
 
 import tilemapVS from './viewVS.glsl';
 import tilemapFS from './viewFS.glsl';
@@ -25,6 +26,6 @@ export default class ViewEngine {
     this.shader.uniforms.chargeMap = context.chargeMapTexture.sampler2D(1);
     this.shader.uniforms.tileMap = context.tileMapTexture.sampler2D(2);
 
-    fillScreen(this.gl);
+    triangle.draw();
   }
 }

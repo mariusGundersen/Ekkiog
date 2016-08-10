@@ -2,6 +2,7 @@ import ViewEngine from './view/ViewEngine.js';
 import TileMapEngine from './tileMap/TileMapEngine.js';
 import ChargeMapEngine from './chargeMap/ChargeMapEngine.js';
 import NetChargeEngine from './netCharges/NetChargeEngine.js';
+import * as triangle from './triangle.js';
 
 export default class Renderer {
   constructor(gl) {
@@ -12,6 +13,7 @@ export default class Renderer {
     this.chargeMapEngine = new ChargeMapEngine(gl);
     this.tileMapEngine = new TileMapEngine(gl);
     this.viewEngine = new ViewEngine(gl);
+    triangle.initialize(gl);
   }
 
   renderMap(context){

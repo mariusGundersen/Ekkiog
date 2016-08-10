@@ -1,5 +1,6 @@
 import createShader from 'gl-shader';
-import fillScreen from 'a-big-triangle';
+
+import * as triangle from '../triangle.js';
 
 import netChargesVS from './netChargesVS.glsl';
 import netChargesFS from './netChargesFS.glsl';
@@ -22,7 +23,7 @@ export default class NetChargeEngine{
 
     this.shader.uniforms.netCharges = inputTexture.sampler2D(1);
 
-    fillScreen(this.gl);
+    triangle.draw();
 
     outputTexture.unbindFramebuffer();
   }

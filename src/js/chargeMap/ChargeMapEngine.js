@@ -1,5 +1,6 @@
 import createShader from 'gl-shader';
-import fillScreen from 'a-big-triangle';
+
+import * as triangle from '../triangle.js';
 
 import chargeMapVS from './chargeMapVS.glsl';
 import chargeMapFS from './chargeMapFS.glsl';
@@ -24,7 +25,7 @@ export default class ChargeMapEngine{
     this.shader.uniforms.netMap = context.netMapTexture.sampler2D(1);
     this.shader.uniforms.netCharges = context.netChargeTextures[tick%2].sampler2D(2);
 
-    fillScreen(this.gl);
+    triangle.draw();
 
     context.chargeMapTexture.unbindFramebuffer();
   }
