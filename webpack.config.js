@@ -30,7 +30,7 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       '__DEV__': debug,
-      'process.env.NODE_ENV': debug ? '"production"' : '"development"'
+      'process.env.NODE_ENV': debug ? '"development"' : '"production"'
     }),
     new OfflinePlugin({
       caches: 'all'
