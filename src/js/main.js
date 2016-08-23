@@ -75,7 +75,7 @@ initialize(store, ({global}) => {
       renderer.renderView(context, perspective);
       const moveState = store.getState().moveIt;
       if(moveState.move){
-        //TODO
+        renderer.renderMove(context, perspective, moveState);
       }
       //viewStats.end();
     },

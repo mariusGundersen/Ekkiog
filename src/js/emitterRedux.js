@@ -98,6 +98,7 @@ export function toWire(editor, context, renderer, storage, dispatch){
 export function moveGate(editor, dispatch){
   return ({tx, ty}) => {
     const [gateX, gateY] = editor.query.getGateOutput(tx, ty);
+    console.log('startMove', gateX, gateY);
     dispatch(startMove(gateY-1, gateX-3, gateX, gateY+1));
     dispatch(hideContextMenu());
   };
