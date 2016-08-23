@@ -12,7 +12,7 @@ import Shell from './Shell.js';
 import Editor from './editing/Editor.js';
 import Storage from './storage/Storage.js';
 import Context from './Context.js';
-import Renderer from './Renderer.js';
+import Renderer from './engines/Renderer.js';
 import Perspective from './Perspective.js';
 import TouchControls from './interaction/TouchControls.js';
 
