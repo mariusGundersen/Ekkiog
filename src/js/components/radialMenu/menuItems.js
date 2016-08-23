@@ -5,13 +5,15 @@ import {
   hideContextMenu,
   removeTileAt,
   toUnderpass,
-  toWire
+  toWire,
+  moveGate
 } from '../../actions.js';
 
 import IconWire from '../icons/IconWire.jsx';
 import IconButton from '../icons/IconButton.jsx';
 import IconGate from '../icons/IconGate.jsx';
 import IconUnderpass from '../icons/IconUnderpass.jsx';
+import IconMove from '../icons/IconMove.jsx';
 import IconRemove from '../icons/IconRemove.jsx';
 import IconAccept from '../icons/IconAccept.jsx';
 
@@ -29,6 +31,10 @@ export function gateMenuItem(selectedTool, dispatch){
 
 export function underpassMenuItem(selectedTool, dispatch){
   return toolMenuItem('underpass', <IconUnderpass />, selectedTool, dispatch);
+}
+
+export function moveMenuItem(dispatch, tx, ty){
+  return menuItem('move', <IconMove />, () => dispatch(moveGate(tx, ty)), false);
 }
 
 export function removeMenuItem(dispatch, tx, ty){

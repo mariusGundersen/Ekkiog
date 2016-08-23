@@ -14,7 +14,8 @@ import {
   acceptMenuItem,
   removeMenuItem,
   toUnderpassMenuItem,
-  toWireMenuItem
+  toWireMenuItem,
+  moveMenuItem
 } from './radialMenu/menuItems.js';
 
 const ContextMenu = connect()(({
@@ -75,6 +76,9 @@ function *tileMenuItems(tile, tx, ty, dispatch){
   }
   if(tile == 'underpass' || tile == 'empty'){
     yield toWireMenuItem(dispatch, tx, ty);
+  }
+  if(tile == 'gate'){
+    yield moveMenuItem(dispatch, tx, ty);
   }
   if(tile != 'empty'){
     yield removeMenuItem(dispatch, tx, ty);

@@ -1,4 +1,8 @@
 import {
+  REMOVE_TILE_AT,
+  TO_UNDERPASS,
+  TO_WIRE,
+  MOVE_GATE,
   startLongPress,
   cancelLongPress,
   showContextMenu,
@@ -7,8 +11,8 @@ import {
 
 export function toEmitterMiddleware(emitter){
   return ({getState, dispatch}) => next => action => {
-    if(action.meta && typeof(action.meta) == 'object' && action.meta.emit){
-      emitter.emit(action.meta.emit, action);
+    if(action.meta && typeof(action.meta) == 'object' && action.meta.emit === true){
+      emitter.emit(action.type, action);
     }
     return next(action)
   };
@@ -17,66 +21,12 @@ export function toEmitterMiddleware(emitter){
 export function fromEmitter(emitter, editor, perspective, context, renderer, storage, store){
   emitter.on('tap', tap(editor, perspective, context, renderer, storage, store.dispatch, store));
   emitter.on('longPress', longPress(editor, perspective, store.dispatch));
-  emitter.on('removeTileAt', removeTileAt(editor, context, renderer, storage, store.dispatch));
-  emitter.on('toUnderpass', toUnderpass(editor, context, renderer, storage, store.dispatch));
-  emitter.on('toWire', toWire(editor, context, renderer, storage, store.dispatch));
+  emitter.on(REMOVE_TILE_AT, removeTileAt(editor, context, renderer, storage, store.dispatch));
+  emitter.on(TO_UNDERPASS, toUnderpass(editor, context, renderer, storage, store.dispatch));
+  emitter.on(TO_WIRE, toWire(editor, context, renderer, storage, store.dispatch));
+  emitter.on(MOVE_GATE, moveGate(store.dispatch));
   emitter.on('potentialLongPress', potentialLongPress(store.dispatch));
   emitter.on('potentialLongPressCancel', potentialLongPressCancel(store.dispatch));
-}
-
-export function potentialLongPress(dispatch){
-  return ({x, y}) => {
-    dispatch(startLongPress(
-      x/window.devicePixelRatio,
-      y/window.devicePixelRatio));
-  };
-}
-
-export function potentialLongPressCancel(dispatch){
-  return ({x, y}) => {
-    dispatch(cancelLongPress());
-  };
-}
-
-export function toWire(editor, context, renderer, storage, dispatch){
-  return ({tx, ty}) => {
-    if(editor.drawWire(tx, ty)){
-      edited(context, renderer, storage);
-    }
-
-    dispatch(hideContextMenu());
-  };
-}
-
-export function toUnderpass(editor, context, renderer, storage, dispatch){
-  return ({tx, ty}) => {
-    if(editor.drawUnderpass(tx, ty)){
-      edited(context, renderer, storage);
-    }
-
-    dispatch(hideContextMenu());
-  };
-}
-
-export function removeTileAt(editor, context, renderer, storage, dispatch){
-  return ({tx, ty}) => {
-    if(editor.clear(tx, ty)){
-      edited(context, renderer, storage);
-    }
-
-    dispatch(hideContextMenu());
-  };
-}
-
-export function longPress(editor, perspective, dispatch){
-  return ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTile(x, y);
-    const tile = editor.getTileAt(Math.floor(tx), Math.floor(ty));
-    dispatch(showContextMenu(
-      tile,
-      tx,
-      ty));
-  };
 }
 
 export function tap(editor, perspective, context, renderer, storage, dispatch, store){
@@ -99,6 +49,68 @@ export function tap(editor, perspective, context, renderer, storage, dispatch, s
         }
       }
     })
+  };
+}
+
+export function longPress(editor, perspective, dispatch){
+  return ({x, y}) => {
+    const [tx, ty] = perspective.viewportToTile(x, y);
+    const tile = editor.getTileAt(Math.floor(tx), Math.floor(ty));
+    dispatch(showContextMenu(
+      tile,
+      tx,
+      ty));
+  };
+}
+
+export function removeTileAt(editor, context, renderer, storage, dispatch){
+  return ({tx, ty}) => {
+    if(editor.clear(tx, ty)){
+      edited(context, renderer, storage);
+    }
+
+    dispatch(hideContextMenu());
+  };
+}
+
+export function toUnderpass(editor, context, renderer, storage, dispatch){
+  return ({tx, ty}) => {
+    if(editor.drawUnderpass(tx, ty)){
+      edited(context, renderer, storage);
+    }
+
+    dispatch(hideContextMenu());
+  };
+}
+
+export function toWire(editor, context, renderer, storage, dispatch){
+  return ({tx, ty}) => {
+    if(editor.drawWire(tx, ty)){
+      edited(context, renderer, storage);
+    }
+
+    dispatch(hideContextMenu());
+  };
+}
+
+export function moveGate(dispatch){
+  return ({tx, ty}) => {
+
+    dispatch(hideContextMenu());
+  };
+}
+
+export function potentialLongPress(dispatch){
+  return ({x, y}) => {
+    dispatch(startLongPress(
+      x/window.devicePixelRatio,
+      y/window.devicePixelRatio));
+  };
+}
+
+export function potentialLongPressCancel(dispatch){
+  return ({x, y}) => {
+    dispatch(cancelLongPress());
   };
 }
 

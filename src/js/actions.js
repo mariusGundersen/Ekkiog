@@ -14,6 +14,8 @@ export const REMOVE_TILE_AT = 'removeTileAt';
 export const TO_UNDERPASS = 'toUnderpass';
 export const TO_WIRE = 'toWire';
 
+export const MOVE_GATE = 'moveGate';
+
 export const resize = (pixelWidth, pixelHeight, screenWidth, screenHeight) => ({
   type: RESIZE,
   pixelWidth,
@@ -60,7 +62,7 @@ export const hideContextMenu = () => ({
 export const removeTileAt = (tx, ty) => ({
   type: REMOVE_TILE_AT,
   meta: {
-    emit: 'removeTileAt'
+    emit: true
   },
   tx,
   ty
@@ -69,7 +71,7 @@ export const removeTileAt = (tx, ty) => ({
 export const toUnderpass = (tx, ty) => ({
   type: TO_UNDERPASS,
   meta: {
-    emit: 'toUnderpass'
+    emit: true
   },
   tx,
   ty
@@ -78,7 +80,16 @@ export const toUnderpass = (tx, ty) => ({
 export const toWire = (tx, ty) => ({
   type: TO_WIRE,
   meta: {
-    emit: 'toWire'
+    emit: true
+  },
+  tx,
+  ty
+});
+
+export const moveGate = (tx, ty) => ({
+  type: MOVE_GATE,
+  meta: {
+    emit: true
   },
   tx,
   ty
