@@ -1,5 +1,21 @@
 import EventSaga from 'event-saga';
 
+import {
+  TOUCH_START,
+  TOUCH_MOVE,
+  TOUCH_END,
+  POINTER_DOWN,
+  POINTER_MOVE,
+  POINTER_UP,
+  TAP,
+  LONG_PRESS,
+  POTENTIAL_LONG_PRESS,
+  POTENTIAL_LONG_PRESS_CANCEL
+} from '../events.js';
+
+const TAP_TOO_SLOW_TIMEOUT = 'tapTooSlowTimeout';
+const LONG_PRESS_TIMEOUT = 'longPressTimeout';
+
 const MAX_UNMOVED_DISTANCE = 5;
 const MAX_TAP_TIME = 100;
 const MIN_LONG_TOUCH_TIME = 1000;
@@ -8,7 +24,7 @@ export default class saga{
   constructor(eventEmitter){
     const saga = new EventSaga(eventEmitter);
 
-    saga.createOn('touchStart', function(data){
+    saga.createOn(TOUCH_START, function(data){
       this.data = {
         moved: false,
         maybeTap: true,
@@ -21,25 +37,25 @@ export default class saga{
         y: data.y
       };
 
-      this.emit('pointer-down', {
+      this.emit(POINTER_DOWN, {
         pointer: this.id,
         x: data.x,
         y: data.y
       });
 
-      this.setTimeout('tapTooSlow', MAX_TAP_TIME);
-      this.setTimeout('touchLong', {
+      this.setTimeout(TAP_TOO_SLOW_TIMEOUT, MAX_TAP_TIME);
+      this.setTimeout(LONG_PRESS_TIMEOUT, {
         x: data.x,
         y: data.y
       }, MIN_LONG_TOUCH_TIME);
 
     });
 
-    saga.on('touchMove', function(data){
+    saga.on(TOUCH_MOVE, function(data){
       this.data.x = data.x;
       this.data.y = data.y;
 
-      this.emit('pointer-move', {
+      this.emit(POINTER_MOVE, {
         pointer: this.id,
         x: data.x,
         y: data.y
@@ -49,9 +65,9 @@ export default class saga{
         this.data.moved = Math.abs(data.x - this.data.start.x) > MAX_UNMOVED_DISTANCE
                        || Math.abs(data.y - this.data.start.y) > MAX_UNMOVED_DISTANCE;
         if(this.data.moved){
-          this.clearTimeout('touchLong');
+          this.clearTimeout(LONG_PRESS_TIMEOUT);
           if(!this.data.maybeTap && !this.data.longPress){
-            this.emit('potentialLongPressCancel', {
+            this.emit(POTENTIAL_LONG_PRESS_CANCEL, {
               pointer: this.id,
               x: data.x,
               y: data.y
@@ -61,10 +77,10 @@ export default class saga{
       }
     });
 
-    saga.on('tapTooSlow', function(data){
+    saga.on(TAP_TOO_SLOW_TIMEOUT, function(data){
       this.data.maybeTap = false;
       if(this.data.moved == false){
-        this.emit('potentialLongPress', {
+        this.emit(POTENTIAL_LONG_PRESS, {
           pointer: this.id,
           x: this.data.x,
           y: this.data.y,
@@ -73,38 +89,38 @@ export default class saga{
       }
     });
 
-    saga.on('touchLong', function (data) {
+    saga.on(LONG_PRESS_TIMEOUT, function (data) {
       this.data.longPress = true;
-      this.emit('pointer-up', {
+      this.emit(POINTER_UP, {
         pointer: this.id,
         x: data.x,
         y: data.y
       });
 
-      this.emit('longPress', {
+      this.emit(LONG_PRESS, {
         pointer: this.id,
         x: data.x,
         y: data.y
       });
     });
 
-    saga.on('touchEnd', function(data){
+    saga.on(TOUCH_END, function(data){
       if(this.data.maybeTap && !this.data.moved){
-        this.emit('tap', {
+        this.emit(TAP, {
           x: data.x,
           y: data.y
         });
       }
 
       if(!this.data.maybeTap && !this.data.longPress){
-        this.emit('potentialLongPressCancel', {
+        this.emit(POTENTIAL_LONG_PRESS_CANCEL, {
           pointer: this.id,
           x: data.x,
           y: data.y
         });
       }
 
-      this.emit('pointer-up', {
+      this.emit(POINTER_UP, {
         pointer: this.id,
         x: data.x,
         y: data.y

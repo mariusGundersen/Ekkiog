@@ -1,9 +1,15 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import{
+import {
   GL
 } from '../actions.js';
+
+import {
+  TOUCH_START,
+  TOUCH_MOVE,
+  TOUCH_END
+} from '../events.js';
 
 const WebGLCanvas = connect(
   ({view, global}) => ({
@@ -16,9 +22,9 @@ const WebGLCanvas = connect(
     const gl = getContext(this.canvas);
 
     // The react event system is too slow, so using the native events
-    this.canvas.addEventListener('touchstart', emitTouchEvents(this.props.emitter, 'touchStart'), false)
-    this.canvas.addEventListener('touchmove', emitTouchEvents(this.props.emitter, 'touchMove'), false);
-    this.canvas.addEventListener('touchend', emitTouchEvents(this.props.emitter, 'touchEnd'), false);
+    this.canvas.addEventListener('touchstart', emitTouchEvents(this.props.emitter, TOUCH_START), false)
+    this.canvas.addEventListener('touchmove', emitTouchEvents(this.props.emitter, TOUCH_MOVE), false);
+    this.canvas.addEventListener('touchend', emitTouchEvents(this.props.emitter, TOUCH_END), false);
 
     this.props.dispatch({
       type: GL,

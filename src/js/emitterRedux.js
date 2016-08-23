@@ -11,6 +11,13 @@ import {
   stopMove
 } from './actions.js';
 
+import {
+  TAP,
+  LONG_PRESS,
+  POTENTIAL_LONG_PRESS,
+  POTENTIAL_LONG_PRESS_CANCEL
+} from './events.js';
+
 export function toEmitterMiddleware(emitter){
   return ({getState, dispatch}) => next => action => {
     if(action.meta && typeof(action.meta) == 'object' && action.meta.emit === true){
@@ -21,14 +28,14 @@ export function toEmitterMiddleware(emitter){
 }
 
 export function fromEmitter(emitter, editor, perspective, context, renderer, storage, store){
-  emitter.on('tap', tap(editor, perspective, context, renderer, storage, store.dispatch, store));
-  emitter.on('longPress', longPress(editor, perspective, store.dispatch));
+  emitter.on(TAP, tap(editor, perspective, context, renderer, storage, store.dispatch, store));
+  emitter.on(LONG_PRESS, longPress(editor, perspective, store.dispatch));
   emitter.on(REMOVE_TILE_AT, removeTileAt(editor, context, renderer, storage, store.dispatch));
   emitter.on(TO_UNDERPASS, toUnderpass(editor, context, renderer, storage, store.dispatch));
   emitter.on(TO_WIRE, toWire(editor, context, renderer, storage, store.dispatch));
   emitter.on(MOVE_GATE, moveGate(editor, store.dispatch));
-  emitter.on('potentialLongPress', potentialLongPress(store.dispatch));
-  emitter.on('potentialLongPressCancel', potentialLongPressCancel(store.dispatch));
+  emitter.on(POTENTIAL_LONG_PRESS, potentialLongPress(store.dispatch));
+  emitter.on(POTENTIAL_LONG_PRESS_CANCEL, potentialLongPressCancel(store.dispatch));
 }
 
 export function tap(editor, perspective, context, renderer, storage, dispatch, store){
