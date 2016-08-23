@@ -73,6 +73,10 @@ initialize(store, ({global}) => {
         store.dispatch(panZoom(perspective.tileToViewportMatrix));
       }
       renderer.renderView(context, perspective);
+      const moveState = store.getState().moveIt;
+      if(moveState.move){
+        //TODO
+      }
       //viewStats.end();
     },
 

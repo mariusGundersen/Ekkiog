@@ -6,7 +6,9 @@ import {
   startLongPress,
   cancelLongPress,
   showContextMenu,
-  hideContextMenu
+  hideContextMenu,
+  startMove,
+  stopMove
 } from './actions.js';
 
 export function toEmitterMiddleware(emitter){
@@ -24,7 +26,7 @@ export function fromEmitter(emitter, editor, perspective, context, renderer, sto
   emitter.on(REMOVE_TILE_AT, removeTileAt(editor, context, renderer, storage, store.dispatch));
   emitter.on(TO_UNDERPASS, toUnderpass(editor, context, renderer, storage, store.dispatch));
   emitter.on(TO_WIRE, toWire(editor, context, renderer, storage, store.dispatch));
-  emitter.on(MOVE_GATE, moveGate(store.dispatch));
+  emitter.on(MOVE_GATE, moveGate(editor, store.dispatch));
   emitter.on('potentialLongPress', potentialLongPress(store.dispatch));
   emitter.on('potentialLongPressCancel', potentialLongPressCancel(store.dispatch));
 }
@@ -93,9 +95,10 @@ export function toWire(editor, context, renderer, storage, dispatch){
   };
 }
 
-export function moveGate(dispatch){
+export function moveGate(editor, dispatch){
   return ({tx, ty}) => {
-
+    const [gateX, gateY] = editor.query.getGateOutput(tx, ty);
+    dispatch(startMove(gateY-1, gateX-3, gateX, gateY+1));
     dispatch(hideContextMenu());
   };
 }
