@@ -12,5 +12,4 @@ export const POTENTIAL_LONG_PRESS = 'potentialLongPress';
 export const POTENTIAL_LONG_PRESS_CANCEL = 'potentialLongPressCancel';
 
 export const START_SELECTION = 'startSelection';
-export const MOVE_SELECTION = 'moveSelection';
 export const CANCEL_PAN_ZOOM = 'cancePanZoom';

@@ -13,7 +13,7 @@ export default class PanZoomSaga{
     this.pointers = pointers;
 
     eventEmitter.on(POINTER_DOWN, function(data){
-      pointers.set(data.pointer, {
+      pointers.set(data.id, {
         x: data.x,
         y: data.y,
         ox: data.x,
@@ -22,23 +22,23 @@ export default class PanZoomSaga{
     });
 
     eventEmitter.on(POINTER_MOVE, function(data){
-      if(!pointers.has(data.pointer)) return;
+      if(!pointers.has(data.id)) return;
 
-      const pointer = pointers.get(data.pointer);
+      const pointer = pointers.get(data.id);
       pointer.x = data.x;
       pointer.y = data.y;
     });
 
     eventEmitter.on(CANCEL_PAN_ZOOM, function(data){
       console.log('cancel', data);
-      if(!pointers.has(data.pointer)) return;
-      pointers.delete(data.pointer);
+      if(!pointers.has(data.id)) return;
+      pointers.delete(data.id);
     });
 
     eventEmitter.on(POINTER_UP, function(data){
-      if(!pointers.has(data.pointer)) return;
+      if(!pointers.has(data.id)) return;
 
-      pointers.delete(data.pointer);
+      pointers.delete(data.id);
     });
   }
 

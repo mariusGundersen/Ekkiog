@@ -37,7 +37,7 @@ export default class TouchSaga extends EventSaga {
         };
 
         this.emit(POINTER_DOWN, {
-          pointer: this.id,
+          id: this.id,
           x: data.x,
           y: data.y
         });
@@ -55,7 +55,7 @@ export default class TouchSaga extends EventSaga {
         this.data.y = data.y;
 
         this.emit(POINTER_MOVE, {
-          pointer: this.id,
+          id: this.id,
           x: data.x,
           y: data.y
         });
@@ -67,7 +67,7 @@ export default class TouchSaga extends EventSaga {
             this.clearTimeout(LONG_PRESS_TIMEOUT);
             if(!this.data.maybeTap && !this.data.longPress){
               this.emit(POTENTIAL_LONG_PRESS_CANCEL, {
-                pointer: this.id,
+                id: this.id,
                 x: data.x,
                 y: data.y
               });
@@ -80,7 +80,7 @@ export default class TouchSaga extends EventSaga {
         this.data.maybeTap = false;
         if(this.data.moved == false){
           this.emit(POTENTIAL_LONG_PRESS, {
-            pointer: this.id,
+            id: this.id,
             x: this.data.x,
             y: this.data.y,
             time: MIN_LONG_TOUCH_TIME - MAX_TAP_TIME
@@ -91,7 +91,7 @@ export default class TouchSaga extends EventSaga {
       saga.on(LONG_PRESS_TIMEOUT, function(data) {
         this.data.longPress = true;
         this.emit(POINTER_UP, {
-          pointer: this.id,
+          id: this.id,
           x: data.x,
           y: data.y
         });
@@ -113,14 +113,14 @@ export default class TouchSaga extends EventSaga {
 
         if(!this.data.maybeTap && !this.data.longPress){
           this.emit(POTENTIAL_LONG_PRESS_CANCEL, {
-            pointer: this.id,
+            id: this.id,
             x: data.x,
             y: data.y
           });
         }
 
         this.emit(POINTER_UP, {
-          pointer: this.id,
+          id: this.id,
           x: data.x,
           y: data.y
         });

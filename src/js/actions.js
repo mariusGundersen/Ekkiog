@@ -15,9 +15,6 @@ export const TO_UNDERPASS = 'toUnderpass';
 export const TO_WIRE = 'toWire';
 
 export const MOVE_GATE = 'moveGate';
-export const START_MOVE = 'startMove';
-export const SET_MOVE = 'setMove';
-export const STOP_MOVE = 'stopMove';
 
 export const resize = (pixelWidth, pixelHeight, screenWidth, screenHeight) => ({
   type: RESIZE,
@@ -96,22 +93,4 @@ export const moveGate = (tx, ty) => ({
   },
   tx,
   ty
-});
-
-export const startMove = (top, left, right, bottom) => ({
-  type: START_MOVE,
-  top,
-  left,
-  right,
-  bottom
-});
-
-export const setMove = (dx, dy) => ({
-  type: SET_MOVE,
-  dx,
-  dy
-});
-
-export const stopMove = () => ({
-  type: STOP_MOVE
 });

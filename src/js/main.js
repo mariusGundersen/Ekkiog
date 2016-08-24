@@ -74,9 +74,8 @@ initialize(store, ({global}) => {
         store.dispatch(panZoom(perspective.tileToViewportMatrix));
       }
       renderer.renderView(context, perspective);
-      const moveState = store.getState().moveIt;
-      if(moveState.move){
-        renderer.renderMove(context, perspective, moveState);
+      if(touchControls.selectionSaga.isSelectionActive){
+        renderer.renderMove(context, perspective, touchControls.selectionSaga.boundingBox, touchControls.selectionSaga.dx, touchControls.selectionSaga.dy);
       }
       //viewStats.end();
     },

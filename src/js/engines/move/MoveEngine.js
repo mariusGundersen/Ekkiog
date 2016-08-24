@@ -12,7 +12,7 @@ export default class MoveEngine {
     this.shader = createShader(gl, moveVS, moveFS);
   }
 
-  render(context, matrix, {top, left, right, bottom, dx, dy}) {
+  render(context, matrix, [top, left, right, bottom], dx, dy) {
     if(!context.spriteSheetTexture.ready) return;
 
     this.shader.bind();

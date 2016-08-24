@@ -17,8 +17,7 @@ import {
   LONG_PRESS,
   POTENTIAL_LONG_PRESS,
   POTENTIAL_LONG_PRESS_CANCEL,
-  START_SELECTION,
-  MOVE_SELECTION
+  START_SELECTION
 } from './events.js';
 
 export function toEmitterMiddleware(emitter){
@@ -39,7 +38,6 @@ export function fromEmitter(emitter, editor, perspective, context, renderer, sto
   emitter.on(MOVE_GATE, moveGate(editor, emitter, store.dispatch));
   emitter.on(POTENTIAL_LONG_PRESS, potentialLongPress(store.dispatch));
   emitter.on(POTENTIAL_LONG_PRESS_CANCEL, potentialLongPressCancel(store.dispatch));
-  emitter.on(MOVE_SELECTION, moveSelection(store.dispatch));
 }
 
 export function tap(editor, perspective, context, renderer, storage, dispatch, store){
@@ -109,7 +107,6 @@ export function toWire(editor, context, renderer, storage, dispatch){
 export function moveGate(editor, emitter, dispatch){
   return ({tx, ty}) => {
     const [gateX, gateY] = editor.query.getGateOutput(tx, ty);
-    dispatch(startMove(gateY-1, gateX-3, gateX, gateY+1));
     console.log('emit');
     emitter.emit(START_SELECTION, {
       top: gateY-1,
@@ -133,12 +130,6 @@ export function potentialLongPressCancel(dispatch){
   return ({x, y}) => {
     dispatch(cancelLongPress());
   };
-}
-
-export function moveSelection(dispatch){
-  return ({tx, ty}) => {
-    dispatch(setMove(tx, ty));
-  }
 }
 
 function edited(context, renderer, storage){

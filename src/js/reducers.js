@@ -119,41 +119,11 @@ function contextMenu(state={
   }
 }
 
-function moveIt(state={
-  move: false
-}, action){
-  switch(action.type){
-    case START_MOVE:
-      return {
-        move: true,
-        top: action.top,
-        left: action.left,
-        right: action.right,
-        bottom: action.bottom,
-        dx: 0,
-        dy: 0
-      };
-    case SET_MOVE:
-      return {
-        ...state,
-        dx: action.dx,
-        dy: action.dy
-      };
-    case STOP_MOVE:
-      return {
-        move: false
-      };
-    default:
-      return state;
-  }
-}
-
 const ekkiogApp = combineReducers({
   view,
   global,
   editor,
-  contextMenu,
-  moveIt
+  contextMenu
 });
 
 export default ekkiogApp;
