@@ -51,8 +51,7 @@ function global(state={
 }
 
 function editor(state={
-  selectedTool: 'wire',
-  showMainMenu: false
+  selectedTool: 'wire'
 }, action){
   switch(action.type){
     case SET_SELECTED_TOOL:
@@ -60,10 +59,20 @@ function editor(state={
         ...state,
         selectedTool: action.tool
       };
+    default:
+      return state;
+  }
+}
+
+function mainMenu(state={
+  open: false,
+  menuType: 'tools'
+}, action){
+  switch(action.type){
     case TOGGLE_MAIN_MENU:
       return {
         ...state,
-        showMainMenu: !state.showMainMenu
+        open: !state.open
       };
     default:
       return state;
@@ -123,6 +132,7 @@ const ekkiogApp = combineReducers({
   view,
   global,
   editor,
+  mainMenu,
   contextMenu
 });
 

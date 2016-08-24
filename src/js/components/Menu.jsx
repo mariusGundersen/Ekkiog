@@ -15,8 +15,6 @@ const Menu = connect(
     pixelHeight: view.pixelHeight,
     screenWidth: view.screenWidth,
     screenHeight: view.screenHeight,
-    showMainMenu: editor.showMainMenu,
-    selectedTool: editor.selectedTool,
     contextMenu: contextMenu
   })
 )(({dispatch, ...props}) => {
@@ -27,7 +25,7 @@ const Menu = connect(
 
   return (
     <svg width={props.screenWidth} height={props.screenHeight} viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
-      <MainMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} showMenu={props.showMainMenu} selectedTool={props.selectedTool} />
+      <MainMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} />
       <ContextMenu radius={radius+gap} width={radius+gap} {...props.contextMenu} />
     </svg>
   )
