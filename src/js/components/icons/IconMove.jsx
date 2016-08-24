@@ -1,16 +1,21 @@
 import React from 'react';
 
+const A = 10;
+const B = 2;
+const C = 4;
+const D = B+C;
+
 export default props => (
   <g>
     <path
-      stroke="black"
+      stroke="none"
       fill="white"
-      strokeWidth="2"
-      d="M2.5,-2.5 L10,-2.5 l0,-2.5 l5,5  l-5,5  l0,-2.5
-         L2.5,2.5  L2.5,10  l2.5,0  l-5,5 l-5,-5 l2.5,0
-         L-2.5,2.5 L-10,2.5 l0,2.5 l-5,-5  l5,-5  l0,2.5
-         L-2.5,-2.5  L-2.5,-10  l-2.5,0  l5,-5 l5,5 l-2.5,0
-         Z"
+      strokeWidth="0"
+      d={`M${B},${-B} L${A},${-B} l0,${-C} l${D},${D}  l${-D},${D}  l0,${-C}
+         L${B},${B}  L${B},${A}  l${C},0  l${-D},${D} l${-D},${-D} l${C},0
+         L${-B},${B} L${-A},${B} l0,${C} l${-D},${-D}  l${D},${-D}  l0,${C}
+         L${-B},${-B}  L${-B},${-A}  l${-C},0  l${D},${-D} l${D},${D} l${-C},0
+         Z`}
     />
   </g>
 );
