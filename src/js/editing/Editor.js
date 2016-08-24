@@ -149,6 +149,8 @@ export default class Editor{
 
     this.context.mapTexture.set(x, y, EMPTY);
     this.context.netMapTexture.set(x, y, GROUND);
+    this.context.netMapTexture.set(x-3, y-1, GROUND);
+    this.context.netMapTexture.set(x-3, y+1, GROUND);
 
     this.context.gatesTexture.set(netX, netY, 0);
 
