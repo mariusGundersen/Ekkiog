@@ -37,7 +37,7 @@ module.exports = {
     })
   ],
   resolve: {
-    root: [JS_PATH, SRC_PATH]
+    root: [SRC_PATH]
   },
   module: {
     loaders: [
