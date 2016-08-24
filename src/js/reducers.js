@@ -74,6 +74,16 @@ function mainMenu(state={
         ...state,
         open: !state.open
       };
+    case SHOW_CONTEXT_MENU:
+      return {
+        ...state,
+        menuType: null
+      };
+    case HIDE_CONTEXT_MENU:
+      return {
+        ...state,
+        menuType: 'tools'
+      };
     default:
       return state;
   }
