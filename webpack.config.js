@@ -33,7 +33,10 @@ module.exports = {
       'process.env.NODE_ENV': debug ? '"development"' : '"production"'
     }),
     new OfflinePlugin({
-      caches: 'all'
+      caches: 'all',
+      ServiceWorker: {
+        events: true
+      }
     })
   ],
   resolve: {

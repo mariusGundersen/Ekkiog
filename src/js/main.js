@@ -31,7 +31,20 @@ import App from './components/App.jsx';
 
 const TILE_SIZE = 16;
 
-if(!__DEV__) offline.install();
+if(!__DEV__){
+  offline.install({
+    onInstalled: () => {
+      //console.log('installed');
+    },
+    onUpdating: () => {
+      //console.log('updating');
+    },
+    onUpdateReady: () => {
+      //console.log('ready');
+      offline.applyUpdate();
+    }
+  });
+}
 
 const emitter = new EventEmitter();
 
