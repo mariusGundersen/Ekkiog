@@ -43,11 +43,12 @@ initialize(store, ({global}) => {
   const gl = global.gl;
 
   const renderer = new Renderer(gl);
-  const touchControls = new TouchControls(emitter);
 
   const perspective = new Perspective();
   const context = new Context(gl, {width: 128, height: 128}, TILE_SIZE);
   perspective.setMapSize(context.width, context.height);
+
+  const touchControls = new TouchControls(emitter, perspective);
 
   const storage = new Storage();
   context.import(storage.load());

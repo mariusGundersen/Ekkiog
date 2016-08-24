@@ -12,7 +12,7 @@ export default class MoveEngine {
     this.shader = createShader(gl, moveVS, moveFS);
   }
 
-  render(context, matrix, {top, left, right, bottom}) {
+  render(context, matrix, {top, left, right, bottom, dx, dy}) {
     if(!context.spriteSheetTexture.ready) return;
 
     this.shader.bind();
@@ -32,6 +32,8 @@ export default class MoveEngine {
       right+1,
       bottom+1
     ];
+    this.shader.uniforms.translate = [dx, dy];
+
     triangle.draw();
   }
 }

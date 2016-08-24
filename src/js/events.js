@@ -10,3 +10,7 @@ export const TAP = 'tap';
 export const LONG_PRESS = 'longPress';
 export const POTENTIAL_LONG_PRESS = 'potentialLongPress';
 export const POTENTIAL_LONG_PRESS_CANCEL = 'potentialLongPressCancel';
+
+export const START_SELECTION = 'startSelection';
+export const MOVE_SELECTION = 'moveSelection';
+export const CANCEL_PAN_ZOOM = 'cancePanZoom';

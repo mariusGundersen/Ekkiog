@@ -88,7 +88,7 @@ export default class TouchSaga extends EventSaga {
         }
       });
 
-      saga.on(LONG_PRESS_TIMEOUT, function (data) {
+      saga.on(LONG_PRESS_TIMEOUT, function(data) {
         this.data.longPress = true;
         this.emit(POINTER_UP, {
           pointer: this.id,

@@ -4,6 +4,7 @@ import {
   POINTER_DOWN,
   POINTER_MOVE,
   POINTER_UP,
+  CANCEL_PAN_ZOOM
 } from '../events.js';
 
 export default class PanZoomSaga{
@@ -26,6 +27,12 @@ export default class PanZoomSaga{
       const pointer = pointers.get(data.pointer);
       pointer.x = data.x;
       pointer.y = data.y;
+    });
+
+    eventEmitter.on(CANCEL_PAN_ZOOM, function(data){
+      console.log('cancel', data);
+      if(!pointers.has(data.pointer)) return;
+      pointers.delete(data.pointer);
     });
 
     eventEmitter.on(POINTER_UP, function(data){

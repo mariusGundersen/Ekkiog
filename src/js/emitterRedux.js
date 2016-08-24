@@ -8,6 +8,7 @@ import {
   showContextMenu,
   hideContextMenu,
   startMove,
+  setMove,
   stopMove
 } from './actions.js';
 
@@ -15,7 +16,9 @@ import {
   TAP,
   LONG_PRESS,
   POTENTIAL_LONG_PRESS,
-  POTENTIAL_LONG_PRESS_CANCEL
+  POTENTIAL_LONG_PRESS_CANCEL,
+  START_SELECTION,
+  MOVE_SELECTION
 } from './events.js';
 
 export function toEmitterMiddleware(emitter){
@@ -33,9 +36,10 @@ export function fromEmitter(emitter, editor, perspective, context, renderer, sto
   emitter.on(REMOVE_TILE_AT, removeTileAt(editor, context, renderer, storage, store.dispatch));
   emitter.on(TO_UNDERPASS, toUnderpass(editor, context, renderer, storage, store.dispatch));
   emitter.on(TO_WIRE, toWire(editor, context, renderer, storage, store.dispatch));
-  emitter.on(MOVE_GATE, moveGate(editor, store.dispatch));
+  emitter.on(MOVE_GATE, moveGate(editor, emitter, store.dispatch));
   emitter.on(POTENTIAL_LONG_PRESS, potentialLongPress(store.dispatch));
   emitter.on(POTENTIAL_LONG_PRESS_CANCEL, potentialLongPressCancel(store.dispatch));
+  emitter.on(MOVE_SELECTION, moveSelection(store.dispatch));
 }
 
 export function tap(editor, perspective, context, renderer, storage, dispatch, store){
@@ -102,11 +106,17 @@ export function toWire(editor, context, renderer, storage, dispatch){
   };
 }
 
-export function moveGate(editor, dispatch){
+export function moveGate(editor, emitter, dispatch){
   return ({tx, ty}) => {
     const [gateX, gateY] = editor.query.getGateOutput(tx, ty);
-    console.log('startMove', gateX, gateY);
     dispatch(startMove(gateY-1, gateX-3, gateX, gateY+1));
+    console.log('emit');
+    emitter.emit(START_SELECTION, {
+      top: gateY-1,
+      left: gateX-3,
+      right: gateX,
+      bottom: gateY+1
+    });
     dispatch(hideContextMenu());
   };
 }
@@ -123,6 +133,12 @@ export function potentialLongPressCancel(dispatch){
   return ({x, y}) => {
     dispatch(cancelLongPress());
   };
+}
+
+export function moveSelection(dispatch){
+  return ({tx, ty}) => {
+    dispatch(setMove(tx, ty));
+  }
 }
 
 function edited(context, renderer, storage){

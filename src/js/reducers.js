@@ -12,6 +12,7 @@ import {
   HIDE_CONTEXT_MENU,
   PAN_ZOOM,
   START_MOVE,
+  SET_MOVE,
   STOP_MOVE,
 } from './actions.js';
 
@@ -131,6 +132,12 @@ function moveIt(state={
         bottom: action.bottom,
         dx: 0,
         dy: 0
+      };
+    case SET_MOVE:
+      return {
+        ...state,
+        dx: action.dx,
+        dy: action.dy
       };
     case STOP_MOVE:
       return {
