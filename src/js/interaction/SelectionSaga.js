@@ -18,7 +18,6 @@ export default class SelectionSaga extends EventSaga {
         }
 
         const [tx, ty] = perspective.viewportToTile(data.x, data.y);
-        console.log(tx, ty);
         if(this.state.top <= Math.floor(ty - this.state.dy)
         && this.state.left <= Math.floor(tx - this.state.dx)
         && this.state.right >= Math.floor(tx - this.state.dx)
@@ -67,7 +66,6 @@ export default class SelectionSaga extends EventSaga {
     };
 
     eventEmitter.on(START_SELECTION, (data) => {
-      console.log('startSelection', data);
       this.state = {
         selection: true,
         top: data.top,

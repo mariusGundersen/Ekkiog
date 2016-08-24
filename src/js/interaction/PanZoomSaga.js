@@ -30,7 +30,6 @@ export default class PanZoomSaga{
     });
 
     eventEmitter.on(CANCEL_PAN_ZOOM, function(data){
-      console.log('cancel', data);
       if(!pointers.has(data.id)) return;
       pointers.delete(data.id);
     });

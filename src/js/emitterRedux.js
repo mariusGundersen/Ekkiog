@@ -107,7 +107,6 @@ export function toWire(editor, context, renderer, storage, dispatch){
 export function moveGate(editor, emitter, dispatch){
   return ({tx, ty}) => {
     const [gateX, gateY] = editor.query.getGateOutput(tx, ty);
-    console.log('emit');
     emitter.emit(START_SELECTION, {
       top: gateY-1,
       left: gateX-3,

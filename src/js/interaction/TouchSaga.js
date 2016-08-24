@@ -7,6 +7,7 @@ import {
   POINTER_DOWN,
   POINTER_MOVE,
   POINTER_UP,
+  CANCEL_PAN_ZOOM,
   TAP,
   LONG_PRESS,
   POTENTIAL_LONG_PRESS,
@@ -90,10 +91,8 @@ export default class TouchSaga extends EventSaga {
 
       saga.on(LONG_PRESS_TIMEOUT, function(data) {
         this.data.longPress = true;
-        this.emit(POINTER_UP, {
-          id: this.id,
-          x: data.x,
-          y: data.y
+        this.emit(CANCEL_PAN_ZOOM, {
+          id: this.id
         });
 
         this.emit(LONG_PRESS, {
