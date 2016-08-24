@@ -2,6 +2,7 @@ import EventSaga from 'event-saga';
 
 import {
   START_SELECTION,
+  STOP_SELECTION,
   POINTER_DOWN,
   POINTER_MOVE,
   POINTER_UP,
@@ -76,6 +77,13 @@ export default class SelectionSaga extends EventSaga {
         dy: 0
       };
     });
+
+    eventEmitter.on(STOP_SELECTION, () => {
+      console.log('stop selection');
+      this.state = {
+        selection: false
+      };
+    })
   }
 
   get isSelectionActive(){

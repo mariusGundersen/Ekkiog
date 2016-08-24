@@ -11,9 +11,8 @@ import {
   CANCEL_LONG_PRESS,
   HIDE_CONTEXT_MENU,
   PAN_ZOOM,
-  START_MOVE,
-  SET_MOVE,
-  STOP_MOVE,
+  SHOW_OK_CANCEL_MENU,
+  RESET_MAIN_MENU
 } from './actions.js';
 
 function view(state={
@@ -66,7 +65,8 @@ function editor(state={
 
 function mainMenu(state={
   open: false,
-  menuType: 'tools'
+  menuType: 'tools',
+  previousMenu: null
 }, action){
   switch(action.type){
     case TOGGLE_MAIN_MENU:
@@ -84,6 +84,17 @@ function mainMenu(state={
         ...state,
         menuType: 'tools'
       };
+    case SHOW_OK_CANCEL_MENU:
+      return {
+        ...state,
+        open: true,
+        menuType: 'okCancel',
+        okAction: action.okAction,
+        cancelAction: action.cancelAction,
+        previousMenu: state
+      };
+    case RESET_MAIN_MENU:
+      return state.previousMenu || state;
     default:
       return state;
   }

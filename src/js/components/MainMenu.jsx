@@ -8,12 +8,15 @@ import IconUnderpass from './icons/IconUnderpass.jsx';
 import IconButton from './icons/IconButton.jsx';
 import IconGate from './icons/IconGate.jsx';
 import IconReturn from './icons/IconReturn.jsx';
+import IconAccept from './icons/IconAccept.jsx';
+import IconRemove from './icons/IconRemove.jsx';
 
 import {
   wireMenuItem,
   buttonMenuItem,
   gateMenuItem,
-  underpassMenuItem
+  underpassMenuItem,
+  menuItem
 } from './radialMenu/menuItems.js';
 
 import {toggleMainMenu} from '../actions.js';
@@ -70,6 +73,8 @@ function createMenuTree(store, dispatch){
   switch(store.mainMenu.menuType){
     case 'tools':
       return createToolsMenuTree(store, dispatch);
+    case 'okCancel':
+      return createOkCancelMenuTree(store, dispatch);
     default:
       return [];
   }
@@ -83,6 +88,17 @@ function createToolsMenuTree({editor}, dispatch){
         buttonMenuItem(editor.selectedTool, dispatch),
         gateMenuItem(editor.selectedTool, dispatch),
         underpassMenuItem(editor.selectedTool, dispatch)
+      ]
+    }
+  ];
+}
+
+function createOkCancelMenuTree({mainMenu}, dispatch){
+  return [
+    {
+      menuItems: [
+        menuItem('ok', <IconAccept />, () => mainMenu.okAction()),
+        menuItem('cancel', <IconRemove />, () => mainMenu.cancelAction())
       ]
     }
   ];

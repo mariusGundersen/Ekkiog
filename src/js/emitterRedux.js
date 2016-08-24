@@ -7,9 +7,8 @@ import {
   cancelLongPress,
   showContextMenu,
   hideContextMenu,
-  startMove,
-  setMove,
-  stopMove
+  showOkCancelMenu,
+  resetMainMenu
 } from './actions.js';
 
 import {
@@ -17,7 +16,8 @@ import {
   LONG_PRESS,
   POTENTIAL_LONG_PRESS,
   POTENTIAL_LONG_PRESS_CANCEL,
-  START_SELECTION
+  START_SELECTION,
+  STOP_SELECTION
 } from './events.js';
 
 export function toEmitterMiddleware(emitter){
@@ -114,6 +114,18 @@ export function moveGate(editor, emitter, dispatch){
       bottom: gateY+1
     });
     dispatch(hideContextMenu());
+    dispatch(showOkCancelMenu(
+      () => {
+        console.log('ok');
+        emitter.emit(STOP_SELECTION, {});
+        dispatch(resetMainMenu());
+      },
+      () => {
+        console.log('cancel');
+        emitter.emit(STOP_SELECTION, {});
+        dispatch(resetMainMenu());
+      }
+    ));
   };
 }
 

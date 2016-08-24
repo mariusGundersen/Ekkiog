@@ -16,6 +16,9 @@ export const TO_WIRE = 'toWire';
 
 export const MOVE_GATE = 'moveGate';
 
+export const SHOW_OK_CANCEL_MENU = 'showOkCancelMenu';
+export const RESET_MAIN_MENU = 'resetMainMenu';
+
 export const resize = (pixelWidth, pixelHeight, screenWidth, screenHeight) => ({
   type: RESIZE,
   pixelWidth,
@@ -93,4 +96,14 @@ export const moveGate = (tx, ty) => ({
   },
   tx,
   ty
+});
+
+export const showOkCancelMenu = (okAction, cancelAction) => ({
+  type: SHOW_OK_CANCEL_MENU,
+  okAction,
+  cancelAction
+});
+
+export const resetMainMenu = () => ({
+  type: RESET_MAIN_MENU
 });
