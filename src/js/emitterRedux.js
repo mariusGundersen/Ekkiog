@@ -1,85 +1,49 @@
 import {
-  startLongPress,
-  cancelLongPress,
+  REMOVE_TILE_AT,
+  TO_UNDERPASS,
+  TO_WIRE,
+  MOVE_GATE,
+  loadContextMenu,
+  abortLoadContextMenu,
   showContextMenu,
-  hideContextMenu
+  hideContextMenu,
+  showOkCancelMenu,
+  resetMainMenu
 } from './actions.js';
+
+import {
+  TAP,
+  SHOW_CONTEXT_MENU,
+  LOAD_CONTEXT_MENU,
+  ABORT_LOAD_CONTEXT_MENU,
+  START_SELECTION,
+  MOVE_SELECTION,
+  CANCEL_SELECTION,
+  OK_SELECTION_MOVE
+} from './events.js';
 
 export function toEmitterMiddleware(emitter){
   return ({getState, dispatch}) => next => action => {
-    if(action.meta && typeof(action.meta) == 'object' && action.meta.emit){
-      emitter.emit(action.meta.emit, action);
+    if(action.meta && typeof(action.meta) == 'object' && action.meta.emit === true){
+      emitter.emit(action.type, action);
     }
     return next(action)
   };
 }
 
 export function fromEmitter(emitter, editor, perspective, context, renderer, storage, store){
-  emitter.on('tap', tap(editor, perspective, context, renderer, storage, store.dispatch, store));
-  emitter.on('longPress', longPress(editor, perspective, store.dispatch));
-  emitter.on('removeTileAt', removeTileAt(editor, context, renderer, storage, store.dispatch));
-  emitter.on('toUnderpass', toUnderpass(editor, context, renderer, storage, store.dispatch));
-  emitter.on('toWire', toWire(editor, context, renderer, storage, store.dispatch));
-  emitter.on('potentialLongPress', potentialLongPress(store.dispatch));
-  emitter.on('potentialLongPressCancel', potentialLongPressCancel(store.dispatch));
+  emitter.on(TAP, handleTap(editor, perspective, context, renderer, storage, store.dispatch, store));
+  emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(editor, perspective, store.dispatch));
+  emitter.on(REMOVE_TILE_AT, handleRemoveTileAt(editor, context, renderer, storage, store.dispatch));
+  emitter.on(TO_UNDERPASS, handleConvertToUnderpass(editor, context, renderer, storage, store.dispatch));
+  emitter.on(TO_WIRE, handleConvertToWire(editor, context, renderer, storage, store.dispatch));
+  emitter.on(MOVE_GATE, handleMoveGate(editor, emitter, store.dispatch));
+  emitter.on(MOVE_SELECTION, handleMoveSelection(editor, context, renderer, storage));
+  emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(store.dispatch));
+  emitter.on(ABORT_LOAD_CONTEXT_MENU, handleAbortContextMenu(store.dispatch));
 }
 
-export function potentialLongPress(dispatch){
-  return ({x, y}) => {
-    dispatch(startLongPress(
-      x/window.devicePixelRatio,
-      y/window.devicePixelRatio));
-  };
-}
-
-export function potentialLongPressCancel(dispatch){
-  return ({x, y}) => {
-    dispatch(cancelLongPress());
-  };
-}
-
-export function toWire(editor, context, renderer, storage, dispatch){
-  return ({tx, ty}) => {
-    if(editor.drawWire(tx, ty)){
-      edited(context, renderer, storage);
-    }
-
-    dispatch(hideContextMenu());
-  };
-}
-
-export function toUnderpass(editor, context, renderer, storage, dispatch){
-  return ({tx, ty}) => {
-    if(editor.drawUnderpass(tx, ty)){
-      edited(context, renderer, storage);
-    }
-
-    dispatch(hideContextMenu());
-  };
-}
-
-export function removeTileAt(editor, context, renderer, storage, dispatch){
-  return ({tx, ty}) => {
-    if(editor.clear(tx, ty)){
-      edited(context, renderer, storage);
-    }
-
-    dispatch(hideContextMenu());
-  };
-}
-
-export function longPress(editor, perspective, dispatch){
-  return ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTile(x, y);
-    const tile = editor.getTileAt(Math.floor(tx), Math.floor(ty));
-    dispatch(showContextMenu(
-      tile,
-      tx,
-      ty));
-  };
-}
-
-export function tap(editor, perspective, context, renderer, storage, dispatch, store){
+export function handleTap(editor, perspective, context, renderer, storage, dispatch, store){
   return ({x, y}) => {
     const [tx, ty] = perspective.viewportToTileFloored(x, y);
 
@@ -94,11 +58,96 @@ export function tap(editor, perspective, context, renderer, storage, dispatch, s
         storage.save(context.export());
       }else{
         const tool = store.getState().editor.selectedTool;
-        if(editor.edit(tx, ty, tool)){
+        if(editor.draw(tx, ty, tool)){
           edited(context, renderer, storage);
         }
       }
     })
+  };
+}
+
+export function handleShowContextMenu(editor, perspective, dispatch){
+  return ({x, y}) => {
+    const [tx, ty] = perspective.viewportToTile(x, y);
+    const tile = editor.getTileAt(Math.floor(tx), Math.floor(ty));
+    dispatch(showContextMenu(
+      tile,
+      tx,
+      ty));
+  };
+}
+
+export function handleRemoveTileAt(editor, context, renderer, storage, dispatch){
+  return ({tx, ty}) => {
+    if(editor.clear(tx, ty)){
+      edited(context, renderer, storage);
+    }
+
+    dispatch(hideContextMenu());
+  };
+}
+
+export function handleConvertToUnderpass(editor, context, renderer, storage, dispatch){
+  return ({tx, ty}) => {
+    if(editor.drawUnderpass(tx, ty)){
+      edited(context, renderer, storage);
+    }
+
+    dispatch(hideContextMenu());
+  };
+}
+
+export function handleConvertToWire(editor, context, renderer, storage, dispatch){
+  return ({tx, ty}) => {
+    if(editor.drawWire(tx, ty)){
+      edited(context, renderer, storage);
+    }
+
+    dispatch(hideContextMenu());
+  };
+}
+
+export function handleMoveGate(editor, emitter, dispatch){
+  return ({tx, ty}) => {
+    const [gateX, gateY] = editor.query.getGateOutput(tx, ty);
+    dispatch(hideContextMenu());
+    emitter.emit(START_SELECTION, {
+      top: gateY-1,
+      left: gateX-3,
+      right: gateX,
+      bottom: gateY+1
+    });
+    dispatch(showOkCancelMenu(
+      () => {
+        emitter.emit(OK_SELECTION_MOVE, {});
+        dispatch(resetMainMenu());
+      },
+      () => {
+        emitter.emit(CANCEL_SELECTION, {});
+        dispatch(resetMainMenu());
+      }
+    ));
+  };
+}
+
+export function handleMoveSelection(editor, context, renderer, storage){
+  return ({top, left, right, bottom, dx, dy}) => {
+    editor.moveSelection(top, left, right, bottom, dx, dy);
+    edited(context, renderer, storage);
+  };
+}
+
+export function handleLoadContextMenu(dispatch){
+  return ({x, y}) => {
+    dispatch(loadContextMenu(
+      x/window.devicePixelRatio,
+      y/window.devicePixelRatio));
+  };
+}
+
+export function handleAbortContextMenu(dispatch){
+  return ({x, y}) => {
+    dispatch(abortLoadContextMenu());
   };
 }
 

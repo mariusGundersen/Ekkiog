@@ -1,116 +1,131 @@
 import EventSaga from 'event-saga';
 
+import {
+  TOUCH_START,
+  TOUCH_MOVE,
+  TOUCH_END,
+  POINTER_DOWN,
+  POINTER_MOVE,
+  POINTER_UP,
+  CANCEL_PAN_ZOOM,
+  POINTER_TAP,
+  LONG_PRESS,
+  POTENTIAL_LONG_PRESS,
+  POTENTIAL_LONG_PRESS_CANCEL
+} from '../events.js';
+
+const TAP_TOO_SLOW_TIMEOUT = 'tapTooSlowTimeout';
+const LONG_PRESS_TIMEOUT = 'longPressTimeout';
+
 const MAX_UNMOVED_DISTANCE = 5;
 const MAX_TAP_TIME = 100;
 const MIN_LONG_TOUCH_TIME = 1000;
 
-export default class saga{
+export default class TouchSaga extends EventSaga {
   constructor(eventEmitter){
-    const saga = new EventSaga(eventEmitter);
-
-    saga.createOn('touchStart', function(data){
-      this.data = {
-        moved: false,
-        maybeTap: true,
-        longPress: false,
-        start: {
+    super(eventEmitter, saga => {
+      saga.createOn(TOUCH_START, function(data){
+        this.data = {
+          moved: false,
+          maybeTap: true,
+          longPress: false,
+          start: {
+            x: data.x,
+            y: data.y
+          },
           x: data.x,
           y: data.y
-        },
-        x: data.x,
-        y: data.y
-      };
+        };
 
-      this.emit('pointer-down', {
-        pointer: this.id,
-        x: data.x,
-        y: data.y
+        this.emit(POINTER_DOWN, {
+          id: this.id,
+          x: data.x,
+          y: data.y
+        });
+
+        this.setTimeout(TAP_TOO_SLOW_TIMEOUT, MAX_TAP_TIME);
+        this.setTimeout(LONG_PRESS_TIMEOUT, {
+          x: data.x,
+          y: data.y
+        }, MIN_LONG_TOUCH_TIME);
+
       });
 
-      this.setTimeout('tapTooSlow', MAX_TAP_TIME);
-      this.setTimeout('touchLong', {
-        x: data.x,
-        y: data.y
-      }, MIN_LONG_TOUCH_TIME);
+      saga.on(TOUCH_MOVE, function(data){
+        this.data.x = data.x;
+        this.data.y = data.y;
 
-    });
+        this.emit(POINTER_MOVE, {
+          id: this.id,
+          x: data.x,
+          y: data.y
+        });
 
-    saga.on('touchMove', function(data){
-      this.data.x = data.x;
-      this.data.y = data.y;
-
-      this.emit('pointer-move', {
-        pointer: this.id,
-        x: data.x,
-        y: data.y
-      });
-
-      if(!this.data.moved){
-        this.data.moved = Math.abs(data.x - this.data.start.x) > MAX_UNMOVED_DISTANCE
-                       || Math.abs(data.y - this.data.start.y) > MAX_UNMOVED_DISTANCE;
-        if(this.data.moved){
-          this.clearTimeout('touchLong');
-          if(!this.data.maybeTap && !this.data.longPress){
-            this.emit('potentialLongPressCancel', {
-              pointer: this.id,
-              x: data.x,
-              y: data.y
-            });
+        if(!this.data.moved){
+          this.data.moved = Math.abs(data.x - this.data.start.x) > MAX_UNMOVED_DISTANCE
+                        || Math.abs(data.y - this.data.start.y) > MAX_UNMOVED_DISTANCE;
+          if(this.data.moved){
+            this.clearTimeout(LONG_PRESS_TIMEOUT);
+            if(!this.data.maybeTap && !this.data.longPress){
+              this.emit(POTENTIAL_LONG_PRESS_CANCEL, {
+                id: this.id,
+                x: data.x,
+                y: data.y
+              });
+            }
           }
         }
-      }
-    });
-
-    saga.on('tapTooSlow', function(data){
-      this.data.maybeTap = false;
-      if(this.data.moved == false){
-        this.emit('potentialLongPress', {
-          pointer: this.id,
-          x: this.data.x,
-          y: this.data.y,
-          time: MIN_LONG_TOUCH_TIME - MAX_TAP_TIME
-        });
-      }
-    });
-
-    saga.on('touchLong', function (data) {
-      this.data.longPress = true;
-      this.emit('pointer-up', {
-        pointer: this.id,
-        x: data.x,
-        y: data.y
       });
 
-      this.emit('longPress', {
-        pointer: this.id,
-        x: data.x,
-        y: data.y
+      saga.on(TAP_TOO_SLOW_TIMEOUT, function(data){
+        this.data.maybeTap = false;
+        if(this.data.moved == false){
+          this.emit(POTENTIAL_LONG_PRESS, {
+            id: this.id,
+            x: this.data.x,
+            y: this.data.y,
+            time: MIN_LONG_TOUCH_TIME - MAX_TAP_TIME
+          });
+        }
       });
-    });
 
-    saga.on('touchEnd', function(data){
-      if(this.data.maybeTap && !this.data.moved){
-        this.emit('tap', {
-          x: data.x,
-          y: data.y
+      saga.on(LONG_PRESS_TIMEOUT, function(data) {
+        this.data.longPress = true;
+        this.emit(CANCEL_PAN_ZOOM, {
+          id: this.id
         });
-      }
 
-      if(!this.data.maybeTap && !this.data.longPress){
-        this.emit('potentialLongPressCancel', {
+        this.emit(LONG_PRESS, {
           pointer: this.id,
           x: data.x,
           y: data.y
         });
-      }
-
-      this.emit('pointer-up', {
-        pointer: this.id,
-        x: data.x,
-        y: data.y
       });
 
-      this.done();
+      saga.on(TOUCH_END, function(data){
+        if(this.data.maybeTap && !this.data.moved){
+          this.emit(POINTER_TAP, {
+            x: data.x,
+            y: data.y
+          });
+        }
+
+        if(!this.data.maybeTap && !this.data.longPress){
+          this.emit(POTENTIAL_LONG_PRESS_CANCEL, {
+            id: this.id,
+            x: data.x,
+            y: data.y
+          });
+        }
+
+        this.emit(POINTER_UP, {
+          id: this.id,
+          x: data.x,
+          y: data.y
+        });
+
+        this.done();
+      });
     });
   }
 }

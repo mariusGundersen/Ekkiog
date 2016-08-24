@@ -1,3 +1,5 @@
+import ndarray from 'ndarray';
+
 import ContextQuery from './ContextQuery.js';
 import Validator from './Validator.js';
 import FloodFiller from './FloodFiller.js';
@@ -147,6 +149,8 @@ export default class Editor{
 
     this.context.mapTexture.set(x, y, EMPTY);
     this.context.netMapTexture.set(x, y, GROUND);
+    this.context.netMapTexture.set(x-3, y-1, GROUND);
+    this.context.netMapTexture.set(x-3, y+1, GROUND);
 
     this.context.gatesTexture.set(netX, netY, 0);
 
@@ -259,7 +263,7 @@ export default class Editor{
     }
   }
 
-  edit(x, y, tool){
+  draw(x, y, tool){
     if(tool == 'wire'){
       if(this.query.isWire(x, y)){
         return this.clearWire(x, y);
@@ -267,13 +271,17 @@ export default class Editor{
         return this.drawWire(x, y);
       }
     }else if(tool == 'underpass'){
-      return this.drawUnderpass(x, y);
+      if(this.query.isUnderpass(x, y)){
+        return this.drawWire(x, y);
+      }else{
+        return this.drawUnderpass(x, y);
+      }
     }else if(tool == 'gate'){
       return this.drawGate(x, y);
     }else if(tool == 'button'){
       return this.drawButton(x, y);
     }else{
-      return this.clear(x, y);
+      return false;
     }
   }
 
@@ -325,6 +333,28 @@ export default class Editor{
     }
   }
 
+  moveSelection(top, left, right, bottom, dx, dy){
+    const width = right-left+1;
+    const height = bottom-top+1;
+    const selection = ndarray([], [height, width]);
+    const sourceMap = this.context.mapTexture.map.lo(top, left).hi(height, width);
+    for(let y=0; y<height; y++){
+      for(let x=0; x<width; x++){
+        selection.set(y, x, toTool(sourceMap.get(y, x)));
+      }
+    }
+    for(let y=0; y<height; y++){
+      for(let x=0; x<width; x++){
+        this.clear(left+x, top+y);
+      }
+    }
+    for(let y=0; y<height; y++){
+      for(let x=0; x<width; x++){
+        this.draw(left+x+dx, top+y+dy, selection.get(y, x));
+      }
+    }
+  }
+
   updateGate(x, y){
     const inputA = this.query.getNet(x-3, y-1);
     const inputB = this.query.getNet(x-3, y+1);
@@ -353,5 +383,15 @@ export default class Editor{
       (v>>0)&0xff,
       (v>>8)&0xff
     ];
+  }
+}
+
+function toTool(value){
+  switch(value){
+    case WIRE: return 'wire';
+    case GATE: return 'gate';
+    case UNDERPASS: return 'underpass';
+    case BUTTON: return 'button';
+    default: return '';
   }
 }

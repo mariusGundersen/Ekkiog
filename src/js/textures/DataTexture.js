@@ -6,17 +6,17 @@ export default class DataTexture extends Texture{
     super(gl, width, height);
     this.data = new Uint8Array(width*height*4);
     this.data32 = new Uint32Array(this.data.buffer);
-    this.map32 = ndarray(this.data32, [height, width]);
+    this.map = ndarray(this.data32, [height, width]);
 
     this.update();
   }
 
   set(x, y, v){
-    this.map32.set(y, x, v);
+    this.map.set(y, x, v);
   }
 
   get(x, y){
-    return this.map32.get(y, x, 0);
+    return this.map.get(y, x, 0);
   }
 
   update(){

@@ -5,13 +5,15 @@ import {
   hideContextMenu,
   removeTileAt,
   toUnderpass,
-  toWire
+  toWire,
+  moveGate
 } from '../../actions.js';
 
 import IconWire from '../icons/IconWire.jsx';
 import IconButton from '../icons/IconButton.jsx';
 import IconGate from '../icons/IconGate.jsx';
 import IconUnderpass from '../icons/IconUnderpass.jsx';
+import IconMove from '../icons/IconMove.jsx';
 import IconRemove from '../icons/IconRemove.jsx';
 import IconAccept from '../icons/IconAccept.jsx';
 
@@ -31,26 +33,30 @@ export function underpassMenuItem(selectedTool, dispatch){
   return toolMenuItem('underpass', <IconUnderpass />, selectedTool, dispatch);
 }
 
+export function moveMenuItem(dispatch, tx, ty){
+  return menuItem('move', <IconMove />, () => dispatch(moveGate(tx, ty)));
+}
+
 export function removeMenuItem(dispatch, tx, ty){
-  return menuItem('remove', <IconRemove />, () => dispatch(removeTileAt(tx, ty)), false);
+  return menuItem('remove', <IconRemove />, () => dispatch(removeTileAt(tx, ty)));
 }
 
 export function toUnderpassMenuItem(dispatch, tx, ty){
-  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(toUnderpass(tx, ty)), false);
+  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(toUnderpass(tx, ty)));
 }
 export function toWireMenuItem(dispatch, tx, ty){
-  return menuItem('toWire', <IconWire />, () => dispatch(toWire(tx, ty)), false);
+  return menuItem('toWire', <IconWire />, () => dispatch(toWire(tx, ty)));
 }
 
 export function acceptMenuItem(dispatch){
-  return menuItem('accept', <IconAccept />, () => dispatch(hideContextMenu()), false);
+  return menuItem('accept', <IconAccept />, () => dispatch(hideContextMenu()));
 }
 
-function toolMenuItem(tool, icon, selectedTool, dispatch){
+export function toolMenuItem(tool, icon, selectedTool, dispatch){
   return menuItem(tool, icon, () => dispatch(setSelectedTool(tool)), selectedTool === tool);
 }
 
-function menuItem(key, icon, action, selected){
+export function menuItem(key, icon, action, selected=false){
   return {
     itemKey: key,
     icon,

@@ -8,57 +8,118 @@ import IconUnderpass from './icons/IconUnderpass.jsx';
 import IconButton from './icons/IconButton.jsx';
 import IconGate from './icons/IconGate.jsx';
 import IconReturn from './icons/IconReturn.jsx';
+import IconAccept from './icons/IconAccept.jsx';
+import IconRemove from './icons/IconRemove.jsx';
 
 import {
   wireMenuItem,
   buttonMenuItem,
   gateMenuItem,
-  underpassMenuItem
+  underpassMenuItem,
+  menuItem
 } from './radialMenu/menuItems.js';
 
 import {toggleMainMenu} from '../actions.js';
 
-const MainMenu = connect()(({
+const MainMenu = connect(
+  (store) => ({
+    store
+  })
+)(({
   cx,
   cy,
   radius,
   gap,
   width,
-  showMenu,
-  selectedTool,
+  store,
   dispatch
 }) => {
   return (
     <RadialMenu
       cx={cx}
       cy={cy}
-      showMenu={showMenu}
-      center={{
-        radius: radius,
-        onClick: () => dispatch(toggleMainMenu()),
-        icon: showMenu ? <IconReturn /> :
-          selectedTool == 'wire' ? <IconWire /> :
-          selectedTool == 'button' ? <IconButton /> :
-          selectedTool == 'gate' ? <IconGate /> :
-          selectedTool == 'underpass' ? <IconUnderpass /> : ''
-      }}
-      menuTree={[
-        {
-          radius: radius+gap,
-          width: width,
-          fromTurnFraction: 3/8,
-          toTurnFraction: 7/8,
-          show: showMenu,
-          ringKey: 0,
-          menuItems: [
-            wireMenuItem(selectedTool, dispatch),
-            buttonMenuItem(selectedTool, dispatch),
-            gateMenuItem(selectedTool, dispatch),
-            underpassMenuItem(selectedTool, dispatch)
-          ]
-        }
-      ]} />
+      showMenu={store.mainMenu.open}
+      center={getCenter(radius, store, dispatch)}
+      menuTree={getMenuTree(radius+gap, width, store, dispatch)} />
   );
 });
 
 export default MainMenu;
+
+function getCenter(radius, store, dispatch){
+  const center = createCenter(store, dispatch);
+  return center && {
+    radius,
+    ...center
+  };
+}
+
+function getMenuTree(radius, width, store, dispatch){
+  return createMenuTree(
+    store,
+    dispatch
+  ).map((ring, index) => ({
+    show: store.mainMenu.open,
+    radius,
+    width,
+    fromTurnFraction: 3/8,
+    toTurnFraction: 7/8,
+    ringKey: index,
+    ...ring
+  }));
+}
+
+function createMenuTree(store, dispatch){
+  switch(store.mainMenu.menuType){
+    case 'tools':
+      return createToolsMenuTree(store, dispatch);
+    case 'okCancel':
+      return createOkCancelMenuTree(store, dispatch);
+    default:
+      return [];
+  }
+}
+
+function createToolsMenuTree({editor}, dispatch){
+  return [
+    {
+      menuItems: [
+        wireMenuItem(editor.selectedTool, dispatch),
+        buttonMenuItem(editor.selectedTool, dispatch),
+        gateMenuItem(editor.selectedTool, dispatch),
+        underpassMenuItem(editor.selectedTool, dispatch)
+      ]
+    }
+  ];
+}
+
+function createOkCancelMenuTree({mainMenu}, dispatch){
+  return [
+    {
+      menuItems: [
+        menuItem('ok', <IconAccept />, () => mainMenu.okAction()),
+        menuItem('cancel', <IconRemove />, () => mainMenu.cancelAction())
+      ]
+    }
+  ];
+}
+
+function createCenter(store, dispatch){
+  switch(store.mainMenu.menuType){
+    case 'tools':
+      return createToolsCenter(store, dispatch);
+    default:
+      return null;
+  }
+}
+
+function createToolsCenter({editor, mainMenu}, dispatch){
+  return {
+    onClick: () => dispatch(toggleMainMenu()),
+    icon: mainMenu.open ? <IconReturn /> :
+      editor.selectedTool == 'wire' ? <IconWire /> :
+      editor.selectedTool == 'button' ? <IconButton /> :
+      editor.selectedTool == 'gate' ? <IconGate /> :
+      editor.selectedTool == 'underpass' ? <IconUnderpass /> : ''
+  };
+}

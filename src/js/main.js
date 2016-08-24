@@ -1,7 +1,7 @@
 import React from 'react';
 import reactDom from 'react-dom';
-import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
+import {Provider} from 'react-redux';
+import {createStore, applyMiddleware} from 'redux';
 import {EventEmitter} from 'events';
 
 import '../css/main.css';
@@ -12,7 +12,7 @@ import Shell from './Shell.js';
 import Editor from './editing/Editor.js';
 import Storage from './storage/Storage.js';
 import Context from './Context.js';
-import Renderer from './Renderer.js';
+import Renderer from './engines/Renderer.js';
 import Perspective from './Perspective.js';
 import TouchControls from './interaction/TouchControls.js';
 
@@ -43,11 +43,12 @@ initialize(store, ({global}) => {
   const gl = global.gl;
 
   const renderer = new Renderer(gl);
-  const touchControls = new TouchControls(emitter);
 
   const perspective = new Perspective();
   const context = new Context(gl, {width: 128, height: 128}, TILE_SIZE);
   perspective.setMapSize(context.width, context.height);
+
+  const touchControls = new TouchControls(emitter, perspective);
 
   const storage = new Storage();
   context.import(storage.load());
@@ -73,6 +74,9 @@ initialize(store, ({global}) => {
         store.dispatch(panZoom(perspective.tileToViewportMatrix));
       }
       renderer.renderView(context, perspective);
+      if(touchControls.selectionSaga.isSelectionActive){
+        renderer.renderMove(context, perspective, touchControls.selectionSaga.boundingBox, touchControls.selectionSaga.dx, touchControls.selectionSaga.dy);
+      }
       //viewStats.end();
     },
 

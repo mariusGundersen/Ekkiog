@@ -1,12 +1,19 @@
 import EventSaga from 'event-saga';
 
+import {
+  POINTER_DOWN,
+  POINTER_MOVE,
+  POINTER_UP,
+  CANCEL_PAN_ZOOM
+} from '../events.js';
+
 export default class PanZoomSaga{
   constructor(eventEmitter){
     const pointers = new Map();
     this.pointers = pointers;
 
-    eventEmitter.on('pointer-down', function(data){
-      pointers.set(data.pointer, {
+    eventEmitter.on(POINTER_DOWN, function(data){
+      pointers.set(data.id, {
         x: data.x,
         y: data.y,
         ox: data.x,
@@ -14,18 +21,23 @@ export default class PanZoomSaga{
       });
     });
 
-    eventEmitter.on('pointer-move', function(data){
-      if(!pointers.has(data.pointer)) return;
+    eventEmitter.on(POINTER_MOVE, function(data){
+      if(!pointers.has(data.id)) return;
 
-      const pointer = pointers.get(data.pointer);
+      const pointer = pointers.get(data.id);
       pointer.x = data.x;
       pointer.y = data.y;
     });
 
-    eventEmitter.on('pointer-up', function(data){
-      if(!pointers.has(data.pointer)) return;
+    eventEmitter.on(CANCEL_PAN_ZOOM, function(data){
+      if(!pointers.has(data.id)) return;
+      pointers.delete(data.id);
+    });
 
-      pointers.delete(data.pointer);
+    eventEmitter.on(POINTER_UP, function(data){
+      if(!pointers.has(data.id)) return;
+
+      pointers.delete(data.id);
     });
   }
 

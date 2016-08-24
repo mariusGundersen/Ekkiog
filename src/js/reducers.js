@@ -6,11 +6,13 @@ import {
   GL,
   SET_SELECTED_TOOL,
   TOGGLE_MAIN_MENU,
-  START_LONG_PRESS,
+  LOAD_CONTEXT_MENU,
   SHOW_CONTEXT_MENU,
-  CANCEL_LONG_PRESS,
+  ABORT_LOAD_CONTEXT_MENU,
   HIDE_CONTEXT_MENU,
   PAN_ZOOM,
+  SHOW_OK_CANCEL_MENU,
+  RESET_MAIN_MENU
 } from './actions.js';
 
 function view(state={
@@ -48,8 +50,7 @@ function global(state={
 }
 
 function editor(state={
-  selectedTool: 'wire',
-  showMainMenu: false
+  selectedTool: 'wire'
 }, action){
   switch(action.type){
     case SET_SELECTED_TOOL:
@@ -57,11 +58,43 @@ function editor(state={
         ...state,
         selectedTool: action.tool
       };
+    default:
+      return state;
+  }
+}
+
+function mainMenu(state={
+  open: false,
+  menuType: 'tools',
+  previousMenu: null
+}, action){
+  switch(action.type){
     case TOGGLE_MAIN_MENU:
       return {
         ...state,
-        showMainMenu: !state.showMainMenu
+        open: !state.open
       };
+    case SHOW_CONTEXT_MENU:
+      return {
+        ...state,
+        menuType: null
+      };
+    case HIDE_CONTEXT_MENU:
+      return {
+        ...state,
+        menuType: 'tools'
+      };
+    case SHOW_OK_CANCEL_MENU:
+      return {
+        ...state,
+        open: true,
+        menuType: 'okCancel',
+        okAction: action.okAction,
+        cancelAction: action.cancelAction,
+        previousMenu: state
+      };
+    case RESET_MAIN_MENU:
+      return state.previousMenu || state;
     default:
       return state;
   }
@@ -76,7 +109,7 @@ function contextMenu(state={
   ty: 0
 }, action){
   switch(action.type){
-    case START_LONG_PRESS:
+    case LOAD_CONTEXT_MENU:
       return state.show == false ? {
         ...state,
         x: action.x,
@@ -93,7 +126,7 @@ function contextMenu(state={
         tx: action.tx,
         ty: action.ty
       };
-    case CANCEL_LONG_PRESS:
+    case ABORT_LOAD_CONTEXT_MENU:
       return state.loading ? {
         ...state,
         loading: false,
@@ -120,6 +153,7 @@ const ekkiogApp = combineReducers({
   view,
   global,
   editor,
+  mainMenu,
   contextMenu
 });
 
