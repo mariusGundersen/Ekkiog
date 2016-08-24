@@ -8,7 +8,7 @@ import {
   POINTER_MOVE,
   POINTER_UP,
   CANCEL_PAN_ZOOM,
-  TAP,
+  POINTER_TAP,
   LONG_PRESS,
   POTENTIAL_LONG_PRESS,
   POTENTIAL_LONG_PRESS_CANCEL
@@ -104,7 +104,7 @@ export default class TouchSaga extends EventSaga {
 
       saga.on(TOUCH_END, function(data){
         if(this.data.maybeTap && !this.data.moved){
-          this.emit(TAP, {
+          this.emit(POINTER_TAP, {
             x: data.x,
             y: data.y
           });

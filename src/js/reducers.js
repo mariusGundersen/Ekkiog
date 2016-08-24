@@ -6,9 +6,9 @@ import {
   GL,
   SET_SELECTED_TOOL,
   TOGGLE_MAIN_MENU,
-  START_LONG_PRESS,
+  LOAD_CONTEXT_MENU,
   SHOW_CONTEXT_MENU,
-  CANCEL_LONG_PRESS,
+  ABORT_LOAD_CONTEXT_MENU,
   HIDE_CONTEXT_MENU,
   PAN_ZOOM,
   SHOW_OK_CANCEL_MENU,
@@ -109,7 +109,7 @@ function contextMenu(state={
   ty: 0
 }, action){
   switch(action.type){
-    case START_LONG_PRESS:
+    case LOAD_CONTEXT_MENU:
       return state.show == false ? {
         ...state,
         x: action.x,
@@ -126,7 +126,7 @@ function contextMenu(state={
         tx: action.tx,
         ty: action.ty
       };
-    case CANCEL_LONG_PRESS:
+    case ABORT_LOAD_CONTEXT_MENU:
       return state.loading ? {
         ...state,
         loading: false,

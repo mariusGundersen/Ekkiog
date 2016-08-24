@@ -3,9 +3,9 @@ export const GL = 'gl';
 export const SET_SELECTED_TOOL = 'setSelectedTool';
 export const TOGGLE_MAIN_MENU = 'toggleMainMenu';
 
-export const START_LONG_PRESS = 'startLongPress';
+export const LOAD_CONTEXT_MENU = 'loadContextMenu';
 export const SHOW_CONTEXT_MENU = 'showContextMenu';
-export const CANCEL_LONG_PRESS = 'cancelLongPress';
+export const ABORT_LOAD_CONTEXT_MENU = 'abortLoadContextMenu';
 export const HIDE_CONTEXT_MENU = 'hideContextMenu';
 
 export const PAN_ZOOM = 'panZoom';
@@ -41,14 +41,14 @@ export const toggleMainMenu = () => ({
   type: TOGGLE_MAIN_MENU
 });
 
-export const startLongPress = (x, y) => ({
-  type: START_LONG_PRESS,
+export const loadContextMenu = (x, y) => ({
+  type: LOAD_CONTEXT_MENU,
   x,
   y
 });
 
-export const cancelLongPress = () => ({
-  type: CANCEL_LONG_PRESS
+export const abortLoadContextMenu = () => ({
+  type: ABORT_LOAD_CONTEXT_MENU
 });
 
 export const showContextMenu = (tile, tx, ty) => ({
@@ -59,7 +59,10 @@ export const showContextMenu = (tile, tx, ty) => ({
 });
 
 export const hideContextMenu = () => ({
-  type: HIDE_CONTEXT_MENU
+  type: HIDE_CONTEXT_MENU,
+  meta: {
+    emit: true
+  }
 });
 
 export const removeTileAt = (tx, ty) => ({

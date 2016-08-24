@@ -348,7 +348,6 @@ export default class Editor{
     }
     for(let y=0; y<height; y++){
       for(let x=0; x<width; x++){
-        console.log(x, y, selection.get(y, x));
         this.draw(left+x+dx, top+y+dy, selection.get(y, x));
       }
     }

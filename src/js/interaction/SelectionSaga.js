@@ -81,14 +81,12 @@ export default class SelectionSaga extends EventSaga {
     });
 
     eventEmitter.on(CANCEL_SELECTION, () => {
-      console.log('stop selection');
       this.state = {
         selection: false
       };
     });
 
     eventEmitter.on(OK_SELECTION_MOVE, () => {
-      console.log('ok move selection');
       eventEmitter.emit(MOVE_SELECTION, {
         top: this.state.top,
         left: this.state.left,
