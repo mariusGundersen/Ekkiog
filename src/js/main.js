@@ -1,7 +1,7 @@
 import React from 'react';
 import reactDom from 'react-dom';
-import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
+import {Provider} from 'react-redux';
+import {createStore, applyMiddleware} from 'redux';
 import {EventEmitter} from 'events';
 
 import '../css/main.css';

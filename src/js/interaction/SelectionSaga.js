@@ -2,7 +2,9 @@ import EventSaga from 'event-saga';
 
 import {
   START_SELECTION,
-  STOP_SELECTION,
+  CANCEL_SELECTION,
+  OK_SELECTION_MOVE,
+  MOVE_SELECTION,
   POINTER_DOWN,
   POINTER_MOVE,
   POINTER_UP,
@@ -78,12 +80,27 @@ export default class SelectionSaga extends EventSaga {
       };
     });
 
-    eventEmitter.on(STOP_SELECTION, () => {
+    eventEmitter.on(CANCEL_SELECTION, () => {
       console.log('stop selection');
       this.state = {
         selection: false
       };
-    })
+    });
+
+    eventEmitter.on(OK_SELECTION_MOVE, () => {
+      console.log('ok move selection');
+      eventEmitter.emit(MOVE_SELECTION, {
+        top: this.state.top,
+        left: this.state.left,
+        right: this.state.right,
+        bottom: this.state.bottom,
+        dx: this.state.dx,
+        dy: this.state.dy
+      });
+      this.state = {
+        selection: false
+      };
+    });
   }
 
   get isSelectionActive(){

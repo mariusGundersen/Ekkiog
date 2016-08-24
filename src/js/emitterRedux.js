@@ -17,7 +17,9 @@ import {
   POTENTIAL_LONG_PRESS,
   POTENTIAL_LONG_PRESS_CANCEL,
   START_SELECTION,
-  STOP_SELECTION
+  MOVE_SELECTION,
+  CANCEL_SELECTION,
+  OK_SELECTION_MOVE
 } from './events.js';
 
 export function toEmitterMiddleware(emitter){
@@ -36,6 +38,7 @@ export function fromEmitter(emitter, editor, perspective, context, renderer, sto
   emitter.on(TO_UNDERPASS, toUnderpass(editor, context, renderer, storage, store.dispatch));
   emitter.on(TO_WIRE, toWire(editor, context, renderer, storage, store.dispatch));
   emitter.on(MOVE_GATE, moveGate(editor, emitter, store.dispatch));
+  emitter.on(MOVE_SELECTION, moveSelection(editor, context, renderer, storage));
   emitter.on(POTENTIAL_LONG_PRESS, potentialLongPress(store.dispatch));
   emitter.on(POTENTIAL_LONG_PRESS_CANCEL, potentialLongPressCancel(store.dispatch));
 }
@@ -55,7 +58,7 @@ export function tap(editor, perspective, context, renderer, storage, dispatch, s
         storage.save(context.export());
       }else{
         const tool = store.getState().editor.selectedTool;
-        if(editor.edit(tx, ty, tool)){
+        if(editor.draw(tx, ty, tool)){
           edited(context, renderer, storage);
         }
       }
@@ -117,15 +120,22 @@ export function moveGate(editor, emitter, dispatch){
     dispatch(showOkCancelMenu(
       () => {
         console.log('ok');
-        emitter.emit(STOP_SELECTION, {});
+        emitter.emit(OK_SELECTION_MOVE, {});
         dispatch(resetMainMenu());
       },
       () => {
         console.log('cancel');
-        emitter.emit(STOP_SELECTION, {});
+        emitter.emit(CANCEL_SELECTION, {});
         dispatch(resetMainMenu());
       }
     ));
+  };
+}
+
+export function moveSelection(editor, context, renderer, storage){
+  return ({top, left, right, bottom, dx, dy}) => {
+    editor.moveSelection(top, left, right, bottom, dx, dy);
+    edited(context, renderer, storage);
   };
 }
 
