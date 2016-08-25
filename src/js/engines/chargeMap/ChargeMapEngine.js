@@ -17,6 +17,7 @@ export default class ChargeMapEngine{
     context.chargeMapTexture.bindFramebuffer();
 
     this.shader.bind();
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     this.shader.uniforms.inverseSpriteTextureSize = context.spriteSheetTexture.inverseSize;
     this.shader.uniforms.tileSize = context.tileSize;

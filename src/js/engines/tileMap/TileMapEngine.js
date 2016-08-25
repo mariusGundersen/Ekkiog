@@ -15,6 +15,7 @@ export default class TileMapEngine{
     context.tileMapTexture.bindFramebuffer();
 
     this.shader.bind();
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     this.shader.uniforms.tilemap = context.mapTexture.sampler2D(0);
     this.shader.uniforms.inverseTileTextureSize = context.mapTexture.inverseSize;

@@ -18,6 +18,7 @@ export default class NetChargeEngine{
     outputTexture.bindFramebuffer();
 
     this.shader.bind();
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     this.shader.uniforms.gates = context.gatesTexture.sampler2D(0);
 

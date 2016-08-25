@@ -10,6 +10,9 @@ export default class Renderer {
     this.gl = gl;
     this.currentTick = 0;
 
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.enable(this.gl.BLEND);
+
     this.netChargeEngine = new NetChargeEngine(gl);
     this.chargeMapEngine = new ChargeMapEngine(gl);
     this.tileMapEngine = new TileMapEngine(gl);
@@ -31,10 +34,6 @@ export default class Renderer {
 
   renderView(context, perspective) {
     this.gl.viewport(0, 0, ...perspective.viewportSize);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-    this.gl.enable(this.gl.BLEND);
-    this.gl.disable(this.gl.DEPTH_TEST);
     this.viewEngine.render(context, perspective.mapToViewportMatrix);
   }
 
