@@ -10,6 +10,7 @@ import ImageTexture from './textures/ImageTexture.js';
 import loadImage from './loadImage.js';
 import tiles from '../img/tiles.png';
 
+const SIZE = 256;
 
 export default class Context{
   constructor(gl, data, tileSize=16){
@@ -24,10 +25,11 @@ export default class Context{
     this.chargeMapTexture = new RenderTexture(gl, this.width, this.height);
     this.netMapTexture = new DataTexture(gl, this.width, this.height);
     this.netChargeTextures = [
-      new RenderTexture(gl, 256, 256),
-      new RenderTexture(gl, 256, 256)
+      new RenderTexture(gl, SIZE, SIZE),
+      new RenderTexture(gl, SIZE, SIZE)
     ];
-    this.gatesTexture = new DataTexture(gl, 256, 256);
+    this.gatesTexture = new DataTexture(gl, SIZE, SIZE);
+    this.memoryTree = new Uint32Array(SIZE*SIZE);
 
     this.import(data);
   }
