@@ -1,71 +1,102 @@
-export function setUsed(memoryTree, address, size=1){
-  const width = Math.ceil(log2(size));
-  const maxDepth = log2(memoryTree.length);
-  setUsedRecursive(memoryTree, address, maxDepth-width, maxDepth);
-}
-
-function setUsedRecursive(memoryTree, address, depth, maxDepth=depth){
-  if(depth < 0) return;
-
-  const bit = 0x1 << maxDepth - depth;
-  const buddy = memoryTree[address^bit];
-
-  memoryTree[address] |= bit;
-  if((buddy & bit) !== 0){
-    setUsedRecursive(memoryTree, address & ~bit, depth-1, maxDepth);
+export function allocate(memoryTree, size=1){
+  const level = Math.ceil(log2(size));
+  const result = findFreeNode(memoryTree, level);
+  if(result){
+    result.used = true;
+    return result.address;
+  }else{
+    return -1;
   }
 }
 
-export function clearUsed(memoryTree, address, size=1){
-  const width = Math.ceil(log2(size));
-  const maxDepth = log2(memoryTree.length);
-  clearUsedRecursive(memoryTree, address, maxDepth-width, maxDepth);
-}
-
-function clearUsedRecursive(memoryTree, address, depth, maxDepth=depth){
-  if(depth < 0) return;
-
-  const bit = 0x1 << maxDepth - depth;
-  const buddy = memoryTree[address^bit];
-
-  memoryTree[address] &= ~bit;
-  if((buddy & bit) !== 0){
-    clearUsedRecursive(memoryTree, address & ~bit, depth-1, maxDepth);
+function findFreeNode(node, level){
+  if(node.level < level){
+    return null;
   }
-}
 
-export function findFreeAddress(memoryTree, size=1){
-  const width = Math.ceil(log2(size));
-  const maxDepth = log2(memoryTree.length);
-  return findUnusedRecursive(memoryTree, 0, width, 0, maxDepth);
-}
+  if(node.used){
+    return null;
+  }
 
-function findUnusedRecursive(memoryTree, address, width, depth, maxDepth){
-  if(depth+width > maxDepth) {
-    const bits = (0x1 << maxDepth - depth + 1)-1;
-    if((memoryTree[address] & bits) === 0){
-      return address;
+  if(node.level === level){
+    if(node.left === null && node.right === null){
+      return node;
     }else{
-      return -1;
+      return null;
     }
   }
 
-  const bit = 0x1 << maxDepth - depth;
-  const buddyAddress = address^bit;
-
-  if((memoryTree[address] & bit) === 0){
-    const result = findUnusedRecursive(memoryTree, address, width, depth+1, maxDepth);
-    if(result != -1) return result;
+  if(node.left == null){
+    node.left = createNode(node.level-1, node.address);
   }
 
-  if((memoryTree[buddyAddress] & bit) === 0){
-    const result = findUnusedRecursive(memoryTree, address | bit, width, depth+1, maxDepth);
-    if(result != -1) return result;
+  const resultLeft = findFreeNode(node.left, level);
+  if(resultLeft != null){
+    return resultLeft;
   }
 
-  return -1;
+  if(node.right == null){
+    node.right = createNode(node.level-1, node.address + node.size/2);
+  }
+
+  const resultRight = findFreeNode(node.right, level);
+  if(resultRight != null){
+    return resultRight;
+  }
+
+  return null;
 }
 
-function log2(x){
+export function deallocate(memoryTree, address, size=1){
+  const level = Math.ceil(log2(size));
+  const result = findNode(memoryTree, address, level);
+}
+
+function findNode(node, address, level){
+  if(node.level < level){
+    return node;
+  }
+
+  if(node.level === level){
+    node.used = false;
+    node.left = null;
+    node.right = null;
+    return null;
+  }
+
+  if(address < node.address + node.size/2){
+    if(node.left){
+      node.left = findNode(node.left, address, level);
+    }
+  }else{
+    if(node.right){
+      node.right = findNode(node.right, address, level);
+    }
+  }
+
+  if(node.left == null && node.right == null){
+    return null;
+  }else{
+    return node;
+  }
+}
+
+export function createNode(level, address=0){
+  return new Node(level, address);
+}
+
+export function log2(x){
   return Math.log(x)/Math.LN2;
+}
+
+export class Node{
+  used = false;
+  left = null;
+  right = null;
+
+  constructor(level, address){
+    this.level = level;
+    this.address = address;
+    this.size = 1 << level
+  }
 }
