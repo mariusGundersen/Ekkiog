@@ -5,8 +5,9 @@ import deserialize from './storage/deserialize.js';
 
 import DataTexture from './textures/DataTexture.js';
 import RenderTexture from './textures/RenderTexture.js';
-
 import ImageTexture from './textures/ImageTexture.js';
+import * as memoryNode from './textures/memoryNode.js';
+
 import loadImage from './loadImage.js';
 import tiles from '../img/tiles.png';
 
@@ -29,7 +30,7 @@ export default class Context{
       new RenderTexture(gl, SIZE, SIZE)
     ];
     this.gatesTexture = new DataTexture(gl, SIZE, SIZE);
-    this.memoryTree = new Uint32Array(SIZE*SIZE);
+    this.memoryTree = memoryNode.createMemoryTree(SIZE*SIZE);
 
     this.import(data);
   }
@@ -40,6 +41,7 @@ export default class Context{
     if(data.gates) this.gatesTexture.import(deserialize(data.gates));
     if(data.netCharges) this.netChargeTextures[0].import(deserialize(data.netCharges));
     if(data.netCharges) this.netChargeTextures[1].import(deserialize(data.netCharges));
+    if(data.memoryTree) this.memoryTree = data.memoryTree;
   }
 
   export(){
@@ -50,6 +52,7 @@ export default class Context{
       netMap: serialize(this.netMapTexture.export()),
       gates: serialize(this.gatesTexture.export()),
       netCharges: serialize(this.netChargeTextures[0].export()),
+      memoryTree: this.memoryTree
     };
   }
 }

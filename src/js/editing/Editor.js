@@ -1,6 +1,7 @@
 import ndarray from 'ndarray';
 
 import ContextQuery from './ContextQuery.js';
+import * as memory from './memory.js';
 import Validator from './Validator.js';
 import FloodFiller from './FloodFiller.js';
 import {
@@ -41,7 +42,7 @@ export default class Editor{
   drawGate(x, y){
     if(!this.validate.canPlaceGateHere(x, y)) return false;
 
-    const nextNet = this.query.getNextNet();
+    const nextNet = memory.allocate(this.context.memoryTree);
 
     this.clear(x, y);
     for(let cy=y-1; cy<=y+1; cy++){
@@ -117,7 +118,7 @@ export default class Editor{
   drawButton(x, y){
     if(!this.validate.canPlaceButtonHere(x, y)) return false;
 
-    const nextNet = this.query.getNextNet();
+    const nextNet = memory.allocate(this.context.memoryTree);
 
     for(let cy=y-1; cy<=y+1; cy++){
       for(let cx=x-2; cx<=x; cx++){
@@ -140,7 +141,10 @@ export default class Editor{
   }
 
   clearGate(x, y){
-    const [netX, netY] = this.split(this.query.getNet(x, y));
+    const net = this.query.getNet(x, y);
+    const [netX, netY] = this.split(net);
+
+    memory.deallocate(this.context.memoryTree, net);
 
     const gatesToUpdate = this.floodFiller.floodFill(x, y, GROUND);
     for(let [gateX, gateY] of gatesToUpdate){
@@ -234,7 +238,10 @@ export default class Editor{
   }
 
   clearButton(x, y){
-    const [netX, netY] = this.split(this.query.getNet(x, y));
+    const net = this.query.getNet(x, y);
+    const [netX, netY] = this.split(net);
+
+    memory.deallocate(this.context.memoryTree, net);
 
     const gatesToUpdate = this.floodFiller.floodFill(x, y, GROUND);
     for(let [gateX, gateY] of gatesToUpdate){

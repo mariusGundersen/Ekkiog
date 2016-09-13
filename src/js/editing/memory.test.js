@@ -1,6 +1,8 @@
 import test from 'ava';
 import * as memory from './memory.js';
 
+import * as memoryNode from '../textures/memoryNode.js';
+
 test('when requesting the full memory', t => {
   const memoryTree = createMemoryTree();
   const address = memory.allocate(memoryTree, memoryTree.size);
@@ -130,5 +132,5 @@ test('when requesting 1 block', t => {
 });
 
 function createMemoryTree(size=16){
-  return memory.createNode(Math.ceil(memory.log2(size)));
+  return memoryNode.createFromSize(size);
 }

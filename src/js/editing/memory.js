@@ -1,5 +1,7 @@
+import * as memoryNode from '../textures/memoryNode.js';
+
 export function allocate(memoryTree, size=1){
-  const level = Math.ceil(log2(size));
+  const level = memoryNode.log2(size);
   const result = findFreeNode(memoryTree, level);
   if(result){
     result.used = true;
@@ -48,7 +50,7 @@ function findFreeNode(node, level){
 }
 
 export function deallocate(memoryTree, address, size=1){
-  const level = Math.ceil(log2(size));
+  const level = memoryNode.log2(size);
   const result = findNode(memoryTree, address, level);
 }
 
@@ -82,21 +84,5 @@ function findNode(node, address, level){
 }
 
 export function createNode(level, address=0){
-  return new Node(level, address);
-}
-
-export function log2(x){
-  return Math.log(x)/Math.LN2;
-}
-
-export class Node{
-  used = false;
-  left = null;
-  right = null;
-
-  constructor(level, address){
-    this.level = level;
-    this.address = address;
-    this.size = 1 << level
-  }
+  return memoryNode.createFromLevel(level, address);
 }
