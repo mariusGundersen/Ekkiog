@@ -31,23 +31,25 @@ export function toEmitterMiddleware(emitter){
   };
 }
 
-export function fromEmitter(emitter, editor, perspective, context, renderer, storage, store){
-  emitter.on(TAP, handleTap(editor, perspective, context, renderer, storage, store.dispatch, store));
+export function fromEmitter(emitter, editor, perspective, getContext, renderer, saveContext, store){
+  emitter.on(TAP, handleTap(editor, perspective, getContext, renderer, saveContext, store.dispatch, store));
   emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(editor, perspective, store.dispatch));
-  emitter.on(REMOVE_TILE_AT, handleRemoveTileAt(editor, context, renderer, storage, store.dispatch));
-  emitter.on(TO_UNDERPASS, handleConvertToUnderpass(editor, context, renderer, storage, store.dispatch));
-  emitter.on(TO_WIRE, handleConvertToWire(editor, context, renderer, storage, store.dispatch));
+  emitter.on(REMOVE_TILE_AT, handleRemoveTileAt(editor, getContext, renderer, saveContext, store.dispatch));
+  emitter.on(TO_UNDERPASS, handleConvertToUnderpass(editor, getContext, renderer, saveContext, store.dispatch));
+  emitter.on(TO_WIRE, handleConvertToWire(editor, getContext, renderer, saveContext, store.dispatch));
   emitter.on(MOVE_GATE, handleMoveGate(editor, emitter, store.dispatch));
-  emitter.on(MOVE_SELECTION, handleMoveSelection(editor, context, renderer, storage));
+  emitter.on(MOVE_SELECTION, handleMoveSelection(editor, getContext, renderer, saveContext));
   emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(store.dispatch));
   emitter.on(ABORT_LOAD_CONTEXT_MENU, handleAbortContextMenu(store.dispatch));
 }
 
-export function handleTap(editor, perspective, context, renderer, storage, dispatch, store){
+export function handleTap(editor, perspective, getContext, renderer, saveContext, dispatch, store){
   return ({x, y}) => {
     const [tx, ty] = perspective.viewportToTileFloored(x, y);
 
     window.requestAnimationFrame(() => {
+      const context = getContext();
+
       if(editor.query.isButton(tx, ty)){
         editor.toggleButton(tx, ty);
 
@@ -55,11 +57,11 @@ export function handleTap(editor, perspective, context, renderer, storage, dispa
 
         renderer.simulateTick(context, renderer.currentTick);
 
-        storage.save(context.export());
+        saveContext();
       }else{
         const tool = store.getState().editor.selectedTool;
         if(editor.draw(tx, ty, tool)){
-          edited(context, renderer, storage);
+          edited(context, renderer, saveContext);
         }
       }
     })
@@ -77,30 +79,30 @@ export function handleShowContextMenu(editor, perspective, dispatch){
   };
 }
 
-export function handleRemoveTileAt(editor, context, renderer, storage, dispatch){
+export function handleRemoveTileAt(editor, getContext, renderer, saveContext, dispatch){
   return ({tx, ty}) => {
     if(editor.clear(tx, ty)){
-      edited(context, renderer, storage);
+      edited(getContext(), renderer, saveContext);
     }
 
     dispatch(hideContextMenu());
   };
 }
 
-export function handleConvertToUnderpass(editor, context, renderer, storage, dispatch){
+export function handleConvertToUnderpass(editor, getContext, renderer, saveContext, dispatch){
   return ({tx, ty}) => {
     if(editor.drawUnderpass(tx, ty)){
-      edited(context, renderer, storage);
+      edited(getContext(), renderer, saveContext);
     }
 
     dispatch(hideContextMenu());
   };
 }
 
-export function handleConvertToWire(editor, context, renderer, storage, dispatch){
+export function handleConvertToWire(editor, getContext, renderer, saveContext, dispatch){
   return ({tx, ty}) => {
     if(editor.drawWire(tx, ty)){
-      edited(context, renderer, storage);
+      edited(getContext(), renderer, saveContext);
     }
 
     dispatch(hideContextMenu());
@@ -130,10 +132,10 @@ export function handleMoveGate(editor, emitter, dispatch){
   };
 }
 
-export function handleMoveSelection(editor, context, renderer, storage){
+export function handleMoveSelection(editor, getContext, renderer, saveContext){
   return ({top, left, right, bottom, dx, dy}) => {
     editor.moveSelection(top, left, right, bottom, dx, dy);
-    edited(context, renderer, storage);
+    edited(getContext(), renderer, saveContext);
   };
 }
 
@@ -151,12 +153,12 @@ export function handleAbortContextMenu(dispatch){
   };
 }
 
-function edited(context, renderer, storage){
+function edited(context, renderer, saveContext){
   context.mapTexture.update();
   context.netMapTexture.update();
   context.gatesTexture.update();
 
   renderer.renderMap(context);
 
-  storage.save(context.export());
+  saveContext();
 }
