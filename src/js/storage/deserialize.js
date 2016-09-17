@@ -20,5 +20,9 @@ export default function deserialize(string){
       output[i++] = parseInt(item, 16);
     }
   }
-  return new Uint8Array(output.buffer);
+  return output;
+}
+
+export function to8Bit(array){
+  return new Uint8Array(array.buffer);
 }

@@ -1,5 +1,4 @@
-export default function serialize(inputArray){
-  const array = new Uint32Array(inputArray.buffer);
+export default function serialize(array){
   const content = [];
   for(let i=0; i<array.length; i++){
     let repeats = 1;
@@ -15,4 +14,8 @@ export default function serialize(inputArray){
     }
   }
   return `(32)${array.length.toString(16)}:${content.join(',')}`
+}
+
+export function to32Bit(array){
+  return new Uint32Array(array.buffer);
 }

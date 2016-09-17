@@ -1,12 +1,12 @@
 import {encode as encodeArray, decode as decodeArary} from 'base64-arraybuffer';
 
-import serialize from './storage/serialize.js';
-import deserialize from './storage/deserialize.js';
+import serialize, {to32Bit} from './storage/serialize.js';
+import deserialize, {to8Bit} from './storage/deserialize.js';
 
 import DataTexture from './textures/DataTexture.js';
 import RenderTexture from './textures/RenderTexture.js';
 import ImageTexture from './textures/ImageTexture.js';
-import * as memoryNode from './textures/memoryNode.js';
+import * as memory from './editing/memory.js';
 
 import loadImage from './loadImage.js';
 import tiles from '../img/tiles.png';
@@ -30,29 +30,29 @@ export default class Context{
       new RenderTexture(gl, SIZE, SIZE)
     ];
     this.gatesTexture = new DataTexture(gl, SIZE, SIZE);
-    this.memoryTree = memoryNode.createMemoryTree(SIZE*SIZE);
+    this.memoryTree = memory.createMemoryTree(SIZE*SIZE);
 
     this.import(data);
   }
 
   import(data){
-    if(data.map) this.mapTexture.import(deserialize(data.map));
-    if(data.netMap) this.netMapTexture.import(deserialize(data.netMap));
-    if(data.gates) this.gatesTexture.import(deserialize(data.gates));
-    if(data.netCharges) this.netChargeTextures[0].import(deserialize(data.netCharges));
-    if(data.netCharges) this.netChargeTextures[1].import(deserialize(data.netCharges));
-    if(data.memoryTree) this.memoryTree = data.memoryTree;
+    if(data.map) this.mapTexture.import(to8Bit(deserialize(data.map)));
+    if(data.netMap) this.netMapTexture.import(to8Bit(deserialize(data.netMap)));
+    if(data.gates) this.gatesTexture.import(to8Bit(deserialize(data.gates)));
+    if(data.netCharges) this.netChargeTextures[0].import(to8Bit(deserialize(data.netCharges)));
+    if(data.netCharges) this.netChargeTextures[1].import(to8Bit(deserialize(data.netCharges)));
+    if(data.memoryTree) this.memoryTree = memory.deserialize(SIZE*SIZE, deserialize(data.memoryTree));
   }
 
   export(){
     return {
       width: this.width,
       height: this.height,
-      map: serialize(this.mapTexture.export()),
-      netMap: serialize(this.netMapTexture.export()),
-      gates: serialize(this.gatesTexture.export()),
-      netCharges: serialize(this.netChargeTextures[0].export()),
-      memoryTree: this.memoryTree
+      map: serialize(to32Bit(this.mapTexture.export())),
+      netMap: serialize(to32Bit(this.netMapTexture.export())),
+      gates: serialize(to32Bit(this.gatesTexture.export())),
+      netCharges: serialize(to32Bit(this.netChargeTextures[0].export())),
+      memoryTree: serialize(memory.serialize(this.memoryTree))
     };
   }
 }

@@ -1,8 +1,6 @@
 import test from 'ava';
 import * as memory from './memory.js';
 
-import * as memoryNode from '../textures/memoryNode.js';
-
 test('when requesting the full memory', t => {
   const memoryTree = createMemoryTree();
   const address = memory.allocate(memoryTree, memoryTree.size);
@@ -131,6 +129,43 @@ test('when requesting 1 block', t => {
   t.is(address, 0);
 });
 
+test('serialize empty', t => {
+  const memoryTree = createMemoryTree();
+  t.deepEqual(memory.serialize(memoryTree), []);
+});
+
+test('serialize 1', t => {
+  const memoryTree = createMemoryTree();
+  memory.allocate(memoryTree, 1);
+  t.deepEqual(memory.serialize(memoryTree), [1]);
+});
+
+test('serialize 1,4', t => {
+  const memoryTree = createMemoryTree();
+  memory.allocate(memoryTree, 1);
+  memory.allocate(memoryTree, 4);
+  t.deepEqual(memory.serialize(memoryTree), [1,4]);
+});
+
+test('deserialize empty', t => {
+  const memoryTree = createMemoryTree();
+  t.deepEqual(memory.deserialize(memoryTree.size, []), memoryTree);
+});
+
+test('deserialize 1', t => {
+  const memoryTree = createMemoryTree();
+  memory.allocate(memoryTree, 1);
+  t.deepEqual(memory.deserialize(memoryTree.size, [1]), memoryTree);
+});
+
+test('serialize 1,4', t => {
+  const memoryTree = createMemoryTree();
+  memory.allocate(memoryTree, 1);
+  memory.allocate(memoryTree, 4);
+  t.deepEqual(memory.deserialize(memoryTree.size, [1,4]), memoryTree);
+});
+
+
 function createMemoryTree(size=16){
-  return memoryNode.createFromSize(size);
+  return memory.createFromSize(size);
 }

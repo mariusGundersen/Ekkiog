@@ -1,7 +1,5 @@
-import * as memoryNode from '../textures/memoryNode.js';
-
 export function allocate(memoryTree, size=1){
-  const level = memoryNode.log2(size);
+  const level = log2(size);
   const result = findFreeNode(memoryTree, level);
   if(result){
     result.used = true;
@@ -50,7 +48,7 @@ function findFreeNode(node, level){
 }
 
 export function deallocate(memoryTree, address, size=1){
-  const level = memoryNode.log2(size);
+  const level = log2(size);
   const result = findNode(memoryTree, address, level);
 }
 
@@ -84,5 +82,49 @@ function findNode(node, address, level){
 }
 
 export function createNode(level, address=0){
-  return memoryNode.createFromLevel(level, address);
+  return createFromLevel(level, address);
+}
+
+export function serialize(node){
+  if(!node){
+    return [];
+  }else if(node.used){
+    return [node.size];
+  }else{
+    return [...serialize(node.left), ...serialize(node.right)];
+  }
+}
+
+export function deserialize(treeSize, memory){
+  const memoryTree = createFromSize(treeSize);
+  for(let size of memory){
+    allocate(memoryTree, size);
+  }
+  return memoryTree;
+}
+
+export function createMemoryTree(size){
+  const tree = createFromSize(size);
+  allocate(tree);//ground
+  allocate(tree);//charge
+  return tree;
+}
+
+export function createFromSize(size, address=0){
+  return createFromLevel(log2(size), address);
+}
+
+export function createFromLevel(level, address=0){
+  return {
+    used: false,
+    left: null,
+    right: null,
+    level: level,
+    size: 1<<level,
+    address: address
+  };
+}
+
+export function log2(x){
+  return Math.ceil(Math.log(x)/Math.LN2);
 }
