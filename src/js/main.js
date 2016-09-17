@@ -10,7 +10,7 @@ import offline from 'offline-plugin/runtime';
 
 import Shell from './Shell.js';
 import Editor from './editing/Editor.js';
-import Storage from './storage/Storage.js';
+import * as database from './storage/database.js';
 import Context from './Context.js';
 import Renderer from './engines/Renderer.js';
 import Perspective from './Perspective.js';
@@ -52,7 +52,7 @@ const store = createStore(reducers, {
   global: { emitter }
 }, applyMiddleware(toEmitterMiddleware(emitter)));
 
-initialize(store, ({global}) => {
+initialize(store, async ({global}) => {
   const gl = global.gl;
 
   const renderer = new Renderer(gl);
@@ -63,24 +63,21 @@ initialize(store, ({global}) => {
 
   const touchControls = new TouchControls(emitter, perspective);
 
-  const storage = new Storage();
-  context.import(storage.load());
+  const storage = await database.open();
+  context.import(await storage.load());
   renderer.renderMap(context);
 
   const editor = new Editor(context);
 
-  fromEmitter(emitter, editor, perspective, context, renderer, storage, store);
+  fromEmitter(emitter, editor, perspective, () => context, renderer, () => storage.save(context.export()), store);
 
   const shell = new Shell({
     tickInterval: 500,
     tick(tickCount) {
-      //engineStats.begin();
       renderer.simulateTick(context, tickCount);
-      //engineStats.end();
     },
 
     render() {
-      //viewStats.begin();
       const result = touchControls.panZoomSaga.process();
       if(result !== null){
         perspective.panZoom(result.previous, result.current);
@@ -90,7 +87,6 @@ initialize(store, ({global}) => {
       if(touchControls.selectionSaga.isSelectionActive){
         renderer.renderMove(context, perspective, touchControls.selectionSaga.boundingBox, touchControls.selectionSaga.dx, touchControls.selectionSaga.dy);
       }
-      //viewStats.end();
     },
 
     resize(pixelWidth, pixelHeight, screenWidth, screenHeight) {
