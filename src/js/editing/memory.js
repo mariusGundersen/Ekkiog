@@ -27,7 +27,7 @@ function findFreeNode(node, level){
   }
 
   if(node.left == null){
-    node.left = createNode(node.level-1, node.address);
+    node.left = createFromLevel(node.level-1, node.address);
   }
 
   const resultLeft = findFreeNode(node.left, level);
@@ -36,7 +36,7 @@ function findFreeNode(node, level){
   }
 
   if(node.right == null){
-    node.right = createNode(node.level-1, node.address + node.size/2);
+    node.right = createFromLevel(node.level-1, node.address + node.size/2);
   }
 
   const resultRight = findFreeNode(node.right, level);
@@ -45,6 +45,70 @@ function findFreeNode(node, level){
   }
 
   return null;
+}
+
+export function addData(node, data, size){
+  if(node === null){
+    return [{
+      ...createFromSize(size),
+      data
+    }, 0];
+  }
+
+  if(node.size < size){
+    return [node, -1];
+  }
+
+  if(node.data !== null){
+    return [node, -1];
+  }
+
+  if(node.size >= size && node.size>>1 < size){
+    if(node.left === null && node.right === null){
+      return [{
+        ...node,
+        data
+      }, node.address];
+    }else{
+      return [node, -1];
+    }
+  }
+
+  if(node.left == null){
+    node = {
+      ...node,
+      left: createFromSize(node.size>>1, node.address)
+    };
+  }
+
+  {
+    const [result, address] = addData(node.left, data, size);
+    if(result != node.left){
+      return [{
+        ...node,
+        left: result
+      }, address];
+    }
+  }
+
+  if(node.right == null){
+    node = {
+      ...node,
+      right: createFromSize(node.size>>1, node.address + node.size/2)
+    };
+  }
+
+  {
+    const [result, address] = addData(node.right, data, size);
+    if(result != node.right){
+      return [{
+        ...node,
+        right: result
+      }, address];
+    }
+  }
+
+  return [node, -1];
 }
 
 export function deallocate(memoryTree, address, size=1){
@@ -81,8 +145,63 @@ function findNode(node, address, level){
   }
 }
 
-export function createNode(level, address=0){
-  return createFromLevel(level, address);
+export function clearData(node, address){
+  if(node.data != null){
+    return null;
+  }
+
+  if(address < node.address + node.size>>1){
+    if(node.left){
+      node = {
+        ...node,
+        left: clearData(node.left, address)
+      };
+    }
+  }else{
+    if(node.right){
+      node = {
+        ...node,
+        right: clearData(node.right, address)
+      };
+    }
+  }
+
+  if(node.left == null && node.right == null){
+    return null;
+  }else{
+    return node;
+  }
+}
+
+export function setData(node, address, data){
+  if(node.data != null){
+    return {
+      ...node,
+      data
+    };
+  }
+
+  if(address < node.address + node.size/2){
+    if(node.left){
+      node = {
+        ...node,
+        left: setData(node.left, address, data)
+      };
+    }
+  }else{
+    if(node.right){
+      node = {
+        ...node,
+        right: setData(node.right, address, data)
+      };
+    }
+  }
+
+  if(node.left == null && node.right == null){
+    return null;
+  }else{
+    return node;
+  }
 }
 
 export function serialize(node){
@@ -104,9 +223,9 @@ export function deserialize(treeSize, memory){
 }
 
 export function createMemoryTree(size){
-  const tree = createFromSize(size);
-  allocate(tree);//ground
-  allocate(tree);//charge
+  let tree = createFromSize(size);
+  tree = allocate(tree);//ground
+  tree = allocate(tree);//charge
   return tree;
 }
 
@@ -116,6 +235,7 @@ export function createFromSize(size, address=0){
 
 export function createFromLevel(level, address=0){
   return {
+    data: null,
     used: false,
     left: null,
     right: null,
