@@ -146,6 +146,10 @@ function findNode(node, address, level){
 }
 
 export function clearData(node, address){
+  if(node == null){
+    return null;
+  }
+
   if(node.data != null){
     return null;
   }
@@ -174,6 +178,10 @@ export function clearData(node, address){
 }
 
 export function setData(node, address, data){
+  if(node == null){
+    return null;
+  }
+
   if(node.data != null){
     return {
       ...node,
