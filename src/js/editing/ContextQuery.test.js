@@ -304,10 +304,6 @@ test('canPlaceButtonHere', t => {
   t.true(cq.canPlaceButtonHere(7, 15));
 });
 
-test('getNextNet', t => {
-  t.is(cq.getNextNet(), 2);
-});
-
 test('getUnderpassTerminalAbove', t => {
   t.is(cq.getUnderpassTerminalAbove(15, 2), 1);
   t.is(cq.getUnderpassTerminalAbove(15, 12), 9);

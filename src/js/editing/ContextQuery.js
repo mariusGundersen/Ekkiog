@@ -136,30 +136,6 @@ export default class ContextQuery{
     return null;
   }
 
-  getNextNet(){
-    const nets = [];
-    for(let y=0; y<this.context.height; y++){
-      for(let x=0; x<this.context.width; x++){
-        if(this.isNetSource(x, y)){
-          nets.push(this.getNet(x, y));
-        }
-      }
-    }
-
-    if(nets.length === 0){
-      return 2;
-    }
-
-    const sortedNets = nets.sort((a,b) => a-b);
-    for(let i=1; i<sortedNets.length; i++){
-      if(sortedNets[i] - sortedNets[i-1] > 1){
-        return sortedNets[i-1] + 1;
-      }
-    }
-
-    return sortedNets[sortedNets.length-1]+1;
-  }
-
   getNeighbouringNets(x, y, type){
     const searchDirections = [...this.getSearchDirections(x, y, type)];
     const nets = searchDirections
