@@ -1,4 +1,5 @@
 import ndarray from 'ndarray';
+import * as ennea from 'ennea-tree';
 
 import ContextQuery from './ContextQuery.js';
 import Validator from './Validator.js';
@@ -33,7 +34,18 @@ export default class Editor{
       for(let [gateX, gateY] of gatesToUpdate){
         this.updateGate(gateX, gateY);
       }
+
+      this.context.enneaTree = ennea.set(this.context.enneaTree, {
+        tile: WIRE,
+        net
+      }, {left:x, top:y});
+    }else{
+      this.context.enneaTree = ennea.set(this.context.enneaTree, {
+        tile: WIRE,
+        net: GROUND
+      }, {left:x, top:y});
     }
+    console.log(this.context.enneaTree);
 
     return true;
   }
@@ -62,6 +74,20 @@ export default class Editor{
     for(let [gateX, gateY] of gatesToUpdate){
       this.updateGate(gateX, gateY);
     }
+
+    this.context.enneaTree = ennea.set(this.context.enneaTree, {
+      tile: GATE,
+      net: nextNet,
+      inputA: {
+        top: y-1,
+        left: x-4
+      },
+      inputB: {
+        top: y-1,
+        left: x-4
+      }
+    }, {left:x, top:y, width:4, height:3});
+    console.log(this.context.enneaTree);
 
     return true;
   }
@@ -154,6 +180,9 @@ export default class Editor{
 
     this.context.gatesTexture.set(netX, netY, 0);
 
+    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y, width:4, height:3});
+    console.log(this.context.enneaTree);
+
     return true;
   }
 
@@ -174,6 +203,9 @@ export default class Editor{
     for(let [gateX, gateY] of gatesToUpdateToNet){
       this.updateGate(gateX, gateY);
     }
+
+    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    console.log(this.context.enneaTree);
 
     return true;
   }

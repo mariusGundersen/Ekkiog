@@ -1,4 +1,5 @@
 import {encode as encodeArray, decode as decodeArary} from 'base64-arraybuffer';
+import {createTree} from 'ennea-tree';
 
 import serialize from './storage/serialize.js';
 import deserialize from './storage/deserialize.js';
@@ -28,6 +29,7 @@ export default class Context{
       new RenderTexture(gl, 256, 256)
     ];
     this.gatesTexture = new DataTexture(gl, 256, 256);
+    this.enneaTree = createTree(this.width);
 
     this.import(data);
   }
