@@ -40,6 +40,7 @@ export default class Context{
     if(data.gates) this.gatesTexture.import(deserialize(data.gates));
     if(data.netCharges) this.netChargeTextures[0].import(deserialize(data.netCharges));
     if(data.netCharges) this.netChargeTextures[1].import(deserialize(data.netCharges));
+    if(data.enneaTree) this.enneaTree = data.enneaTree;
   }
 
   export(){
@@ -50,6 +51,7 @@ export default class Context{
       netMap: serialize(this.netMapTexture.export()),
       gates: serialize(this.gatesTexture.export()),
       netCharges: serialize(this.netChargeTextures[0].export()),
+      enneaTree: this.enneaTree
     };
   }
 }

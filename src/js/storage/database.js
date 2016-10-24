@@ -7,7 +7,7 @@ export async function open(){
     switch(db.oldVersion){
       case 0:
         const saves = await db.createObjectStore('saves');
-        saves.add(tryGetFromLocalStorage(), 'default');
+        //saves.add(tryGetFromLocalStorage(), 'default');
     }
   });
 
