@@ -28,24 +28,19 @@ export default class Editor{
     const neighbouringNets = this.query.getNeighbouringNets(x, y, WIRE);
 
     this.context.mapTexture.set(x, y, WIRE);
+    const net = neighbouringNets[0] || GROUND;
     if(neighbouringNets.length == 1){
-      const net = neighbouringNets[0];
       const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
       for(let [gateX, gateY] of gatesToUpdate){
         this.updateGate(gateX, gateY);
       }
-
-      this.context.enneaTree = ennea.set(this.context.enneaTree, {
-        tile: WIRE,
-        net
-      }, {left:x, top:y});
-    }else{
-      this.context.enneaTree = ennea.set(this.context.enneaTree, {
-        tile: WIRE,
-        net: GROUND
-      }, {left:x, top:y});
     }
-    console.log(this.context.enneaTree);
+
+    this.context.enneaTree = ennea.set(this.context.enneaTree, {
+      tile: WIRE,
+      net
+    }, {left:x, top:y});
+    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
   }
@@ -86,8 +81,8 @@ export default class Editor{
         top: y-1,
         left: x-4
       }
-    }, {left:x, top:y, width:4, height:3});
-    console.log(this.context.enneaTree);
+    }, {left:x-3, top:y-1, width:4, height:3});
+    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
   }
@@ -102,27 +97,33 @@ export default class Editor{
     const neighbouringNets = this.query.getNeighbouringNets(x, y, UNDERPASS);
 
     this.context.mapTexture.set(x, y, UNDERPASS);
+    const net = neighbouringNets[0] || GROUND;
     if(neighbouringNets.length == 1){
-      const net = neighbouringNets[0];
       const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
       for(let [gateX, gateY] of gatesToUpdate){
         this.updateGate(gateX, gateY);
       }
     }
 
+    this.context.enneaTree = ennea.set(this.context.enneaTree, {
+      tile: UNDERPASS,
+      net
+    }, {left:x, top:y});
+    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
+
     const terminalAbove = this.query.getUnderpassTerminalAbove(x, y);
     const terminalBelow = this.query.getUnderpassTerminalBelow(x, y);
     const netAbove = this.query.getNet(x, terminalAbove);
     const netBelow = this.query.getNet(x, terminalBelow);
 
-    if(netAbove > 0){
+    if(netAbove != GROUND){
       const gatesToUpdate = this.floodFiller.floodFill(x, terminalAbove, netAbove);
       for(let [gateX, gateY] of gatesToUpdate){
         this.updateGate(gateX, gateY);
       }
     }
 
-    if(netBelow > 0){
+    if(netBelow != GROUND){
       const gatesToUpdate = this.floodFiller.floodFill(x, terminalBelow, netBelow);
       for(let [gateX, gateY] of gatesToUpdate){
         this.updateGate(gateX, gateY);
@@ -143,7 +144,7 @@ export default class Editor{
   drawButton(x, y){
     if(!this.validate.canPlaceButtonHere(x, y)) return false;
 
-    const nextNet = this.query.getNextNet();
+    const net = this.query.getNextNet();
 
     for(let cy=y-1; cy<=y+1; cy++){
       for(let cx=x-2; cx<=x; cx++){
@@ -152,15 +153,22 @@ export default class Editor{
     }
 
     this.context.mapTexture.set(x, y, BUTTON);
-    this.context.netMapTexture.set(x, y, nextNet);
-    this.context.netMapTexture.set(x-1, y, nextNet);
-    const [netX, netY] = this.split(nextNet);
+    this.context.netMapTexture.set(x, y, net);
+    this.context.netMapTexture.set(x-1, y, net);
+    const [netX, netY] = this.split(net);
     this.context.gatesTexture.set(netX, netY, (1<<16) | (1<<0));
 
-    const gatesToUpdate = this.floodFiller.floodFill(x, y, nextNet);
+    const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
     for(let [gateX, gateY] of gatesToUpdate){
       this.updateGate(gateX, gateY);
     }
+
+    this.context.enneaTree = ennea.set(this.context.enneaTree, {
+      tile: BUTTON,
+      state: 1,
+      net
+    }, {left:x-2, top:y-1, width:3, height:3});
+    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
   }
@@ -180,8 +188,8 @@ export default class Editor{
 
     this.context.gatesTexture.set(netX, netY, 0);
 
-    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y, width:4, height:3});
-    console.log(this.context.enneaTree);
+    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
   }
@@ -205,7 +213,7 @@ export default class Editor{
     }
 
     this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
-    console.log(this.context.enneaTree);
+    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
   }
@@ -226,6 +234,9 @@ export default class Editor{
 
     this.context.mapTexture.set(x, y, EMPTY);
     this.context.netMapTexture.set(x, y, 0);
+
+    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     const [sx, sy] = this.query.getNetSource(net);
 
@@ -275,6 +286,9 @@ export default class Editor{
 
     this.context.mapTexture.set(x, y, EMPTY);
     this.context.netMapTexture.set(x, y, GROUND);
+
+    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     this.context.gatesTexture.set(netX, netY, 0);
 
