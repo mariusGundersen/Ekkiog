@@ -12,6 +12,9 @@ import {
   BUTTON
 } from './tileConstants.js';
 
+import {getWireSearchDirections} from './query/getSearchDirections.js';
+import canPlaceWireHere from './validate/canPlaceWireHere.js';
+
 const GROUND = 0;
 
 export default class Editor{
@@ -23,9 +26,13 @@ export default class Editor{
   }
 
   drawWire(x, y){
-    if(!this.validate.canPlaceWireHere(x, y)) return false;
+    if(!canPlaceWireHere(this.context.enneaTree, x, y)) return false;
 
-    const neighbouringNets = this.query.getNeighbouringNets(x, y, WIRE);
+    const neighbours = [...getWireSearchDirections(this.context.enneaTree, x, y)];
+    const neighbouringNets = neighbours
+      .map(([x, y]) => this.context.netMapTexture.get(x, y))
+      .filter(net => net != GROUND)
+      .filter((net, index, nets) => nets.indexOf(net) === index);
 
     this.context.mapTexture.set(x, y, WIRE);
     const net = neighbouringNets[0] || GROUND;

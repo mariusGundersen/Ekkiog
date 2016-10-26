@@ -35,6 +35,7 @@ export default class Context{
   }
 
   import(data){
+    if(!data) return;
     if(data.map) this.mapTexture.import(deserialize(data.map));
     if(data.netMap) this.netMapTexture.import(deserialize(data.netMap));
     if(data.gates) this.gatesTexture.import(deserialize(data.gates));
