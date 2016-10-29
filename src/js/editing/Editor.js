@@ -213,7 +213,10 @@ export default class Editor{
       this.updateGate(gateX, gateY);
     }
 
-    this.context.mapTexture.set(x, y, EMPTY);
+    const enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
+
     this.context.netMapTexture.set(x, y, 0);
 
     const [sx, sy] = this.query.getNetSource(net);
@@ -223,9 +226,8 @@ export default class Editor{
       this.updateGate(gateX, gateY);
     }
 
-    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    this.context.enneaTree = enneaTree;
     console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
-
     return true;
   }
 
