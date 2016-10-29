@@ -6,6 +6,8 @@ import {
   BUTTON
 } from './tileConstants.js';
 
+const GROUND = 0;
+
 export default function reconcile(context, changes){
   for(const change of changes){
     reconcileChange(context, change);
@@ -17,7 +19,7 @@ export function reconcileChange(context, change){
     case 'set':
       return reconcileSet(context, change);
     case 'clear':
-      return setMapTexture(context, change, EMPTY);
+      return clearArea(context, change);
   }
 }
 
@@ -45,10 +47,11 @@ export function setGate(context, {top, left, width, height}, gate){
   context.netMapTexture.set(x-3, y+1, context.netMapTexture.get(x-4, y+1));
 }
 
-export function setMapTexture(context, {top, left, width, height}, tile){
+export function clearArea(context, {top, left, width, height}){
   for(let y=top; y<top+height; y++){
     for(let x=left; x<left+width; x++){
-      context.mapTexture.set(x, y, tile);
+      context.mapTexture.set(x, y, EMPTY);
+      context.netMapTexture.set(x, y, GROUND);
     }
   }
 }

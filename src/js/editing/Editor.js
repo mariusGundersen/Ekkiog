@@ -180,19 +180,19 @@ export default class Editor{
   clearGate(x, y){
     const [netX, netY] = this.split(this.query.getNet(x, y));
 
+    const enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+
     const gatesToUpdate = this.floodFiller.floodFill(x, y, GROUND);
     for(let [gateX, gateY] of gatesToUpdate){
       this.updateGate(gateX, gateY);
     }
 
-    this.context.mapTexture.set(x, y, EMPTY);
-    this.context.netMapTexture.set(x, y, GROUND);
-    this.context.netMapTexture.set(x-3, y-1, GROUND);
-    this.context.netMapTexture.set(x-3, y+1, GROUND);
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
 
     this.context.gatesTexture.set(netX, netY, 0);
 
-    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    this.context.enneaTree = enneaTree;
     console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
