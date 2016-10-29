@@ -29,6 +29,8 @@ export function reconcileSet(context, change){
       return setWire(context, change, change.after);
     case 'gate':
       return setGate(context, change, change.after);
+    case 'button':
+      return setButton(context, change, change.after);
   }
 }
 
@@ -45,6 +47,15 @@ export function setGate(context, {top, left, width, height}, gate){
 
   context.netMapTexture.set(x-3, y-1, context.netMapTexture.get(x-4, y-1));
   context.netMapTexture.set(x-3, y+1, context.netMapTexture.get(x-4, y+1));
+}
+
+export function setButton(context, {top, left, width, height}, button){
+  const x = left+2;
+  const y = top+1;
+
+  context.mapTexture.set(x, y, BUTTON);
+  context.netMapTexture.set(x, y, button.net);
+  context.netMapTexture.set(x-1, y, button.net);
 }
 
 export function clearArea(context, {top, left, width, height}){

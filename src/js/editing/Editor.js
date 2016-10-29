@@ -15,6 +15,7 @@ import {
 import {getWireSearchDirections} from './query/getSearchDirections.js';
 import canPlaceWireHere from './validate/canPlaceWireHere.js';
 import canPlaceGateHere from './validate/canPlaceGateHere.js';
+import canPlaceButtonHere from './validate/canPlaceButtonHere.js';
 import reconcile from './reconcile.js';
 
 const GROUND = 0;
@@ -146,19 +147,19 @@ export default class Editor{
   }
 
   drawButton(x, y){
-    if(!this.validate.canPlaceButtonHere(x, y)) return false;
+    if(!canPlaceButtonHere(this.context, x-2, y-1)) return false;
 
     const net = this.query.getNextNet();
 
-    for(let cy=y-1; cy<=y+1; cy++){
-      for(let cx=x-2; cx<=x; cx++){
-        this.clear(cx, cy);
-      }
-    }
+    const enneaTree = ennea.set(this.context.enneaTree, {
+      type: 'button',
+      net,
+      state: 0
+    }, {left:x-2, top:y-1, width:3, height:3});
 
-    this.context.mapTexture.set(x, y, BUTTON);
-    this.context.netMapTexture.set(x, y, net);
-    this.context.netMapTexture.set(x-1, y, net);
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
+
     const [netX, netY] = this.split(net);
     this.context.gatesTexture.set(netX, netY, (1<<16) | (1<<0));
 
@@ -167,11 +168,7 @@ export default class Editor{
       this.updateGate(gateX, gateY);
     }
 
-    this.context.enneaTree = ennea.set(this.context.enneaTree, {
-      tile: BUTTON,
-      state: 1,
-      net
-    }, {left:x-2, top:y-1, width:3, height:3});
+    this.context.enneaTree = enneaTree;
     console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
@@ -209,8 +206,6 @@ export default class Editor{
     const enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
-
-    this.context.netMapTexture.set(x, y, 0);
 
     const [sx, sy] = this.query.getNetSource(net);
 
@@ -290,10 +285,11 @@ export default class Editor{
       this.updateGate(gateX, gateY);
     }
 
-    this.context.mapTexture.set(x, y, EMPTY);
-    this.context.netMapTexture.set(x, y, GROUND);
+    const enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
 
-    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    this.context.enneaTree = enneaTree;
     console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     this.context.gatesTexture.set(netX, netY, 0);
