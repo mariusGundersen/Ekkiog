@@ -36,14 +36,14 @@ export function* getButtonSearchDirections(tree, x, y){
 }
 
 export function* searchLeft(tree, x, y){
-  const left = ennea.get(tree, {top: y, left: x-1});
+  const left = ennea.get(tree, y, x-1);
   if(tile.isWire(left) || tile.isUnderpass(left) || tile.isGateOutput(left) || tile.isButtonOutput(left)){
     yield [x-1, y];
   }
 }
 
 export function* searchRight(tree, x, y){
-  const right = ennea.get(tree, {top: y, left: x+1});
+  const right = ennea.get(tree, y, x+1);
   if(tile.isWire(right) || tile.isUnderpass(right) || tile.isGateInput(right)){
     yield [x+1, y];
   }
@@ -51,10 +51,10 @@ export function* searchRight(tree, x, y){
 
 export function* searchUp(tree, x, y){
   let top = y-1;
-  let above = ennea.get(tree, {top, left: x});
+  let above = ennea.get(tree, top, x);
   while(tile.isUnderpass(above)){
     top--;
-    above = ennea.get(tree, {top, left: x});
+    above = ennea.get(tree, top, x);
   }
 
   if(tile.isWire(above)){
@@ -64,10 +64,10 @@ export function* searchUp(tree, x, y){
 
 export function* searchDown(tree, x, y){
   let top = y+1;
-  let below = ennea.get(tree, {top, left: x});
+  let below = ennea.get(tree, top, x);
   while(tile.isUnderpass(below)){
     top++;
-    below = ennea.get(tree, {top, left: x});
+    below = ennea.get(tree, top, x);
   }
 
   if(tile.isWire(below)){
