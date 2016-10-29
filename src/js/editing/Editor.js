@@ -14,6 +14,7 @@ import {
 
 import {getWireSearchDirections} from './query/getSearchDirections.js';
 import canPlaceWireHere from './validate/canPlaceWireHere.js';
+import reconcile from './reconcile.js';
 
 const GROUND = 0;
 
@@ -34,7 +35,14 @@ export default class Editor{
       .filter(net => net != GROUND)
       .filter((net, index, nets) => nets.indexOf(net) === index);
 
-    this.context.mapTexture.set(x, y, WIRE);
+    const enneaTree = ennea.set(this.context.enneaTree, {
+      type: 'wire',
+      net
+    }, {left:x, top:y});
+
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
+
     const net = neighbouringNets[0] || GROUND;
     if(neighbouringNets.length == 1){
       const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
@@ -43,12 +51,8 @@ export default class Editor{
       }
     }
 
-    this.context.enneaTree = ennea.set(this.context.enneaTree, {
-      tile: WIRE,
-      net
-    }, {left:x, top:y});
-    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
-
+    this.context.enneaTree = enneaTree;
+    //console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
     return true;
   }
 
