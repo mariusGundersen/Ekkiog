@@ -12,7 +12,7 @@ import {
   BUTTON
 } from './tileConstants.js';
 
-import {getWireSearchDirections} from './query/getSearchDirections.js';
+import {getWireNeighbouringNets} from './query/getNeighbouringNets.js';
 import canPlaceWireHere from './validate/canPlaceWireHere.js';
 import canPlaceGateHere from './validate/canPlaceGateHere.js';
 import canPlaceButtonHere from './validate/canPlaceButtonHere.js';
@@ -30,13 +30,9 @@ export default class Editor{
   }
 
   drawWire(x, y){
-    if(!canPlaceWireHere(this.context, x, y)) return false;
+    if(!canPlaceWireHere(this.context.enneaTree, x, y)) return false;
 
-    const neighbours = [...getWireSearchDirections(this.context.enneaTree, x, y)];
-    const neighbouringNets = neighbours
-      .map(([x, y]) => this.context.netMapTexture.get(x, y))
-      .filter(net => net != GROUND)
-      .filter((net, index, nets) => nets.indexOf(net) === index);
+    const neighbouringNets = getWireNeighbouringNets(this.context.enneaTree, x, y);
 
     if(neighbouringNets.length > 1){
       return false;
