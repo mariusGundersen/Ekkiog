@@ -2,9 +2,9 @@ import {
   update
 } from 'ennea-tree';
 
-export default function floodFill(enneaTree, net, pos){
+export default function floodFill(enneaTree, net, pos, dx=0, dy=0){
   const changes = [
-    {area: pos, context: {pos, prev: pos}}
+    makePos(pos, dx, dy)
   ];
 
   const updater = update(enneaTree, (old, ctx, pos) => {
@@ -12,7 +12,7 @@ export default function floodFill(enneaTree, net, pos){
       case 'wire':
         return floodWire(old, ctx, changes, fillWire(old, net));
       case 'gate':
-        return fillGate(old, pos, net);
+        return fillGate(old, pos, ctx, net);
       default:
         return old;
     }
@@ -43,8 +43,12 @@ function floodWire(oldWire, ctx, changes, newWire){
   return newWire;
 }
 
-function fillGate(old, pos, net){
+function fillGate(old, pos, ctx, net){
   if(pos.left !== 0 || pos.top === 1){
+    return old;
+  }
+
+  if(ctx.pos.left - ctx.prev.left !== 1 || ctx.pos.top !== ctx.prev.top){
     return old;
   }
 

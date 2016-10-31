@@ -76,7 +76,7 @@ export default class Editor{
       }
     }, {left:x-3, top:y-1, width:4, height:3});
 
-    enneaTree = floodFill(enneaTree, net, {left:x+1, top:y});
+    enneaTree = floodFill(enneaTree, net, {left:x, top:y}, 1, 0);
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
@@ -152,7 +152,7 @@ export default class Editor{
       state: 0
     }, {left:x-2, top:y-1, width:3, height:3});
 
-    enneaTree = floodFill(enneaTree, net, {left:x+1, top:y});
+    enneaTree = floodFill(enneaTree, net, {left:x, top:y}, 1, 0);
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
