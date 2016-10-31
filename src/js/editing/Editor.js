@@ -16,6 +16,7 @@ import {getWireSearchDirections} from './query/getSearchDirections.js';
 import canPlaceWireHere from './validate/canPlaceWireHere.js';
 import canPlaceGateHere from './validate/canPlaceGateHere.js';
 import canPlaceButtonHere from './validate/canPlaceButtonHere.js';
+import floodFill from './floodFill.js';
 import reconcile from './reconcile.js';
 
 const GROUND = 0;
@@ -36,22 +37,23 @@ export default class Editor{
       .map(([x, y]) => this.context.netMapTexture.get(x, y))
       .filter(net => net != GROUND)
       .filter((net, index, nets) => nets.indexOf(net) === index);
+
+    if(neighbouringNets.length > 1){
+      return false;
+    }
+
     const net = neighbouringNets[0] || GROUND;
 
-    const enneaTree = ennea.set(this.context.enneaTree, {
+    let enneaTree = ennea.set(this.context.enneaTree, {
       type: 'wire',
-      net
+      net: GROUND
     }, {left:x, top:y});
+
+    enneaTree = floodFill(enneaTree, net, {left:x, top:y});
+    console.log('floodFill', enneaTree);
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
-
-    if(neighbouringNets.length == 1){
-      const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
-      for(let [gateX, gateY] of gatesToUpdate){
-        this.updateGate(gateX, gateY);
-      }
-    }
 
     this.context.enneaTree = enneaTree;
     console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));

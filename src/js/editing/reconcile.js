@@ -10,6 +10,7 @@ const GROUND = 0;
 
 export default function reconcile(context, changes){
   for(const change of changes){
+    console.log('change', change);
     reconcileChange(context, change);
   }
 }
@@ -20,6 +21,8 @@ export function reconcileChange(context, change){
       return reconcileSet(context, change);
     case 'clear':
       return clearArea(context, change);
+    case 'update':
+      return reconcileUpdate(context, change);
   }
 }
 
@@ -34,8 +37,19 @@ export function reconcileSet(context, change){
   }
 }
 
+export function reconcileUpdate(context, change){
+  switch(change.after.type){
+    case 'wire':
+      return setWireNet(context, change, change.after);
+  }
+}
+
 export function setWire(context, {top:y, left:x}, wire){
   context.mapTexture.set(x, y, WIRE);
+  context.netMapTexture.set(x, y, wire.net);
+}
+
+export function setWireNet(context, {top:y, left:x}, wire){
   context.netMapTexture.set(x, y, wire.net);
 }
 
