@@ -69,12 +69,10 @@ export default class Editor{
       type: 'gate',
       net: nextNet,
       inputA: {
-        top: y-1,
-        left: x-4
+        net: GROUND
       },
       inputB: {
-        top: y-1,
-        left: x-4
+        net: GROUND
       }
     }, {left:x-3, top:y-1, width:4, height:3});
 
