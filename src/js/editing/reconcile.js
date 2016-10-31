@@ -4,7 +4,6 @@ import clear from './reconcile/clear.js';
 
 export default function reconcile(context, changes){
   for(const change of changes){
-    console.log('change', change);
     reconcileChange(context, change);
   }
 }

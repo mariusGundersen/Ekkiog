@@ -50,44 +50,39 @@ export default class Editor{
     }, {left:x, top:y});
 
     enneaTree = floodFill(enneaTree, net, {left:x, top:y});
-    console.log('floodFill', enneaTree);
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
+    //console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
     return true;
   }
 
   drawGate(x, y){
     if(!canPlaceGateHere(this.context, x-3, y-1)) return false;
 
-    const nextNet = this.query.getNextNet();
-
-    const enneaTree = ennea.set(this.context.enneaTree, {
+    const net = this.query.getNextNet();
+    const inputA = ennea.get(this.context.enneaTree, y-1, x-4);
+    const inputB = ennea.get(this.context.enneaTree, y+1, x-4);
+    let enneaTree = ennea.set(this.context.enneaTree, {
       type: 'gate',
-      net: nextNet,
+      net,
       inputA: {
-        net: GROUND
+        net: inputA ? inputA.data.net : GROUND
       },
       inputB: {
-        net: GROUND
+        net: inputB ? inputB.data.net : GROUND
       }
     }, {left:x-3, top:y-1, width:4, height:3});
+
+    enneaTree = floodFill(enneaTree, net, {left:x+1, top:y});
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
 
-    this.updateGate(x, y);
-
-    const gatesToUpdate = this.floodFiller.floodFill(x, y, nextNet);
-    for(let [gateX, gateY] of gatesToUpdate){
-      this.updateGate(gateX, gateY);
-    }
-
     this.context.enneaTree = enneaTree;
-    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
+    //console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
   }

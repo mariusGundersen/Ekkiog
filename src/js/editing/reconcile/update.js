@@ -1,3 +1,7 @@
+import {
+  setNetMap,
+  setGate
+} from './mutateContext.js';
 
 export default function update(context, change){
   switch(change.after.type){
@@ -9,14 +13,11 @@ export default function update(context, change){
 }
 
 export function updateWireNet(context, {top:y, left:x}, wire){
-  context.netMapTexture.set(x, y, wire.net);
+  setNetMap(context, x, y, wire.net);
 }
 
 export function updateGateInput(context, {top:y, left:x}, gate){
-  const v = gate.net;
-  const a = gate.inputA.net;
-  const b = gate.inputB.net;
-  context.netMapTexture.set(x, y+0, a);
-  context.netMapTexture.set(x, y+2, b);
-  context.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
+  setNetMap(context, x, y+0, gate.inputA.net);
+  setNetMap(context, x, y+2, gate.inputB.net);
+  setGate(context, gate.net, gate.inputA.net, gate.inputB.net);
 }

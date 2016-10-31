@@ -44,19 +44,16 @@ function floodWire(oldWire, ctx, changes, newWire){
 }
 
 function fillGate(old, pos, net){
-  console.log('fillGate', pos);
   if(pos.left !== 0 || pos.top === 1){
     return old;
   }
 
   const input = pos.top === 0 ? 'inputA' : 'inputB';
-  console.log('fillGate', old, input, net);
 
   if(old[input].net === net){
     return old;
   }
 
-  console.log('filGate', old[input]);
   return {
     ...old,
     [input]: {
