@@ -142,26 +142,20 @@ export default class Editor{
   }
 
   drawButton(x, y){
-    if(!canPlaceButtonHere(this.context, x-2, y-1)) return false;
+    if(!canPlaceButtonHere(this.context.enneaTree, x-2, y-1)) return false;
 
     const net = this.query.getNextNet();
 
-    const enneaTree = ennea.set(this.context.enneaTree, {
+    let enneaTree = ennea.set(this.context.enneaTree, {
       type: 'button',
       net,
       state: 0
     }, {left:x-2, top:y-1, width:3, height:3});
 
+    enneaTree = floodFill(enneaTree, net, {left:x+1, top:y});
+
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
-
-    const [netX, netY] = this.split(net);
-    this.context.gatesTexture.set(netX, netY, (1<<16) | (1<<0));
-
-    const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
-    for(let [gateX, gateY] of gatesToUpdate){
-      this.updateGate(gateX, gateY);
-    }
 
     this.context.enneaTree = enneaTree;
     console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
