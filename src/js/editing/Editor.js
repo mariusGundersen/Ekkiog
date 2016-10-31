@@ -60,7 +60,7 @@ export default class Editor{
   }
 
   drawGate(x, y){
-    if(!canPlaceGateHere(this.context, x-3, y-1)) return false;
+    if(!canPlaceGateHere(this.context.enneaTree, x-3, y-1)) return false;
 
     const net = this.query.getNextNet();
     const inputA = ennea.get(this.context.enneaTree, y-1, x-4);
