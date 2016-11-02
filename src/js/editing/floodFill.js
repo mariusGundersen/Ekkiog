@@ -2,17 +2,13 @@ import {
   update
 } from 'ennea-tree';
 
-export default function floodFill(enneaTree, net, pos, dx=0, dy=0){
-  const changes = [
-    makePos(pos, dx, dy)
-  ];
-
+export default function floodFill(enneaTree, ...changes){
   const updater = update(enneaTree, (old, ctx, pos) => {
     switch(old.type){
       case 'wire':
-        return floodWire(old, ctx, changes, fillWire(old, net));
+        return floodWire(old, ctx, changes, fillWire(old, ctx));
       case 'gate':
-        return fillGate(old, pos, ctx, net);
+        return fillGate(old, pos, ctx);
       default:
         return old;
     }
@@ -21,29 +17,29 @@ export default function floodFill(enneaTree, net, pos, dx=0, dy=0){
   return updater.result(changes);
 }
 
-function fillWire(old, net){
-  if(old.net === net){
+function fillWire(old, ctx){
+  if(old.net === ctx.net){
     return old;
   }
 
   return {
     ...old,
-    net
+    net: ctx.net
   };
 }
 
 function floodWire(oldWire, ctx, changes, newWire){
   if(oldWire !== newWire){
-    pushPosToChanges(changes, ctx.pos, ctx.prev, -1, 0);
-    pushPosToChanges(changes, ctx.pos, ctx.prev, +1, 0);
-    pushPosToChanges(changes, ctx.pos, ctx.prev, 0, -1);
-    pushPosToChanges(changes, ctx.pos, ctx.prev, 0, +1);
+    pushPosToChanges(changes, ctx, -1, 0);
+    pushPosToChanges(changes, ctx, +1, 0);
+    pushPosToChanges(changes, ctx, 0, -1);
+    pushPosToChanges(changes, ctx, 0, +1);
   }
 
   return newWire;
 }
 
-function fillGate(old, pos, ctx, net){
+function fillGate(old, pos, ctx){
   if(pos.left !== 0 || pos.top === 1){
     return old;
   }
@@ -54,7 +50,7 @@ function fillGate(old, pos, ctx, net){
 
   const input = pos.top === 0 ? 'inputA' : 'inputB';
 
-  if(old[input].net === net){
+  if(old[input].net === ctx.net){
     return old;
   }
 
@@ -62,24 +58,25 @@ function fillGate(old, pos, ctx, net){
     ...old,
     [input]: {
       ...old[input],
-      net
+      net: ctx.net
     }
   };
 }
 
-function pushPosToChanges(changes, pos, prev, dx, dy){
-  if(pos.left+dx != prev.left || pos.top+dy != prev.top){
-    changes.push(makePos(pos, dx, dy));
+function pushPosToChanges(changes, ctx, dx, dy){
+  if(ctx.pos.left+dx != ctx.prev.left || ctx.pos.top+dy != ctx.prev.top){
+    changes.push(makePos(ctx.pos, ctx.net, dx, dy));
   }
 }
 
-function makePos({top, left}, dx, dy){
+export function makePos({top, left}, net, dx=0, dy=0){
   return {
     area: {
       top: top+dy,
       left: left+dx
     },
     context: {
+      net,
       pos: {
         top: top+dy,
         left: left+dx
