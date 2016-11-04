@@ -1,6 +1,6 @@
-import set from './reconcile/set.js';
-import update from './reconcile/update.js';
-import clear from './reconcile/clear.js';
+import set from './set.js';
+import update from './update.js';
+import clear from './clear.js';
 
 export default function reconcile(context, changes){
   for(const change of changes){

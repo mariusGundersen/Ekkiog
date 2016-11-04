@@ -16,8 +16,8 @@ import {getWireNeighbouringNets} from './query/getNeighbouringNets.js';
 import canPlaceWireHere from './validate/canPlaceWireHere.js';
 import canPlaceGateHere from './validate/canPlaceGateHere.js';
 import canPlaceButtonHere from './validate/canPlaceButtonHere.js';
-import floodFill, {make} from './floodFill.js';
-import reconcile from './reconcile.js';
+import floodFill from './flooding/floodFill.js';
+import reconcile from './reconciliation/reconcile.js';
 
 const GROUND = 0;
 
@@ -46,7 +46,7 @@ export default class Editor{
     const box = {left:x, top:y};
     let enneaTree = ennea.set(this.context.enneaTree, data, box);
 
-    enneaTree = floodFill(enneaTree, ...make(net, {...box, data}));
+    enneaTree = floodFill(enneaTree, net, {...box, data});
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
@@ -75,7 +75,7 @@ export default class Editor{
     const box = {left:x-3, top:y-1, width:4, height:3};
     let enneaTree = ennea.set(this.context.enneaTree, data, box);
 
-    enneaTree = floodFill(enneaTree, ...make(net, {...box, data}));
+    enneaTree = floodFill(enneaTree, net, {...box, data});
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
@@ -152,7 +152,7 @@ export default class Editor{
     const box = {left:x-2, top:y-1, width:3, height:3};
     let enneaTree = ennea.set(this.context.enneaTree, data, box);
 
-    enneaTree = floodFill(enneaTree, ...make(net, {...box, data}));
+    enneaTree = floodFill(enneaTree, net, {...box, data});
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
@@ -173,7 +173,7 @@ export default class Editor{
 
     let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
 
-    enneaTree = floodFill(enneaTree, ...make(GROUND, ...cleared));
+    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
@@ -186,7 +186,7 @@ export default class Editor{
   clearGate(x, y){
     let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
 
-    enneaTree = floodFill(enneaTree, ...make(GROUND, ...cleared));
+    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
@@ -258,7 +258,7 @@ export default class Editor{
   clearButton(x, y){
     let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
 
-    enneaTree = floodFill(enneaTree, ...make(GROUND, ...cleared));
+    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
