@@ -390,10 +390,17 @@ export default class Editor{
   }
 
   toggleButton(x, y){
-    const [buttonX, buttonY] = this.query.getButtonOutput(x, y);
-    const [outputX, outputY] = this.split(this.query.getNet(buttonX, buttonY));
-    const button = this.context.gatesTexture.get(outputX, outputY);
-    this.context.gatesTexture.set(outputX, outputY, button === 0 ? ((1<<16) | (1<<0)) : 0);
+    const updater = ennea.update(this.context.enneaTree, old => ({
+      ...old,
+      state: old.state ? 0 : 1
+    }));
+    updater.update({top: y, left: x});
+    const enneaTree = updater.result();
+
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
+
+    this.context.enneaTree = enneaTree;
   }
 
   split(v){
