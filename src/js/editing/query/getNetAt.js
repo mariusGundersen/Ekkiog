@@ -2,7 +2,7 @@ import * as ennea from 'ennea-tree';
 
 const GROUND = 0;
 
-export default function(enneaTree, x, y, dx, dy){
+export default function getNetAt(enneaTree, x, y, dx, dy){
   const tile = ennea.get(enneaTree, y, x);
   if(!tile) return GROUND;
 
@@ -12,7 +12,7 @@ export default function(enneaTree, x, y, dx, dy){
     case 'gate':
       return getGateNet(tile, dx, dy);
     case 'underpass':
-      return getUnderpassNet(tile, dx, dy);
+      return getUnderpassNet(tile, dx, dy, enneaTree, x, y);
     case 'button':
       return getButtonNet(tile);
   }
@@ -30,11 +30,11 @@ export function getGateNet(gate, dx, dy){
   }
 }
 
-export function getUnderpassNet(underpass, dx, dy){
+export function getUnderpassNet(underpass, dx, dy, enneaTree, x, y){
   if(dx !== 0 && dy === 0){
     return underpass.data.net;
   }else{
-    return GROUND;
+    return getNetAt(enneaTree, x, y+dy, dx, dy);
   }
 }
 

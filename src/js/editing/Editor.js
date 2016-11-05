@@ -12,11 +12,10 @@ import {
 
 import {
   getWireNeighbouringNets,
-  getUnderpassNeighbouringNets
+  getGateNeighbouringNets,
+  getUnderpassNeighbouringNets,
+  getButtonNeighbouringNets
 } from './query/getNeighbouringNets.js';
-import canPlaceGateHere from './validate/canPlaceGateHere.js';
-import canPlaceUnderpassHere from './validate/canPlaceUnderpassHere.js';
-import canPlaceButtonHere from './validate/canPlaceButtonHere.js';
 import floodFill from './flooding/floodFill.js';
 import reconcile from './reconciliation/reconcile.js';
 
@@ -58,7 +57,11 @@ export default class Editor{
   }
 
   drawGate(x, y){
-    if(!canPlaceGateHere(this.context.enneaTree, x-3, y-1)) return false;
+    const neighbouringNets = getGateNeighbouringNets(this.context.enneaTree, x, y);
+
+    if(neighbouringNets.length == 1){
+      return false;
+    }
 
     const net = this.query.getNextNet();
     const inputA = ennea.get(this.context.enneaTree, y-1, x-4);
@@ -92,15 +95,13 @@ export default class Editor{
   }
 
   drawUnderpass(x, y){
-    if(!canPlaceUnderpassHere(this.context.enneaTree, x, y)) return false;
-
     const neighbouringNets = getUnderpassNeighbouringNets(this.context.enneaTree, x, y);
 
-    if(neighbouringNets.length > 1){
+    if(neighbouringNets.horizontal.length > 1 || neighbouringNets.vertical.length > 1){
       return false;
     }
 
-    const net = neighbouringNets[0] || GROUND;
+    const net = neighbouringNets.horizontal[0] || GROUND;
     const data = {
       type: 'underpass',
       net
@@ -126,7 +127,11 @@ export default class Editor{
   }
 
   drawButton(x, y){
-    if(!canPlaceButtonHere(this.context.enneaTree, x-2, y-1)) return false;
+    const neighbouringNets = getButtonNeighbouringNets(this.context.enneaTree, x, y);
+
+    if(neighbouringNets.length == 1){
+      return false;
+    }
 
     const net = this.query.getNextNet();
     const data = {
