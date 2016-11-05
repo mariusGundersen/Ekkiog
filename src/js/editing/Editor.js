@@ -2,8 +2,6 @@ import ndarray from 'ndarray';
 import * as ennea from 'ennea-tree';
 
 import ContextQuery from './ContextQuery.js';
-import Validator from './Validator.js';
-import FloodFiller from './FloodFiller.js';
 import {
   EMPTY,
   WIRE,
@@ -28,8 +26,6 @@ export default class Editor{
   constructor(context){
     this.context = context;
     this.query = new ContextQuery(this.context);
-    this.floodFiller = new FloodFiller(this.context, this.query);
-    this.validate = new Validator(this.query);
   }
 
   drawWire(x, y){
@@ -156,80 +152,29 @@ export default class Editor{
     return true;
   }
 
-  clearWire(x, y){
-    let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
-
-    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
-
-    return true;
-  }
-
-  clearGate(x, y){
-    let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
-
-    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
-
-    return true;
-  }
-
-  clearUnderpass(x, y){
-    let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
-
-    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
-
-    return true;
-  }
-
-  clearButton(x, y){
-    let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
-
-    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
-
-    return true;
-  }
-
   clear(x, y){
-    if(this.query.isGate(x, y)){
-      return this.clearGate(x, y);
-    }else if(this.query.isButton(x, y)){
-      return this.clearButton(x, y);
-    }else if(this.query.isWire(x, y)){
-      return this.clearWire(x, y);
-    }else if(this.query.isUnderpass(x, y)){
-      return this.clearUnderpass(x, y);
-    }
+    let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+
+    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
+
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
+
+    this.context.enneaTree = enneaTree;
+
+    return true;
   }
 
   draw(x, y, tool){
     if(tool == 'wire'){
       if(this.query.isWire(x, y)){
-        return this.clearWire(x, y);
+        return this.clear(x, y);
       }else{
         return this.drawWire(x, y);
       }
     }else if(tool == 'underpass'){
       if(this.query.isUnderpass(x, y)){
-        return this.drawWire(x, y);
+        return this.clear(x, y);
       }else{
         return this.drawUnderpass(x, y);
       }
@@ -265,31 +210,6 @@ export default class Editor{
     }
   }
 
-  longPress(x, y){
-    switch(this.query.getTileType(x, y)){
-      case WIRE:
-        this.drawUnderpass(x, y);
-        return true;
-      case UNDERPASS:
-        this.drawWire(x, y);
-        return true;
-      case EMPTY:
-        if(this.query.isGate(x, y)){
-          const [gateX, gateY] = this.query.getGateOutput(x, y);
-          this.clearGate(gateX, gateY);
-          return true;
-        }else if(this.query.isButton(x, y)){
-          const [buttonX, buttonY] = this.query.getButtonOutput(x, y);
-          this.clearButton(buttonX, buttonY);
-          return true;
-        }else{
-          return false;
-        }
-      default:
-        return false;
-    }
-  }
-
   moveSelection(top, left, right, bottom, dx, dy){
     const width = right-left+1;
     const height = bottom-top+1;
@@ -312,22 +232,6 @@ export default class Editor{
     }
   }
 
-  updateGate(x, y){
-    const inputA = this.query.getNet(x-3, y-1);
-    const inputB = this.query.getNet(x-3, y+1);
-    this.setGateInput(x, y, inputA, inputB);
-  }
-
-  getGateInput(x, y){
-    const [outputX, outputY] = this.split(this.query.getNet(x, y));
-    return this.context.gatesTexture.get(outputX, outputY);
-  }
-
-  setGateInput(x, y, a, b){
-    const [outputX, outputY] = this.split(this.query.getNet(x, y));
-    this.context.gatesTexture.set(outputX, outputY, (a<<16) | (b<<0));
-  }
-
   toggleButton(x, y){
     const updater = ennea.update(this.context.enneaTree, old => ({
       ...old,
@@ -340,13 +244,6 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-  }
-
-  split(v){
-    return [
-      (v>>0)&0xff,
-      (v>>8)&0xff
-    ];
   }
 }
 
