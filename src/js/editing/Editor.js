@@ -59,7 +59,7 @@ export default class Editor{
   drawGate(x, y){
     const neighbouringNets = getGateNeighbouringNets(this.context.enneaTree, x, y);
 
-    if(neighbouringNets.length == 1){
+    if(neighbouringNets.length === 1){
       return false;
     }
 
@@ -129,7 +129,7 @@ export default class Editor{
   drawButton(x, y){
     const neighbouringNets = getButtonNeighbouringNets(this.context.enneaTree, x, y);
 
-    if(neighbouringNets.length == 1){
+    if(neighbouringNets.length === 1){
       return false;
     }
 
@@ -171,21 +171,21 @@ export default class Editor{
   }
 
   draw(x, y, tool){
-    if(tool == 'wire'){
-      if(this.query.isWire(x, y)){
+    if(tool === 'wire'){
+      if(this.getTileAt(x, y) === 'wire'){
         return this.clear(x, y);
       }else{
         return this.drawWire(x, y);
       }
-    }else if(tool == 'underpass'){
-      if(this.query.isUnderpass(x, y)){
+    }else if(tool === 'underpass'){
+      if(this.getTileAt(x, y) === 'underpass'){
         return this.clear(x, y);
       }else{
         return this.drawUnderpass(x, y);
       }
-    }else if(tool == 'gate'){
+    }else if(tool === 'gate'){
       return this.drawGate(x, y);
-    }else if(tool == 'button'){
+    }else if(tool === 'button'){
       return this.drawButton(x, y);
     }else{
       return false;
@@ -193,26 +193,12 @@ export default class Editor{
   }
 
   getTileAt(x, y){
-    switch(this.query.getTileType(x, y)){
-      case WIRE:
-        return 'wire';
-      case UNDERPASS:
-        return 'underpass';
-      case GATE:
-        return 'gate';
-      case BUTTON:
-        return 'button';
-      case EMPTY:
-        if(this.query.isGate(x, y)){
-          return 'gate';
-        }else if(this.query.isButton(x, y)){
-          return 'button';
-        }else{
-          return 'empty';
-        }
-      default:
-        return 'empty';
+    const tile = ennea.get(this.context.enneaTree, y, x);
+    if(!tile){
+      return 'empty';
     }
+
+    return tile.data.type;
   }
 
   moveSelection(top, left, right, bottom, dx, dy){
