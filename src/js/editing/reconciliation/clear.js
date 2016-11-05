@@ -18,7 +18,11 @@ export default function clear(context, change){
   clearArea(context, change);
   switch(change.before.type){
     case 'wire':
+      return;
     case 'gate':
+      return setGate(context, change.before.net, 0, 0);
+    case 'underpass':
+      return;
     case 'button':
       return setGate(context, change.before.net, 0, 0);
   }

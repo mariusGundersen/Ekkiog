@@ -20,6 +20,8 @@ export default function set(context, change){
       return wire(context, change, change.after);
     case 'gate':
       return gate(context, change, change.after);
+    case 'underpass':
+      return underpass(context, change, change.after);
     case 'button':
       return button(context, change, change.after);
   }
@@ -36,6 +38,11 @@ export function gate(context, {top:y, left:x, width, height}, gate){
   setNetMap(context, x+0, y+0, gate.inputA.net);
   setNetMap(context, x+0, y+2, gate.inputB.net);
   setGate(context, gate.net, gate.inputA.net, gate.inputB.net);
+}
+
+export function underpass(context, {top:y, left:x}, underpass){
+  setMap(context, x, y, UNDERPASS);
+  setNetMap(context, x, y, underpass.net);
 }
 
 export function button(context, {top:y, left:x, width, height}, button){

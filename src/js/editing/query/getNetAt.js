@@ -8,10 +8,11 @@ export default function(enneaTree, x, y, dx, dy){
 
   switch(tile.data.type){
     case 'wire':
-    case 'underpass':
       return tile.data.net;
     case 'gate':
       return getGateNet(tile, dx, dy);
+    case 'underpass':
+      return getUnderpassNet(tile, dx, dy);
     case 'button':
       return getButtonNet(tile);
   }
@@ -24,6 +25,14 @@ export function getGateNet(gate, dx, dy){
     return gate.data.inputA.net;
   }else if(gate.top === 2 && gate.left === 0 && dx === 1 && dy === 0){
     return gate.data.inputB.net;
+  }else{
+    return GROUND;
+  }
+}
+
+export function getUnderpassNet(underpass, dx, dy){
+  if(dx !== 0 && dy === 0){
+    return underpass.data.net;
   }else{
     return GROUND;
   }

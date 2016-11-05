@@ -12,9 +12,13 @@ import {
   BUTTON
 } from './tileConstants.js';
 
-import {getWireNeighbouringNets} from './query/getNeighbouringNets.js';
+import {
+  getWireNeighbouringNets,
+  getUnderpassNeighbouringNets
+} from './query/getNeighbouringNets.js';
 import canPlaceWireHere from './validate/canPlaceWireHere.js';
 import canPlaceGateHere from './validate/canPlaceGateHere.js';
+import canPlaceUnderpassHere from './validate/canPlaceUnderpassHere.js';
 import canPlaceButtonHere from './validate/canPlaceButtonHere.js';
 import floodFill from './flooding/floodFill.js';
 import reconcile from './reconciliation/reconcile.js';
@@ -52,7 +56,7 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-    //console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
+
     return true;
   }
 
@@ -81,62 +85,37 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-    //console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
+
 
     return true;
   }
 
   drawUnderpass(x, y){
-    if(!this.validate.canPlaceUnderpassHere(x, y)) return false;
+    if(!canPlaceUnderpassHere(this.context.enneaTree, x, y)) return false;
 
-    if(this.query.isWire(x, y)){
-      this.clearWire(x, y);
+    const neighbouringNets = getUnderpassNeighbouringNets(this.context.enneaTree, x, y);
+
+    if(neighbouringNets.length > 1){
+      return false;
     }
 
-    const neighbouringNets = this.query.getNeighbouringNets(x, y, UNDERPASS);
-
-    this.context.mapTexture.set(x, y, UNDERPASS);
     const net = neighbouringNets[0] || GROUND;
-    if(neighbouringNets.length == 1){
-      const gatesToUpdate = this.floodFiller.floodFill(x, y, net);
-      for(let [gateX, gateY] of gatesToUpdate){
-        this.updateGate(gateX, gateY);
-      }
-    }
-
-    this.context.enneaTree = ennea.set(this.context.enneaTree, {
-      tile: UNDERPASS,
+    const data = {
+      type: 'underpass',
       net
-    }, {left:x, top:y});
-    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
+    };
+    const box = {left:x, top:y};
 
-    const terminalAbove = this.query.getUnderpassTerminalAbove(x, y);
-    const terminalBelow = this.query.getUnderpassTerminalBelow(x, y);
-    const netAbove = this.query.getNet(x, terminalAbove);
-    const netBelow = this.query.getNet(x, terminalBelow);
+    let enneaTree = ennea.set(this.context.enneaTree, data, box);
+    enneaTree = ennea.set(enneaTree, {type:'wire', net: GROUND}, {left:x, top:y-1});
+    enneaTree = ennea.set(enneaTree, {type:'wire', net: GROUND}, {left:x, top:y+1});
 
-    if(netAbove != GROUND){
-      const gatesToUpdate = this.floodFiller.floodFill(x, terminalAbove, netAbove);
-      for(let [gateX, gateY] of gatesToUpdate){
-        this.updateGate(gateX, gateY);
-      }
-    }
+    enneaTree = floodFill(enneaTree, net, {...box, data});
 
-    if(netBelow != GROUND){
-      const gatesToUpdate = this.floodFiller.floodFill(x, terminalBelow, netBelow);
-      for(let [gateX, gateY] of gatesToUpdate){
-        this.updateGate(gateX, gateY);
-      }
-    }
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
 
-    if(this.query.isEmpty(x, terminalAbove)){
-      this.drawWire(x, terminalAbove);
-    }
-
-    if(this.query.isEmpty(x, terminalBelow)){
-      this.drawWire(x, terminalBelow);
-    }
-
+    this.context.enneaTree = enneaTree;
     return true;
   }
 
@@ -158,19 +137,12 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
+
 
     return true;
   }
 
   clearWire(x, y){
-    const net = this.query.getNet(x, y);
-
-    const gatesToUpdateToGround = this.floodFiller.floodFill(x, y, GROUND);
-    for(let [gateX, gateY] of gatesToUpdateToGround){
-      this.updateGate(gateX, gateY);
-    }
-
     let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
 
     enneaTree = floodFill(enneaTree, GROUND, ...cleared);
@@ -179,7 +151,7 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-//    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
+
     return true;
   }
 
@@ -192,65 +164,19 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
   }
 
   clearUnderpass(x, y){
-    const net = this.query.getNet(x, y);
+    let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
 
-    const terminalAbove = this.query.getUnderpassTerminalAbove(x, y);
-    const terminalBelow = this.query.getUnderpassTerminalBelow(x, y);
+    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
 
-    const netAbove = this.query.getNet(x, terminalAbove);
-    const netBelow = this.query.getNet(x, terminalBelow);
+    const changes = ennea.diff(this.context.enneaTree, enneaTree);
+    reconcile(this.context, changes);
 
-    const gatesToUpdateToGround = this.floodFiller.floodFill(x, y, GROUND);
-    for(let [gateX, gateY] of gatesToUpdateToGround){
-      this.updateGate(gateX, gateY);
-    }
-
-    this.context.mapTexture.set(x, y, EMPTY);
-    this.context.netMapTexture.set(x, y, 0);
-
-    this.context.enneaTree = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
-    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
-
-    const [sx, sy] = this.query.getNetSource(net);
-
-    const gatesToUpdateToNet = this.floodFiller.floodFill(sx, sy, net);
-    for(let [gateX, gateY] of gatesToUpdateToNet){
-      this.updateGate(gateX, gateY);
-    }
-
-    if(netAbove > 0){
-      const gatesToUpdateToGround = this.floodFiller.floodFill(x, terminalAbove, GROUND);
-      for(let [gateX, gateY] of gatesToUpdateToGround){
-        this.updateGate(gateX, gateY);
-      }
-
-      const [sx, sy] = this.query.getNetSource(netAbove);
-
-      const gatesToUpdateToNet = this.floodFiller.floodFill(sx, sy, netAbove);
-      for(let [gateX, gateY] of gatesToUpdateToNet){
-        this.updateGate(gateX, gateY);
-      }
-    }
-
-    if(netBelow > 0){
-      const gatesToUpdateToGround = this.floodFiller.floodFill(x, terminalBelow, GROUND);
-      for(let [gateX, gateY] of gatesToUpdateToGround){
-        this.updateGate(gateX, gateY);
-      }
-
-      const [sx, sy] = this.query.getNetSource(netBelow);
-
-      const gatesToUpdateToNet = this.floodFiller.floodFill(sx, sy, netBelow);
-      for(let [gateX, gateY] of gatesToUpdateToNet){
-        this.updateGate(gateX, gateY);
-      }
-    }
+    this.context.enneaTree = enneaTree;
 
     return true;
   }
@@ -264,7 +190,6 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-    console.log(ennea.getAll(this.context.enneaTree, {top:0, left:0, width:this.context.enneaTree.size, height:this.context.enneaTree.size}));
 
     return true;
   }

@@ -6,7 +6,10 @@ import makePos from './makePos.js';
 
 import wire from './wire.js';
 import gate from './gate.js';
+import underpass from './underpass.js';
 import button from './button.js';
+
+const GROUND = 0;
 
 export default function floodFill(enneaTree, net, ...changes){
 
@@ -17,6 +20,8 @@ export default function floodFill(enneaTree, net, ...changes){
         return wire(old, pos, ctx, queue);
       case 'gate':
         return gate(old, pos, ctx, queue);
+      case 'underpass':
+        return underpass(old, pos, ctx, queue);
       case 'button':
         return button(old, pos, ctx, queue);
       default:
@@ -38,6 +43,12 @@ export function* make(net, ...boxes){
         break;
       case 'gate':
         yield makePos({top: box.top+1, left: box.left+3}, net, 1, 0);
+        break;
+      case 'underpass':
+        yield makePos({top: box.top, left: box.left}, net, 1, 0);
+        yield makePos({top: box.top, left: box.left}, net, -1, 0);
+        yield makePos({top: box.top, left: box.left}, GROUND, 0, 1);
+        yield makePos({top: box.top, left: box.left}, GROUND, 0, -1);
         break;
       case 'button':
         yield makePos({top: box.top+1, left: box.left+2}, net, 1, 0);
