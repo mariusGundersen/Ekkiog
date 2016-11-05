@@ -1,6 +1,6 @@
-import getNetAt from '../query/getNetAt.js';
+import {GROUND} from '../constants.js';
 
-const GROUND = 0;
+import getNetAt from './getNetAt.js';
 
 export function getWireNeighbouringNets(enneaTree, x, y){
   return unique(

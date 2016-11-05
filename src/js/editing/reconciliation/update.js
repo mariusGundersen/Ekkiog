@@ -3,15 +3,23 @@ import {
   setGate
 } from './mutateContext.js';
 
+import {
+  WIRE,
+  GATE,
+  UNDERPASS,
+  BUTTON,
+  GROUND
+} from '../constants.js';
+
 export default function update(context, change){
   switch(change.after.type){
-    case 'wire':
+    case WIRE:
       return updateWireNet(context, change, change.after);
-    case 'gate':
+    case GATE:
       return updateGateInput(context, change, change.after);
-    case 'underpass':
+    case UNDERPASS:
       return updateUnderpassNet(context, change, change.after);
-    case 'button':
+    case BUTTON:
       return updateButtonState(context, change, change.after);
   }
 }

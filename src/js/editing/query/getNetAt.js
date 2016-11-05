@@ -1,19 +1,25 @@
 import * as ennea from 'ennea-tree';
 
-const GROUND = 0;
+import {
+  WIRE,
+  GATE,
+  UNDERPASS,
+  BUTTON,
+  GROUND
+} from '../constants.js';
 
 export default function getNetAt(enneaTree, x, y, dx, dy){
   const tile = ennea.get(enneaTree, y, x);
   if(!tile) return GROUND;
 
   switch(tile.data.type){
-    case 'wire':
+    case WIRE:
       return tile.data.net;
-    case 'gate':
+    case GATE:
       return getGateNet(tile, dx, dy);
-    case 'underpass':
+    case UNDERPASS:
       return getUnderpassNet(tile, dx, dy, enneaTree, x, y);
-    case 'button':
+    case BUTTON:
       return getButtonNet(tile);
   }
 }

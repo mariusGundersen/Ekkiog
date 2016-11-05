@@ -3,12 +3,20 @@ import * as ennea from 'ennea-tree';
 
 import ContextQuery from './ContextQuery.js';
 import {
+  WIRE_TILE,
+  GATE_TILE,
+  UNDERPASS_TILE,
+  BUTTON_TILE
+} from './tileConstants.js';
+
+import {
   EMPTY,
   WIRE,
   GATE,
   UNDERPASS,
-  BUTTON
-} from './tileConstants.js';
+  BUTTON,
+  GROUND
+} from './constants.js';
 
 import {
   getWireNeighbouringNets,
@@ -18,8 +26,6 @@ import {
 } from './query/getNeighbouringNets.js';
 import floodFill from './flooding/floodFill.js';
 import reconcile from './reconciliation/reconcile.js';
-
-const GROUND = 0;
 
 export default class Editor{
   constructor(context){
@@ -36,7 +42,7 @@ export default class Editor{
 
     const net = neighbouringNets[0] || GROUND;
     const data = {
-      type: 'wire',
+      type: WIRE,
       net
     };
     const box = {left:x, top:y};
@@ -52,7 +58,6 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-
     return true;
   }
 
@@ -67,7 +72,7 @@ export default class Editor{
     const inputA = ennea.get(this.context.enneaTree, y-1, x-4);
     const inputB = ennea.get(this.context.enneaTree, y+1, x-4);
     const data = {
-      type: 'gate',
+      type: GATE,
       net,
       inputA: {
         net: inputA ? inputA.data.net : GROUND
@@ -89,8 +94,6 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-
-
     return true;
   }
 
@@ -103,7 +106,7 @@ export default class Editor{
 
     const net = neighbouringNets.horizontal[0] || GROUND;
     const data = {
-      type: 'underpass',
+      type: UNDERPASS,
       net
     };
     const box = {left:x, top:y};
@@ -114,8 +117,8 @@ export default class Editor{
       return false;
     }
 
-    enneaTree = ennea.set(enneaTree, {type:'wire', net: GROUND}, {left:x, top:y-1});
-    enneaTree = ennea.set(enneaTree, {type:'wire', net: GROUND}, {left:x, top:y+1});
+    enneaTree = ennea.set(enneaTree, {type:WIRE, net: GROUND}, {left:x, top:y-1});
+    enneaTree = ennea.set(enneaTree, {type:WIRE, net: GROUND}, {left:x, top:y+1});
 
     enneaTree = floodFill(enneaTree, net, {...box, data});
 
@@ -135,7 +138,7 @@ export default class Editor{
 
     const net = this.query.getNextNet();
     const data = {
-      type: 'button',
+      type: BUTTON,
       net,
       state: false
     };
@@ -152,13 +155,11 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-
-
     return true;
   }
 
   clear(x, y){
-    let [enneaTree, ...cleared] = ennea.clearBranch(this.context.enneaTree, {left:x, top:y});
+    let [enneaTree, ...cleared] = ennea.clear(this.context.enneaTree, {left:x, top:y});
 
     enneaTree = floodFill(enneaTree, GROUND, ...cleared);
 
@@ -166,26 +167,25 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
-
     return true;
   }
 
   draw(x, y, tool){
-    if(tool === 'wire'){
-      if(this.getTileAt(x, y) === 'wire'){
+    if(tool === WIRE){
+      if(this.getTileAt(x, y) === WIRE){
         return this.clear(x, y);
       }else{
         return this.drawWire(x, y);
       }
-    }else if(tool === 'underpass'){
-      if(this.getTileAt(x, y) === 'underpass'){
+    }else if(tool === UNDERPASS){
+      if(this.getTileAt(x, y) === UNDERPASS){
         return this.clear(x, y);
       }else{
         return this.drawUnderpass(x, y);
       }
-    }else if(tool === 'gate'){
+    }else if(tool === GATE){
       return this.drawGate(x, y);
-    }else if(tool === 'button'){
+    }else if(tool === BUTTON){
       return this.drawButton(x, y);
     }else{
       return false;
@@ -195,7 +195,7 @@ export default class Editor{
   getTileAt(x, y){
     const tile = ennea.get(this.context.enneaTree, y, x);
     if(!tile){
-      return 'empty';
+      return EMPTY;
     }
 
     return tile.data.type;
@@ -235,15 +235,16 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
+    return true;
   }
 }
 
 function toTool(value){
   switch(value){
-    case WIRE: return 'wire';
-    case GATE: return 'gate';
-    case UNDERPASS: return 'underpass';
-    case BUTTON: return 'button';
-    default: return '';
+    case WIRE_TILE: return WIRE;
+    case GATE_TILE: return GATE;
+    case UNDERPASS_TILE: return UNDERPASS;
+    case BUTTON_TILE: return BUTTON;
+    default: return EMPTY;
   }
 }

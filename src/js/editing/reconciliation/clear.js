@@ -5,25 +5,27 @@ import {
 } from './mutateContext.js';
 
 import {
-  EMPTY,
+  EMPTY_TILE
+} from '../tileConstants.js';
+
+import {
   WIRE,
   GATE,
   UNDERPASS,
-  BUTTON
-} from '../tileConstants.js';
-
-const GROUND = 0;
+  BUTTON,
+  GROUND
+} from '../constants.js';
 
 export default function clear(context, change){
   clearArea(context, change);
   switch(change.before.type){
-    case 'wire':
+    case WIRE:
       return;
-    case 'gate':
+    case GATE:
       return setGate(context, change.before.net, 0, 0);
-    case 'underpass':
+    case UNDERPASS:
       return;
-    case 'button':
+    case BUTTON:
       return setGate(context, change.before.net, 0, 0);
   }
 }
@@ -31,7 +33,7 @@ export default function clear(context, change){
 export function clearArea(context, {top, left, width, height}){
   for(let y=top; y<top+height; y++){
     for(let x=left; x<left+width; x++){
-      setMap(context, x, y, EMPTY);
+      setMap(context, x, y, EMPTY_TILE);
       setNetMap(context, x, y, GROUND);
     }
   }

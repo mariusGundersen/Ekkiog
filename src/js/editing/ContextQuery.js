@@ -1,11 +1,11 @@
 import unique from 'array-unique';
 
 import {
-  EMPTY,
-  WIRE,
-  GATE,
-  UNDERPASS,
-  BUTTON
+  EMPTY_TILE,
+  WIRE_TILE,
+  GATE_TILE,
+  UNDERPASS_TILE,
+  BUTTON_TILE
 } from './tileConstants.js';
 
 export default class ContextQuery{
@@ -18,21 +18,21 @@ export default class ContextQuery{
   }
 
   isEmpty(x, y){
-    return this.getTileType(x, y) === EMPTY
+    return this.getTileType(x, y) === EMPTY_TILE
         && !this.isGate(x, y)
         && !this.isButton(x, y);
   }
 
   isWire(x, y){
-    return this.getTileType(x, y) === WIRE;
+    return this.getTileType(x, y) === WIRE_TILE;
   }
 
   isUnderpass(x, y){
-    return this.getTileType(x, y) === UNDERPASS;
+    return this.getTileType(x, y) === UNDERPASS_TILE;
   }
 
   isGateOutput(x, y){
-    return this.getTileType(x, y) === GATE;
+    return this.getTileType(x, y) === GATE_TILE;
   }
 
   isGateInput(x, y){
@@ -41,7 +41,7 @@ export default class ContextQuery{
   }
 
   isButtonOutput(x, y){
-    return this.getTileType(x, y) === BUTTON;
+    return this.getTileType(x, y) === BUTTON_TILE;
   }
 
   isGate(tx, ty){
@@ -85,7 +85,7 @@ export default class ContextQuery{
 
   isNetSource(x, y){
     const type = this.getTileType(x, y);
-    return type === GATE || type === BUTTON;
+    return type === GATE_TILE || type === BUTTON_TILE;
   }
 
   isGroundNet(x, y){
@@ -181,7 +181,7 @@ export default class ContextQuery{
   *getSearchDirections(x, y, type){
     const w = this.context.width;
     const h = this.context.height;
-    if(type == WIRE){
+    if(type == WIRE_TILE){
       if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y) || this.isButtonOutput(x-1, y))){
         yield [x-1, y];
       }
@@ -206,18 +206,18 @@ export default class ContextQuery{
           yield [x, terminalY];
         }
       }
-    }else if(type == UNDERPASS){
+    }else if(type == UNDERPASS_TILE){
       if(x > 0 && (this.isWire(x-1, y) || this.isUnderpass(x-1, y) || this.isGateOutput(x-1, y) || this.isButtonOutput(x-1, y))){
         yield [x-1, y];
       }
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
         yield [x+1, y];
       }
-    }else if(type == GATE){
+    }else if(type == GATE_TILE){
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
         yield [x+1, y];
       }
-    }else if(type == BUTTON){
+    }else if(type == BUTTON_TILE){
       if(x+1 < w && (this.isWire(x+1, y) || this.isUnderpass(x+1, y) || this.isGateInput(x+1, y))){
         yield [x+1, y];
       }

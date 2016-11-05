@@ -1,11 +1,11 @@
 import test from 'ava';
 
 import {
-  EMPTY,
-  WIRE,
-  GATE,
-  UNDERPASS,
-  BUTTON
+  EMPTY_TILE,
+  WIRE_TILE,
+  GATE_TILE,
+  UNDERPASS_TILE,
+  BUTTON_TILE
 } from './tileConstants.js';
 import ContextQuery from './ContextQuery.js';
 
@@ -32,7 +32,7 @@ test(
   `000
    0x0
    000`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   []);
 
 test(
@@ -41,7 +41,7 @@ test(
   `010
    1x1
    010`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   [[0,1],[2,1],[1,0],[1,2]]);
 
 test(
@@ -50,7 +50,7 @@ test(
   `000000
    2x0000
    000002`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   [[0,1],[2,1]]);
 
 test(
@@ -59,7 +59,7 @@ test(
   `000002
    2x0000
    000000`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   [[0,1],[2,1]]);
 
 test(
@@ -69,7 +69,7 @@ test(
    0x0000
    000000
    000002`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   []);
 
 test(
@@ -79,7 +79,7 @@ test(
    000000
    0x0000
    000000`,
-  [1, 2, WIRE],
+  [1, 2, WIRE_TILE],
   []);
 
 test(
@@ -88,7 +88,7 @@ test(
   `000
    3x3
    000`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   [[0,1],[2,1]]);
 
 test(
@@ -97,7 +97,7 @@ test(
   `000
    4x0
    000`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   [[0,1]]);
 
 test(
@@ -107,7 +107,7 @@ test(
    030
    0x0
    000`,
-  [1, 2, WIRE],
+  [1, 2, WIRE_TILE],
   [[1,0]]);
 
 test(
@@ -117,7 +117,7 @@ test(
    0x0
    030
    010`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   [[1,3]]);
 
 test(
@@ -129,7 +129,7 @@ test(
    030
    0x0
    000`,
-  [1, 4, WIRE],
+  [1, 4, WIRE_TILE],
   [[1,0]]);
 
 test(
@@ -141,7 +141,7 @@ test(
    030
    030
    010`,
-  [1, 1, WIRE],
+  [1, 1, WIRE_TILE],
   [[1,5]]);
 
 test(
@@ -150,7 +150,7 @@ test(
   `000
    0x0
    000`,
-  [1, 1, UNDERPASS],
+  [1, 1, UNDERPASS_TILE],
   []);
 
 test(
@@ -159,7 +159,7 @@ test(
   `010
    1x1
    010`,
-  [1, 1, UNDERPASS],
+  [1, 1, UNDERPASS_TILE],
   [[0,1],[2,1]]);
 
 test(
@@ -170,7 +170,7 @@ test(
    3x3
    030
    010`,
-  [1, 2, UNDERPASS],
+  [1, 2, UNDERPASS_TILE],
   [[0,2],[2,2]]);
 
 test(
@@ -179,7 +179,7 @@ test(
   `000
    4x0
    000`,
-  [1, 1, UNDERPASS],
+  [1, 1, UNDERPASS_TILE],
   [[0,1]]);
 
 test(
@@ -188,7 +188,7 @@ test(
   `000000
    2x0000
    000002`,
-  [1, 1, UNDERPASS],
+  [1, 1, UNDERPASS_TILE],
   [[0,1],[2,1]]);
 
 test(
@@ -197,7 +197,7 @@ test(
   `000002
    2x0000
    000000`,
-  [1, 1, UNDERPASS],
+  [1, 1, UNDERPASS_TILE],
   [[0,1],[2,1]]);
 
 test(
@@ -206,7 +206,7 @@ test(
   `000
    0x0
    000`,
-  [1, 1, GATE],
+  [1, 1, GATE_TILE],
   []);
 
 test(
@@ -215,7 +215,7 @@ test(
   `000
    0x1
    000`,
-  [1, 1, GATE],
+  [1, 1, GATE_TILE],
   [[2,1]]);
 
 test(
@@ -224,7 +224,7 @@ test(
   `000
    0x3
    000`,
-  [1, 1, GATE],
+  [1, 1, GATE_TILE],
   [[2,1]]);
 
 test(
@@ -233,7 +233,7 @@ test(
   `000000
    0x0000
    000002`,
-  [1, 1, GATE],
+  [1, 1, GATE_TILE],
   [[2,1]]);
 
 test(
@@ -242,7 +242,7 @@ test(
   `000002
    0x0000
    000000`,
-  [1, 1, GATE],
+  [1, 1, GATE_TILE],
   [[2,1]]);
 
 test(
@@ -251,7 +251,7 @@ test(
   `000
    0x1
    000`,
-  [1, 1, BUTTON],
+  [1, 1, BUTTON_TILE],
   [[2,1]]);
 
 test(
@@ -260,7 +260,7 @@ test(
   `000
    0x3
    000`,
-  [1, 1, BUTTON],
+  [1, 1, BUTTON_TILE],
   [[2,1]]);
 
 test(
@@ -269,7 +269,7 @@ test(
   `000000
    0x0000
    000002`,
-  [1, 1, BUTTON],
+  [1, 1, BUTTON_TILE],
   [[2,1]]);
 
 test(
@@ -278,7 +278,7 @@ test(
   `000002
    0x0000
    000000`,
-  [1, 1, BUTTON],
+  [1, 1, BUTTON_TILE],
   [[2,1]]);
 
 
