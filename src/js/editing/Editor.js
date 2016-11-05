@@ -16,7 +16,6 @@ import {
   getWireNeighbouringNets,
   getUnderpassNeighbouringNets
 } from './query/getNeighbouringNets.js';
-import canPlaceWireHere from './validate/canPlaceWireHere.js';
 import canPlaceGateHere from './validate/canPlaceGateHere.js';
 import canPlaceUnderpassHere from './validate/canPlaceUnderpassHere.js';
 import canPlaceButtonHere from './validate/canPlaceButtonHere.js';
@@ -34,8 +33,6 @@ export default class Editor{
   }
 
   drawWire(x, y){
-    if(!canPlaceWireHere(this.context.enneaTree, x, y)) return false;
-
     const neighbouringNets = getWireNeighbouringNets(this.context.enneaTree, x, y);
 
     if(neighbouringNets.length > 1){
@@ -49,6 +46,10 @@ export default class Editor{
     };
     const box = {left:x, top:y};
     let enneaTree = ennea.set(this.context.enneaTree, data, box);
+
+    if(this.context.enneaTree === enneaTree){
+      return false;
+    }
 
     enneaTree = floodFill(enneaTree, net, {...box, data});
 
@@ -79,6 +80,10 @@ export default class Editor{
     const box = {left:x-3, top:y-1, width:4, height:3};
     let enneaTree = ennea.set(this.context.enneaTree, data, box);
 
+    if(this.context.enneaTree === enneaTree){
+      return false;
+    }
+
     enneaTree = floodFill(enneaTree, net, {...box, data});
 
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
@@ -107,6 +112,11 @@ export default class Editor{
     const box = {left:x, top:y};
 
     let enneaTree = ennea.set(this.context.enneaTree, data, box);
+
+    if(this.context.enneaTree === enneaTree){
+      return false;
+    }
+
     enneaTree = ennea.set(enneaTree, {type:'wire', net: GROUND}, {left:x, top:y-1});
     enneaTree = ennea.set(enneaTree, {type:'wire', net: GROUND}, {left:x, top:y+1});
 
@@ -126,10 +136,14 @@ export default class Editor{
     const data = {
       type: 'button',
       net,
-      state: 0
+      state: false
     };
     const box = {left:x-2, top:y-1, width:3, height:3};
     let enneaTree = ennea.set(this.context.enneaTree, data, box);
+
+    if(this.context.enneaTree === enneaTree){
+      return false;
+    }
 
     enneaTree = floodFill(enneaTree, net, {...box, data});
 
@@ -317,7 +331,7 @@ export default class Editor{
   toggleButton(x, y){
     const updater = ennea.update(this.context.enneaTree, old => ({
       ...old,
-      state: old.state ? 0 : 1
+      state: !old.state
     }));
     updater.update({top: y, left: x});
     const enneaTree = updater.result();

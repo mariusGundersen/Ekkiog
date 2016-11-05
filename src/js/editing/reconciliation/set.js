@@ -49,5 +49,6 @@ export function button(context, {top:y, left:x, width, height}, button){
   setMap(context, x+2, y+1, BUTTON);
   setNetMap(context, x+2, y+1, button.net);
   setNetMap(context, x+1, y+1, button.net);
-  setGate(context, button.net, button.state, button.state);
+  const state = button.state ? 0 : 1;
+  setGate(context, button.net, state, state);
 }

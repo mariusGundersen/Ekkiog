@@ -5,7 +5,7 @@ import getNetAt from '../query/getNetAt.js';
 const GROUND = 0;
 
 export default function canPlaceUnderpassHere(enneaTree, x, y){
-  if(!ennea.isEmpty(enneaTree, {top: y, left: x})) return false;
+  //ToDo: check above and below
 
   return true;
 };

@@ -31,5 +31,6 @@ export function updateUnderpassNet(context, {top:y, left:x}, underpass){
 }
 
 export function updateButtonState(context, {top:y, lfet:x}, button){
-  setGate(context, button.net, button.state, button.state);
+  const state = button.state ? 0 : 1;
+  setGate(context, button.net, state, state);
 }
