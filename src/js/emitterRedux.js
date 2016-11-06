@@ -24,12 +24,13 @@ import {
   OK_SELECTION_MOVE
 } from './events.js';
 
-export function createEmitterMiddleware(emitter){
-  return ({getState, dispatch}) => next => action => {
+export function createEmitterMiddleware(){
+  return ({getState}) => next => action => {
     if(action.meta && typeof(action.meta) == 'object' && action.meta.emit === true){
-      emitter.emit(action.type, action);
+      getState().global.emitter.emit(action.type, action);
+    }else{
+      return next(action);
     }
-    return next(action)
   };
 }
 
@@ -60,8 +61,9 @@ export function handleTap(perspective, dispatch, store){
 
 export function handleShowContextMenu(perspective, dispatch, store){
   return ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTile(x, y);
-    const tile = getTypeAt(store.getState().forest.enneaTree, Math.floor(tx), Math.floor(ty));
+    const [tx, ty] = perspective.viewportToTileFloored(x, y);
+    const enneaTree = store.getState().forest.enneaTree;
+    const tile = getTypeAt(enneaTree, tx, ty);
     dispatch(showContextMenu(
       tile,
       tx,
