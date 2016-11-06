@@ -8,12 +8,12 @@ import {
 import {getWireNeighbouringNets} from '../query/getNeighbouringNets.js';
 import floodFill from '../flooding/floodFill.js';
 
-export default function drawWire(context, x, y){
-  const buddyTree = context.buddyTree;
-  const neighbouringNets = getWireNeighbouringNets(context.enneaTree, x, y);
+export default function drawWire(forest, x, y){
+  const buddyTree = forest.buddyTree;
+  const neighbouringNets = getWireNeighbouringNets(forest.enneaTree, x, y);
 
   if(neighbouringNets.length > 1){
-    return context;
+    return forest;
   }
 
   const net = neighbouringNets[0] || GROUND;
@@ -22,10 +22,10 @@ export default function drawWire(context, x, y){
     net
   };
   const box = {left:x, top:y};
-  let enneaTree = ennea.set(context.enneaTree, data, box);
+  let enneaTree = ennea.set(forest.enneaTree, data, box);
 
-  if(context.enneaTree === enneaTree){
-    return context;
+  if(forest.enneaTree === enneaTree){
+    return forest;
   }
 
   enneaTree = floodFill(enneaTree, net, {...box, data});

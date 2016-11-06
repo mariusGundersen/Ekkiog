@@ -6,34 +6,33 @@ import {
   GROUND
 } from '../constants.js';
 
+import getNetAt from '../query/getNetAt.js';
 import {getGateNeighbouringNets} from '../query/getNeighbouringNets.js';
 import floodFill from '../flooding/floodFill.js';
 
-export default function drawGate(context, x, y){
-  const neighbouringNets = getGateNeighbouringNets(context.enneaTree, x, y);
+export default function drawGate(forest, x, y){
+  const neighbouringNets = getGateNeighbouringNets(forest.enneaTree, x, y);
 
   if(neighbouringNets.length === 1){
-    return context;
+    return forest;
   }
 
-  const [buddyTree, net] = allocate(context.buddyTree);
-  const inputA = ennea.get(context.enneaTree, y-1, x-4);
-  const inputB = ennea.get(context.enneaTree, y+1, x-4);
+  const [buddyTree, net] = allocate(forest.buddyTree);
   const data = {
     type: GATE,
     net,
     inputA: {
-      net: inputA ? inputA.data.net : GROUND
+      net: getNetAt(forest.enneaTree, x-4, y-1, 0, -1)
     },
     inputB: {
-      net: inputB ? inputB.data.net : GROUND
+      net: getNetAt(forest.enneaTree, x-4, y+1, 0, -1)
     }
   };
   const box = {left:x-3, top:y-1, width:4, height:3};
-  let enneaTree = ennea.set(context.enneaTree, data, box);
+  let enneaTree = ennea.set(forest.enneaTree, data, box);
 
-  if(context.enneaTree === enneaTree){
-    return context;
+  if(forest.enneaTree === enneaTree){
+    return forest;
   }
 
   enneaTree = floodFill(enneaTree, net, {...box, data});

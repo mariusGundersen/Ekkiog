@@ -8,24 +8,24 @@ import {
 import {getButtonNeighbouringNets} from '../query/getNeighbouringNets.js';
 import floodFill from '../flooding/floodFill.js';
 
-export default function drawButton(context, x, y){
-  const neighbouringNets = getButtonNeighbouringNets(context.enneaTree, x, y);
+export default function drawButton(forest, x, y){
+  const neighbouringNets = getButtonNeighbouringNets(forest.enneaTree, x, y);
 
   if(neighbouringNets.length === 1){
-    return context;
+    return forest;
   }
 
-  const [buddyTree, net] = allocate(context.buddyTree);
+  const [buddyTree, net] = allocate(forest.buddyTree);
   const data = {
     type: BUTTON,
     net,
     state: false
   };
   const box = {left:x-2, top:y-1, width:3, height:3};
-  let enneaTree = ennea.set(context.enneaTree, data, box);
+  let enneaTree = ennea.set(forest.enneaTree, data, box);
 
-  if(context.enneaTree === enneaTree){
-    return context;
+  if(forest.enneaTree === enneaTree){
+    return forest;
   }
 
   enneaTree = floodFill(enneaTree, net, {...box, data});

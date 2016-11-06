@@ -9,12 +9,12 @@ import {
 import {getUnderpassNeighbouringNets} from '../query/getNeighbouringNets.js';
 import floodFill from '../flooding/floodFill.js';
 
-export default function drawUnderpass(context, x, y){
-  const buddyTree = context.buddyTree;
-  const neighbouringNets = getUnderpassNeighbouringNets(context.enneaTree, x, y);
+export default function drawUnderpass(forest, x, y){
+  const buddyTree = forest.buddyTree;
+  const neighbouringNets = getUnderpassNeighbouringNets(forest.enneaTree, x, y);
 
   if(neighbouringNets.horizontal.length > 1 || neighbouringNets.vertical.length > 1){
-    return context;
+    return forest;
   }
 
   const net = neighbouringNets.horizontal[0] || GROUND;
@@ -24,10 +24,10 @@ export default function drawUnderpass(context, x, y){
   };
   const box = {left:x, top:y};
 
-  let enneaTree = ennea.set(context.enneaTree, data, box);
+  let enneaTree = ennea.set(forest.enneaTree, data, box);
 
-  if(context.enneaTree === enneaTree){
-    return context;
+  if(forest.enneaTree === enneaTree){
+    return forest;
   }
 
   enneaTree = ennea.set(enneaTree, {type:WIRE, net: GROUND}, {left:x, top:y-1});

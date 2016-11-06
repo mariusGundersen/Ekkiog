@@ -9,14 +9,14 @@ import {
 
 import floodFill from '../flooding/floodFill.js';
 
-export default function clear(context, x, y){
-  let [enneaTree, ...cleared] = ennea.clear(context.enneaTree, {left:x, top:y});
+export default function clear(forest, x, y){
+  let [enneaTree, ...cleared] = ennea.clear(forest.enneaTree, {left:x, top:y});
 
   enneaTree = floodFill(enneaTree, GROUND, ...cleared);
 
   const buddyTree = cleared.map(getNetSource)
     .filter(net => net > 1)
-    .reduce(deallocate, context.buddyTree);
+    .reduce(deallocate, forest.buddyTree);
 
   return {
     enneaTree,
