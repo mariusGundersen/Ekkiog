@@ -1,6 +1,5 @@
 import ndarray from 'ndarray';
 import * as ennea from 'ennea-tree';
-import {allocate, deallocate} from 'buddy-tree';
 
 import {
   WIRE_TILE,
@@ -18,14 +17,17 @@ import {
   GROUND
 } from './constants.js';
 
-import {
-  getWireNeighbouringNets,
-  getGateNeighbouringNets,
-  getUnderpassNeighbouringNets,
-  getButtonNeighbouringNets
-} from './query/getNeighbouringNets.js';
-import floodFill from './flooding/floodFill.js';
+import getTypeAt from './query/getTypeAt.js';
 import reconcile from './reconciliation/reconcile.js';
+
+import drawWire from './actions/drawWire.js';
+import drawGate from './actions/drawGate.js';
+import drawUnderpass from './actions/drawUnderpass.js';
+import drawButton from './actions/drawButton.js';
+import clear from './actions/clear.js';
+import toggleButton from './actions/toggleButton.js';
+
+import mutateContext from './mutateContext.js';
 
 export default class Editor{
   constructor(context){
@@ -33,146 +35,83 @@ export default class Editor{
   }
 
   drawWire(x, y){
-    const neighbouringNets = getWireNeighbouringNets(this.context.enneaTree, x, y);
+    const context = drawWire(this.context, x, y);
 
-    if(neighbouringNets.length > 1){
+    if(this.context === context){
       return false;
     }
 
-    const net = neighbouringNets[0] || GROUND;
-    const data = {
-      type: WIRE,
-      net
-    };
-    const box = {left:x, top:y};
-    let enneaTree = ennea.set(this.context.enneaTree, data, box);
+    mutateContext(this.context, this.context.enneaTree, context.enneaTree);
 
-    if(this.context.enneaTree === enneaTree){
-      return false;
-    }
-
-    enneaTree = floodFill(enneaTree, net, {...box, data});
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
+    this.context.enneaTree = context.enneaTree;
     return true;
   }
 
   drawGate(x, y){
-    const neighbouringNets = getGateNeighbouringNets(this.context.enneaTree, x, y);
+    const context = drawGate(this.context, x, y);
 
-    if(neighbouringNets.length === 1){
+    if(this.context === context){
       return false;
     }
 
-    const [buddyTree, net] = allocate(this.context.buddyTree);
-    const inputA = ennea.get(this.context.enneaTree, y-1, x-4);
-    const inputB = ennea.get(this.context.enneaTree, y+1, x-4);
-    const data = {
-      type: GATE,
-      net,
-      inputA: {
-        net: inputA ? inputA.data.net : GROUND
-      },
-      inputB: {
-        net: inputB ? inputB.data.net : GROUND
-      }
-    };
-    const box = {left:x-3, top:y-1, width:4, height:3};
-    let enneaTree = ennea.set(this.context.enneaTree, data, box);
+    mutateContext(this.context, this.context.enneaTree, context.enneaTree);
 
-    if(this.context.enneaTree === enneaTree){
-      return false;
-    }
-
-    enneaTree = floodFill(enneaTree, net, {...box, data});
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
-    this.context.buddyTree = buddyTree;
+    this.context.enneaTree = context.enneaTree;
+    this.context.buddyTree = context.buddyTree;
     return true;
   }
 
   drawUnderpass(x, y){
-    const neighbouringNets = getUnderpassNeighbouringNets(this.context.enneaTree, x, y);
+    const context = drawUnderpass(this.context, x, y);
 
-    if(neighbouringNets.horizontal.length > 1 || neighbouringNets.vertical.length > 1){
+    if(this.context === context){
       return false;
     }
 
-    const net = neighbouringNets.horizontal[0] || GROUND;
-    const data = {
-      type: UNDERPASS,
-      net
-    };
-    const box = {left:x, top:y};
+    mutateContext(this.context, this.context.enneaTree, context.enneaTree);
 
-    let enneaTree = ennea.set(this.context.enneaTree, data, box);
-
-    if(this.context.enneaTree === enneaTree){
-      return false;
-    }
-
-    enneaTree = ennea.set(enneaTree, {type:WIRE, net: GROUND}, {left:x, top:y-1});
-    enneaTree = ennea.set(enneaTree, {type:WIRE, net: GROUND}, {left:x, top:y+1});
-
-    enneaTree = floodFill(enneaTree, net, {...box, data});
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
+    this.context.enneaTree = context.enneaTree;
     return true;
   }
 
   drawButton(x, y){
-    const neighbouringNets = getButtonNeighbouringNets(this.context.enneaTree, x, y);
+    const context = drawButton(this.context, x, y);
 
-    if(neighbouringNets.length === 1){
+    if(this.context === context){
       return false;
     }
 
-    const [buddyTree, net] = allocate(this.context.buddyTree);
-    const data = {
-      type: BUTTON,
-      net,
-      state: false
-    };
-    const box = {left:x-2, top:y-1, width:3, height:3};
-    let enneaTree = ennea.set(this.context.enneaTree, data, box);
+    mutateContext(this.context, this.context.enneaTree, context.enneaTree);
 
-    if(this.context.enneaTree === enneaTree){
-      return false;
-    }
-
-    enneaTree = floodFill(enneaTree, net, {...box, data});
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
-    this.context.buddyTree = buddyTree;
+    this.context.enneaTree = context.enneaTree;
+    this.context.buddyTree = context.buddyTree;
     return true;
   }
 
   clear(x, y){
-    let [enneaTree, ...cleared] = ennea.clear(this.context.enneaTree, {left:x, top:y});
+    const context = clear(this.context, x, y);
 
-    enneaTree = floodFill(enneaTree, GROUND, ...cleared);
+    if(this.context === context){
+      return false;
+    }
 
-    let buddyTree = cleared.map(getNetSource)
-      .filter(net => net > 1)
-      .reduce((tree, net) => deallocate(tree, net), this.context.buddyTree);
+    mutateContext(this.context, this.context.enneaTree, context.enneaTree);
 
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
+    this.context.enneaTree = context.enneaTree;
+    this.context.buddyTree = context.buddyTree;
+    return true;
+  }
 
-    this.context.enneaTree = enneaTree;
-    this.context.buddyTree = buddyTree;
+  toggleButton(x, y){
+    const context = toggleButton(this.context, x, y);
+
+    if(this.context === context){
+      return false;
+    }
+
+    mutateContext(this.context, this.context.enneaTree, context.enneaTree);
+
+    this.context.enneaTree = context.enneaTree;
     return true;
   }
 
@@ -199,12 +138,7 @@ export default class Editor{
   }
 
   getTileAt(x, y){
-    const tile = ennea.get(this.context.enneaTree, y, x);
-    if(!tile){
-      return EMPTY;
-    }
-
-    return tile.data.type;
+    getTypeAt(this.context.enneaTree, x, y);
   }
 
   moveSelection(top, left, right, bottom, dx, dy){
@@ -228,21 +162,6 @@ export default class Editor{
       }
     }
   }
-
-  toggleButton(x, y){
-    const updater = ennea.update(this.context.enneaTree, old => ({
-      ...old,
-      state: !old.state
-    }));
-    updater.update({top: y, left: x});
-    const enneaTree = updater.result();
-
-    const changes = ennea.diff(this.context.enneaTree, enneaTree);
-    reconcile(this.context, changes);
-
-    this.context.enneaTree = enneaTree;
-    return true;
-  }
 }
 
 function toTool(value){
@@ -252,15 +171,5 @@ function toTool(value){
     case UNDERPASS_TILE: return UNDERPASS;
     case BUTTON_TILE: return BUTTON;
     default: return EMPTY;
-  }
-}
-
-function getNetSource(box){
-  switch(box.data.type){
-    case GATE:
-    case BUTTON:
-      return box.data.net;
-    default:
-      return 0;
   }
 }

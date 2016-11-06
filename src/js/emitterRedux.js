@@ -50,7 +50,7 @@ export function handleTap(editor, perspective, getContext, renderer, saveContext
     window.requestAnimationFrame(() => {
       const context = getContext();
 
-      if(editor.query.isButton(tx, ty)){
+      if(editor.getTileAt(tx, ty) === 'button'){
         editor.toggleButton(tx, ty);
 
         context.gatesTexture.update();
