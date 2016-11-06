@@ -23,7 +23,9 @@ export default function reduce(forest=createForest(), action){
     case 'remove-tile-at':
       return clear(forest, action.x, action.y);
     case 'convert-wire-to-underpass':
+      return wireToUnderpass(forest, action.x, action.y);
     case 'convert-underpass-to-wire':
+      return underpassToWire(forest, action.x, action.y);
     default:
       return forest;
   }
@@ -52,4 +54,26 @@ function tap(forest, tool, x, y){
   }else{
     return forest;
   }
+}
+
+function wireToUnderpass(forest, x, y){
+  const type = getTypeAt(forest.enneaTree, x, y);
+  if(type !== WIRE) return forest;
+
+  const tempForest = clear(forest, x, y);
+  const result = drawUnderpass(tempForest, x, y);
+  if(result === tempForest) return forest;
+
+  return result;
+}
+
+function underpassToWire(forest, x, y){
+  const type = getTypeAt(forest.enneaTree, x, y);
+  if(type !== UNDERPASS) return forest;
+
+  const tempForest = clear(forest, x, y);
+  const result = drawWire(tempForest, x, y);
+  if(result === tempForest) return forest;
+
+  return result;
 }

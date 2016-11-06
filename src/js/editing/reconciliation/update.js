@@ -1,7 +1,16 @@
 import {
+  setMap,
   setNetMap,
   setGate
 } from './mutateContext.js';
+
+import {
+  EMPTY_TILE,
+  WIRE_TILE,
+  GATE_TILE,
+  UNDERPASS_TILE,
+  BUTTON_TILE
+} from '../tileConstants.js';
 
 import {
   WIRE,
@@ -25,6 +34,7 @@ export default function update(context, change){
 }
 
 export function updateWireNet(context, {top:y, left:x}, wire){
+  setMap(context, x, y, WIRE_TILE);
   setNetMap(context, x, y, wire.net);
 }
 
@@ -35,6 +45,7 @@ export function updateGateInput(context, {top:y, left:x}, gate){
 }
 
 export function updateUnderpassNet(context, {top:y, left:x}, underpass){
+  setMap(context, x, y, UNDERPASS_TILE);
   setNetMap(context, x, y, underpass.net);
 }
 
