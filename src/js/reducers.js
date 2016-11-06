@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
 import { vec2 } from 'gl-matrix';
 
+import forest from './editing/reduce.js';
+
 import {
   RESIZE,
   GL,
@@ -154,7 +156,8 @@ const ekkiogApp = combineReducers({
   global,
   editor,
   mainMenu,
-  contextMenu
+  contextMenu,
+  forest
 });
 
 export default ekkiogApp;

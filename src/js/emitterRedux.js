@@ -1,3 +1,5 @@
+import getTypeAt from './editing/query/getTypeAt.js';
+
 import {
   REMOVE_TILE_AT,
   TO_UNDERPASS,
@@ -22,7 +24,7 @@ import {
   OK_SELECTION_MOVE
 } from './events.js';
 
-export function toEmitterMiddleware(emitter){
+export function createEmitterMiddleware(emitter){
   return ({getState, dispatch}) => next => action => {
     if(action.meta && typeof(action.meta) == 'object' && action.meta.emit === true){
       emitter.emit(action.type, action);
@@ -31,47 +33,38 @@ export function toEmitterMiddleware(emitter){
   };
 }
 
-export function fromEmitter(emitter, editor, perspective, getContext, renderer, saveContext, store){
-  emitter.on(TAP, handleTap(editor, perspective, getContext, renderer, saveContext, store.dispatch, store));
-  emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(editor, perspective, store.dispatch));
-  emitter.on(REMOVE_TILE_AT, handleRemoveTileAt(editor, getContext, renderer, saveContext, store.dispatch));
-  emitter.on(TO_UNDERPASS, handleConvertToUnderpass(editor, getContext, renderer, saveContext, store.dispatch));
-  emitter.on(TO_WIRE, handleConvertToWire(editor, getContext, renderer, saveContext, store.dispatch));
-  emitter.on(MOVE_GATE, handleMoveGate(editor, emitter, store.dispatch));
-  emitter.on(MOVE_SELECTION, handleMoveSelection(editor, getContext, renderer, saveContext));
-  emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(store.dispatch));
-  emitter.on(ABORT_LOAD_CONTEXT_MENU, handleAbortContextMenu(store.dispatch));
+export function fromEmitter(emitter, perspective, store){
+  const dispatch = store.dispatch;
+  emitter.on(TAP, handleTap(perspective, dispatch, store));
+  emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(perspective, dispatch, store));
+  emitter.on(REMOVE_TILE_AT, handleRemoveTileAt(dispatch));
+  emitter.on(TO_UNDERPASS, handleConvertToUnderpass(dispatch));
+  emitter.on(TO_WIRE, handleConvertToWire(dispatch));
+  //emitter.on(MOVE_GATE, handleMoveGate(editor, emitter, dispatch));
+  //emitter.on(MOVE_SELECTION, handleMoveSelection(editor, getContext, renderer, saveContext));
+  emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(dispatch));
+  emitter.on(ABORT_LOAD_CONTEXT_MENU, handleAbortContextMenu(dispatch));
 }
 
-export function handleTap(editor, perspective, getContext, renderer, saveContext, dispatch, store){
+export function handleTap(perspective, dispatch, store){
   return ({x, y}) => {
     const [tx, ty] = perspective.viewportToTileFloored(x, y);
 
     window.requestAnimationFrame(() => {
-      const context = getContext();
-
-      if(editor.getTileAt(tx, ty) === 'button'){
-        editor.toggleButton(tx, ty);
-
-        context.gatesTexture.update();
-
-        renderer.simulateTick(context, renderer.currentTick);
-
-        saveContext();
-      }else{
-        const tool = store.getState().editor.selectedTool;
-        if(editor.draw(tx, ty, tool)){
-          edited(context, renderer, saveContext);
-        }
-      }
-    })
+      dispatch({
+        type: 'tap-tile',
+        x: tx,
+        y: ty,
+        tool: store.getState().editor.selectedTool
+      });
+    });
   };
 }
 
-export function handleShowContextMenu(editor, perspective, dispatch){
+export function handleShowContextMenu(perspective, dispatch, store){
   return ({x, y}) => {
     const [tx, ty] = perspective.viewportToTile(x, y);
-    const tile = editor.getTileAt(Math.floor(tx), Math.floor(ty));
+    const tile = getTypeAt(store.getState().forest.enneaTree, Math.floor(tx), Math.floor(ty));
     dispatch(showContextMenu(
       tile,
       tx,
@@ -79,31 +72,37 @@ export function handleShowContextMenu(editor, perspective, dispatch){
   };
 }
 
-export function handleRemoveTileAt(editor, getContext, renderer, saveContext, dispatch){
+export function handleRemoveTileAt(dispatch){
   return ({tx, ty}) => {
-    if(editor.clear(tx, ty)){
-      edited(getContext(), renderer, saveContext);
-    }
+    dispatch({
+      type: 'clear-tile',
+      x: tx,
+      y: ty
+    });
 
     dispatch(hideContextMenu());
   };
 }
 
-export function handleConvertToUnderpass(editor, getContext, renderer, saveContext, dispatch){
+export function handleConvertToUnderpass(dispatch){
   return ({tx, ty}) => {
-    if(editor.drawUnderpass(tx, ty)){
-      edited(getContext(), renderer, saveContext);
-    }
+    dispatch({
+      type: 'convert-wire-to-underpass',
+      x: tx,
+      y: ty
+    });
 
     dispatch(hideContextMenu());
   };
 }
 
-export function handleConvertToWire(editor, getContext, renderer, saveContext, dispatch){
+export function handleConvertToWire(dispatch){
   return ({tx, ty}) => {
-    if(editor.drawWire(tx, ty)){
-      edited(getContext(), renderer, saveContext);
-    }
+    dispatch({
+      type: 'convert-underpass-to-wire',
+      x: tx,
+      y: ty
+    });
 
     dispatch(hideContextMenu());
   };
@@ -151,14 +150,4 @@ export function handleAbortContextMenu(dispatch){
   return ({x, y}) => {
     dispatch(abortLoadContextMenu());
   };
-}
-
-function edited(context, renderer, saveContext){
-  context.mapTexture.update();
-  context.netMapTexture.update();
-  context.gatesTexture.update();
-
-  renderer.renderMap(context);
-
-  saveContext();
 }

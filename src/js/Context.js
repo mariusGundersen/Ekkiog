@@ -1,6 +1,4 @@
 import {encode as encodeArray, decode as decodeArary} from 'base64-arraybuffer';
-import {createTree as createEnneaTree} from 'ennea-tree';
-import {createTree as createBuddyTree, allocate} from 'buddy-tree';
 
 import serialize from './storage/serialize.js';
 import deserialize from './storage/deserialize.js';
@@ -12,51 +10,24 @@ import ImageTexture from './textures/ImageTexture.js';
 import loadImage from './loadImage.js';
 import tiles from '../img/tiles.png';
 
+const SQRT_NET_COUNT = 256;
 
 export default class Context{
-  constructor(gl, data, tileSize=16){
+  constructor(gl, mapSize=128, tileSize=16){
     this.gl = gl;
-    this.width = data.width;
-    this.height = data.height;
+    this.width = mapSize;
+    this.height = mapSize;
     this.tileSize = tileSize;
 
     this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
-    this.mapTexture = new DataTexture(gl, this.width, this.height);
-    this.tileMapTexture = new RenderTexture(gl, this.width, this.height);
-    this.chargeMapTexture = new RenderTexture(gl, this.width, this.height);
-    this.netMapTexture = new DataTexture(gl, this.width, this.height);
+    this.mapTexture = new DataTexture(gl, mapSize, mapSize);
+    this.tileMapTexture = new RenderTexture(gl, mapSize, mapSize);
+    this.chargeMapTexture = new RenderTexture(gl, mapSize, mapSize);
+    this.netMapTexture = new DataTexture(gl, mapSize, mapSize);
     this.netChargeTextures = [
-      new RenderTexture(gl, 256, 256),
-      new RenderTexture(gl, 256, 256)
+      new RenderTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT),
+      new RenderTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT)
     ];
-    this.gatesTexture = new DataTexture(gl, 256, 256);
-    this.enneaTree = createEnneaTree(this.width);
-    this.buddyTree = allocate(createBuddyTree(256*256), 2)[0];
-
-    this.import(data);
-  }
-
-  import(data){
-    if(!data) return;
-    if(data.map) this.mapTexture.import(deserialize(data.map));
-    if(data.netMap) this.netMapTexture.import(deserialize(data.netMap));
-    if(data.gates) this.gatesTexture.import(deserialize(data.gates));
-    if(data.netCharges) this.netChargeTextures[0].import(deserialize(data.netCharges));
-    if(data.netCharges) this.netChargeTextures[1].import(deserialize(data.netCharges));
-    if(data.enneaTree) this.enneaTree = data.enneaTree;
-    if(data.buddyTree) this.buddyTree = data.buddyTree;
-  }
-
-  export(){
-    return {
-      width: this.width,
-      height: this.height,
-      map: serialize(this.mapTexture.export()),
-      netMap: serialize(this.netMapTexture.export()),
-      gates: serialize(this.gatesTexture.export()),
-      netCharges: serialize(this.netChargeTextures[0].export()),
-      enneaTree: this.enneaTree,
-      buddyTree: this.buddyTree
-    };
+    this.gatesTexture = new DataTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT);
   }
 }

@@ -12,19 +12,18 @@ import {
 } from '../events.js';
 
 const WebGLCanvas = connect(
-  ({view, global}) => ({
+  ({view}) => ({
     width: view.pixelWidth,
-    height: view.pixelHeight,
-    emitter: global.emitter
+    height: view.pixelHeight
   })
 )(class extends React.Component{
   componentDidMount(){
     const gl = getContext(this.canvas);
 
     // The react event system is too slow, so using the native events
-    this.canvas.addEventListener('touchstart', emitTouchEvents(this.props.emitter, TOUCH_START), false)
-    this.canvas.addEventListener('touchmove', emitTouchEvents(this.props.emitter, TOUCH_MOVE), false);
-    this.canvas.addEventListener('touchend', emitTouchEvents(this.props.emitter, TOUCH_END), false);
+    this.canvas.addEventListener('touchstart', dispatchTouchEvents(this.props.dispatch, TOUCH_START), false)
+    this.canvas.addEventListener('touchmove', dispatchTouchEvents(this.props.dispatch, TOUCH_MOVE), false);
+    this.canvas.addEventListener('touchend', dispatchTouchEvents(this.props.dispatch, TOUCH_END), false);
 
     this.props.dispatch({
       type: GL,
@@ -54,14 +53,18 @@ function getContext(canvas) {
       || canvas.getContext("experimental-webgl", {});
 }
 
-function emitTouchEvents(emitter, type){
+function dispatchTouchEvents(dispatch, type){
   return event => {
     for(let i=0; i < event.changedTouches.length; i++){
       let touch = event.changedTouches[i];
-      emitter.emit(type, {
+      dispatch({
+        type,
         id: touch.identifier,
         x: touch.pageX*window.devicePixelRatio,
-        y: touch.pageY*window.devicePixelRatio
+        y: touch.pageY*window.devicePixelRatio,
+        meta: {
+          emit: true
+        }
       });
     }
 

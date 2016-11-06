@@ -17,9 +17,11 @@ import Perspective from './Perspective.js';
 import TouchControls from './interaction/TouchControls.js';
 
 import {
-  toEmitterMiddleware,
+  createEmitterMiddleware,
   fromEmitter
 } from './emitterRedux.js';
+
+import createContextMiddleware from './editing/createContextMiddleware.js';
 
 import {
   resize,
@@ -29,6 +31,7 @@ import {
 import reducers from './reducers.js';
 import App from './components/App.jsx';
 
+const MAP_SIZE = 128;
 const TILE_SIZE = 16;
 
 if(!__DEV__){
@@ -47,29 +50,37 @@ if(!__DEV__){
 }
 
 const emitter = new EventEmitter();
+const world = {
+  context: null,
+  renderer: null
+};
 
-const store = createStore(reducers, {
-  global: { emitter }
-}, applyMiddleware(toEmitterMiddleware(emitter)));
+const store = createStore(
+  reducers,
+  applyMiddleware(
+    createEmitterMiddleware(emitter),
+    createContextMiddleware(world)
+  )
+);
 
 initialize(store, async ({global}) => {
   const gl = global.gl;
 
   const renderer = new Renderer(gl);
+  const context = new Context(gl, MAP_SIZE, TILE_SIZE);
+  world.context = context;
+  world.renderer = renderer;
 
   const perspective = new Perspective();
-  const context = new Context(gl, {width: 128, height: 128}, TILE_SIZE);
   perspective.setMapSize(context.width, context.height);
 
   const touchControls = new TouchControls(emitter, perspective);
 
   const storage = await database.open();
-  context.import(await storage.load());
-  renderer.renderMap(context);
+  //context.import(await storage.load());
+  //renderer.renderMap(context);
 
-  const editor = new Editor(context);
-
-  fromEmitter(emitter, editor, perspective, () => context, renderer, () => storage.save(context.export()), store);
+  fromEmitter(emitter, perspective, store);
 
   const shell = new Shell({
     tickInterval: 500,
@@ -111,7 +122,7 @@ function initialize(store, listener){
     const gl = state.global.gl;
     if(gl != null){
       unsubscribe();
-      listener(state);
+      listener(state).catch(e => console.error(e));
     }
   });
 }
