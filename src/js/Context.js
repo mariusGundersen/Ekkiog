@@ -1,8 +1,3 @@
-import {encode as encodeArray, decode as decodeArary} from 'base64-arraybuffer';
-
-import serialize from './storage/serialize.js';
-import deserialize from './storage/deserialize.js';
-
 import DataTexture from './textures/DataTexture.js';
 import RenderTexture from './textures/RenderTexture.js';
 

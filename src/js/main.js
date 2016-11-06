@@ -9,7 +9,6 @@ import '../manifest.json';
 import offline from 'offline-plugin/runtime';
 
 import Shell from './Shell.js';
-import Editor from './editing/Editor.js';
 import * as database from './storage/database.js';
 import Context from './Context.js';
 import Renderer from './engines/Renderer.js';

@@ -20,7 +20,7 @@ export default function reduce(forest=createForest(), action){
   switch(action.type){
     case 'tap-tile':
       return tap(forest, action.tool, action.x, action.y);
-    case 'clear-tile':
+    case 'remove-tile-at':
       return clear(forest, action.x, action.y);
     case 'convert-wire-to-underpass':
     case 'convert-underpass-to-wire':

@@ -37,9 +37,6 @@ export function fromEmitter(emitter, perspective, store){
   const dispatch = store.dispatch;
   emitter.on(TAP, handleTap(perspective, dispatch, store));
   emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(perspective, dispatch, store));
-  emitter.on(REMOVE_TILE_AT, handleRemoveTileAt(dispatch));
-  emitter.on(TO_UNDERPASS, handleConvertToUnderpass(dispatch));
-  emitter.on(TO_WIRE, handleConvertToWire(dispatch));
   //emitter.on(MOVE_GATE, handleMoveGate(editor, emitter, dispatch));
   //emitter.on(MOVE_SELECTION, handleMoveSelection(editor, getContext, renderer, saveContext));
   emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(dispatch));
@@ -69,42 +66,6 @@ export function handleShowContextMenu(perspective, dispatch, store){
       tile,
       tx,
       ty));
-  };
-}
-
-export function handleRemoveTileAt(dispatch){
-  return ({tx, ty}) => {
-    dispatch({
-      type: 'clear-tile',
-      x: tx,
-      y: ty
-    });
-
-    dispatch(hideContextMenu());
-  };
-}
-
-export function handleConvertToUnderpass(dispatch){
-  return ({tx, ty}) => {
-    dispatch({
-      type: 'convert-wire-to-underpass',
-      x: tx,
-      y: ty
-    });
-
-    dispatch(hideContextMenu());
-  };
-}
-
-export function handleConvertToWire(dispatch){
-  return ({tx, ty}) => {
-    dispatch({
-      type: 'convert-underpass-to-wire',
-      x: tx,
-      y: ty
-    });
-
-    dispatch(hideContextMenu());
   };
 }
 

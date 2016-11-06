@@ -38,14 +38,23 @@ export function moveMenuItem(dispatch, tx, ty){
 }
 
 export function removeMenuItem(dispatch, tx, ty){
-  return menuItem('remove', <IconRemove />, () => dispatch(removeTileAt(tx, ty)));
+  return menuItem('remove', <IconRemove />, () => {
+    dispatch(removeTileAt(tx, ty));
+    dispatch(hideContextMenu());
+  });
 }
 
 export function toUnderpassMenuItem(dispatch, tx, ty){
-  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(toUnderpass(tx, ty)));
+  return menuItem('toUnderpass', <IconUnderpass />, () => {
+    dispatch(toUnderpass(tx, ty));
+    dispatch(hideContextMenu());
+  });
 }
 export function toWireMenuItem(dispatch, tx, ty){
-  return menuItem('toWire', <IconWire />, () => dispatch(toWire(tx, ty)));
+  return menuItem('toWire', <IconWire />, () => {
+    dispatch(toWire(tx, ty));
+    dispatch(hideContextMenu());
+  });
 }
 
 export function acceptMenuItem(dispatch){
