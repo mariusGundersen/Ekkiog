@@ -18,6 +18,9 @@ import toggleButton from './actions/toggleButton.js';
 
 export default function reduce(forest=createForest(), action){
   switch(action.type){
+    case 'set-forest':
+      console.log('set-forest', action);
+      return action.forest || forest;
     case 'tap-tile':
       return tap(forest, action.tool, action.x, action.y);
     case 'remove-tile-at':

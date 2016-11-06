@@ -6,6 +6,11 @@ export default function createContextMiddleware(world){
     const result = next(action);
     const after = store.getState().forest;
     mutateContext(world.context, world.renderer, before, after);
+
+    if(before !== after && world.storage && action.type !== 'set-forest'){
+      world.storage.save(after);
+    }
+
     return result;
   }
 }

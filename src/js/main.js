@@ -51,7 +51,8 @@ if(!__DEV__){
 const emitter = new EventEmitter();
 const world = {
   context: null,
-  renderer: null
+  renderer: null,
+  storage: null
 };
 
 const store = createStore(
@@ -67,8 +68,6 @@ initialize(store, async ({global}) => {
 
   const renderer = new Renderer(gl);
   const context = new Context(gl, MAP_SIZE, TILE_SIZE);
-  world.context = context;
-  world.renderer = renderer;
 
   const perspective = new Perspective();
   perspective.setMapSize(context.width, context.height);
@@ -76,8 +75,15 @@ initialize(store, async ({global}) => {
   const touchControls = new TouchControls(emitter, perspective);
 
   const storage = await database.open();
-  //context.import(await storage.load());
   //renderer.renderMap(context);
+  world.context = context;
+  world.renderer = renderer;
+  world.storage = storage;
+
+  store.dispatch({
+    type: 'set-forest',
+    forest: await storage.load()
+  });
 
   fromEmitter(emitter, perspective, store);
 
