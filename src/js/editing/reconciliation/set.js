@@ -52,7 +52,6 @@ export function underpass(context, {top:y, left:x}, underpass){
 }
 
 export function button(context, {top:y, left:x, width, height}, button){
-  console.log('set button', BUTTON_TILE);
   setMap(context, x+2, y+1, BUTTON_TILE);
   setNetMap(context, x+2, y+1, button.net);
   setNetMap(context, x+1, y+1, button.net);

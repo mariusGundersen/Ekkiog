@@ -1,5 +1,6 @@
 import {encode as encodeArray, decode as decodeArary} from 'base64-arraybuffer';
-import {createTree} from 'ennea-tree';
+import {createTree as createEnneaTree} from 'ennea-tree';
+import {createTree as createBuddyTree, allocate} from 'buddy-tree';
 
 import serialize from './storage/serialize.js';
 import deserialize from './storage/deserialize.js';
@@ -29,7 +30,8 @@ export default class Context{
       new RenderTexture(gl, 256, 256)
     ];
     this.gatesTexture = new DataTexture(gl, 256, 256);
-    this.enneaTree = createTree(this.width);
+    this.enneaTree = createEnneaTree(this.width);
+    this.buddyTree = allocate(createBuddyTree(256*256), 2)[0];
 
     this.import(data);
   }
@@ -42,6 +44,7 @@ export default class Context{
     if(data.netCharges) this.netChargeTextures[0].import(deserialize(data.netCharges));
     if(data.netCharges) this.netChargeTextures[1].import(deserialize(data.netCharges));
     if(data.enneaTree) this.enneaTree = data.enneaTree;
+    if(data.buddyTree) this.buddyTree = data.buddyTree;
   }
 
   export(){
@@ -52,7 +55,8 @@ export default class Context{
       netMap: serialize(this.netMapTexture.export()),
       gates: serialize(this.gatesTexture.export()),
       netCharges: serialize(this.netChargeTextures[0].export()),
-      enneaTree: this.enneaTree
+      enneaTree: this.enneaTree,
+      buddyTree: this.buddyTree
     };
   }
 }

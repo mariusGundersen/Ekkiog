@@ -1,7 +1,7 @@
 import ndarray from 'ndarray';
 import * as ennea from 'ennea-tree';
+import {allocate, deallocate} from 'buddy-tree';
 
-import ContextQuery from './ContextQuery.js';
 import {
   WIRE_TILE,
   GATE_TILE,
@@ -30,7 +30,6 @@ import reconcile from './reconciliation/reconcile.js';
 export default class Editor{
   constructor(context){
     this.context = context;
-    this.query = new ContextQuery(this.context);
   }
 
   drawWire(x, y){
@@ -68,7 +67,7 @@ export default class Editor{
       return false;
     }
 
-    const net = this.query.getNextNet();
+    const [buddyTree, net] = allocate(this.context.buddyTree);
     const inputA = ennea.get(this.context.enneaTree, y-1, x-4);
     const inputB = ennea.get(this.context.enneaTree, y+1, x-4);
     const data = {
@@ -94,6 +93,7 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
+    this.context.buddyTree = buddyTree;
     return true;
   }
 
@@ -136,7 +136,7 @@ export default class Editor{
       return false;
     }
 
-    const net = this.query.getNextNet();
+    const [buddyTree, net] = allocate(this.context.buddyTree);
     const data = {
       type: BUTTON,
       net,
@@ -155,6 +155,7 @@ export default class Editor{
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
+    this.context.buddyTree = buddyTree;
     return true;
   }
 
@@ -163,10 +164,15 @@ export default class Editor{
 
     enneaTree = floodFill(enneaTree, GROUND, ...cleared);
 
+    let buddyTree = cleared.map(getNetSource)
+      .filter(net => net > 1)
+      .reduce((tree, net) => deallocate(tree, net), this.context.buddyTree);
+
     const changes = ennea.diff(this.context.enneaTree, enneaTree);
     reconcile(this.context, changes);
 
     this.context.enneaTree = enneaTree;
+    this.context.buddyTree = buddyTree;
     return true;
   }
 
@@ -246,5 +252,15 @@ function toTool(value){
     case UNDERPASS_TILE: return UNDERPASS;
     case BUTTON_TILE: return BUTTON;
     default: return EMPTY;
+  }
+}
+
+function getNetSource(box){
+  switch(box.data.type){
+    case GATE:
+    case BUTTON:
+      return box.data.net;
+    default:
+      return 0;
   }
 }
