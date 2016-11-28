@@ -1,10 +1,8 @@
 import getTypeAt from './editing/query/getTypeAt.js';
 
 import {
-  REMOVE_TILE_AT,
-  TO_UNDERPASS,
-  TO_WIRE,
   MOVE_GATE,
+  tapTile,
   loadContextMenu,
   abortLoadContextMenu,
   showContextMenu,
@@ -47,14 +45,10 @@ export function fromEmitter(emitter, perspective, store){
 export function handleTap(perspective, dispatch, store){
   return ({x, y}) => {
     const [tx, ty] = perspective.viewportToTileFloored(x, y);
+    const tool = store.getState().editor.selectedTool;
 
     window.requestAnimationFrame(() => {
-      dispatch({
-        type: 'tap-tile',
-        x: tx,
-        y: ty,
-        tool: store.getState().editor.selectedTool
-      });
+      dispatch(tapTile(tx, ty, tool));
     });
   };
 }

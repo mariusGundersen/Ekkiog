@@ -7,6 +7,14 @@ import {
   BUTTON
 } from './constants.js';
 
+import {
+  SET_FOREST,
+  TAP_TILE,
+  REMOVE_TILE_AT,
+  TO_UNDERPASS,
+  TO_WIRE,
+} from '../actions.js';
+
 import getTypeAt from './query/getTypeAt.js';
 
 import drawWire from './actions/drawWire.js';
@@ -18,15 +26,15 @@ import toggleButton from './actions/toggleButton.js';
 
 export default function reduce(forest=createForest(), action){
   switch(action.type){
-    case 'set-forest':
+    case SET_FOREST:
       return action.forest || forest;
-    case 'tap-tile':
+    case TAP_TILE:
       return tap(forest, action.tool, action.x, action.y);
-    case 'remove-tile-at':
+    case REMOVE_TILE_AT:
       return clear(forest, action.x, action.y);
-    case 'convert-wire-to-underpass':
+    case TO_UNDERPASS:
       return wireToUnderpass(forest, action.x, action.y);
-    case 'convert-underpass-to-wire':
+    case TO_WIRE:
       return underpassToWire(forest, action.x, action.y);
     default:
       return forest;

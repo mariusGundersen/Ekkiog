@@ -20,7 +20,8 @@ import createContextMiddleware from './editing/createContextMiddleware.js';
 
 import {
   resize,
-  panZoom
+  panZoom,
+  setForest
 } from './actions.js';
 
 import reduce from './reduce.js';
@@ -52,10 +53,7 @@ database.open().then(storage => {
 
     const touchControls = new TouchControls(emitter, perspective);
 
-    store.dispatch({
-      type: 'set-forest',
-      forest: await storage.load()
-    });
+    store.dispatch(setForest(await storage.load()));
 
     fromEmitter(emitter, perspective, store);
 

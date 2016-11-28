@@ -10,6 +10,8 @@ export const HIDE_CONTEXT_MENU = 'hideContextMenu';
 
 export const PAN_ZOOM = 'panZoom';
 
+export const SET_FOREST = 'set-forest';
+export const TAP_TILE = 'tap-tile';
 export const REMOVE_TILE_AT = 'remove-tile-at';
 export const TO_UNDERPASS = 'convert-wire-to-underpass';
 export const TO_WIRE = 'convert-underpass-to-wire';
@@ -63,6 +65,18 @@ export const hideContextMenu = () => ({
   meta: {
     emit: true
   }
+});
+
+export const setForest = (forest) => ({
+  type: SET_FOREST,
+  forest
+});
+
+export const tapTile = (tx, ty, tool) => ({
+  type: TAP_TILE,
+  x: tx,
+  y: ty,
+  tool
 });
 
 export const removeTileAt = (tx, ty) => ({
