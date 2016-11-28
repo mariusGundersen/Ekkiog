@@ -6,7 +6,7 @@
   "scripts": {
     "build": "NODE_ENV=production webpack -p --progress --colors",
     "watch": "webpack --progress --colors --watch",
-    "dev": "webpack-dev-server --content-base dist/ --colors --hot --inline --host 0.0.0.0",
+    "dev": "webpack-dashboard -- webpack-dev-server --content-base dist/ --colors --hot --inline --host 0.0.0.0",
     "start": "node server.js",
     "test": "ava"
   },
@@ -35,6 +35,7 @@
     "style-loader": "^0.13.1",
     "w3c-manifest-loader": "^1.1.0",
     "webpack": "^1.12.4",
+    "webpack-dashboard": "^0.2.0",
     "webpack-dev-server": "^1.12.1",
     "webpack-glsl-loader": "^1.0.1"
   },
@@ -42,6 +43,8 @@
     "array-unique": "^0.2.1",
     "babel-runtime": "^6.11.6",
     "base64-arraybuffer": "^0.1.5",
+    "buddy-tree": "^1.0.1",
+    "ennea-tree": "^1.0.0",
     "event-saga": "^3.0.0",
     "express": "^4.14.0",
     "gl-big-triangle": "^1.0.0",

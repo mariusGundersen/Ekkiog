@@ -10,9 +10,11 @@ export const HIDE_CONTEXT_MENU = 'hideContextMenu';
 
 export const PAN_ZOOM = 'panZoom';
 
-export const REMOVE_TILE_AT = 'removeTileAt';
-export const TO_UNDERPASS = 'toUnderpass';
-export const TO_WIRE = 'toWire';
+export const SET_FOREST = 'set-forest';
+export const TAP_TILE = 'tap-tile';
+export const REMOVE_TILE_AT = 'remove-tile-at';
+export const TO_UNDERPASS = 'convert-wire-to-underpass';
+export const TO_WIRE = 'convert-underpass-to-wire';
 
 export const MOVE_GATE = 'moveGate';
 
@@ -61,35 +63,39 @@ export const showContextMenu = (tile, tx, ty) => ({
 export const hideContextMenu = () => ({
   type: HIDE_CONTEXT_MENU,
   meta: {
-    emit: true
+    emit: true,
+    dispatch: true
   }
+});
+
+export const setForest = (forest) => ({
+  type: SET_FOREST,
+  forest
+});
+
+export const tapTile = (tx, ty, tool) => ({
+  type: TAP_TILE,
+  x: tx,
+  y: ty,
+  tool
 });
 
 export const removeTileAt = (tx, ty) => ({
   type: REMOVE_TILE_AT,
-  meta: {
-    emit: true
-  },
-  tx,
-  ty
+  x: tx,
+  y: ty
 });
 
 export const toUnderpass = (tx, ty) => ({
   type: TO_UNDERPASS,
-  meta: {
-    emit: true
-  },
-  tx,
-  ty
+  x: tx,
+  y: ty
 });
 
 export const toWire = (tx, ty) => ({
   type: TO_WIRE,
-  meta: {
-    emit: true
-  },
-  tx,
-  ty
+  x: tx,
+  y: ty
 });
 
 export const moveGate = (tx, ty) => ({
