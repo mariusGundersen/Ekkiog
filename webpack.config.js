@@ -1,6 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var DashboardPlugin = require('webpack-dashboard/plugin');
 var OfflinePlugin = require('offline-plugin');
 var autoprefixer = require('autoprefixer');
 
@@ -32,6 +33,7 @@ module.exports = {
       '__DEV__': debug,
       'process.env.NODE_ENV': debug ? '"development"' : '"production"'
     }),
+    new DashboardPlugin(),
     new OfflinePlugin({
       caches: 'all',
       ServiceWorker: {
