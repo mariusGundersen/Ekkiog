@@ -26,6 +26,9 @@ export function createEmitterMiddleware(){
   return ({getState}) => next => action => {
     if(action.meta && typeof(action.meta) == 'object' && action.meta.emit === true){
       getState().global.emitter.emit(action.type, action);
+      if(action.meta.dispatch === true){
+        return next(action);
+      }
     }else{
       return next(action);
     }
@@ -55,9 +58,9 @@ export function handleTap(perspective, dispatch, store){
 
 export function handleShowContextMenu(perspective, dispatch, store){
   return ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTileFloored(x, y);
+    const [tx, ty] = perspective.viewportToTile(x, y);
     const enneaTree = store.getState().forest.enneaTree;
-    const tile = getTypeAt(enneaTree, tx, ty);
+    const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
     dispatch(showContextMenu(
       tile,
       tx,

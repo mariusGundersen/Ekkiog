@@ -63,7 +63,8 @@ export const showContextMenu = (tile, tx, ty) => ({
 export const hideContextMenu = () => ({
   type: HIDE_CONTEXT_MENU,
   meta: {
-    emit: true
+    emit: true,
+    dispatch: true
   }
 });
 
