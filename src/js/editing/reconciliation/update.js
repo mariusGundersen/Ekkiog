@@ -7,10 +7,8 @@ import {
 import {
   EMPTY_TILE,
   WIRE_TILE,
-  GATE_TILE,
-  UNDERPASS_TILE,
-  BUTTON_TILE
-} from '../tileConstants.js';
+  UNDERPASS_TILE
+} from './tileConstants.js';
 
 import {
   WIRE,

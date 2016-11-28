@@ -6,7 +6,7 @@ import {
 
 import {
   EMPTY_TILE
-} from '../tileConstants.js';
+} from './tileConstants.js';
 
 import {
   WIRE,
