@@ -1,7 +1,6 @@
 import * as ennea from 'ennea-tree';
 
 import {
-  WIRE,
   UNDERPASS,
   GROUND
 } from '../constants.js';
@@ -29,9 +28,6 @@ export default function drawUnderpass(forest, x, y){
   if(forest.enneaTree === enneaTree){
     return forest;
   }
-
-  enneaTree = ennea.set(enneaTree, {type:WIRE, net: GROUND}, {left:x, top:y-1});
-  enneaTree = ennea.set(enneaTree, {type:WIRE, net: GROUND}, {left:x, top:y+1});
 
   enneaTree = floodFill(enneaTree, net, {...box, data});
 

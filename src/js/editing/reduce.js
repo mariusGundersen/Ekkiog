@@ -47,7 +47,7 @@ function tap(forest, tool, x, y){
     if(type === UNDERPASS){
       return clear(forest, x, y);
     }else{
-      return drawUnderpass(forest, x, y);
+      return drawUnderpassWithWires(forest, x, y);
     }
   }else if(tool === GATE){
     return drawGate(forest, x, y);
@@ -58,12 +58,22 @@ function tap(forest, tool, x, y){
   }
 }
 
+function drawUnderpassWithWires(forest, x, y){
+  const forest1 = drawUnderpass(forest, x, y);
+  if(forest === forest1){
+    return forest;
+  }
+  const forest2 = drawWire(forest1, x, y-1);
+  const forest3 = drawWire(forest2, x, y+1);
+  return forest3;
+}
+
 function wireToUnderpass(forest, x, y){
   const type = getTypeAt(forest.enneaTree, x, y);
   if(type !== WIRE) return forest;
 
   const tempForest = clear(forest, x, y);
-  const result = drawUnderpass(tempForest, x, y);
+  const result = drawUnderpassWithWires(tempForest, x, y);
   if(result === tempForest) return forest;
 
   return result;
