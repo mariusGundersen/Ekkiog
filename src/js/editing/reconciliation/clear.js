@@ -13,6 +13,7 @@ import {
   GATE,
   UNDERPASS,
   BUTTON,
+  COMPONENT,
   GROUND
 } from '../constants.js';
 
@@ -22,11 +23,13 @@ export default function clear(context, change){
     case WIRE:
       return;
     case GATE:
-      return setGate(context, change.before.net, 0, 0);
+      return setGate(context, change.before.net, GROUND, GROUND);
     case UNDERPASS:
       return;
     case BUTTON:
-      return setGate(context, change.before.net, 0, 0);
+      return setGate(context, change.before.net, GROUND, GROUND);
+    case COMPONENT:
+      return clearComponent(context, change.before);
   }
 }
 
@@ -37,4 +40,8 @@ export function clearArea(context, {top, left, width, height}){
       setNetMap(context, x, y, GROUND);
     }
   }
+}
+
+export function clearComponent(context, component){
+  //clear all gates
 }

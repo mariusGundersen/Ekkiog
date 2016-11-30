@@ -15,6 +15,7 @@ import {
   GATE,
   UNDERPASS,
   BUTTON,
+  COMPONENT,
   GROUND
 } from '../constants.js';
 
@@ -28,6 +29,8 @@ export default function update(context, change){
       return updateUnderpassNet(context, change, change.after);
     case BUTTON:
       return updateButtonState(context, change, change.after);
+    case COMPONENT:
+      return updateComponent(context, change, change.after);
   }
 }
 
@@ -47,7 +50,18 @@ export function updateUnderpassNet(context, {top:y, left:x}, underpass){
   setNetMap(context, x, y, underpass.net);
 }
 
-export function updateButtonState(context, {top:y, lfet:x}, button){
+export function updateButtonState(context, {top:y, left:x}, button){
   const state = button.state ? 0 : 1;
   setGate(context, button.net, state, state);
+}
+
+export function updateComponent(context, {top:y, left:x}, component){
+
+  for(const input of compontent.inputs){
+    setNetMap(context, x+input.x, y+input.y, input.net);
+  }
+
+  for(const output of component.outputs){
+    setNetMap(context, x+output.x, y+output.y, output.net);
+  }
 }

@@ -5,14 +5,6 @@ export const GATE_TILE = tile(9, 4);
 export const BUTTON_TILE = tile(9, 0);
 export const COMPONENT_TILE = tile(1, 8);
 
-export function gateTile(x, y){
-  return tile(x+9, y+4);
-}
-
-export function buttonTile(x, y){
-  return tile(x+9, y);
-}
-
-function tile(x, y){
+export function tile(x, y){
   return x|(y<<8);
 }
