@@ -9,6 +9,8 @@ var ROOT_PATH = path.resolve(__dirname);
 var ENTRY_PATH = path.resolve(ROOT_PATH, 'src/js/main.js');
 var SRC_PATH = path.resolve(ROOT_PATH, 'src');
 var JS_PATH = path.resolve(ROOT_PATH, 'src/js');
+var BUDDY_PATH = path.resolve(ROOT_PATH, 'node_modules/buddy-tree');
+var ENNEA_PATH = path.resolve(ROOT_PATH, 'node_modules/ennea-tree');
 var TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
 var SHADER_PATH = path.resolve(ROOT_PATH, 'src/shaders');
 var BUILD_PATH = path.resolve(ROOT_PATH, 'dist');
@@ -33,14 +35,13 @@ module.exports = {
       '__DEV__': debug,
       'process.env.NODE_ENV': debug ? '"development"' : '"production"'
     }),
-    new DashboardPlugin(),
     new OfflinePlugin({
       caches: 'all',
       ServiceWorker: {
         events: true
       }
     })
-  ],
+  ].concat(debug ? [new DashboardPlugin()] : []),
   resolve: {
     root: [SRC_PATH]
   },
@@ -48,8 +49,7 @@ module.exports = {
     loaders: [
       {
         test: /\.jsx?$/,
-        include: JS_PATH,
-        exclude: /(node_modules|bower_components)/,
+        include: [JS_PATH, ENNEA_PATH, BUDDY_PATH],
         loader: 'babel',
         query: {
           cacheDirectory: true
