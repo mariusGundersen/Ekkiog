@@ -30,10 +30,6 @@ export default function getNetAt(enneaTree, x, y, dx, dy){
 export function getGateNet(tile, dx, dy){
   if(tile.top === 1 && tile.left === 3){
     return tile.data.net;
-  }else if(tile.top === 0 && tile.left === 0 && dx === 1 && dy === 0){
-    return tile.data.inputA.net;
-  }else if(tile.top === 2 && tile.left === 0 && dx === 1 && dy === 0){
-    return tile.data.inputB.net;
   }else{
     return GROUND;
   }
@@ -56,9 +52,8 @@ export function getButtonNet(tile){
 }
 
 export function getComponentNet(tile, dx, dy){
-  //TODO: add all directions
   const output = tile.data.outputs.filter(output => output.x === tile.left && output.y === tile.top)[0];
-  if(output){
+  if(output && output.dx === -dx && output.dy === -dy){
     return output.net;
   }else{
     return GROUND;

@@ -7,17 +7,9 @@ import {
 } from '../constants.js';
 
 import getNetAt from '../query/getNetAt.js';
-import {getGateNeighbouringNets} from '../query/getNeighbouringNets.js';
 import floodFill from '../flooding/floodFill.js';
 
 export default function drawComponent(forest, x, y, source=makeXOR()){
-  //TODO: fix this
-  const neighbouringNets = getGateNeighbouringNets(forest.enneaTree, x, y);
-
-  if(neighbouringNets.length === 1){
-    return forest;
-  }
-
   const [buddyTree, ...nets] = allocate(forest.buddyTree, source.gates.length);
 
   const gates = source.gates.map((gate, index) => ({...gate, net: nets[index]}));
@@ -25,13 +17,17 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
   const inputs = source.inputs.map((input, index) => ({
     x: input.x,
     y: input.y,
-    net: getNetAt(forest.enneaTree, ...posOf(x, y, input.x, input.y, source.width, source.height)),
+    dx: input.dx,
+    dy: input.dy,
+    net: getNetAt(forest.enneaTree, ...posOf(x, y, input.x, input.y, input.dx, input.dy)),
     pointsTo: [...makePointsTo(gates, index)]
   }));
 
   const outputs = source.outputs.map(output => ({
     x: output.x,
     y: output.y,
+    dx: output.dx,
+    dy: output.dy,
     net: nets[output.gate]
   }));
 
@@ -52,6 +48,8 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
   enneaTree = floodFill(enneaTree, ...outputs.map(output => ({
     left: box.left + output.x,
     top: box.top + output.y,
+    dx: output.dx,
+    dy: output.dy,
     type: COMPONENT,
     net: output.net
   })));
@@ -62,18 +60,8 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
   };
 }
 
-export function posOf(sx, sy, x, y, w, h){
-  if(x === 0){
-    return [sx+x-1, sy+y, -1, 0];
-  }else if(y === 0){
-    return [sx+x, sy+y-1, 0, -1];
-  }else if(x === w-1){
-    return [sx+x+1, sy+y, 1, 0];
-  }else if(y === h-1){
-    return [sx+x, sy+y+1, 0, 1];
-  }else{
-    return [sx+x, sy+y, 0, 0];
-  }
+export function posOf(sx, sy, x, y, dx, dy){
+  return [sx+x+dx, sy+y+dy, dx, dy];
 }
 
 export function* makePointsTo(gates, index){
@@ -104,17 +92,23 @@ function makeXOR(){
     inputs: [
       {
         x: 0,
-        y: 1
+        y: 1,
+        dx: -1,
+        dy: 0
       },
       {
         x: 0,
-        y: 3
+        y: 3,
+        dx: -1,
+        dy: 0
       }
     ],
     outputs: [
       {
         x: 2,
         y: 2,
+        dx: 1,
+        dy: 0,
         gate: 3
       }
     ],

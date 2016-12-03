@@ -16,8 +16,7 @@ export default function component(oldComponent, pos, ctx, queue){
 
   const output = oldComponent.outputs.filter(output => output.x === pos.left && output.y === pos.top)[0];
   if(output){
-    //TODO: fix for all directions
-    queue.push(makePos(ctx.pos, output.net, 1, 0));
+    queue.push(makePos(ctx.pos, output.net, output.dx, output.dy));
   }
 
   return oldComponent;

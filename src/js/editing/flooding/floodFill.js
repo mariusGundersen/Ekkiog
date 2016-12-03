@@ -63,8 +63,7 @@ export function* make(boxes){
         yield makePos({top: box.top+1, left: box.left+2}, box.net, 1, 0);
         break;
       case COMPONENT:
-        //TODO: make this for all directions
-        yield makePos({top: box.top, left: box.left}, box.net, 1, 0);
+        yield makePos({top: box.top, left: box.left}, box.net, box.dx, box.dy);
         break;
     }
   }
