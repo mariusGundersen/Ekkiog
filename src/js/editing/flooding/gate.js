@@ -1,10 +1,16 @@
 import makePos from './makePos.js';
+import {getGateNet} from '../query/getNetAt.js';
+import {GROUND} from '../constants.js';
 
 export default function gate(oldGate, pos, ctx, queue){
-  if(pos.left === 3 && pos.top === 1){
-    if(ctx.prev.left - ctx.pos.left === 1 && ctx.prev.top === ctx.pos.top){
-      queue.push(makePos(ctx.pos, oldGate.net, 1, 0));
-    }
+  const net = getGateNet(
+    oldGate,
+    pos.left,
+    pos.top,
+    ctx.pos.left - ctx.prev.left,
+    ctx.pos.top - ctx.prev.top);
+  if(net != GROUND){
+    queue.push(makePos(ctx.pos, net, 1, 0));
   }
 
   if(pos.left !== 0 || pos.top === 1){

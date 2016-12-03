@@ -17,19 +17,19 @@ export default function getNetAt(enneaTree, x, y, dx, dy){
     case WIRE:
       return tile.data.net;
     case GATE:
-      return getGateNet(tile, dx, dy);
+      return getGateNet(tile.data, tile.left, tile.top, dx, dy);
     case UNDERPASS:
       return getUnderpassNet(tile, dx, dy, enneaTree, x, y);
     case BUTTON:
-      return getButtonNet(tile);
+      return getButtonNet(tile.data, tile.left, tile.top, dx, dy);
     case COMPONENT:
       return getComponentNet(tile, dx, dy)
   }
 }
 
-export function getGateNet(tile, dx, dy){
-  if(tile.top === 1 && tile.left === 3){
-    return tile.data.net;
+export function getGateNet(gate, x, y, dx, dy){
+  if(x === 3 && y === 1 && dx === -1 && dy === 0){
+    return gate.net;
   }else{
     return GROUND;
   }
@@ -43,9 +43,9 @@ export function getUnderpassNet(tile, dx, dy, enneaTree, x, y){
   }
 }
 
-export function getButtonNet(tile){
-  if(tile.top === 1 && tile.left === 2){
-    return tile.data.net;
+export function getButtonNet(button, x, y, dx, dy){
+  if(x === 2 && y === 1 && dx === -1 && dy === 0){
+    return button.net;
   }else{
     return GROUND;
   }
