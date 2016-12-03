@@ -34,6 +34,7 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
 
   const data = {
     type: COMPONENT,
+    nets,
     inputs,
     outputs,
     gates: source.gates
@@ -45,10 +46,12 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
     return forest;
   }
 
-  for(const output of outputs){
-    //TODO: fix this
-    enneaTree = floodFill(enneaTree, output.net, {...box, data});
-  }
+  enneaTree = floodFill(enneaTree, ...outputs.map(output => ({
+    left: box.left + output.x,
+    top: box.top + output.y,
+    type: COMPONENT,
+    net: output.net
+  })));
 
   return {
     enneaTree,
