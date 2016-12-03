@@ -42,9 +42,9 @@ export function updateWireNet(context, {top:y, left:x}, wire){
 }
 
 export function updateGateInput(context, {top:y, left:x}, gate){
-  setNetMap(context, x, y+0, gate.inputA.net);
-  setNetMap(context, x, y+2, gate.inputB.net);
-  setGate(context, gate.net, gate.inputA.net, gate.inputB.net);
+  setNetMap(context, x, y+0, gate.inputA);
+  setNetMap(context, x, y+2, gate.inputB);
+  setGate(context, gate.net, gate.inputA, gate.inputB);
 }
 
 export function updateUnderpassNet(context, {top:y, left:x}, underpass){

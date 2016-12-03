@@ -60,7 +60,7 @@ function tap(forest, tool, x, y){
       return drawUnderpassWithWires(forest, x, y);
     }
   }else if(tool === GATE){
-    return drawComponent(forest, x, y);
+    return drawGate(forest, x, y);
   }else if(tool === BUTTON){
     return drawButton(forest, x, y);
   }else{

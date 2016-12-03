@@ -52,9 +52,9 @@ export function gate(context, {top:y, left:x, width, height}, gate){
     }
   }
   setNetMap(context, x+3, y+1, gate.net);
-  setNetMap(context, x+0, y+0, gate.inputA.net);
-  setNetMap(context, x+0, y+2, gate.inputB.net);
-  setGate(context, gate.net, gate.inputA.net, gate.inputB.net);
+  setNetMap(context, x+0, y+0, gate.inputA);
+  setNetMap(context, x+0, y+2, gate.inputB);
+  setGate(context, gate.net, gate.inputA, gate.inputB);
 }
 
 export function underpass(context, {top:y, left:x}, underpass){

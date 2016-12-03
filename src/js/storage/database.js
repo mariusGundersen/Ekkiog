@@ -1,12 +1,15 @@
 import idb from 'idb';
 
-const PATH = 'ekkiog[0.0.4].save';
+import upgradeFrom0 from './upgrade/from0.js';
+import upgradeFrom1 from './upgrade/from1.js';
 
 export async function open(){
-  const db = await idb.open('ekkiog', 1, async (db) => {
+  const db = await idb.open('ekkiog', 2, async (db) => {
     switch(db.oldVersion){
       case 0:
-        const saves = await db.createObjectStore('saves');
+        await upgradeFrom0(db);
+      case 1:
+        await upgradeFrom1(db);
     }
   });
 

@@ -23,15 +23,12 @@ export default function gate(oldGate, pos, ctx, queue){
 
   const input = pos.top === 0 ? 'inputA' : 'inputB';
 
-  if(oldGate[input].net === ctx.net){
+  if(oldGate[input] === ctx.net){
     return oldGate;
   }
 
   return {
     ...oldGate,
-    [input]: {
-      ...oldGate[input],
-      net: ctx.net
-    }
+    [input]: ctx.net
   };
 }
