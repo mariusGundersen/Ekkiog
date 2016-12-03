@@ -7,8 +7,7 @@ export default function component(oldComponent, pos, ctx, queue){
       ...oldComponent,
       inputs: oldComponent.inputs.map(input => input.x === pos.left && input.y === pos.top
         ? {
-          x: input.x,
-          y: input.y,
+          ...input,
           net: ctx.net
         }
         : input)

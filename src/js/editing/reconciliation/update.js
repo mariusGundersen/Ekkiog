@@ -1,7 +1,9 @@
 import {
   setMap,
   setNetMap,
-  setGate
+  setGate,
+  setGateA,
+  setGateB
 } from './mutateContext.js';
 
 import {
@@ -56,12 +58,15 @@ export function updateButtonState(context, {top:y, left:x}, button){
 }
 
 export function updateComponent(context, {top:y, left:x}, component){
-
   for(const input of component.inputs){
     setNetMap(context, x+input.x, y+input.y, input.net);
+    for(const pointer of input.pointsTo){
+      if(pointer.input === 'A'){
+        setGateA(context, pointer.net, input.net);
+      }else{
+        setGateB(context, pointer.net, input.net);
+      }
+    }
   }
 
-  for(const output of component.outputs){
-    setNetMap(context, x+output.x, y+output.y, output.net);
-  }
 }

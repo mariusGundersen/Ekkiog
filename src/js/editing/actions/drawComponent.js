@@ -20,10 +20,13 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
 
   const [buddyTree, ...nets] = allocate(forest.buddyTree, source.gates.length);
 
-  const inputs = source.inputs.map(input => ({
+  const gates = source.gates.map((gate, index) => ({...gate, net: nets[index]}));
+
+  const inputs = source.inputs.map((input, index) => ({
     x: input.x,
     y: input.y,
-    net: getNetAt(forest.enneaTree, ...posOf(x, y, input.x, input.y, source.width, source.height))
+    net: getNetAt(forest.enneaTree, ...posOf(x, y, input.x, input.y, source.width, source.height)),
+    pointsTo: [...makePointsTo(gates, index)]
   }));
 
   const outputs = source.outputs.map(output => ({
@@ -37,7 +40,7 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
     nets,
     inputs,
     outputs,
-    gates: source.gates
+    gates: source.gates.map((gate, index) => makeGate(gate, index, nets))
   };
   const box = {left:x, top:y, width:source.width, height:source.height};
   let enneaTree = ennea.set(forest.enneaTree, data, box);
@@ -71,6 +74,27 @@ export function posOf(sx, sy, x, y, w, h){
   }else{
     return [sx+x, sy+y, 0, 0];
   }
+}
+
+export function* makePointsTo(gates, index){
+  yield* gates
+    .filter(g => g.inputA.type === 'input' && g.inputA.index === index)
+    .map(g => ({net: g.net, input: 'A'}));
+  yield* gates
+    .filter(g => g.inputB.type === 'input' && g.inputB.index === index)
+    .map(g => ({net: g.net, input: 'B'}));
+}
+
+export function makeGate(gate, index, nets){
+  return {
+    net: nets[index],
+    inputA: gate.inputA.type === 'input'
+      ? GROUND
+      : nets[gate.inputA.index],
+    inputB: gate.inputB.type === 'input'
+      ? GROUND
+      : nets[gate.inputB.index]
+  };
 }
 
 function makeXOR(){
