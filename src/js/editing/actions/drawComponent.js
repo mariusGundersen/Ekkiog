@@ -11,6 +11,7 @@ import {getGateNeighbouringNets} from '../query/getNeighbouringNets.js';
 import floodFill from '../flooding/floodFill.js';
 
 export default function drawComponent(forest, x, y, source=makeXOR()){
+  //TODO: fix this
   const neighbouringNets = getGateNeighbouringNets(forest.enneaTree, x, y);
 
   if(neighbouringNets.length === 1){
@@ -22,7 +23,7 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
   const inputs = source.inputs.map(input => ({
     x: input.x,
     y: input.y,
-    net: getNetAt(forest.enneaTree, ...posOf(x, y, input.x, input.y, source.width, source.height));
+    net: getNetAt(forest.enneaTree, ...posOf(x, y, input.x, input.y, source.width, source.height))
   }));
 
   const outputs = source.outputs.map(output => ({
@@ -45,6 +46,7 @@ export default function drawComponent(forest, x, y, source=makeXOR()){
   }
 
   for(const output of outputs){
+    //TODO: fix this
     enneaTree = floodFill(enneaTree, output.net, {...box, data});
   }
 

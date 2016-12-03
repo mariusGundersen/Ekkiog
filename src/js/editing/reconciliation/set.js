@@ -10,7 +10,8 @@ import {
   UNDERPASS_TILE,
   GATE_TILE,
   BUTTON_TILE,
-  COMPONENT_TILE
+  COMPONENT_TILE,
+  tile
 } from './tileConstants.js';
 
 import {

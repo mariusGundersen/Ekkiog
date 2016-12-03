@@ -7,6 +7,7 @@ import {
   GATE,
   UNDERPASS,
   BUTTON,
+  COMPONENT,
   GROUND
 } from '../constants.js';
 import makePos from './makePos.js';
@@ -15,6 +16,7 @@ import wire from './wire.js';
 import gate from './gate.js';
 import underpass from './underpass.js';
 import button from './button.js';
+import component from './component.js';
 
 export default function floodFill(enneaTree, net, ...changes){
 
@@ -29,6 +31,8 @@ export default function floodFill(enneaTree, net, ...changes){
         return underpass(old, pos, ctx, queue);
       case BUTTON:
         return button(old, pos, ctx, queue);
+      case COMPONENT:
+        return component(old, pos, ctx, queue);
       default:
         return old;
     }

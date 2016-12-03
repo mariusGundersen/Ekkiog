@@ -57,7 +57,7 @@ export function updateButtonState(context, {top:y, left:x}, button){
 
 export function updateComponent(context, {top:y, left:x}, component){
 
-  for(const input of compontent.inputs){
+  for(const input of component.inputs){
     setNetMap(context, x+input.x, y+input.y, input.net);
   }
 

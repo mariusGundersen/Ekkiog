@@ -21,6 +21,8 @@ import drawWire from './actions/drawWire.js';
 import drawGate from './actions/drawGate.js';
 import drawUnderpass from './actions/drawUnderpass.js';
 import drawButton from './actions/drawButton.js';
+import drawComponent from './actions/drawComponent.js';
+
 import clear from './actions/clear.js';
 import toggleButton from './actions/toggleButton.js';
 
@@ -58,7 +60,7 @@ function tap(forest, tool, x, y){
       return drawUnderpassWithWires(forest, x, y);
     }
   }else if(tool === GATE){
-    return drawGate(forest, x, y);
+    return drawComponent(forest, x, y);
   }else if(tool === BUTTON){
     return drawButton(forest, x, y);
   }else{
