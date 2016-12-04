@@ -21,6 +21,8 @@ import drawWire from './actions/drawWire.js';
 import drawGate from './actions/drawGate.js';
 import drawUnderpass from './actions/drawUnderpass.js';
 import drawButton from './actions/drawButton.js';
+import drawComponent from './actions/drawComponent.js';
+
 import clear from './actions/clear.js';
 import toggleButton from './actions/toggleButton.js';
 

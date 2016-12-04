@@ -1,22 +1,23 @@
 import {
   setMap,
   setNetMap,
-  setGate
+  setGate,
+  setGateA,
+  setGateB
 } from './mutateContext.js';
 
 import {
   EMPTY_TILE,
   WIRE_TILE,
-  GATE_TILE,
-  UNDERPASS_TILE,
-  BUTTON_TILE
-} from '../tileConstants.js';
+  UNDERPASS_TILE
+} from './tileConstants.js';
 
 import {
   WIRE,
   GATE,
   UNDERPASS,
   BUTTON,
+  COMPONENT,
   GROUND
 } from '../constants.js';
 
@@ -30,6 +31,8 @@ export default function update(context, change){
       return updateUnderpassNet(context, change, change.after);
     case BUTTON:
       return updateButtonState(context, change, change.after);
+    case COMPONENT:
+      return updateComponent(context, change, change.after);
   }
 }
 
@@ -39,9 +42,9 @@ export function updateWireNet(context, {top:y, left:x}, wire){
 }
 
 export function updateGateInput(context, {top:y, left:x}, gate){
-  setNetMap(context, x, y+0, gate.inputA.net);
-  setNetMap(context, x, y+2, gate.inputB.net);
-  setGate(context, gate.net, gate.inputA.net, gate.inputB.net);
+  setNetMap(context, x, y+0, gate.inputA);
+  setNetMap(context, x, y+2, gate.inputB);
+  setGate(context, gate.net, gate.inputA, gate.inputB);
 }
 
 export function updateUnderpassNet(context, {top:y, left:x}, underpass){
@@ -49,7 +52,21 @@ export function updateUnderpassNet(context, {top:y, left:x}, underpass){
   setNetMap(context, x, y, underpass.net);
 }
 
-export function updateButtonState(context, {top:y, lfet:x}, button){
+export function updateButtonState(context, {top:y, left:x}, button){
   const state = button.state ? 0 : 1;
   setGate(context, button.net, state, state);
+}
+
+export function updateComponent(context, {top:y, left:x}, component){
+  for(const input of component.inputs){
+    setNetMap(context, x+input.x, y+input.y, input.net);
+    for(const pointer of input.pointsTo){
+      if(pointer.input === 'A'){
+        setGateA(context, pointer.net, input.net);
+      }else{
+        setGateB(context, pointer.net, input.net);
+      }
+    }
+  }
+
 }
