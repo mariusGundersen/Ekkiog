@@ -48,13 +48,13 @@ function tap(forest, tool, x, y){
   if(type === BUTTON){
     return toggleButton(forest, x, y);
   }else if(tool === WIRE){
-    if(type === WIRE){
+    if(type === WIRE || type === UNDERPASS){
       return clear(forest, x, y);
     }else{
       return drawWire(forest, x, y);
     }
   }else if(tool === UNDERPASS){
-    if(type === UNDERPASS){
+    if(type === UNDERPASS || type === WIRE){
       return clear(forest, x, y);
     }else{
       return drawUnderpassWithWires(forest, x, y);
@@ -75,7 +75,9 @@ function drawUnderpassWithWires(forest, x, y){
   }
   const forest2 = drawWire(forest1, x, y-1);
   const forest3 = drawWire(forest2, x, y+1);
-  return forest3;
+  const forest4 = drawWire(forest3, x-1, y);
+  const forest5 = drawWire(forest4, x+1, y);
+  return forest5;
 }
 
 function wireToUnderpass(forest, x, y){
