@@ -1,5 +1,7 @@
 import idb from 'idb';
 
+import xor from './xor.json';
+
 import upgradeFrom0 from './upgrade/from0.js';
 import upgradeFrom1 from './upgrade/from1.js';
 
@@ -26,6 +28,7 @@ class Storage{
   }
 
   async load(){
-    return await this.db.transaction('saves').objectStore('saves').get('default');
+    const result = await this.db.transaction('saves').objectStore('saves').get('default');
+    return result || xor;
   }
 }

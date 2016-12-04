@@ -70,6 +70,11 @@ module.exports = {
       {
         test: /manifest\.json$/,
         loader: 'w3c-manifest?name=[name].[hash].[ext]&icon=icons/[name].[hash].[ext]&legacyAppleSupport=true'
+      },
+      {
+        test: /\.json$/,
+        exclude: [/manifest\.json/],
+        loader: 'json'
       }
     ]
   },
