@@ -1,5 +1,4 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-  "git.enableLongCommitWarning": false,
-  "javascript.validate.enable": false
+  "git.enableLongCommitWarning": false
 }
