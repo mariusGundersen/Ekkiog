@@ -51,11 +51,11 @@ database.open().then(storage => {
   initialize(store, async ({gl, renderer, context, emitter, perspective}) => {
     perspective.setMapSize(context.width, context.height);
 
-    const touchControls = new TouchControls(emitter, perspective);
+    const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
 
     store.dispatch(setForest(await storage.load()));
 
-    fromEmitter(emitter, perspective, store);
+    fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), () => store.getState(), store.dispatch);
 
     const shell = new Shell({
       tickInterval: 500,

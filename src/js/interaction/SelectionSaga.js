@@ -12,7 +12,7 @@ import {
 } from '../events.js';
 
 export default class SelectionSaga extends EventSaga {
-  constructor(eventEmitter, perspective){
+  constructor(eventEmitter, viewportToTile){
     super(eventEmitter, saga => {
       saga.createOn(POINTER_DOWN, (data, actor) => {
         if(!this.state.selection) {
@@ -20,7 +20,7 @@ export default class SelectionSaga extends EventSaga {
           return;
         }
 
-        const [tx, ty] = perspective.viewportToTile(data.x, data.y);
+        const [tx, ty] = viewportToTile(data.x, data.y);
         if(this.state.top <= Math.floor(ty - this.state.dy)
         && this.state.left <= Math.floor(tx - this.state.dx)
         && this.state.right >= Math.floor(tx - this.state.dx)
@@ -46,7 +46,7 @@ export default class SelectionSaga extends EventSaga {
           return;
         }
 
-        const [tx, ty] = perspective.viewportToTile(data.x, data.y);
+        const [tx, ty] = viewportToTile(data.x, data.y);
         this.state.dx = Math.round(tx - actor.data.tx + actor.data.dx);
         this.state.dy = Math.round(ty - actor.data.ty + actor.data.dy);
       });
@@ -57,7 +57,7 @@ export default class SelectionSaga extends EventSaga {
           return;
         }
 
-        const [tx, ty] = perspective.viewportToTile(data.x, data.y);
+        const [tx, ty] = viewportToTile(data.x, data.y);
         actor.data.dx = Math.round(tx - actor.data.tx + this.state.dx - actor.data.dx);
         actor.data.dy = Math.round(ty - actor.data.ty + this.state.dy - actor.data.dy);
         actor.done();

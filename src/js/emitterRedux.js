@@ -35,31 +35,30 @@ export function createEmitterMiddleware(){
   };
 }
 
-export function fromEmitter(emitter, perspective, store){
-  const dispatch = store.dispatch;
-  emitter.on(TAP, handleTap(perspective, dispatch, store));
-  emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(perspective, dispatch, store));
-  //emitter.on(MOVE_GATE, handleMoveGate(editor, emitter, dispatch));
-  //emitter.on(MOVE_SELECTION, handleMoveSelection(editor, getContext, renderer, saveContext));
+export function fromEmitter(emitter, viewportToTile, getState, dispatch){
+  emitter.on(TAP, handleTap(viewportToTile, dispatch, getState));
+  emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(viewportToTile, dispatch, getState));
   emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(dispatch));
   emitter.on(ABORT_LOAD_CONTEXT_MENU, handleAbortContextMenu(dispatch));
+  //emitter.on(MOVE_GATE, handleMoveGate(editor, emitter, dispatch));
+  //emitter.on(MOVE_SELECTION, handleMoveSelection(editor, getContext, renderer, saveContext));
 }
 
-export function handleTap(perspective, dispatch, store){
+export function handleTap(viewportToTile, dispatch, getState){
   return ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTileFloored(x, y);
-    const tool = store.getState().editor.selectedTool;
+    const [tx, ty] = viewportToTile(x, y);
+    const tool = getState().editor.selectedTool;
 
     window.requestAnimationFrame(() => {
-      dispatch(tapTile(tx, ty, tool));
+      dispatch(tapTile(Math.floor(tx), Math.floor(ty), tool));
     });
   };
 }
 
-export function handleShowContextMenu(perspective, dispatch, store){
+export function handleShowContextMenu(viewportToTile, dispatch, store){
   return ({x, y}) => {
-    const [tx, ty] = perspective.viewportToTile(x, y);
-    const enneaTree = store.getState().forest.enneaTree;
+    const [tx, ty] = viewportToTile(x, y);
+    const enneaTree = getState().forest.enneaTree;
     const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
     dispatch(showContextMenu(
       tile,
@@ -68,6 +67,21 @@ export function handleShowContextMenu(perspective, dispatch, store){
   };
 }
 
+export function handleLoadContextMenu(dispatch){
+  return ({x, y}) => {
+    dispatch(loadContextMenu(
+      x/window.devicePixelRatio,
+      y/window.devicePixelRatio));
+  };
+}
+
+export function handleAbortContextMenu(dispatch){
+  return ({x, y}) => {
+    dispatch(abortLoadContextMenu());
+  };
+}
+
+/*
 export function handleMoveGate(editor, emitter, dispatch){
   return ({tx, ty}) => {
     const [gateX, gateY] = editor.query.getGateOutput(tx, ty);
@@ -96,18 +110,4 @@ export function handleMoveSelection(editor, getContext, renderer, saveContext){
     editor.moveSelection(top, left, right, bottom, dx, dy);
     edited(getContext(), renderer, saveContext);
   };
-}
-
-export function handleLoadContextMenu(dispatch){
-  return ({x, y}) => {
-    dispatch(loadContextMenu(
-      x/window.devicePixelRatio,
-      y/window.devicePixelRatio));
-  };
-}
-
-export function handleAbortContextMenu(dispatch){
-  return ({x, y}) => {
-    dispatch(abortLoadContextMenu());
-  };
-}
+}*/
