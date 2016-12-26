@@ -1,3 +1,5 @@
+import * as ennea from 'ennea-tree';
+
 import mutateContext from './mutateContext.js';
 import {
   SET_FOREST
@@ -8,7 +10,9 @@ export default function createContextMiddleware(storage){
     const before = store.getState();
     const result = next(action);
     const after = store.getState();
-    mutateContext(before.global.context, before.global.renderer, before.forest, after.forest);
+
+    const changes = ennea.diff(before.forest.enneaTree, after.forest.enneaTree);
+    mutateContext(before.global.context, before.global.renderer, changes);
 
     if(before.forest !== after.forest && action.type !== SET_FOREST){
       storage.save(after.forest);

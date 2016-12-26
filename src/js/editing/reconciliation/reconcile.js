@@ -9,9 +9,12 @@ import update from './update.js';
 import clear from './clear.js';
 
 export default function reconcile(context, changes){
+  let changed = false;
   for(const change of changes){
+    changed = true;
     reconcileChange(context, change);
   }
+  return changed;
 }
 
 export function reconcileChange(context, change){

@@ -1,15 +1,11 @@
-import * as ennea from 'ennea-tree';
-
 import reconcile from './reconciliation/reconcile.js';
 
-export default function mutateContext(context, renderer, oldForest, newForest){
-  if(oldForest === newForest) return;
-
+export default function mutateContext(context, renderer, changes){
   if(!context) return;
   if(!renderer) return;
 
-  const changes = ennea.diff(oldForest.enneaTree, newForest.enneaTree);
-  reconcile(context, changes);
+  const changed = reconcile(context, changes);
+  if(!changed) return;
 
   context.mapTexture.update();
   context.netMapTexture.update();
