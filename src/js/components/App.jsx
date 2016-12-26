@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 
 import Menu from './Menu.jsx';
 import WebGLCanvas from './WebGLCanvas.jsx';
+import Search from './Search.jsx';
 
 const App = connect(
   state => ({
@@ -13,6 +14,7 @@ const App = connect(
   <div className="root">
     <Menu />
     <WebGLCanvas />
+    <Search />
   </div>
 ));
 

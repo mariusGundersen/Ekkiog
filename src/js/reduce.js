@@ -6,6 +6,7 @@ import editor from './reducers/editor.js';
 import mainMenu from './reducers/mainMenu.js';
 import contextMenu from './reducers/contextMenu.js';
 import forest from './editing/reduce.js';
+import search from './reducers/search.js';
 
 const reduce = combineReducers({
   view,
@@ -13,7 +14,8 @@ const reduce = combineReducers({
   editor,
   mainMenu,
   contextMenu,
-  forest
+  forest,
+  search
 });
 
 export default reduce;
