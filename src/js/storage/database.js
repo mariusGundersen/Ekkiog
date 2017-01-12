@@ -38,8 +38,8 @@ class Storage{
 
   async saveComponent(name, forest){
     return await this.db
-      .transaction('componets', 'readwrite')
-      .objectStore('componets')
+      .transaction('components', 'readwrite')
+      .objectStore('components')
       .put({
         name,
         forest
@@ -48,8 +48,8 @@ class Storage{
 
   async loadComponent(name){
     return await this.db
-      .transaction('componets')
-      .objectStore('componets')
+      .transaction('components')
+      .objectStore('components')
       .get(name);
   }
 
@@ -63,8 +63,13 @@ class Storage{
       });
       const abort = s.add(() => tx.abort());
       tx.complete
-        .then(() => s.remove(abort))
-        .then(() => s.complete(), e => s.error(e));
+        .then(() => {
+          s.remove(abort);
+          s.complete();
+        }, e => {
+          s.remove(abort);
+          s.error(e);
+        });
     });
   }
 }

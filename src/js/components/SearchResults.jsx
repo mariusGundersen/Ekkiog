@@ -7,9 +7,9 @@ import SearchResultsView from './SearchResultsView.jsx';
 const SearchResults = connect({
   searchTerm: event => event.currentTarget.value,
   toggleShow: event => 1
-}, ({searchTerm, toggleShow}, props) => ({
+}, ({searchTerm, toggleShow}, props, initialProps) => ({
   showSearch: showSearch(toggleShow),
-  searchResults: props.first().switchMap(props => searchResults(searchTerm, props.database))
+  searchResults: searchResults(searchTerm, initialProps.database)
 }), ({searchResults, showSearch, actions, ...props}) => (
   <SearchResultsView
     show={showSearch}
@@ -28,10 +28,14 @@ function showSearch(toggleShow){
 }
 
 function searchResults(searchTerm, database){
-  console.log(database);
   return searchTerm
-    .switchMap(term => database.getComponentNames(term)
-      .scan((acc, val) => (acc.push(val), acc), [])
-      .startWith([]))
+    .map(term => term.toLowerCase())
+    .switchMap(term =>
+      term
+      ? database.getComponentNames()
+        .filter(name => name.toLowerCase().indexOf(term) >= 0)
+        .scan((acc, val) => [...acc, val], [])
+        .startWith([])
+      : Rx.Observable.of([]))
     .startWith([]);
 }

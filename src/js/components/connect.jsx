@@ -9,7 +9,7 @@ export default function connect(actions, observablesFactory, Component){
         .startWith(props);
 
       const {functions, sources} = deconstruct(actions);
-      const observables = observablesFactory(sources, observableProps);
+      const observables = observablesFactory(sources, observableProps, props);
 
       this.functions = functions;
       this.subscriptions = Rx.Observable.merge(
