@@ -55,14 +55,16 @@ class Storage{
 
   getComponentNames(){
     return new Rx.Observable(s => {
-      const tx = db.transaction('components');
+      const tx = this.db.transaction('components');
       tx.objectStore('components').iterateCursor(cursor => {
         if (!cursor) return;
         s.next(cursor.key);
         cursor.continue();
       });
-      tx.complete.then(() => s.complete());
-      s.add(() => tx.abort());
+      const abort = s.add(() => tx.abort());
+      tx.complete
+        .then(() => s.remove(abort))
+        .then(() => s.complete(), e => s.error(e));
     });
   }
 }

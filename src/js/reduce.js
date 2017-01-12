@@ -6,16 +6,12 @@ import editor from './reducers/editor.js';
 import mainMenu from './reducers/mainMenu.js';
 import contextMenu from './reducers/contextMenu.js';
 import forest from './editing/reduce.js';
-import search from './reducers/search.js';
 
-const reduce = combineReducers({
+export default database => combineReducers({
   view,
-  global,
+  global: global(database),
   editor,
   mainMenu,
   contextMenu,
-  forest,
-  search
+  forest
 });
-
-export default reduce;

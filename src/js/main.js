@@ -8,7 +8,7 @@ import '../manifest.json';
 import offline from 'offline-plugin/runtime';
 
 import Shell from './Shell.js';
-import * as database from './storage/database.js';
+import {open as openDatabase} from './storage/database.js';
 import TouchControls from './interaction/TouchControls.js';
 
 import {
@@ -24,7 +24,7 @@ import {
   setForest
 } from './actions.js';
 
-import reduce from './reduce.js';
+import createReduce from './reduce.js';
 import App from './components/App.jsx';
 
 if(!__DEV__){
@@ -39,21 +39,23 @@ if(!__DEV__){
   });
 }
 
-database.open().then(storage => {
+openDatabase().then(database => {
   const store = createStore(
-    reduce,
+    createReduce(database),
     applyMiddleware(
       createEmitterMiddleware(),
-      createContextMiddleware(storage)
+      createContextMiddleware()
     )
   );
+
+  console.log(store.getState());
 
   initialize(store, async ({gl, renderer, context, emitter, perspective}) => {
     perspective.setMapSize(context.width, context.height);
 
     const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
 
-    store.dispatch(setForest(await storage.load()));
+    store.dispatch(setForest(await database.load()));
 
     fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), () => store.getState(), store.dispatch);
 

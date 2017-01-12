@@ -5,7 +5,7 @@ import {
   SET_FOREST
 } from '../actions.js';
 
-export default function createContextMiddleware(storage){
+export default function createContextMiddleware(){
   return store => next => action => {
     const before = store.getState();
     const result = next(action);
@@ -15,7 +15,7 @@ export default function createContextMiddleware(storage){
     mutateContext(before.global.context, before.global.renderer, changes);
 
     if(before.forest !== after.forest && action.type !== SET_FOREST){
-      storage.save(after.forest);
+      after.global.database.save(after.forest);
     }
 
     return result;
