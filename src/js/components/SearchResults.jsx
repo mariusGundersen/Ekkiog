@@ -1,7 +1,7 @@
 import React from 'react';
 import Rx from 'rxjs/Rx.js';
 
-import connect from './connect.jsx';
+import connect from 'reaxjs';
 import SearchResultsView from './SearchResultsView.jsx';
 
 const SearchResults = connect({
