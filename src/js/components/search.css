@@ -1,0 +1,32 @@
+.search{
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+
+}
+
+.input{
+  background: #2a2d30;
+  border: 2px solid #446364;
+  color: white;
+  flex: 0 0 auto;
+}
+
+.searchButton{
+  position: absolute;
+  background: #2a2d30;
+  border: 2px solid #446364;
+  color: white;
+}
+
+.results{
+  margin: 0.25em 0 0 0;
+  flex: 1 0 auto;
+  background: #2a2d30;
+  border: 2px solid #446364;
+  color: white;
+}
+
+.result{
+  padding: 0.5em;
+}

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import style from './search.css';
+
 export default function({
   show,
   onToggle,
@@ -13,46 +15,46 @@ export default function({
   return (
     <div>
     {show ?
-    <div style={{
-      position: 'absolute',
-      top: cy + radius/2 -2,
-      left: gap,
-      right: radius*2 + gap*2,
-      width: cx - gap*2,
-      height: radius,
-      background: '#2a2d30',
-      border: '2px solid #446364',
-      display: 'flex'
-    }}>
+    <div
+      className={style.search}
+      style={{
+        top: cy + radius/2 -2,
+        left: gap,
+        right: radius*2 + gap*2,
+        width: cx - gap*2,
+        height: radius,
+      }}>
       <input
+        className={style.input}
         style={{
-          background: 'transparent',
-          border: 'none',
-          color: 'white',
-          flex: '1 0 100%',
-          width: '100%',
           fontSize: radius-5
         }}
         onChange={onChange}
         autoComplete={true}/>
-        <div>
-          {searchResults.map((result, index) => (<div key={index}>{result}</div>))}
-        </div>
+        {searchResults.length > 0 ?
+          <div className={style.results}>
+            {searchResults.map((result, index) => (
+              <div
+                className={style.result}
+                key={index}>
+                {result}
+              </div>
+            ))}
+          </div>
+          : null }
     </div>
     : null}
-    <button style={{
-      position: 'absolute',
-      top: cy,
-      left: cx,
-      borderRadius: radius,
-      width: radius*2,
-      height: radius*2,
-      background: '#2a2d30',
-      border: '2px solid #446364',
-      color: 'white',
-      fontSize: radius
-    }}
-    onClick={onToggle}>
+    <button
+      className={style.searchButton}
+      style={{
+        top: cy,
+        left: cx,
+        borderRadius: radius,
+        width: radius*2,
+        height: radius*2,
+        fontSize: radius
+      }}
+      onClick={onToggle}>
       🔎
     </button>
   </div>
