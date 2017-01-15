@@ -13,6 +13,7 @@ import {
   REMOVE_TILE_AT,
   TO_UNDERPASS,
   TO_WIRE,
+  INSERT_COMPONENT
 } from '../actions.js';
 
 import getTypeAt from './query/getTypeAt.js';
@@ -38,6 +39,8 @@ export default function reduce(forest=createForest(), action){
       return wireToUnderpass(forest, action.x, action.y);
     case TO_WIRE:
       return underpassToWire(forest, action.x, action.y);
+    case INSERT_COMPONENT:
+      return drawComponent(forest, 64, 74);
     default:
       return forest;
   }
