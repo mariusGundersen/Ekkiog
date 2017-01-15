@@ -9,7 +9,7 @@ import {
 import getNetAt from '../query/getNetAt.js';
 import floodFill from '../flooding/floodFill.js';
 
-export default function drawComponent(forest, x, y, source=makeXOR()){
+export default function drawComponent(forest, x, y, source){
   const [buddyTree, ...nets] = allocate(forest.buddyTree, source.gates.length);
 
   const gates = source.gates.map((gate, index) => ({...gate, net: nets[index]}));
@@ -82,77 +82,5 @@ export function makeGate(gate, index, nets){
     inputB: gate.inputB.type === 'input'
       ? GROUND
       : nets[gate.inputB.index]
-  };
-}
-
-function makeXOR(){
-  return {
-    width: 3,
-    height: 5,
-    inputs: [
-      {
-        x: 0,
-        y: 1,
-        dx: -1,
-        dy: 0
-      },
-      {
-        x: 0,
-        y: 3,
-        dx: -1,
-        dy: 0
-      }
-    ],
-    outputs: [
-      {
-        x: 2,
-        y: 2,
-        dx: 1,
-        dy: 0,
-        gate: 3
-      }
-    ],
-    gates: [
-      {
-        inputA: {
-          type: 'input',
-          index: 0
-        },
-        inputB: {
-          type: 'input',
-          index: 1
-        }
-      },
-      {
-        inputA: {
-          type: 'input',
-          index: 0
-        },
-        inputB: {
-          type: 'gate',
-          index: 0
-        }
-      },
-      {
-        inputA: {
-          type: 'gate',
-          index: 0
-        },
-        inputB: {
-          type: 'input',
-          index: 1
-        }
-      },
-      {
-        inputA: {
-          type: 'gate',
-          index: 1
-        },
-        inputB: {
-          type: 'gate',
-          index: 2
-        }
-      }
-    ]
   };
 }

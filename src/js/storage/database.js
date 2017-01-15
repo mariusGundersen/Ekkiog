@@ -6,9 +6,10 @@ import xor from './xor.json';
 import upgradeFrom0 from './upgrade/from0.js';
 import upgradeFrom1 from './upgrade/from1.js';
 import upgradeFrom2 from './upgrade/from2.js';
+import upgradeFrom3 from './upgrade/from3.js';
 
 export async function open(){
-  const db = await idb.open('ekkiog', 3, async (db) => {
+  const db = await idb.open('ekkiog', 4, async (db) => {
     switch(db.oldVersion){
       case 0:
         await upgradeFrom0(db);
@@ -16,6 +17,8 @@ export async function open(){
         await upgradeFrom1(db);
       case 2:
         await upgradeFrom2(db);
+      case 3:
+        await upgradeFrom3(db);
     }
   });
 
