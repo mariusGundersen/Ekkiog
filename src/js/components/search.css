@@ -10,6 +10,7 @@
   border: 2px solid #446364;
   color: white;
   flex: 0 0 auto;
+  outline: none;
 }
 
 .searchButton{
@@ -17,6 +18,7 @@
   background: #2a2d30;
   border: 2px solid #446364;
   color: white;
+  outline: none;
 }
 
 .results{
@@ -29,4 +31,5 @@
 
 .result{
   padding: 0.5em;
+  outline: none;
 }
