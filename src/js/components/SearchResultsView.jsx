@@ -28,7 +28,7 @@ export default function({
       <input
         className={style.input}
         onChange={onChange}
-        autoComplete={true}/>
+        autoFocus />
         {searchResults.length > 0 ?
           <div className={style.results}>
             {searchResults.map(result => (
