@@ -11,6 +11,8 @@
   color: white;
   flex: 0 0 auto;
   outline: none;
+  font-size: 16px;
+  padding: 0.5em;
 }
 
 .searchButton{
@@ -24,6 +26,8 @@
 .results{
   margin: 0.25em 0 0 0;
   flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
   background: #2a2d30;
   border: 2px solid #446364;
   color: white;
@@ -32,4 +36,13 @@
 .result{
   padding: 0.5em;
   outline: none;
+  background: none;
+  border: none;
+  text-align: left;
+  color: white;
+  font-size: 16px;
+}
+
+.result:active{
+  background: #446364;
 }

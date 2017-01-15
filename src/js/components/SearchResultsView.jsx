@@ -7,6 +7,7 @@ export default function({
   onToggle,
   onChange,
   searchResults,
+  onSelect,
   cx,
   cy,
   radius,
@@ -26,19 +27,17 @@ export default function({
       }}>
       <input
         className={style.input}
-        style={{
-          fontSize: radius-5
-        }}
         onChange={onChange}
         autoComplete={true}/>
         {searchResults.length > 0 ?
           <div className={style.results}>
-            {searchResults.map((result, index) => (
-              <div
+            {searchResults.map(result => (
+              <button
+                onClick={e => onSelect(result)}
                 className={style.result}
-                key={index}>
+                key={result}>
                 {result}
-              </div>
+              </button>
             ))}
           </div>
           : null }

@@ -6,17 +6,26 @@ import SearchResultsView from './SearchResultsView.jsx';
 
 const SearchResults = connect({
   searchTerm: event => event.currentTarget.value,
-  toggleShow: event => 1
-}, ({searchTerm, toggleShow}, props, initialProps) => ({
-  showSearch: showSearch(toggleShow),
-  searchResults: searchResults(searchTerm, initialProps.database)
-}), ({searchResults, showSearch, actions, ...props}) => (
+  toggleShow: event => 1,
+  selectedResult: result => result
+}, ({searchTerm, toggleShow, selectedResult}, props, initialProps) => {
+
+  selectedResult
+    .withLatestFrom(props)
+    .subscribe(([result, props]) => props.onSelect(result));
+
+  return {
+    showSearch: showSearch(toggleShow.merge(selectedResult)),
+    searchResults: searchResults(searchTerm.merge(selectedResult.map(_ => '')), initialProps.database)
+  };
+}, ({searchResults, showSearch, actions, ...props}) => (
   <SearchResultsView
+    {...props}
     show={showSearch}
     onToggle={actions.toggleShow}
     searchResults={searchResults}
     onChange={actions.searchTerm}
-    {...props} />
+    onSelect={actions.selectedResult} />
 ));
 
 export default SearchResults;
@@ -37,5 +46,6 @@ function searchResults(searchTerm, database){
         .scan((acc, val) => [...acc, val], [])
         .startWith([])
       : Rx.Observable.of([]))
-    .startWith([]);
+    .startWith([])
+    .distinctUntilChanged();
 }

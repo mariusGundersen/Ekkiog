@@ -9,14 +9,20 @@ const Search = connect(
     screenHeight: view.screenHeight,
     database: global.database
   })
-)((props) => {
+)(({screenWidth, database, dispatch}) => {
   const radius = 40;
   const gap = 10;
-  const cx = props.screenWidth - radius*2 - gap;
+  const cx = screenWidth - radius*2 - gap;
   const cy = gap;
 
   return (
-    <SearchResults radius={radius} gap={gap} cx={cx} cy={cy} database={props.database} />
+    <SearchResults
+      radius={radius}
+      gap={gap}
+      cx={cx}
+      cy={cy}
+      database={database}
+      onSelect={() => dispatch({type:'bleh'})} />
   );
 });
 
