@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import SearchResults from './SearchResults.jsx';
+import {insertComponent} from '../actions.js';
 
 const Search = connect(
   ({view, global}) => ({
@@ -22,7 +23,7 @@ const Search = connect(
       cx={cx}
       cy={cy}
       database={database}
-      onSelect={() => dispatch({type:'bleh'})} />
+      onSelect={result => dispatch(insertComponent(result))} />
   );
 });
 

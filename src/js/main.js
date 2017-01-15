@@ -48,8 +48,6 @@ openDatabase().then(database => {
     )
   );
 
-  console.log(store.getState());
-
   initialize(store, async ({gl, renderer, context, emitter, perspective}) => {
     perspective.setMapSize(context.width, context.height);
 

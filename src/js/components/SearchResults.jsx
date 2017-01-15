@@ -12,11 +12,13 @@ const SearchResults = connect({
 
   selectedResult
     .withLatestFrom(props)
+    .switchMap(([result, props]) => Rx.Observable.from(props.database.loadComponent(result)))
+    .withLatestFrom(props)
     .subscribe(([result, props]) => props.onSelect(result));
 
   return {
     showSearch: showSearch(toggleShow.merge(selectedResult)),
-    searchResults: searchResults(searchTerm.merge(selectedResult.map(_ => '')), initialProps.database)
+    searchResults: searchResults(searchTerm.merge(selectedResult.mapTo('')), initialProps.database)
   };
 }, ({searchResults, showSearch, actions, ...props}) => (
   <SearchResultsView
