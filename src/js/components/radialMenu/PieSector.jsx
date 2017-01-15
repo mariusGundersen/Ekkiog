@@ -1,6 +1,8 @@
 import React from 'react';
 import {mat4, vec2} from 'gl-matrix';
 
+import style from '../main.css';
+
 export default ({
   innerRadius,
   outerRadius,
@@ -30,7 +32,7 @@ export default ({
     <g
       key={itemKey}
       onClick={onClick}
-      className="trans-trans clickable"
+      className={`${style.clickable} ${style.transTrans}`}
       style={{transform: `rotate(${degreesRotate}deg)`}}>
       <path
         fill="#2a2d30"
@@ -38,7 +40,7 @@ export default ({
         strokeWidth="2"
         d={path}/>
         <g transform={`translate(${averageRadius} 0)`}>
-          <g className="trans-trans" style={{transform: `rotate(${-degreesRotate}deg)`}} >
+          <g className={style.transTrans} style={{transform: `rotate(${-degreesRotate}deg)`}} >
             {icon}
           </g>
         </g>

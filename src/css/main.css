@@ -12,15 +12,6 @@ body{
   overflow: hidden; /* prevent scrollbars */
 }
 
-.react-app{
-  display: flex;
-  flex: 1 0 100%;
-}
-
-.root{
-  flex: 1 0 100%;
-}
-
 svg{
   position: absolute;
   top: 0;
@@ -42,14 +33,6 @@ canvas{
   height: 100%;
   background: black;
   touch-action: none;
-}
-
-.clickable{
-  pointer-events: painted;
-}
-
-.trans-trans{
-  transition: transform 0.5s;
 }
 
 #viewStats{

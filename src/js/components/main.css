@@ -1,0 +1,18 @@
+
+
+:global .react-app{
+  display: flex;
+  flex: 1 0 100%;
+}
+
+.root{
+  flex: 1 0 100%;
+}
+
+.clickable{
+  pointer-events: painted;
+}
+
+.transTrans{
+  transition: transform 0.5s;
+}

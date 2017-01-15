@@ -5,13 +5,15 @@ import Menu from './Menu.jsx';
 import WebGLCanvas from './WebGLCanvas.jsx';
 import Search from './Search.jsx';
 
+import style from './main.css';
+
 const App = connect(
   state => ({
     width: state.width,
     height: state.height,
   })
 )(props => (
-  <div className="root">
+  <div className={style.root}>
     <Menu />
     <WebGLCanvas />
     <Search />
