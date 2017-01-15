@@ -55,7 +55,7 @@ export function handleTap(viewportToTile, dispatch, getState){
   };
 }
 
-export function handleShowContextMenu(viewportToTile, dispatch, store){
+export function handleShowContextMenu(viewportToTile, dispatch, getState){
   return ({x, y}) => {
     const [tx, ty] = viewportToTile(x, y);
     const enneaTree = getState().forest.enneaTree;
