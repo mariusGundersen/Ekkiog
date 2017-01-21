@@ -69,9 +69,19 @@ openDatabase().then(database => {
           perspective.panZoom(result.previous, result.current);
           store.dispatch(panZoom(perspective.tileToViewportMatrix));
         }
-        renderer.renderView(context, perspective);
+
+        renderer.renderView(
+          context,
+          perspective.mapToViewportMatrix,
+          perspective.viewportSize);
+
         if(touchControls.selectionSaga.isSelectionActive){
-          renderer.renderMove(context, perspective, touchControls.selectionSaga.boundingBox, touchControls.selectionSaga.dx, touchControls.selectionSaga.dy);
+          renderer.renderMove(
+            context,
+            perspective.mapToViewportMatrix,
+            touchControls.selectionSaga.boundingBox,
+            touchControls.selectionSaga.dx,
+            touchControls.selectionSaga.dy);
         }
       },
 

@@ -32,12 +32,12 @@ export default class Renderer {
     this.chargeMapEngine.render(context, tick);
   }
 
-  renderView(context, perspective) {
-    this.gl.viewport(0, 0, ...perspective.viewportSize);
-    this.viewEngine.render(context, perspective.mapToViewportMatrix);
+  renderView(context, mapToViewportMatrix, viewportSize) {
+    this.gl.viewport(0, 0, ...viewportSize);
+    this.viewEngine.render(context, mapToViewportMatrix);
   }
 
-  renderMove(context, perspective, boundingBox, dx, dy){
-    this.moveEngine.render(context, perspective.mapToViewportMatrix, boundingBox, dx, dy);
+  renderMove(context, mapToViewportMatrix, boundingBox, dx, dy){
+    this.moveEngine.render(context, mapToViewportMatrix, boundingBox, dx, dy);
   }
 }
