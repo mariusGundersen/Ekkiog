@@ -32,6 +32,7 @@ export default function mainMenu(state={
         ...state,
         open: true,
         menuType: 'okCancel',
+        isValid: true,
         okAction: action.okAction,
         cancelAction: action.cancelAction,
         previousMenu: state

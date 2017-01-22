@@ -65,11 +65,12 @@ export function toolMenuItem(tool, icon, selectedTool, dispatch){
   return menuItem(tool, icon, () => dispatch(setSelectedTool(tool)), selectedTool === tool);
 }
 
-export function menuItem(key, icon, action, selected=false){
+export function menuItem(key, icon, action, selected=false, visible=true){
   return {
     itemKey: key,
     icon,
     selected,
-    onClick: action
+    onClick: action,
+    visible
   };
 }

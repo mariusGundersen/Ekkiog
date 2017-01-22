@@ -12,8 +12,13 @@ export default ({
   gap,
   itemKey,
   onClick,
-  icon
+  icon,
+  visible
 }) => {
+
+  if(!visible){
+    return <g key={itemKey}></g>;
+  }
   const averageRadius = (innerRadius + outerRadius)/2;
 
   const radiansStart = -turnFractionSection*Math.PI;
