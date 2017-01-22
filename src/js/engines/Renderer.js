@@ -22,14 +22,29 @@ export default class Renderer {
   }
 
   renderMap(context){
-    this.tileMapEngine.render(context);
-    this.chargeMapEngine.render(context, this.currentTick);
+    this.tileMapEngine.render(
+      context.mapTexture,
+      context.tileMapTexture);
   }
 
-  simulateTick(context, tick){
+  simulateTick(context, tick=this.currentTick){
     this.currentTick = tick;
-    this.netChargeEngine.render(context, tick);
-    this.chargeMapEngine.render(context, tick);
+
+    const prevousCharges = context.netChargeTextures[(tick+1)%2];
+    const nextCharges = context.netChargeTextures[tick%2];
+
+    this.netChargeEngine.render(
+      prevousCharges,
+      context.gatesTexture,
+      nextCharges);
+
+    const currentCharges = nextCharges;
+
+    this.chargeMapEngine.render(
+      context.netMapTexture,
+      currentCharges,
+      context.spriteSheetTexture,
+      context.chargeMapTexture);
   }
 
   renderView(context, mapToViewportMatrix, viewportSize) {

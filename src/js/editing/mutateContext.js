@@ -11,6 +11,6 @@ export default function mutateContext(context, renderer, changes){
   context.netMapTexture.update();
   context.gatesTexture.update();
 
-  renderer.simulateTick(context, renderer.currentTick);
+  renderer.simulateTick(context);
   renderer.renderMap(context);
 }

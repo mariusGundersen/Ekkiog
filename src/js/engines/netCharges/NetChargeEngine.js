@@ -11,17 +11,13 @@ export default class NetChargeEngine{
     this.shader = createShader(gl, netChargesVS, netChargesFS);
   }
 
-  render(context, tick){
-    const inputTexture = context.netChargeTextures[(tick+1)%2];
-    const outputTexture = context.netChargeTextures[tick%2];
-
+  render(inputTexture, gatesTexture, outputTexture){
     outputTexture.bindFramebuffer();
 
     this.shader.bind();
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    this.shader.uniforms.gates = context.gatesTexture.sampler2D(0);
-
+    this.shader.uniforms.gates = gatesTexture.sampler2D(0);
     this.shader.uniforms.netCharges = inputTexture.sampler2D(1);
 
     triangle.draw();
