@@ -40,7 +40,7 @@ export default function reduce(forest=createForest(), action){
     case TO_WIRE:
       return underpassToWire(forest, action.x, action.y);
     case INSERT_COMPONENT:
-      return drawComponent(forest, 64, 74, action.component.source);
+      return drawComponent(forest, action.position.x|0, action.position.y|0, action.component.source);
     default:
       return forest;
   }

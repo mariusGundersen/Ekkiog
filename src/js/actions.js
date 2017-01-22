@@ -31,9 +31,10 @@ export const resize = (pixelWidth, pixelHeight, screenWidth, screenHeight) => ({
   screenHeight
 });
 
-export const panZoom = (matrix) => ({
+export const panZoom = (matrix, inverse) => ({
   type: PAN_ZOOM,
-  matrix
+  matrix,
+  inverse
 });
 
 export const setSelectedTool = (tool) => ({
@@ -119,7 +120,8 @@ export const resetMainMenu = () => ({
   type: RESET_MAIN_MENU
 });
 
-export const insertComponent = (component) => ({
+export const insertComponent = (component, position) => ({
   type: INSERT_COMPONENT,
-  component
+  component,
+  position
 });

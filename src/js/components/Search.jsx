@@ -12,9 +12,10 @@ const Search = connect(
   ({view, global}) => ({
     screenWidth: view.screenWidth,
     screenHeight: view.screenHeight,
+    centerTile: view.centerTile,
     database: global.database
   })
-)(({screenWidth, database, dispatch}) => {
+)(({screenWidth, centerTile, database, dispatch}) => {
   const radius = 40;
   const gap = 10;
   const cx = screenWidth - radius*2 - gap;
@@ -30,7 +31,7 @@ const Search = connect(
       onSelect={result => {
         dispatch(showOkCancelMenu(
           () => {
-            dispatch(insertComponent(result));
+            dispatch(insertComponent(result, centerTile));
             dispatch(resetMainMenu());
           },
           () => dispatch(resetMainMenu())

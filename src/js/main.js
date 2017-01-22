@@ -67,7 +67,7 @@ openDatabase().then(database => {
         const result = touchControls.panZoomSaga.process();
         if(result !== null){
           perspective.panZoom(result.previous, result.current);
-          store.dispatch(panZoom(perspective.tileToViewportMatrix));
+          store.dispatch(panZoom(perspective.tileToViewportMatrix, perspective.viewportToTileMatrix));
         }
 
         renderer.renderView(
@@ -89,7 +89,7 @@ openDatabase().then(database => {
         store.dispatch(resize(pixelWidth, pixelHeight, screenWidth, screenHeight));
         perspective.setViewport(pixelWidth, pixelHeight);
         perspective.scale = context.tileSize * context.width / screenWidth;
-        store.dispatch(panZoom(perspective.tileToViewportMatrix));
+        store.dispatch(panZoom(perspective.tileToViewportMatrix, perspective.viewportToTileMatrix));
       }
     });
   });

@@ -10,6 +10,8 @@ import getNetAt from '../query/getNetAt.js';
 import floodFill from '../flooding/floodFill.js';
 
 export default function drawComponent(forest, x, y, source){
+  x -= source.width>>1;
+  y -= source.height>>1;
   const [buddyTree, ...nets] = allocate(forest.buddyTree, source.gates.length);
 
   const gates = source.gates.map((gate, index) => ({...gate, net: nets[index]}));
