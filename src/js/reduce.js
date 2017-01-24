@@ -6,6 +6,7 @@ import editor from './reducers/editor.js';
 import mainMenu from './reducers/mainMenu.js';
 import contextMenu from './reducers/contextMenu.js';
 import forest from './editing/reduce.js';
+import selection from './reducers/selection.js';
 
 export default database => combineReducers({
   view,
@@ -13,5 +14,6 @@ export default database => combineReducers({
   editor,
   mainMenu,
   contextMenu,
-  forest
+  forest,
+  selection
 });

@@ -17,14 +17,33 @@ export default class Context{
     this.tileSize = TILE_SIZE;
 
     this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
+
     this.mapTexture = new DataTexture(gl, MAP_SIZE, MAP_SIZE);
+    this.netMapTexture = new DataTexture(gl, MAP_SIZE, MAP_SIZE);
+    this.gatesTexture = new DataTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT);
+
     this.tileMapTexture = new RenderTexture(gl, MAP_SIZE, MAP_SIZE);
     this.chargeMapTexture = new RenderTexture(gl, MAP_SIZE, MAP_SIZE);
-    this.netMapTexture = new DataTexture(gl, MAP_SIZE, MAP_SIZE);
     this.netChargeTextures = [
       new RenderTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT),
       new RenderTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT)
     ];
-    this.gatesTexture = new DataTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT);
+
+    this.selection = {
+      gl: this.gl,
+      width: this.width,
+      height: this.height,
+      tileSize: this.tileSize,
+
+      spriteSheetTexture: this.spriteSheetTexture,
+      mapTexture: new DataTexture(gl, MAP_SIZE, MAP_SIZE),
+      netMapTexture: new DataTexture(gl, MAP_SIZE, MAP_SIZE),
+      gatesTexture: this.gatesTexture,
+
+      tileMapTexture: new RenderTexture(gl, MAP_SIZE, MAP_SIZE),
+      chargeMapTexture: new RenderTexture(gl, MAP_SIZE, MAP_SIZE),
+
+      netChargeTextures: this.netChargeTextures
+    };
   }
 }

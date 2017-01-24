@@ -22,6 +22,7 @@ export const SHOW_OK_CANCEL_MENU = 'showOkCancelMenu';
 export const RESET_MAIN_MENU = 'resetMainMenu';
 
 export const INSERT_COMPONENT = 'insertComponent';
+export const SELECT_COMPONENT = 'selectComponent';
 
 export const resize = (pixelWidth, pixelHeight, screenWidth, screenHeight) => ({
   type: RESIZE,
@@ -122,6 +123,12 @@ export const resetMainMenu = () => ({
 
 export const insertComponent = (component, position) => ({
   type: INSERT_COMPONENT,
+  component,
+  position
+});
+
+export const selectComponent = (component, position) => ({
+  type: SELECT_COMPONENT,
   component,
   position
 });

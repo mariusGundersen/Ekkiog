@@ -4,9 +4,12 @@ import {connect} from 'react-redux';
 import SearchResults from './SearchResults.jsx';
 import {
   insertComponent,
+  selectComponent,
   showOkCancelMenu,
   resetMainMenu
 } from '../actions.js';
+import drawComponent from '../editing/actions/drawComponent.js';
+import createForest from '../editing/actions/createForest.js';
 
 const Search = connect(
   ({view, global}) => ({
@@ -29,6 +32,7 @@ const Search = connect(
       cy={cy}
       database={database}
       onSelect={result => {
+        dispatch(selectComponent(result, centerTile))
         dispatch(showOkCancelMenu(
           () => {
             dispatch(insertComponent(result, centerTile));
