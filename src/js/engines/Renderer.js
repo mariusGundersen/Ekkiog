@@ -52,7 +52,7 @@ export default class Renderer {
     this.viewEngine.render(context, mapToViewportMatrix);
   }
 
-  renderMove(context, mapToViewportMatrix, boundingBox, dx, dy){
-    this.moveEngine.render(context, mapToViewportMatrix, boundingBox, dx, dy);
+  renderMove(context, mapToViewportMatrix, {top, left, right, bottom}, dx, dy){
+    this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
   }
 }

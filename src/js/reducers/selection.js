@@ -8,16 +8,24 @@ import drawComponent from '../editing/actions/drawComponent.js';
 
 export default function reduce(state={
   forest: createForest(),
-  x: 0,
-  y: 0,
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  dx: 0,
+  dy: 0,
   selection: false
 }, action){
   switch(action.type){
     case SELECT_COMPONENT:
       return {
         forest: drawComponent(state.forest, action.position.x|0, action.position.y|0, action.component.source),
-        x: action.position.x|0,
-        y: action.position.y|0,
+        top: action.position.y|0,
+        left: action.position.x|0,
+        right: (action.position.x|0) + action.component.source.width,
+        bottom: (action.position.y|0) + action.component.source.height,
+        dx: 0,
+        dy: 0,
         selection: true
       };
     default:

@@ -19,6 +19,7 @@ export default database => function global(state={
         gl: action.gl,
         renderer: new Renderer(action.gl),
         context: new Context(action.gl),
+        selectionContext: new Context(action.gl),
         emitter: new EventEmitter(),
         perspective: new Perspective()
       };

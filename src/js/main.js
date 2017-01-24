@@ -48,7 +48,7 @@ openDatabase().then(database => {
     )
   );
 
-  initialize(store, async ({gl, renderer, context, emitter, perspective}) => {
+  initialize(store, async ({gl, renderer, context, selectionContext, emitter, perspective}) => {
     perspective.setMapSize(context.width, context.height);
 
     const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
@@ -64,6 +64,7 @@ openDatabase().then(database => {
       },
 
       render() {
+        const state = store.getState();
         const result = touchControls.panZoomSaga.process();
         if(result !== null){
           perspective.panZoom(result.previous, result.current);
@@ -75,13 +76,13 @@ openDatabase().then(database => {
           perspective.mapToViewportMatrix,
           perspective.viewportSize);
 
-        if(touchControls.selectionSaga.isSelectionActive){
+        if(state.selection.selection){
           renderer.renderMove(
-            context,
+            selectionContext,
             perspective.mapToViewportMatrix,
-            touchControls.selectionSaga.boundingBox,
-            touchControls.selectionSaga.dx,
-            touchControls.selectionSaga.dy);
+            state.selection,
+            state.selection.dx,
+            state.selection.dy);
         }
       },
 

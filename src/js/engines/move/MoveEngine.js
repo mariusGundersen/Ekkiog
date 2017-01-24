@@ -18,19 +18,19 @@ export default class MoveEngine {
     this.shader.bind();
 
     this.shader.uniforms.inverseSpriteTextureSize = context.spriteSheetTexture.inverseSize;
-    this.shader.uniforms.mapTextureSize = context.selectionTileMapTexture.size;
+    this.shader.uniforms.mapTextureSize = context.tileMapTexture.size;
     this.shader.uniforms.tileSize = context.tileSize;
     this.shader.uniforms.matrix = matrix;
 
     this.shader.uniforms.spriteSheet = context.spriteSheetTexture.sampler2D(0);
     this.shader.uniforms.chargeMap = context.chargeMapTexture.sampler2D(1);
-    this.shader.uniforms.tileMap = context.selectionTileMapTexture.sampler2D(2);
+    this.shader.uniforms.tileMap = context.tileMapTexture.sampler2D(2);
 
     this.shader.uniforms.boundingBox = [
-      top-1,
-      left-1,
-      right+1,
-      bottom+1
+      top-3,
+      left-2,
+      right-1,
+      bottom-2
     ];
     this.shader.uniforms.translate = [dx, dy];
 

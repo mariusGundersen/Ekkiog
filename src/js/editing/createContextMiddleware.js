@@ -19,8 +19,8 @@ export default function createContextMiddleware(){
   }
 }
 
-function selectionHandler(before, after, {global: {context = {}, renderer}}){
-  mutateContext(context.selection, renderer, before, after);
+function selectionHandler(before, after, {global: {selectionContext, renderer}}){
+  mutateContext(selectionContext, renderer, before, after);
 }
 
 function forestHandler(before, after, {global: {context, renderer}}){
