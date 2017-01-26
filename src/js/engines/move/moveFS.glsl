@@ -33,8 +33,20 @@ void main(void) {
 
   if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, movedCoord);
-    gl_FragColor = charge * vec4(1.0, 1.0, 1.0, 0.9);
+    gl_FragColor = charge * vec4(1.0, 1.0, 1.0, 0.8);
+  }else if(color.a == 0.0){
+    float dx = tilePos.x-1.0 == boundingBox.y
+      ? 1.0-spriteCoord.x/tileSize
+      : tilePos.x+1.0 == boundingBox.z
+      ? spriteCoord.x/tileSize
+      : 0.0;
+    float dy = tilePos.y-1.0 == boundingBox.x
+      ? 1.0-spriteCoord.y/tileSize
+      : tilePos.y+1.0 == boundingBox.w
+      ? spriteCoord.y/tileSize
+      : 0.0;
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 2.0-2.0*sqrt(dx*dx+dy*dy));
   }else{
-    gl_FragColor = color * vec4(1.0, 1.0, 1.0, 0.9);
+    gl_FragColor = color;
   }
 }
