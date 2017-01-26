@@ -16,7 +16,9 @@ export default class ViewEngine {
     if(!context.spriteSheetTexture.ready) return;
 
     this.shader.bind();
+    this.gl.clearColor(42/255, 45/255, 48/255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    this.gl.clearColor(0, 0, 0, 1);
 
     this.shader.uniforms.inverseSpriteTextureSize = context.spriteSheetTexture.inverseSize;
     this.shader.uniforms.mapTextureSize = context.tileMapTexture.size;
