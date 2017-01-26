@@ -15,48 +15,26 @@ void main(void) {
   if(texCoord.x > 1.0 || texCoord.y > 1.0){
     discard;
   }
+
   vec2 movedCoord = texCoord - translate/mapTextureSize;
   vec2 tilePos = floor(movedCoord * mapTextureSize);
-  vec2 spriteOffset;
 
-  if(tilePos.y < boundingBox.x
-  || tilePos.x < boundingBox.y
-  || tilePos.y > boundingBox.w
-  || tilePos.x > boundingBox.z){
-    spriteOffset = vec2(6.0, 9.0) * tileSize;
-  }else if(tilePos.y == boundingBox.x
-        && tilePos.x == boundingBox.y){
-    spriteOffset = vec2(5.0, 8.0) * tileSize;
-  }else if(tilePos.y == boundingBox.w
-        && tilePos.x == boundingBox.z){
-    spriteOffset = vec2(7.0, 10.0) * tileSize;
-  }else if(tilePos.y == boundingBox.w
-        && tilePos.x == boundingBox.y){
-    spriteOffset = vec2(5.0, 10.0) * tileSize;
-  }else if(tilePos.y == boundingBox.x
-        && tilePos.x == boundingBox.z){
-    spriteOffset = vec2(7.0, 8.0) * tileSize;
-  }else if(tilePos.y == boundingBox.x){
-    spriteOffset = vec2(6.0, 8.0) * tileSize;
-  }else if(tilePos.x == boundingBox.y){
-    spriteOffset = vec2(5.0, 9.0) * tileSize;
-  }else if(tilePos.x == boundingBox.z){
-    spriteOffset = vec2(7.0, 9.0) * tileSize;
-  }else if(tilePos.y == boundingBox.w){
-    spriteOffset = vec2(6.0, 10.0) * tileSize;
-  }else{
-    vec4 tile = texture2D(tileMap, movedCoord);
-    spriteOffset = floor(tile.xy * 256.0) * tileSize;
+  if(tilePos.y <= boundingBox.x
+  || tilePos.x <= boundingBox.y
+  || tilePos.y >= boundingBox.w
+  || tilePos.x >= boundingBox.z){
+    discard;
   }
 
+  vec4 tile = texture2D(tileMap, movedCoord);
+  vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;
   vec2 spriteCoord = mod(pixelCoord, tileSize);
-
   vec4 color = texture2D(spriteSheet, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);
 
   if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, movedCoord);
-    gl_FragColor = charge;
+    gl_FragColor = charge * vec4(1.0, 1.0, 1.0, 0.9);
   }else{
-    gl_FragColor = color;
+    gl_FragColor = color * vec4(1.0, 1.0, 1.0, 0.9);
   }
 }
