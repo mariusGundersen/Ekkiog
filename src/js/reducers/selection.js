@@ -20,10 +20,10 @@ export default function reduce(state={
     case SELECT_COMPONENT:
       return {
         forest: drawComponent(state.forest, action.position.x|0, action.position.y|0, action.component.source),
-        top: action.position.y|0,
-        left: action.position.x|0,
-        right: (action.position.x|0) + action.component.source.width,
-        bottom: (action.position.y|0) + action.component.source.height,
+        top: (action.position.y|0) - (action.component.source.height>>1),
+        left: (action.position.x|0) - (action.component.source.width>>1),
+        right: (action.position.x|0) - (action.component.source.width>>1) + action.component.source.width,
+        bottom: (action.position.y|0) - (action.component.source.height>>1) + action.component.source.height,
         dx: 0,
         dy: 0,
         selection: true

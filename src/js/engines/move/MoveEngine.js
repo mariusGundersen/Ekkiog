@@ -27,10 +27,10 @@ export default class MoveEngine {
     this.shader.uniforms.tileMap = context.tileMapTexture.sampler2D(2);
 
     this.shader.uniforms.boundingBox = [
-      top-3,
-      left-2,
-      right-1,
-      bottom-2
+      top-1,
+      left-1,
+      right,
+      bottom
     ];
     this.shader.uniforms.translate = [dx, dy];
 
