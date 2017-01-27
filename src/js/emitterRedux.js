@@ -8,7 +8,8 @@ import {
   showContextMenu,
   hideContextMenu,
   showOkCancelMenu,
-  resetMainMenu
+  resetMainMenu,
+  moveSelection
 } from './actions.js';
 
 import {
@@ -18,8 +19,7 @@ import {
   ABORT_LOAD_CONTEXT_MENU,
   START_SELECTION,
   MOVE_SELECTION,
-  CANCEL_SELECTION,
-  OK_SELECTION_MOVE
+  STOP_SELECTION
 } from './events.js';
 
 export function createEmitterMiddleware(){
@@ -40,8 +40,7 @@ export function fromEmitter(emitter, viewportToTile, getState, dispatch){
   emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(viewportToTile, dispatch, getState));
   emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(dispatch));
   emitter.on(ABORT_LOAD_CONTEXT_MENU, handleAbortContextMenu(dispatch));
-  //emitter.on(MOVE_GATE, handleMoveGate(editor, emitter, dispatch));
-  //emitter.on(MOVE_SELECTION, handleMoveSelection(editor, getContext, renderer, saveContext));
+  emitter.on(MOVE_SELECTION, handleMoveSelection(dispatch));
 }
 
 export function handleTap(viewportToTile, dispatch, getState){
@@ -81,33 +80,8 @@ export function handleAbortContextMenu(dispatch){
   };
 }
 
-/*
-export function handleMoveGate(editor, emitter, dispatch){
-  return ({tx, ty}) => {
-    const [gateX, gateY] = editor.query.getGateOutput(tx, ty);
-    dispatch(hideContextMenu());
-    emitter.emit(START_SELECTION, {
-      top: gateY-1,
-      left: gateX-3,
-      right: gateX,
-      bottom: gateY+1
-    });
-    dispatch(showOkCancelMenu(
-      () => {
-        emitter.emit(OK_SELECTION_MOVE, {});
-        dispatch(resetMainMenu());
-      },
-      () => {
-        emitter.emit(CANCEL_SELECTION, {});
-        dispatch(resetMainMenu());
-      }
-    ));
+export function handleMoveSelection(dispatch){
+  return ({dx, dy}) => {
+    dispatch(moveSelection(dx, dy));
   };
 }
-
-export function handleMoveSelection(editor, getContext, renderer, saveContext){
-  return ({top, left, right, bottom, dx, dy}) => {
-    editor.moveSelection(top, left, right, bottom, dx, dy);
-    edited(getContext(), renderer, saveContext);
-  };
-}*/

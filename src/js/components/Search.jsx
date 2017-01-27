@@ -6,7 +6,9 @@ import {
   insertComponent,
   selectComponent,
   showOkCancelMenu,
-  resetMainMenu
+  resetMainMenu,
+  startSelection,
+  stopSelection
 } from '../actions.js';
 import drawComponent from '../editing/actions/drawComponent.js';
 import createForest from '../editing/actions/createForest.js';
@@ -32,13 +34,22 @@ const Search = connect(
       cy={cy}
       database={database}
       onSelect={result => {
-        dispatch(selectComponent(result, centerTile))
+        const top = (centerTile.y|0) - (result.source.height>>1);
+        const left = (centerTile.x|0) - (result.source.width>>1);
+        const right = (centerTile.x|0) - (result.source.width>>1) + result.source.width;
+        const bottom = (centerTile.y|0) - (result.source.height>>1) + result.source.height;
+        dispatch(startSelection(top, left, right, bottom));
+        dispatch(selectComponent(result, centerTile));
         dispatch(showOkCancelMenu(
           () => {
             dispatch(insertComponent(result, centerTile));
             dispatch(resetMainMenu());
+            dispatch(stopSelection());
           },
-          () => dispatch(resetMainMenu())
+          () => {
+            dispatch(resetMainMenu());
+            dispatch(stopSelection());
+          }
         ));
       }} />
   );

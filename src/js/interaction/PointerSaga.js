@@ -1,7 +1,6 @@
 import {
   START_SELECTION,
-  CANCEL_SELECTION,
-  OK_SELECTION_MOVE,
+  STOP_SELECTION,
   POINTER_TAP,
   TAP,
   LONG_PRESS,
@@ -27,8 +26,7 @@ export default class PointerSaga{
     maybeEmit(emitter, () => this.canShowContextMenu, POTENTIAL_LONG_PRESS_CANCEL, ABORT_LOAD_CONTEXT_MENU);
 
     emitter.on(START_SELECTION, () => this.disableAll());
-    emitter.on(CANCEL_SELECTION, () => this.enableAll());
-    emitter.on(OK_SELECTION_MOVE, () => this.enableAll());
+    emitter.on(STOP_SELECTION, () => this.enableAll());
 
     emitter.on(SHOW_CONTEXT_MENU, () => this.disableAll());
     emitter.on(HIDE_CONTEXT_MENU, () => this.enableAll());

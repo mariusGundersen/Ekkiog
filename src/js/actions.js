@@ -23,6 +23,9 @@ export const RESET_MAIN_MENU = 'resetMainMenu';
 
 export const INSERT_COMPONENT = 'insertComponent';
 export const SELECT_COMPONENT = 'selectComponent';
+export const START_SELECTION = 'startSelection';
+export const STOP_SELECTION = 'stopSelection';
+export const MOVE_SELECTION = 'moveSelection';
 
 export const resize = (pixelWidth, pixelHeight, screenWidth, screenHeight) => ({
   type: RESIZE,
@@ -131,4 +134,28 @@ export const selectComponent = (component, position) => ({
   type: SELECT_COMPONENT,
   component,
   position
+});
+
+export const startSelection = (top, left, right, bottom) => ({
+  type: START_SELECTION,
+  meta: {
+    emit: true
+  },
+  top,
+  left,
+  right,
+  bottom
+});
+
+export const moveSelection = (dx, dy) => ({
+  type: MOVE_SELECTION,
+  dx,
+  dy
+});
+
+export const stopSelection = () => ({
+  type: STOP_SELECTION,
+  meta: {
+    emit: true
+  }
 });

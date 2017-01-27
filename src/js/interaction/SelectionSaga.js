@@ -2,8 +2,7 @@ import EventSaga from 'event-saga';
 
 import {
   START_SELECTION,
-  CANCEL_SELECTION,
-  OK_SELECTION_MOVE,
+  STOP_SELECTION,
   MOVE_SELECTION,
   POINTER_DOWN,
   POINTER_MOVE,
@@ -49,6 +48,10 @@ export default class SelectionSaga extends EventSaga {
         const [tx, ty] = viewportToTile(data.x, data.y);
         this.state.dx = Math.round(tx - actor.data.tx + actor.data.dx);
         this.state.dy = Math.round(ty - actor.data.ty + actor.data.dy);
+        eventEmitter.emit(MOVE_SELECTION, {
+          dx: this.state.dx,
+          dy: this.state.dy
+        });
       });
 
       saga.on(POINTER_UP, (data, actor) => {
@@ -68,6 +71,7 @@ export default class SelectionSaga extends EventSaga {
       selection: false
     };
 
+    console.log(START_SELECTION);
     eventEmitter.on(START_SELECTION, (data) => {
       this.state = {
         selection: true,
@@ -80,21 +84,7 @@ export default class SelectionSaga extends EventSaga {
       };
     });
 
-    eventEmitter.on(CANCEL_SELECTION, () => {
-      this.state = {
-        selection: false
-      };
-    });
-
-    eventEmitter.on(OK_SELECTION_MOVE, () => {
-      eventEmitter.emit(MOVE_SELECTION, {
-        top: this.state.top,
-        left: this.state.left,
-        right: this.state.right,
-        bottom: this.state.bottom,
-        dx: this.state.dx,
-        dy: this.state.dy
-      });
+    eventEmitter.on(STOP_SELECTION, () => {
       this.state = {
         selection: false
       };
