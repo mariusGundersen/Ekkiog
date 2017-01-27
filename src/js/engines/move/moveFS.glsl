@@ -15,48 +15,44 @@ void main(void) {
   if(texCoord.x > 1.0 || texCoord.y > 1.0){
     discard;
   }
+
   vec2 movedCoord = texCoord - translate/mapTextureSize;
   vec2 tilePos = floor(movedCoord * mapTextureSize);
-  vec2 spriteOffset;
 
-  if(tilePos.y < boundingBox.x
-  || tilePos.x < boundingBox.y
-  || tilePos.y > boundingBox.w
-  || tilePos.x > boundingBox.z){
-    spriteOffset = vec2(6.0, 9.0) * tileSize;
-  }else if(tilePos.y == boundingBox.x
-        && tilePos.x == boundingBox.y){
-    spriteOffset = vec2(5.0, 8.0) * tileSize;
-  }else if(tilePos.y == boundingBox.w
-        && tilePos.x == boundingBox.z){
-    spriteOffset = vec2(7.0, 10.0) * tileSize;
-  }else if(tilePos.y == boundingBox.w
-        && tilePos.x == boundingBox.y){
-    spriteOffset = vec2(5.0, 10.0) * tileSize;
-  }else if(tilePos.y == boundingBox.x
-        && tilePos.x == boundingBox.z){
-    spriteOffset = vec2(7.0, 8.0) * tileSize;
-  }else if(tilePos.y == boundingBox.x){
-    spriteOffset = vec2(6.0, 8.0) * tileSize;
-  }else if(tilePos.x == boundingBox.y){
-    spriteOffset = vec2(5.0, 9.0) * tileSize;
-  }else if(tilePos.x == boundingBox.z){
-    spriteOffset = vec2(7.0, 9.0) * tileSize;
-  }else if(tilePos.y == boundingBox.w){
-    spriteOffset = vec2(6.0, 10.0) * tileSize;
-  }else{
-    vec4 tile = texture2D(tileMap, movedCoord);
-    spriteOffset = floor(tile.xy * 256.0) * tileSize;
+  if(tilePos.y <= boundingBox.x
+  || tilePos.x <= boundingBox.y
+  || tilePos.y >= boundingBox.w
+  || tilePos.x >= boundingBox.z){
+    discard;
   }
 
+  vec4 tile = texture2D(tileMap, movedCoord);
+  vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;
   vec2 spriteCoord = mod(pixelCoord, tileSize);
+  vec2 coord = (spriteOffset + spriteCoord) * inverseSpriteTextureSize;
+  vec4 color = texture2D(spriteSheet, coord);
 
-  vec4 color = texture2D(spriteSheet, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);
 
-  if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
+  if(color.a <= 0.5
+  || (tilePos.y == boundingBox.x+1.0 && spriteCoord.y <= 1.0)
+  || (tilePos.x == boundingBox.y+1.0 && spriteCoord.x <= 1.0)
+  || (tilePos.y == boundingBox.w-1.0 && spriteCoord.y >= 15.0)
+  || (tilePos.x == boundingBox.z-1.0 && spriteCoord.x >= 15.0)){
+    if(spriteCoord.x < 15.0 && texture2D(spriteSheet, coord + vec2(inverseSpriteTextureSize.x, 0.0)).a > 0.5){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }else if(spriteCoord.x > 1.0 && texture2D(spriteSheet, coord + vec2(-inverseSpriteTextureSize.x, 0.0)).a > 0.5){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }else if(spriteCoord.y < 15.0 && texture2D(spriteSheet, coord + vec2(0.0, inverseSpriteTextureSize.y)).a > 0.5){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }else if(spriteCoord.y > 1.0 && texture2D(spriteSheet, coord + vec2(0.0, -inverseSpriteTextureSize.y)).a > 0.5){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }else{
+      gl_FragColor = vec4(0.0);
+    }
+  }else if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, movedCoord);
-    gl_FragColor = charge;
+    gl_FragColor = charge * vec4(1.0, 1.0, 1.0, 0.8);
   }else{
-    gl_FragColor = color;
+    gl_FragColor = color * vec4(1.0, 1.0, 1.0, 0.8);
   }
 }

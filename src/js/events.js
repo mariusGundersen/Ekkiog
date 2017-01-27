@@ -17,8 +17,7 @@ export const LOAD_CONTEXT_MENU = 'loadContextMenu';
 export const ABORT_LOAD_CONTEXT_MENU = 'abortLoadContextMenu';
 
 export const START_SELECTION = 'startSelection';
-export const CANCEL_SELECTION = 'cancelSelection';
-export const OK_SELECTION_MOVE = 'okSelectionMove';
+export const STOP_SELECTION = 'stopSelection';
 export const MOVE_SELECTION = 'moveSelection';
 
 export const CANCEL_PAN_ZOOM = 'cancelPanZoom';

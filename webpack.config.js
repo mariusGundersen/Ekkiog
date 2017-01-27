@@ -65,7 +65,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style!css!postcss'
+        loader: 'style!css?modules=true!postcss'
       },
       {
         test: /manifest\.json$/,

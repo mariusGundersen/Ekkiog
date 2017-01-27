@@ -3,6 +3,9 @@ import {connect} from 'react-redux';
 
 import Menu from './Menu.jsx';
 import WebGLCanvas from './WebGLCanvas.jsx';
+import Search from './Search.jsx';
+
+import style from './main.css';
 
 const App = connect(
   state => ({
@@ -10,9 +13,10 @@ const App = connect(
     height: state.height,
   })
 )(props => (
-  <div className="root">
+  <div className={style.root}>
     <Menu />
     <WebGLCanvas />
+    <Search />
   </div>
 ));
 

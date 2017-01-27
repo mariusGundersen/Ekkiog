@@ -1,9 +1,13 @@
+import * as ennea from 'ennea-tree';
+
 import reconcile from './reconciliation/reconcile.js';
 
-export default function mutateContext(context, renderer, changes){
+export default function mutateContext(context, renderer, before, after){
   if(!context) return;
   if(!renderer) return;
+  if(before === after) return;
 
+  const changes = ennea.diff(before.enneaTree, after.enneaTree)
   const changed = reconcile(context, changes);
   if(!changed) return;
 
@@ -11,6 +15,6 @@ export default function mutateContext(context, renderer, changes){
   context.netMapTexture.update();
   context.gatesTexture.update();
 
-  renderer.simulateTick(context, renderer.currentTick);
+  renderer.simulateTick(context);
   renderer.renderMap(context);
 }

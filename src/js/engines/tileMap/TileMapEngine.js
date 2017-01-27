@@ -11,17 +11,17 @@ export default class TileMapEngine{
     this.shader = createShader(gl, tileMapVS, tileMapFS);
   }
 
-  render(context){
-    context.tileMapTexture.bindFramebuffer();
+  render(input, output){
+    output.bindFramebuffer();
 
     this.shader.bind();
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    this.shader.uniforms.tilemap = context.mapTexture.sampler2D(0);
-    this.shader.uniforms.inverseTileTextureSize = context.mapTexture.inverseSize;
+    this.shader.uniforms.tilemap = input.sampler2D(0);
+    this.shader.uniforms.inverseTileTextureSize = input.inverseSize;
 
     triangle.draw();
 
-    context.tileMapTexture.unbindFramebuffer();
+    output.unbindFramebuffer();
   }
 }

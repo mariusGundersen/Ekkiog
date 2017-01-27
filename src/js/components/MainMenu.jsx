@@ -97,7 +97,7 @@ function createOkCancelMenuTree({mainMenu}, dispatch){
   return [
     {
       menuItems: [
-        menuItem('ok', <IconAccept />, () => mainMenu.okAction()),
+        menuItem('ok', <IconAccept />, () => mainMenu.okAction(), false, mainMenu.isValid),
         menuItem('cancel', <IconRemove />, () => mainMenu.cancelAction())
       ]
     }

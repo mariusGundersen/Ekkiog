@@ -29,8 +29,8 @@ export default class MoveEngine {
     this.shader.uniforms.boundingBox = [
       top-1,
       left-1,
-      right+1,
-      bottom+1
+      right,
+      bottom
     ];
     this.shader.uniforms.translate = [dx, dy];
 

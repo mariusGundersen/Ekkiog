@@ -6,14 +6,14 @@ import editor from './reducers/editor.js';
 import mainMenu from './reducers/mainMenu.js';
 import contextMenu from './reducers/contextMenu.js';
 import forest from './editing/reduce.js';
+import selection from './reducers/selection.js';
 
-const reduce = combineReducers({
+export default database => combineReducers({
   view,
-  global,
+  global: global(database),
   editor,
   mainMenu,
   contextMenu,
-  forest
+  forest,
+  selection
 });
-
-export default reduce;

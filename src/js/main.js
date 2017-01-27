@@ -2,13 +2,14 @@ import React from 'react';
 import reactDom from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore, applyMiddleware} from 'redux';
+import thunk from 'redux-thunk';
 
 import '../css/main.css';
 import '../manifest.json';
 import offline from 'offline-plugin/runtime';
 
 import Shell from './Shell.js';
-import * as database from './storage/database.js';
+import {open as openDatabase} from './storage/database.js';
 import TouchControls from './interaction/TouchControls.js';
 
 import {
@@ -24,7 +25,7 @@ import {
   setForest
 } from './actions.js';
 
-import reduce from './reduce.js';
+import createReduce from './reduce.js';
 import App from './components/App.jsx';
 
 if(!__DEV__){
@@ -39,21 +40,22 @@ if(!__DEV__){
   });
 }
 
-database.open().then(storage => {
+openDatabase().then(database => {
   const store = createStore(
-    reduce,
+    createReduce(database),
     applyMiddleware(
+      thunk,
       createEmitterMiddleware(),
-      createContextMiddleware(storage)
+      createContextMiddleware()
     )
   );
 
-  initialize(store, async ({gl, renderer, context, emitter, perspective}) => {
+  initialize(store, async ({gl, renderer, context, selectionContext, emitter, perspective}) => {
     perspective.setMapSize(context.width, context.height);
 
     const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
 
-    store.dispatch(setForest(await storage.load()));
+    store.dispatch(setForest(await database.load()));
 
     fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), () => store.getState(), store.dispatch);
 
@@ -64,14 +66,25 @@ database.open().then(storage => {
       },
 
       render() {
+        const state = store.getState();
         const result = touchControls.panZoomSaga.process();
         if(result !== null){
           perspective.panZoom(result.previous, result.current);
-          store.dispatch(panZoom(perspective.tileToViewportMatrix));
+          store.dispatch(panZoom(perspective.tileToViewportMatrix, perspective.viewportToTileMatrix));
         }
-        renderer.renderView(context, perspective);
-        if(touchControls.selectionSaga.isSelectionActive){
-          renderer.renderMove(context, perspective, touchControls.selectionSaga.boundingBox, touchControls.selectionSaga.dx, touchControls.selectionSaga.dy);
+
+        renderer.renderView(
+          context,
+          perspective.mapToViewportMatrix,
+          perspective.viewportSize);
+
+        if(state.selection.selection){
+          renderer.renderMove(
+            selectionContext,
+            perspective.mapToViewportMatrix,
+            state.selection,
+            state.selection.dx,
+            state.selection.dy);
         }
       },
 
@@ -79,7 +92,7 @@ database.open().then(storage => {
         store.dispatch(resize(pixelWidth, pixelHeight, screenWidth, screenHeight));
         perspective.setViewport(pixelWidth, pixelHeight);
         perspective.scale = context.tileSize * context.width / screenWidth;
-        store.dispatch(panZoom(perspective.tileToViewportMatrix));
+        store.dispatch(panZoom(perspective.tileToViewportMatrix, perspective.viewportToTileMatrix));
       }
     });
   });

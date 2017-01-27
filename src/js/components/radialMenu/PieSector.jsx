@@ -1,6 +1,8 @@
 import React from 'react';
 import {mat4, vec2} from 'gl-matrix';
 
+import style from '../main.css';
+
 export default ({
   innerRadius,
   outerRadius,
@@ -10,13 +12,23 @@ export default ({
   gap,
   itemKey,
   onClick,
-  icon
+  icon,
+  visible
 }) => {
   const averageRadius = (innerRadius + outerRadius)/2;
 
   const radiansStart = -turnFractionSection*Math.PI;
   const radiansEnd = turnFractionSection*Math.PI;
   const degreesRotate = turnFractionCenter*360;
+
+  if(!visible){
+    return (
+      <g
+        key={itemKey}
+        className={`${style.clickable} ${style.transTrans}`}
+        style={{transform: `rotate(${degreesRotate}deg)`}}>
+      </g>);
+  }
 
   const path = [
     `M${innerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${innerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}`,
@@ -30,7 +42,7 @@ export default ({
     <g
       key={itemKey}
       onClick={onClick}
-      className="trans-trans clickable"
+      className={`${style.clickable} ${style.transTrans}`}
       style={{transform: `rotate(${degreesRotate}deg)`}}>
       <path
         fill="#2a2d30"
@@ -38,7 +50,7 @@ export default ({
         strokeWidth="2"
         d={path}/>
         <g transform={`translate(${averageRadius} 0)`}>
-          <g className="trans-trans" style={{transform: `rotate(${-degreesRotate}deg)`}} >
+          <g className={style.transTrans} style={{transform: `rotate(${-degreesRotate}deg)`}} >
             {icon}
           </g>
         </g>

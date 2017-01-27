@@ -22,22 +22,37 @@ export default class Renderer {
   }
 
   renderMap(context){
-    this.tileMapEngine.render(context);
-    this.chargeMapEngine.render(context, this.currentTick);
+    this.tileMapEngine.render(
+      context.mapTexture,
+      context.tileMapTexture);
   }
 
-  simulateTick(context, tick){
+  simulateTick(context, tick=this.currentTick){
     this.currentTick = tick;
-    this.netChargeEngine.render(context, tick);
-    this.chargeMapEngine.render(context, tick);
+
+    const prevousCharges = context.netChargeTextures[(tick+1)%2];
+    const nextCharges = context.netChargeTextures[tick%2];
+
+    this.netChargeEngine.render(
+      prevousCharges,
+      context.gatesTexture,
+      nextCharges);
+
+    const currentCharges = nextCharges;
+
+    this.chargeMapEngine.render(
+      context.netMapTexture,
+      currentCharges,
+      context.spriteSheetTexture,
+      context.chargeMapTexture);
   }
 
-  renderView(context, perspective) {
-    this.gl.viewport(0, 0, ...perspective.viewportSize);
-    this.viewEngine.render(context, perspective.mapToViewportMatrix);
+  renderView(context, mapToViewportMatrix, viewportSize) {
+    this.gl.viewport(0, 0, ...viewportSize);
+    this.viewEngine.render(context, mapToViewportMatrix);
   }
 
-  renderMove(context, perspective, boundingBox, dx, dy){
-    this.moveEngine.render(context, perspective.mapToViewportMatrix, boundingBox, dx, dy);
+  renderMove(context, mapToViewportMatrix, {top, left, right, bottom}, dx, dy){
+    this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
   }
 }
