@@ -15,15 +15,20 @@ export default ({
   icon,
   visible
 }) => {
-
-  if(!visible){
-    return <g key={itemKey}></g>;
-  }
   const averageRadius = (innerRadius + outerRadius)/2;
 
   const radiansStart = -turnFractionSection*Math.PI;
   const radiansEnd = turnFractionSection*Math.PI;
   const degreesRotate = turnFractionCenter*360;
+
+  if(!visible){
+    return (
+      <g
+        key={itemKey}
+        className={`${style.clickable} ${style.transTrans}`}
+        style={{transform: `rotate(${degreesRotate}deg)`}}>
+      </g>);
+  }
 
   const path = [
     `M${innerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${innerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}`,
