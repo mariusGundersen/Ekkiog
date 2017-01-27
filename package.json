@@ -62,6 +62,7 @@
     "reaxjs": "^0.1.6",
     "redux": "^3.5.2",
     "redux-thunk": "^2.2.0",
+    "rxjs": "^5.0.3",
     "serve-favicon": "^2.3.0",
     "serve-static": "^1.11.1",
     "stats-js": "^1.0.0-alpha1"
