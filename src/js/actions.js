@@ -124,11 +124,17 @@ export const resetMainMenu = () => ({
   type: RESET_MAIN_MENU
 });
 
-export const insertComponent = (component, position) => ({
-  type: INSERT_COMPONENT,
-  component,
-  position
-});
+export const insertComponent = (component, position) => (dispatch, getState) => {
+  const selection = getState().selection;
+  dispatch({
+    type: INSERT_COMPONENT,
+    component,
+    position: {
+      x: (position.x|0) + selection.dx,
+      y: (position.y|0) + selection.dy
+    }
+  })
+};
 
 export const selectComponent = (component, position) => ({
   type: SELECT_COMPONENT,
@@ -156,6 +162,7 @@ export const moveSelection = (dx, dy) => ({
 export const stopSelection = () => ({
   type: STOP_SELECTION,
   meta: {
-    emit: true
+    emit: true,
+    dispatch: true
   }
 });

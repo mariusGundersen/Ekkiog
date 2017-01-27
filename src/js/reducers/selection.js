@@ -2,7 +2,8 @@ import createForest from '../editing/actions/createForest.js';
 
 import {
   SELECT_COMPONENT,
-  MOVE_SELECTION
+  MOVE_SELECTION,
+  STOP_SELECTION
 } from '../actions.js';
 
 import drawComponent from '../editing/actions/drawComponent.js';
@@ -35,6 +36,12 @@ export default function reduce(state={
         dx: action.dx,
         dy: action.dy
       };
+    case STOP_SELECTION:
+      return {
+        ...state,
+        forest: createForest(),
+        selection: false
+      }
     default:
       return state;
   }
