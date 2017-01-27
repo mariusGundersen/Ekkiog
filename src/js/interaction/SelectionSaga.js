@@ -71,7 +71,6 @@ export default class SelectionSaga extends EventSaga {
       selection: false
     };
 
-    console.log(START_SELECTION);
     eventEmitter.on(START_SELECTION, (data) => {
       this.state = {
         selection: true,
