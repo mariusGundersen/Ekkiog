@@ -29,24 +29,30 @@ void main(void) {
   vec4 tile = texture2D(tileMap, movedCoord);
   vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;
   vec2 spriteCoord = mod(pixelCoord, tileSize);
-  vec4 color = texture2D(spriteSheet, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);
+  vec2 coord = (spriteOffset + spriteCoord) * inverseSpriteTextureSize;
+  vec4 color = texture2D(spriteSheet, coord);
 
-  if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
+
+  if(color.a <= 0.5
+  || (tilePos.y == boundingBox.x+1.0 && spriteCoord.y <= 1.0)
+  || (tilePos.x == boundingBox.y+1.0 && spriteCoord.x <= 1.0)
+  || (tilePos.y == boundingBox.w-1.0 && spriteCoord.y >= 15.0)
+  || (tilePos.x == boundingBox.z-1.0 && spriteCoord.x >= 15.0)){
+    if(spriteCoord.x < 15.0 && texture2D(spriteSheet, coord + vec2(inverseSpriteTextureSize.x, 0.0)).a > 0.5){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }else if(spriteCoord.x > 1.0 && texture2D(spriteSheet, coord + vec2(-inverseSpriteTextureSize.x, 0.0)).a > 0.5){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }else if(spriteCoord.y < 15.0 && texture2D(spriteSheet, coord + vec2(0.0, inverseSpriteTextureSize.y)).a > 0.5){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }else if(spriteCoord.y > 1.0 && texture2D(spriteSheet, coord + vec2(0.0, -inverseSpriteTextureSize.y)).a > 0.5){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }else{
+      gl_FragColor = vec4(0.0);
+    }
+  }else if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, movedCoord);
     gl_FragColor = charge * vec4(1.0, 1.0, 1.0, 0.8);
-  }else if(color.a == 0.0){
-    float dx = tilePos.x-1.0 == boundingBox.y
-      ? 1.0-spriteCoord.x/tileSize
-      : tilePos.x+1.0 == boundingBox.z
-      ? spriteCoord.x/tileSize
-      : 0.0;
-    float dy = tilePos.y-1.0 == boundingBox.x
-      ? 1.0-spriteCoord.y/tileSize
-      : tilePos.y+1.0 == boundingBox.w
-      ? spriteCoord.y/tileSize
-      : 0.0;
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 2.0-2.0*sqrt(dx*dx+dy*dy));
   }else{
-    gl_FragColor = color;
+    gl_FragColor = color * vec4(1.0, 1.0, 1.0, 0.8);
   }
 }
