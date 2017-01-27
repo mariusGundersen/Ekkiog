@@ -1,3 +1,5 @@
+import isEmpty from './editing/query/isEmpty.js';
+
 export const RESIZE = 'resize';
 export const GL = 'gl';
 export const SET_SELECTED_TOOL = 'setSelectedTool';
@@ -19,6 +21,7 @@ export const TO_WIRE = 'convert-underpass-to-wire';
 export const MOVE_GATE = 'moveGate';
 
 export const SHOW_OK_CANCEL_MENU = 'showOkCancelMenu';
+export const SET_OK_CANCEL_MENU_VALID = 'setOkCancelMenuValid';
 export const RESET_MAIN_MENU = 'resetMainMenu';
 
 export const INSERT_COMPONENT = 'insertComponent';
@@ -120,6 +123,11 @@ export const showOkCancelMenu = (okAction, cancelAction) => ({
   cancelAction
 });
 
+export const setOkCancelMenuValid = (isValid) => ({
+  type: SET_OK_CANCEL_MENU_VALID,
+  isValid
+});
+
 export const resetMainMenu = () => ({
   type: RESET_MAIN_MENU
 });
@@ -142,16 +150,26 @@ export const selectComponent = (component, position) => ({
   position
 });
 
-export const startSelection = (top, left, right, bottom) => ({
-  type: START_SELECTION,
-  meta: {
-    emit: true
-  },
-  top,
-  left,
-  right,
-  bottom
-});
+export const startSelection = (top, left, right, bottom) => (dispatch, getState) => {
+  dispatch({
+    type: START_SELECTION,
+    meta: {
+      emit: true
+    },
+    top,
+    left,
+    right,
+    bottom
+  });
+  const state = getState();
+  const isValid = isEmpty(
+    state.forest.enneaTree,
+    top,
+    left,
+    right,
+    bottom);
+  dispatch(setOkCancelMenuValid(isValid));
+};
 
 export const moveSelection = (dx, dy) => ({
   type: MOVE_SELECTION,

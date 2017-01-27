@@ -8,6 +8,7 @@ import {
   showContextMenu,
   hideContextMenu,
   showOkCancelMenu,
+  setOkCancelMenuValid,
   resetMainMenu,
   moveSelection
 } from './actions.js';
@@ -21,6 +22,8 @@ import {
   MOVE_SELECTION,
   STOP_SELECTION
 } from './events.js';
+
+import isEmpty from './editing/query/isEmpty.js';
 
 export function createEmitterMiddleware(){
   return ({getState}) => next => action => {
@@ -40,7 +43,7 @@ export function fromEmitter(emitter, viewportToTile, getState, dispatch){
   emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(viewportToTile, dispatch, getState));
   emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(dispatch));
   emitter.on(ABORT_LOAD_CONTEXT_MENU, handleAbortContextMenu(dispatch));
-  emitter.on(MOVE_SELECTION, handleMoveSelection(dispatch));
+  emitter.on(MOVE_SELECTION, handleMoveSelection(dispatch, getState));
 }
 
 export function handleTap(viewportToTile, dispatch, getState){
@@ -80,8 +83,17 @@ export function handleAbortContextMenu(dispatch){
   };
 }
 
-export function handleMoveSelection(dispatch){
+export function handleMoveSelection(dispatch, getState){
   return ({dx, dy}) => {
     dispatch(moveSelection(dx, dy));
+    const state = getState();
+    const selection = state.selection;
+    const isValid = isEmpty(
+      state.forest.enneaTree,
+      selection.top + selection.dy,
+      selection.left + selection.dx,
+      selection.right + selection.dx,
+      selection.bottom + selection.dy);
+    dispatch(setOkCancelMenuValid(isValid));
   };
 }

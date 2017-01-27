@@ -43,8 +43,6 @@ const Search = connect(
         const right = centerTile.x - (result.source.width>>1) + result.source.width;
         const bottom = centerTile.y - (result.source.height>>1) + result.source.height;
 
-        dispatch(startSelection(top, left, right, bottom));
-        dispatch(selectComponent(result, centerTile));
         dispatch(showOkCancelMenu(
           () => {
             dispatch(stopSelection());
@@ -56,6 +54,8 @@ const Search = connect(
             dispatch(resetMainMenu());
           }
         ));
+        dispatch(startSelection(top, left, right, bottom));
+        dispatch(selectComponent(result, centerTile));
       }} />
   );
 });

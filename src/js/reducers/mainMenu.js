@@ -3,6 +3,7 @@ import {
   SHOW_CONTEXT_MENU,
   HIDE_CONTEXT_MENU,
   SHOW_OK_CANCEL_MENU,
+  SET_OK_CANCEL_MENU_VALID,
   RESET_MAIN_MENU
 } from '../actions.js';
 
@@ -36,6 +37,11 @@ export default function mainMenu(state={
         okAction: action.okAction,
         cancelAction: action.cancelAction,
         previousMenu: state
+      };
+    case SET_OK_CANCEL_MENU_VALID:
+      return {
+        ...state,
+        isValid: action.isValid
       };
     case RESET_MAIN_MENU:
       return state.previousMenu || state;
