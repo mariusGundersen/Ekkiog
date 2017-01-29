@@ -78,11 +78,11 @@ export function* makePointsTo(gates, index){
 export function makeGate(gate, index, nets){
   return {
     net: nets[index],
-    inputA: gate.inputA.type === 'input'
-      ? GROUND
-      : nets[gate.inputA.index],
-    inputB: gate.inputB.type === 'input'
-      ? GROUND
-      : nets[gate.inputB.index]
+    inputA: gate.inputA.type === 'gate'
+      ? nets[gate.inputA.index]
+      : GROUND,
+    inputB: gate.inputB.type === 'gate'
+      ? nets[gate.inputB.index]
+      : GROUND
   };
 }
