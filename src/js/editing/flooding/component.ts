@@ -1,6 +1,16 @@
+import { Pos, BoxContext } from 'ennea-tree';
+
 import makePos from './makePos.js';
 
-export default function component(oldComponent, pos, ctx, queue){
+import {
+  Context
+} from './types';
+
+import {
+  Component
+} from '../types';
+
+export default function component(oldComponent : Component, pos : Pos, ctx : Context, queue : BoxContext<Context>[]){
   const hitsInput = oldComponent.inputs.some(input => input.x === pos.left && input.y === pos.top);
   if(hitsInput){
     return {

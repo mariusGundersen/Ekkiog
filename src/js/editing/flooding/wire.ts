@@ -1,6 +1,16 @@
+import { Pos, BoxContext } from 'ennea-tree';
+
 import makePos from './makePos.js';
 
-export default function wire(oldWire, pos, ctx, queue){
+import {
+  Context
+} from './types';
+
+import {
+  Wire
+} from '../types';
+
+export default function wire(oldWire : Wire, pos : Pos, ctx : Context, queue : BoxContext<Context>[]){
   if(oldWire.net === ctx.net){
     return oldWire;
   }
@@ -16,7 +26,7 @@ export default function wire(oldWire, pos, ctx, queue){
   };
 }
 
-function pushPosToChanges(queue, ctx, dx, dy){
+function pushPosToChanges(queue : BoxContext<Context>[], ctx : Context, dx : number, dy : number){
   if(ctx.pos.left+dx != ctx.prev.left || ctx.pos.top+dy != ctx.prev.top){
     queue.push(makePos(ctx.pos, ctx.net, dx, dy));
   }

@@ -10,10 +10,14 @@ import {
 
 import floodFill from '../flooding/floodFill.js';
 
-export default function clear(forest, x, y){
-  let [enneaTree, ...cleared] = ennea.clear(forest.enneaTree, {left:x, top:y});
+import { Forest, Item } from '../types';
 
-  enneaTree = floodFill(enneaTree, ...cleared.reduce((a, b) => [...a, ...clearBox(b)], []));
+import { FloodSource, FloodSourceComponent } from '../flooding/types';
+
+export default function clear(forest : Forest, x : number, y : number){
+  let {tree : enneaTree, cleared} = ennea.clear(forest.enneaTree, {left:x, top:y});
+
+  enneaTree = floodFill(enneaTree, ...cleared.reduce((a, b) => a.concat(...clearBox(b)), [] as FloodSource[]));
 
   const buddyTree = cleared.map(getNetSource)
     .filter(net => net > 1)
@@ -25,15 +29,17 @@ export default function clear(forest, x, y){
   };
 }
 
-function* clearBox(box){
-  if(box.data.type === COMPONENT){
+function* clearBox(box : ennea.AreaData<Item>){
+  if(!box.data){
+    return;
+  }else if(box.data.type === COMPONENT){
     for(const output of box.data.outputs){
       yield {
         left: box.left + output.x,
         top: box.top + output.y,
         type: box.data.type,
         net: GROUND
-      };
+      } as FloodSourceComponent;
     }
   }
 
@@ -42,10 +48,10 @@ function* clearBox(box){
     top: box.top,
     type: box.data.type,
     net: GROUND
-  };
+  } as FloodSource;
 }
 
-function getNetSource(box){
+function getNetSource(box : ennea.AreaData<Item>){
   switch(box.data.type){
     case GATE:
     case BUTTON:

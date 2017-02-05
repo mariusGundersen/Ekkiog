@@ -9,7 +9,11 @@ import {
 import getNetAt from '../query/getNetAt.js';
 import floodFill from '../flooding/floodFill.js';
 
-export default function drawComponent(forest, x, y, source){
+import { Forest, TreeNode, Component, ComponentSource, ComponentSourceGate, ComponentInputPointer } from '../types';
+
+import { FloodSourceComponent } from '../flooding/types';
+
+export default function drawComponent(forest : Forest, x : number, y : number, source : ComponentSource){
   x -= source.width>>1;
   y -= source.height>>1;
   const [buddyTree, ...nets] = allocate(forest.buddyTree, source.gates.length);
@@ -21,7 +25,7 @@ export default function drawComponent(forest, x, y, source){
     y: input.y,
     dx: input.dx,
     dy: input.dy,
-    net: getNetAt(forest.enneaTree, ...posOf(x, y, input.x, input.y, input.dx, input.dy)),
+    net: getNetAtPos(forest.enneaTree, x, y, input.x, input.y, input.dx, input.dy),
     pointsTo: [...makePointsTo(gates, index)]
   }));
 
@@ -39,7 +43,7 @@ export default function drawComponent(forest, x, y, source){
     inputs,
     outputs,
     gates: source.gates.map((gate, index) => makeGate(gate, index, nets))
-  };
+  } as Component;
   const box = {left:x, top:y, width:source.width, height:source.height};
   let enneaTree = ennea.set(forest.enneaTree, data, box);
 
@@ -54,7 +58,7 @@ export default function drawComponent(forest, x, y, source){
     dy: output.dy,
     type: COMPONENT,
     net: output.net
-  })));
+  } as FloodSourceComponent)));
 
   return {
     enneaTree,
@@ -62,20 +66,20 @@ export default function drawComponent(forest, x, y, source){
   };
 }
 
-export function posOf(sx, sy, x, y, dx, dy){
-  return [sx+x+dx, sy+y+dy, dx, dy];
+export function getNetAtPos(tree : TreeNode, sx : number, sy : number, x : number, y : number, dx : number, dy : number){
+  return getNetAt(tree, sx+x+dx, sy+y+dy, dx, dy);
 }
 
-export function* makePointsTo(gates, index){
+export function* makePointsTo(gates : ComponentSourceGate[], index : number){
   yield* gates
     .filter(g => g.inputA.type === 'input' && g.inputA.index === index)
-    .map(g => ({net: g.net, input: 'A'}));
+    .map(g => ({net: g.net, input: 'A'} as ComponentInputPointer));
   yield* gates
     .filter(g => g.inputB.type === 'input' && g.inputB.index === index)
-    .map(g => ({net: g.net, input: 'B'}));
+    .map(g => ({net: g.net, input: 'B'} as ComponentInputPointer));
 }
 
-export function makeGate(gate, index, nets){
+export function makeGate(gate : ComponentSourceGate, index : number, nets : number[]){
   return {
     net: nets[index],
     inputA: gate.inputA.type === 'gate'

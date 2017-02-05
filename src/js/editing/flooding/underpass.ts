@@ -1,6 +1,16 @@
+import { Pos, BoxContext } from 'ennea-tree';
+
 import makePos from './makePos.js';
 
-export default function underpass(oldUnderpass, pos, ctx, queue){
+import {
+  Context
+} from './types';
+
+import {
+  Underpass
+} from '../types';
+
+export default function underpass(oldUnderpass : Underpass, pos : Pos, ctx : Context, queue : BoxContext<Context>[]){
   const dx = ctx.pos.left - ctx.prev.left;
   const dy = ctx.pos.top - ctx.prev.top;
   queue.push(makePos(ctx.pos, ctx.net, dx, dy));

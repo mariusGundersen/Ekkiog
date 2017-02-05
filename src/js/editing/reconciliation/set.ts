@@ -1,3 +1,5 @@
+import { ChangeSet, Area } from 'ennea-tree';
+
 import {
   setMap,
   setNetMap,
@@ -25,7 +27,9 @@ import {
   COMPONENT
 } from '../constants.js';
 
-export default function set(context, change){
+import { Item, Wire, Gate, Underpass, Button, Component, Context } from '../types';
+
+export default function set(context : Context, change : ChangeSet<Item>){
   switch(change.after.type){
     case WIRE:
       return wire(context, change, change.after);
@@ -40,12 +44,12 @@ export default function set(context, change){
   }
 }
 
-export function wire(context, {top:y, left:x}, wire){
+export function wire(context : Context, {top:y, left:x} : Area, wire : Wire){
   setMap(context, x, y, WIRE_TILE);
   setNetMap(context, x, y, wire.net);
 }
 
-export function gate(context, {top:y, left:x, width, height}, gate){
+export function gate(context : Context, {top:y, left:x, width, height} : Area, gate : Gate){
   for(let ty=0; ty<height; ty++){
     for(let tx=0; tx<width; tx++){
       setMap(context, tx+x, ty+y, gateTile(tx, ty));
@@ -57,12 +61,12 @@ export function gate(context, {top:y, left:x, width, height}, gate){
   setGate(context, gate.net, gate.inputA, gate.inputB);
 }
 
-export function underpass(context, {top:y, left:x}, underpass){
+export function underpass(context : Context, {top:y, left:x} : Area, underpass : Underpass){
   setMap(context, x, y, UNDERPASS_TILE);
   setNetMap(context, x, y, underpass.net);
 }
 
-export function button(context, {top:y, left:x, width, height}, button){
+export function button(context : Context, {top:y, left:x, width, height} : Area, button : Button){
   for(let ty=0; ty<height; ty++){
     for(let tx=0; tx<width; tx++){
       setMap(context, tx+x, ty+y, buttonTile(tx, ty));
@@ -74,7 +78,7 @@ export function button(context, {top:y, left:x, width, height}, button){
   setGate(context, button.net, state, state);
 }
 
-export function component(context, {top:y, left:x, width, height}, component){
+export function component(context : Context, {top:y, left:x, width, height} : Area, component : Component){
   const ports = [...component.inputs, ...component.outputs];
 
   for(let ty=0; ty<height; ty++){
@@ -103,15 +107,15 @@ export function component(context, {top:y, left:x, width, height}, component){
   }
 }
 
-export function gateTile(x, y){
+export function gateTile(x : number, y : number){
   return GATE_TILE + tile(x, y);
 }
 
-export function buttonTile(x, y){
+export function buttonTile(x : number, y : number){
   return BUTTON_TILE + tile(x, y);
 }
 
-export function componentTile(x, y, w, h, ports){
+export function componentTile(x : number, y : number, w : number, h : number, ports : {x : number, y : number}[]){
   if(x === 0){
     if(y === 0){
       return COMPONENT_TILE + tile(0, 0);

@@ -1,8 +1,18 @@
-import makePos from './makePos.js';
+import { Pos, BoxContext } from 'ennea-tree';
+
 import {getButtonNet} from '../query/getNetAt.js';
 import {GROUND} from '../constants.js';
+import makePos from './makePos.js';
 
-export default function button(oldButton, pos, ctx, queue){
+import {
+  Context
+} from './types';
+
+import {
+  Button
+} from '../types';
+
+export default function button(oldButton : Button, pos : Pos, ctx : Context, queue : BoxContext<Context>[]){
   const net = getButtonNet(
     oldButton,
     pos.left,

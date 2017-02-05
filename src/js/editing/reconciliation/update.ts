@@ -1,3 +1,5 @@
+import { ChangeUpdate, Area } from 'ennea-tree';
+
 import {
   setMap,
   setNetMap,
@@ -21,7 +23,9 @@ import {
   GROUND
 } from '../constants.js';
 
-export default function update(context, change){
+import { Item, Wire, Gate, Underpass, Button, Component, Context } from '../types';
+
+export default function update(context : Context, change : ChangeUpdate<Item>){
   switch(change.after.type){
     case WIRE:
       return updateWireNet(context, change, change.after);
@@ -36,28 +40,28 @@ export default function update(context, change){
   }
 }
 
-export function updateWireNet(context, {top:y, left:x}, wire){
+export function updateWireNet(context : Context, {top:y, left:x} : Area, wire : Wire){
   setMap(context, x, y, WIRE_TILE);
   setNetMap(context, x, y, wire.net);
 }
 
-export function updateGateInput(context, {top:y, left:x}, gate){
+export function updateGateInput(context : Context, {top:y, left:x} : Area, gate : Gate){
   setNetMap(context, x, y+0, gate.inputA);
   setNetMap(context, x, y+2, gate.inputB);
   setGate(context, gate.net, gate.inputA, gate.inputB);
 }
 
-export function updateUnderpassNet(context, {top:y, left:x}, underpass){
+export function updateUnderpassNet(context : Context, {top:y, left:x} : Area, underpass : Underpass){
   setMap(context, x, y, UNDERPASS_TILE);
   setNetMap(context, x, y, underpass.net);
 }
 
-export function updateButtonState(context, {top:y, left:x}, button){
+export function updateButtonState(context : Context, {top:y, left:x} : Area, button : Button){
   const state = button.state ? 0 : 1;
   setGate(context, button.net, state, state);
 }
 
-export function updateComponent(context, {top:y, left:x}, component){
+export function updateComponent(context : Context, {top:y, left:x} : Area, component : Component){
   for(const input of component.inputs){
     setNetMap(context, x+input.x, y+input.y, input.net);
     for(const pointer of input.pointsTo){

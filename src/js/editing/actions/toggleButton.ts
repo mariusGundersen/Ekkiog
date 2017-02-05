@@ -4,13 +4,15 @@ import {
   BUTTON
 } from '../constants.js';
 
-export default function toggleButton(forest, x, y){
+import { Forest, Button } from '../types';
+
+export default function toggleButton(forest : Forest, x : number, y : number) : Forest{
   const buddyTree = forest.buddyTree;
   const updater = ennea.update(forest.enneaTree, old => (old.type === BUTTON ? {
     ...old,
     state: !old.state
   } : old));
-  updater.update({top: y, left: x});
+  updater.update({top: y, left: x}, {});
   const enneaTree = updater.result();
 
   return {

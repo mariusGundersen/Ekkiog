@@ -1,3 +1,5 @@
+import { ChangeClear, Area } from 'ennea-tree';
+
 import {
   setMap,
   setNetMap,
@@ -17,7 +19,9 @@ import {
   GROUND
 } from '../constants.js';
 
-export default function clear(context, change){
+import { Item, Component, Context } from '../types';
+
+export default function clear(context : Context, change : ChangeClear<Item>){
   clearArea(context, change);
   switch(change.before.type){
     case WIRE:
@@ -33,7 +37,7 @@ export default function clear(context, change){
   }
 }
 
-export function clearArea(context, {top, left, width, height}){
+export function clearArea(context : Context, {top, left, width, height} : Area){
   for(let y=top; y<top+height; y++){
     for(let x=left; x<left+width; x++){
       setMap(context, x, y, EMPTY_TILE);
@@ -42,6 +46,6 @@ export function clearArea(context, {top, left, width, height}){
   }
 }
 
-export function clearComponent(context, component){
+export function clearComponent(context : Context, component : Component){
   //clear all gates
 }
