@@ -1,5 +1,5 @@
 import * as ennea from 'ennea-tree';
-import {deallocate} from 'buddy-tree';
+import { deallocate } from 'buddy-tree';
 
 import {
   GATE,
@@ -52,6 +52,10 @@ function* clearBox(box : ennea.AreaData<Item>){
 }
 
 function getNetSource(box : ennea.AreaData<Item>){
+  if(box.data == null){
+    return -1;
+  }
+
   switch(box.data.type){
     case GATE:
     case BUTTON:

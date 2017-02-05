@@ -19,7 +19,7 @@ export default function drawGate(forest : Forest, x : number, y : number){
     return forest;
   }
 
-  const [buddyTree, net] = allocate(forest.buddyTree);
+  const {tree: buddyTree, address: net} = allocate(forest.buddyTree);
   const data = {
     type: GATE,
     net,

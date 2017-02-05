@@ -1,7 +1,8 @@
 import { Node } from 'ennea-tree';
+import { Node as BuddyNode } from 'buddy-tree';
 
 export interface Forest {
-  buddyTree : any,
+  buddyTree : BuddyNode,
   enneaTree : TreeNode
 }
 
@@ -34,7 +35,8 @@ export interface Component{
   type : 'component',
   inputs : {x : number, y : number, net : number, pointsTo : ComponentInputPointer[]}[],
   outputs : {x : number, y : number, net : number, dx : number, dy : number}[],
-  gates : {net : number, inputA : number, inputB : number}[]
+  gates : {net : number, inputA : number, inputB : number}[],
+  nets : number[]
 }
 
 export interface ComponentInputPointer {
