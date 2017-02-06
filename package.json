@@ -4,7 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
+    "tsc": "tsc",
     "build": "NODE_ENV=production webpack -p --progress --colors",
+    "debug": "webpack -p --progress --display-error-details",
     "watch": "webpack --progress --colors --watch",
     "dev": "webpack-dashboard -- webpack-dev-server --content-base dist/ --colors --hot --inline --host 0.0.0.0",
     "start": "node server.js",
@@ -15,6 +17,7 @@
   "devDependencies": {
     "autoprefixer": "^6.4.0",
     "ava": "^0.15.2",
+    "awesome-typescript-loader": "^3.0.2",
     "babel-core": "^6.1.19",
     "babel-loader": "^6.1.0",
     "babel-plugin-transform-class-properties": "^6.11.5",

@@ -1,20 +1,41 @@
-var path = require('path');
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var DashboardPlugin = require('webpack-dashboard/plugin');
-var OfflinePlugin = require('offline-plugin');
-var autoprefixer = require('autoprefixer');
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const DashboardPlugin = require('webpack-dashboard/plugin');
+const OfflinePlugin = require('offline-plugin');
+const autoprefixer = require('autoprefixer');
 
-var ROOT_PATH = path.resolve(__dirname);
-var BUDDY_PATH = path.resolve(ROOT_PATH, 'node_modules/buddy-tree');
-var ENNEA_PATH = path.resolve(ROOT_PATH, 'node_modules/ennea-tree');
+const debug = process.env.NODE_ENV !== 'production';
 
-var debug = process.env.NODE_ENV !== 'production';
+const babelLoader = {
+  loader: 'babel-loader',
+  query: {
+    cacheDirectory: true
+  }
+};
+
+const cssLoader = {
+  loader:'css-loader',
+  options: {
+    modules: true
+  }
+};
+
+const postCssLoader = {
+  loader: 'postcss-loader',
+  options: {
+    plugins: function () {
+      return [
+        autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] })
+      ];
+    }
+  }
+};
 
 module.exports = {
   entry: './src/js/main.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: 'dist',
     publicPath: '/',
     filename: 'bundle.js'
   },
@@ -37,14 +58,17 @@ module.exports = {
       ServiceWorker: {
         events: true
       }
-    })
-  ].concat(debug ? [new DashboardPlugin()] : []),
+    }),
+    ...(debug ? [new DashboardPlugin()] : [])
+  ],
   resolve: {
     modules: [
-      path.resolve(__dirname, "src"),
+      'src',
       'node_modules'
-    ]
+    ],
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
+  devtool: debug ? 'eval-source-map' : 'source-map',
   module: {
     rules: [
       {
@@ -55,16 +79,18 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        loader: 'ts-loader',
-        exclude: /node_modules/,
+        use: [
+          babelLoader,
+          'ts-loader',
+        ],
+        exclude: /node_modules/
       },
       {
         test: /\.jsx?$/,
-        include: [path.resolve(__dirname, 'src/js'), BUDDY_PATH, ENNEA_PATH],
-        loader: 'babel-loader',
-        options: {
-          cacheDirectory: true
-        }
+        exclude: /node_modules/,
+        use: [
+          babelLoader
+        ]
       },
       {
         test: /\.glsl$/,
@@ -81,17 +107,8 @@ module.exports = {
         test: /\.css$/,
         use: [
           'style-loader',
-          'css-loader?modules=true',
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: function () {
-                return [
-                  autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] })
-                ];
-              }
-            }
-          }
+          cssLoader,
+          postCssLoader
         ]
       },
       {
@@ -104,6 +121,5 @@ module.exports = {
         }
       }
     ]
-  },
-  devtool: debug ? 'eval-source-map' : 'source-map'
+  }
 };
