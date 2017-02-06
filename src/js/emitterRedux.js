@@ -1,4 +1,4 @@
-import getTypeAt from './editing/query/getTypeAt.js';
+import getTypeAt from './editing/query/getTypeAt.ts';
 
 import {
   MOVE_GATE,
@@ -23,7 +23,7 @@ import {
   STOP_SELECTION
 } from './events.js';
 
-import isEmpty from './editing/query/isEmpty.js';
+import isEmpty from './editing/query/isEmpty.ts';
 
 export function createEmitterMiddleware(){
   return ({getState}) => next => action => {

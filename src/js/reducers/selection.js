@@ -1,4 +1,4 @@
-import createForest from '../editing/actions/createForest.js';
+import createForest from '../editing/actions/createForest.ts';
 
 import {
   SELECT_COMPONENT,
@@ -6,7 +6,7 @@ import {
   STOP_SELECTION
 } from '../actions.js';
 
-import drawComponent from '../editing/actions/drawComponent.js';
+import drawComponent from '../editing/actions/drawComponent.ts';
 
 export default function reduce(state={
   forest: createForest(),

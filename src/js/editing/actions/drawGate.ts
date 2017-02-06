@@ -4,11 +4,11 @@ import {allocate} from 'buddy-tree';
 import {
   GATE,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
-import getNetAt from '../query/getNetAt.js';
-import {getGateNeighbouringNets} from '../query/getNeighbouringNets.js';
-import floodFill from '../flooding/floodFill.js';
+import getNetAt from '../query/getNetAt';
+import {getGateNeighbouringNets} from '../query/getNeighbouringNets';
+import floodFill from '../flooding/floodFill';
 
 import { Forest, TreeNode, Gate } from '../types';
 

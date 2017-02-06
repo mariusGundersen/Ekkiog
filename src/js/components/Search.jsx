@@ -10,8 +10,8 @@ import {
   startSelection,
   stopSelection
 } from '../actions.js';
-import drawComponent from '../editing/actions/drawComponent.js';
-import createForest from '../editing/actions/createForest.js';
+import drawComponent from '../editing/actions/drawComponent.ts';
+import createForest from '../editing/actions/createForest.ts';
 
 const Search = connect(
   ({view, global, selection}) => ({

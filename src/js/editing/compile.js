@@ -2,7 +2,7 @@ import * as ennea from 'ennea-tree';
 
 import {
  GATE
-} from './constants.js';
+} from './constants';
 
 export default function compile(forest){
   return {

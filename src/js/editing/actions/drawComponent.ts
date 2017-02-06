@@ -4,10 +4,10 @@ import {allocate} from 'buddy-tree';
 import {
   COMPONENT,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
-import getNetAt from '../query/getNetAt.js';
-import floodFill from '../flooding/floodFill.js';
+import getNetAt from '../query/getNetAt';
+import floodFill from '../flooding/floodFill';
 
 import { Forest, TreeNode, Component, ComponentSource, ComponentSourceGate, ComponentInputPointer } from '../types';
 

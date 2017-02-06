@@ -3,10 +3,10 @@ import {allocate} from 'buddy-tree';
 
 import {
   BUTTON
-} from '../constants.js';
+} from '../constants';
 
-import {getButtonNeighbouringNets} from '../query/getNeighbouringNets.js';
-import floodFill from '../flooding/floodFill.js';
+import {getButtonNeighbouringNets} from '../query/getNeighbouringNets';
+import floodFill from '../flooding/floodFill';
 
 import { Forest, Button } from '../types';
 

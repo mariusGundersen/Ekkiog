@@ -2,7 +2,7 @@ import * as ennea from 'ennea-tree';
 
 import {
   BUTTON
-} from '../constants.js';
+} from '../constants';
 
 import { Forest, Button } from '../types';
 

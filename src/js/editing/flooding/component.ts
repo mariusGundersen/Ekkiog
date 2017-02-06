@@ -1,6 +1,6 @@
 import { Pos, BoxContext } from 'ennea-tree';
 
-import makePos from './makePos.js';
+import makePos from './makePos';
 
 import {
   Context

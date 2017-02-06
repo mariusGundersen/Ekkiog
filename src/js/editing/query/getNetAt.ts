@@ -7,7 +7,7 @@ import {
   BUTTON,
   COMPONENT,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
 import {
   TreeNode,

@@ -2,7 +2,7 @@ import { get, Node, AreaData } from 'ennea-tree';
 
 import {
   EMPTY
-} from '../constants.js';
+} from '../constants';
 
 import { TreeNode } from '../types';
 

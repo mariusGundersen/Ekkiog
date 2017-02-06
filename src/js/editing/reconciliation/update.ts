@@ -6,13 +6,13 @@ import {
   setGate,
   setGateA,
   setGateB
-} from './mutateContext.js';
+} from './mutateContext';
 
 import {
   EMPTY_TILE,
   WIRE_TILE,
   UNDERPASS_TILE
-} from './tileConstants.js';
+} from './tileConstants';
 
 import {
   WIRE,
@@ -21,7 +21,7 @@ import {
   BUTTON,
   COMPONENT,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
 import { Item, Wire, Gate, Underpass, Button, Component, Context } from '../types';
 

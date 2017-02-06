@@ -6,6 +6,6 @@ import { Forest, TreeNode } from '../types';
 export default function createForest() : Forest{
   return {
     enneaTree: createEnneaTree(128) as TreeNode,
-    buddyTree: allocate(createBuddyTree(256*256), 2)[0]
+    buddyTree: allocate(createBuddyTree(256*256), 2).tree
   };
 }

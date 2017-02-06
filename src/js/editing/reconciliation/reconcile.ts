@@ -5,13 +5,13 @@ import {
   Change
 } from 'ennea-tree';
 
-import set from './set.js';
-import update from './update.js';
-import clear from './clear.js';
+import set from './set';
+import update from './update';
+import clear from './clear';
 
 import { Item, Context } from '../types';
 
-export default function reconcile(context : Context, changes : Change<Item>[]){
+export default function reconcile(context : Context, changes : IterableIterator<Change<Item>>){
   let changed = false;
   for(const change of changes){
     changed = true;

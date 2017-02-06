@@ -6,15 +6,15 @@ import {
   BUTTON,
   COMPONENT,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
-import floodFill from '../flooding/floodFill.js';
+import floodFill from '../flooding/floodFill';
 
 import { Forest, Item } from '../types';
 
 import { FloodSource, FloodSourceComponent } from '../flooding/types';
 
-export default function clear(forest : Forest, x : number, y : number){
+export default function clear(forest : Forest, x : number, y : number) : Forest {
   let {tree : enneaTree, cleared} = ennea.clear(forest.enneaTree, {left:x, top:y});
 
   enneaTree = floodFill(enneaTree, ...cleared.reduce((a, b) => a.concat(...clearBox(b)), [] as FloodSource[]));

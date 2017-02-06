@@ -1,8 +1,8 @@
 import { Pos, BoxContext } from 'ennea-tree';
 
-import {getGateNet} from '../query/getNetAt.js';
-import {GROUND} from '../constants.js';
-import makePos from './makePos.js';
+import {getGateNet} from '../query/getNetAt';
+import {GROUND} from '../constants';
+import makePos from './makePos';
 
 import {
   Context

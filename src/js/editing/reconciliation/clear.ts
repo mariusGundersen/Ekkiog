@@ -4,11 +4,11 @@ import {
   setMap,
   setNetMap,
   setGate
-} from './mutateContext.js';
+} from './mutateContext';
 
 import {
   EMPTY_TILE
-} from './tileConstants.js';
+} from './tileConstants';
 
 import {
   WIRE,
@@ -17,7 +17,7 @@ import {
   BUTTON,
   COMPONENT,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
 import { Item, Component, Context } from '../types';
 

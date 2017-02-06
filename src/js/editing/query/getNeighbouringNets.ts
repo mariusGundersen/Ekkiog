@@ -1,8 +1,8 @@
 import { Node } from 'ennea-tree';
 
-import {GROUND} from '../constants.js';
+import {GROUND} from '../constants';
 
-import getNetAt from './getNetAt.js';
+import getNetAt from './getNetAt';
 
 import { TreeNode } from '../types';
 

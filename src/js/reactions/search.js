@@ -9,7 +9,6 @@ export default function search(storage){
       onSearchTermChanged: event => event.target.value
     }
   }
-  return
 }
 
 function typeAhead(onSearchTermChanged, storage){

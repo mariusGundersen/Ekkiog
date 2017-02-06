@@ -3,10 +3,10 @@ import * as ennea from 'ennea-tree';
 import {
   WIRE,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
-import {getWireNeighbouringNets} from '../query/getNeighbouringNets.js';
-import floodFill from '../flooding/floodFill.js';
+import {getWireNeighbouringNets} from '../query/getNeighbouringNets';
+import floodFill from '../flooding/floodFill';
 
 import { Forest, Wire } from '../types';
 

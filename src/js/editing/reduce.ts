@@ -1,4 +1,4 @@
-import createForest from './actions/createForest.js';
+import createForest from './actions/createForest';
 
 import {
   WIRE,
@@ -6,7 +6,7 @@ import {
   UNDERPASS,
   BUTTON,
   Tool
-} from './constants.js';
+} from './constants';
 
 import {
   SET_FOREST,
@@ -17,16 +17,16 @@ import {
   INSERT_COMPONENT
 } from '../actions.js';
 
-import getTypeAt from './query/getTypeAt.js';
+import getTypeAt from './query/getTypeAt';
 
-import drawWire from './actions/drawWire.js';
-import drawGate from './actions/drawGate.js';
-import drawUnderpass from './actions/drawUnderpass.js';
-import drawButton from './actions/drawButton.js';
-import drawComponent from './actions/drawComponent.js';
+import drawWire from './actions/drawWire';
+import drawGate from './actions/drawGate';
+import drawUnderpass from './actions/drawUnderpass';
+import drawButton from './actions/drawButton';
+import drawComponent from './actions/drawComponent';
 
-import clear from './actions/clear.js';
-import toggleButton from './actions/toggleButton.js';
+import clear from './actions/clear';
+import toggleButton from './actions/toggleButton';
 
 import { Forest } from './types';
 

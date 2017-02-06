@@ -3,10 +3,10 @@ import * as ennea from 'ennea-tree';
 import {
   UNDERPASS,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
-import {getUnderpassNeighbouringNets} from '../query/getNeighbouringNets.js';
-import floodFill from '../flooding/floodFill.js';
+import {getUnderpassNeighbouringNets} from '../query/getNeighbouringNets';
+import floodFill from '../flooding/floodFill';
 
 import { Forest, Underpass } from '../types';
 

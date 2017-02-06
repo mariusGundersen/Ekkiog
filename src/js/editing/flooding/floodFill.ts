@@ -12,14 +12,14 @@ import {
   BUTTON,
   COMPONENT,
   GROUND
-} from '../constants.js';
-import makePos from './makePos.js';
+} from '../constants';
+import makePos from './makePos';
 
-import wire from './wire.js';
-import gate from './gate.js';
-import underpass from './underpass.js';
-import button from './button.js';
-import component from './component.js';
+import wire from './wire';
+import gate from './gate';
+import underpass from './underpass';
+import button from './button';
+import component from './component';
 
 import {
   TreeNode
@@ -35,7 +35,7 @@ import {
   FloodSourceWire
 } from './types';
 
-export default function floodFill(enneaTree : TreeNode, ...floodSources : FloodSource[]){
+export default function floodFill(enneaTree : TreeNode, ...floodSources : FloodSource[]) : TreeNode {
 
   const queue = [...make(floodSources)];
   const updater = update(enneaTree, (old, ctx : Context, pos) => {
