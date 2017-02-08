@@ -1,12 +1,10 @@
-import createForest from '../editing/actions/createForest.ts';
+import { drawComponent, createForest } from 'ekkiog-editing';
 
 import {
   SELECT_COMPONENT,
   MOVE_SELECTION,
   STOP_SELECTION
 } from '../actions.js';
-
-import drawComponent from '../editing/actions/drawComponent.ts';
 
 export default function reduce(state={
   forest: createForest(),

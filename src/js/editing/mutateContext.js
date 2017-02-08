@@ -1,14 +1,11 @@
-import * as ennea from 'ennea-tree';
-
-import reconcile from './reconciliation/reconcile';
+import { diffAndReconcile } from 'ekkiog-editing';
 
 export default function mutateContext(context, renderer, before, after){
   if(!context) return;
   if(!renderer) return;
   if(before === after) return;
 
-  const changes = ennea.diff(before.enneaTree, after.enneaTree)
-  const changed = reconcile(context, changes);
+  const changed = diffAndReconcile(before.enneaTree, after.enneaTree, context);
   if(!changed) return;
 
   context.mapTexture.update();

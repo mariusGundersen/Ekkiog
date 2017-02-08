@@ -1,4 +1,4 @@
-import getTypeAt from './editing/query/getTypeAt.ts';
+import { getTypeAt, isEmpty } from 'ekkiog-editing';
 
 import {
   MOVE_GATE,
@@ -22,8 +22,6 @@ import {
   MOVE_SELECTION,
   STOP_SELECTION
 } from './events.js';
-
-import isEmpty from './editing/query/isEmpty.ts';
 
 export function createEmitterMiddleware(){
   return ({getState}) => next => action => {
