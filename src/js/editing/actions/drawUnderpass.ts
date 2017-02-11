@@ -3,12 +3,14 @@ import * as ennea from 'ennea-tree';
 import {
   UNDERPASS,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
-import {getUnderpassNeighbouringNets} from '../query/getNeighbouringNets.js';
-import floodFill from '../flooding/floodFill.js';
+import {getUnderpassNeighbouringNets} from '../query/getNeighbouringNets';
+import floodFill from '../flooding/floodFill';
 
-export default function drawUnderpass(forest, x, y){
+import { Forest, Underpass } from '../types';
+
+export default function drawUnderpass(forest : Forest, x : number, y : number){
   const buddyTree = forest.buddyTree;
   const neighbouringNets = getUnderpassNeighbouringNets(forest.enneaTree, x, y);
 
@@ -20,7 +22,7 @@ export default function drawUnderpass(forest, x, y){
   const data = {
     type: UNDERPASS,
     net
-  };
+  } as Underpass;
   const box = {left:x, top:y};
 
   let enneaTree = ennea.set(forest.enneaTree, data, box);

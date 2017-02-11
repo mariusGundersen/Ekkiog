@@ -1,6 +1,6 @@
 import * as ennea from 'ennea-tree';
 
-import reconcile from './reconciliation/reconcile.js';
+import reconcile from './reconciliation/reconcile';
 
 export default function mutateContext(context, renderer, before, after){
   if(!context) return;

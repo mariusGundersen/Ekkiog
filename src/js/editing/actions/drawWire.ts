@@ -3,12 +3,14 @@ import * as ennea from 'ennea-tree';
 import {
   WIRE,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
-import {getWireNeighbouringNets} from '../query/getNeighbouringNets.js';
-import floodFill from '../flooding/floodFill.js';
+import {getWireNeighbouringNets} from '../query/getNeighbouringNets';
+import floodFill from '../flooding/floodFill';
 
-export default function drawWire(forest, x, y){
+import { Forest, Wire } from '../types';
+
+export default function drawWire(forest : Forest, x : number, y : number){
   const buddyTree = forest.buddyTree;
   const neighbouringNets = getWireNeighbouringNets(forest.enneaTree, x, y);
 
@@ -20,7 +22,7 @@ export default function drawWire(forest, x, y){
   const data = {
     type: WIRE,
     net
-  };
+  } as Wire;
   const box = {left:x, top:y};
   let enneaTree = ennea.set(forest.enneaTree, data, box);
 

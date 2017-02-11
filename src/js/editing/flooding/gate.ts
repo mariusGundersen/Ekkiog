@@ -1,8 +1,18 @@
-import makePos from './makePos.js';
-import {getGateNet} from '../query/getNetAt.js';
-import {GROUND} from '../constants.js';
+import { Pos, BoxContext } from 'ennea-tree';
 
-export default function gate(oldGate, pos, ctx, queue){
+import {getGateNet} from '../query/getNetAt';
+import {GROUND} from '../constants';
+import makePos from './makePos';
+
+import {
+  Context
+} from './types';
+
+import {
+  Gate
+} from '../types';
+
+export default function gate(oldGate : Gate, pos : Pos, ctx : Context, queue : BoxContext<Context>[]){
   const net = getGateNet(
     oldGate,
     pos.left,

@@ -1,14 +1,17 @@
 import {
   SET,
   UPDATE,
-  CLEAR
+  CLEAR,
+  Change
 } from 'ennea-tree';
 
-import set from './set.js';
-import update from './update.js';
-import clear from './clear.js';
+import set from './set';
+import update from './update';
+import clear from './clear';
 
-export default function reconcile(context, changes){
+import { Item, Context } from '../types';
+
+export default function reconcile(context : Context, changes : IterableIterator<Change<Item>>){
   let changed = false;
   for(const change of changes){
     changed = true;
@@ -17,7 +20,7 @@ export default function reconcile(context, changes){
   return changed;
 }
 
-export function reconcileChange(context, change){
+export function reconcileChange(context : Context, change : Change<Item>){
   switch(change.type){
     case SET:
       return set(context, change);

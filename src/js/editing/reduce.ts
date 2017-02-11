@@ -1,11 +1,12 @@
-import createForest from './actions/createForest.js';
+import createForest from './actions/createForest';
 
 import {
   WIRE,
   GATE,
   UNDERPASS,
-  BUTTON
-} from './constants.js';
+  BUTTON,
+  Tool
+} from './constants';
 
 import {
   SET_FOREST,
@@ -16,18 +17,20 @@ import {
   INSERT_COMPONENT
 } from '../actions.js';
 
-import getTypeAt from './query/getTypeAt.js';
+import getTypeAt from './query/getTypeAt';
 
-import drawWire from './actions/drawWire.js';
-import drawGate from './actions/drawGate.js';
-import drawUnderpass from './actions/drawUnderpass.js';
-import drawButton from './actions/drawButton.js';
-import drawComponent from './actions/drawComponent.js';
+import drawWire from './actions/drawWire';
+import drawGate from './actions/drawGate';
+import drawUnderpass from './actions/drawUnderpass';
+import drawButton from './actions/drawButton';
+import drawComponent from './actions/drawComponent';
 
-import clear from './actions/clear.js';
-import toggleButton from './actions/toggleButton.js';
+import clear from './actions/clear';
+import toggleButton from './actions/toggleButton';
 
-export default function reduce(forest=createForest(), action){
+import { Forest } from './types';
+
+export default function reduce(forest=createForest(), action : any){
   switch(action.type){
     case SET_FOREST:
       return action.forest || forest;
@@ -46,7 +49,7 @@ export default function reduce(forest=createForest(), action){
   }
 }
 
-function tap(forest, tool, x, y){
+function tap(forest : Forest, tool : Tool, x : number, y : number) : Forest{
   const type = getTypeAt(forest.enneaTree, x, y);
   if(type === BUTTON){
     return toggleButton(forest, x, y);
@@ -71,7 +74,7 @@ function tap(forest, tool, x, y){
   }
 }
 
-function drawUnderpassWithWires(forest, x, y){
+function drawUnderpassWithWires(forest : Forest, x : number, y : number){
   const forest1 = drawUnderpass(forest, x, y);
   if(forest === forest1){
     return forest;
@@ -83,7 +86,7 @@ function drawUnderpassWithWires(forest, x, y){
   return forest5;
 }
 
-function wireToUnderpass(forest, x, y){
+function wireToUnderpass(forest : Forest, x : number, y : number){
   const type = getTypeAt(forest.enneaTree, x, y);
   if(type !== WIRE) return forest;
 
@@ -94,7 +97,7 @@ function wireToUnderpass(forest, x, y){
   return result;
 }
 
-function underpassToWire(forest, x, y){
+function underpassToWire(forest : Forest, x : number, y : number){
   const type = getTypeAt(forest.enneaTree, x, y);
   if(type !== UNDERPASS) return forest;
 

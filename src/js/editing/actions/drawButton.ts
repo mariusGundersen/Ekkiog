@@ -3,24 +3,26 @@ import {allocate} from 'buddy-tree';
 
 import {
   BUTTON
-} from '../constants.js';
+} from '../constants';
 
-import {getButtonNeighbouringNets} from '../query/getNeighbouringNets.js';
-import floodFill from '../flooding/floodFill.js';
+import {getButtonNeighbouringNets} from '../query/getNeighbouringNets';
+import floodFill from '../flooding/floodFill';
 
-export default function drawButton(forest, x, y){
+import { Forest, Button } from '../types';
+
+export default function drawButton(forest : Forest, x : number, y : number){
   const neighbouringNets = getButtonNeighbouringNets(forest.enneaTree, x, y);
 
   if(neighbouringNets.length === 1){
     return forest;
   }
 
-  const [buddyTree, net] = allocate(forest.buddyTree);
+  const {tree: buddyTree, address: net} = allocate(forest.buddyTree);
   const data = {
     type: BUTTON,
     net,
     state: false
-  };
+  } as Button;
   const box = {left:x-2, top:y-1, width:3, height:3};
   let enneaTree = ennea.set(forest.enneaTree, data, box);
 

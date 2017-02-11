@@ -1,4 +1,4 @@
-import isEmpty from './editing/query/isEmpty.js';
+import isEmpty from './editing/query/isEmpty.ts';
 
 export const RESIZE = 'resize';
 export const GL = 'gl';

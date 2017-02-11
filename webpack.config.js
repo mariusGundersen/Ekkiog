@@ -1,86 +1,125 @@
-var path = require('path');
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var DashboardPlugin = require('webpack-dashboard/plugin');
-var OfflinePlugin = require('offline-plugin');
-var autoprefixer = require('autoprefixer');
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const DashboardPlugin = require('webpack-dashboard/plugin');
+const OfflinePlugin = require('offline-plugin');
+const autoprefixer = require('autoprefixer');
 
-var ROOT_PATH = path.resolve(__dirname);
-var ENTRY_PATH = path.resolve(ROOT_PATH, 'src/js/main.js');
-var SRC_PATH = path.resolve(ROOT_PATH, 'src');
-var JS_PATH = path.resolve(ROOT_PATH, 'src/js');
-var BUDDY_PATH = path.resolve(ROOT_PATH, 'node_modules/buddy-tree');
-var ENNEA_PATH = path.resolve(ROOT_PATH, 'node_modules/ennea-tree');
-var TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
-var SHADER_PATH = path.resolve(ROOT_PATH, 'src/shaders');
-var BUILD_PATH = path.resolve(ROOT_PATH, 'dist');
-var FAVICON_PATH = path.resolve(ROOT_PATH, 'src/icons/favicon.ico');
+const debug = process.env.NODE_ENV !== 'production';
 
-var debug = process.env.NODE_ENV !== 'production';
+const babelLoader = {
+  loader: 'babel-loader',
+  query: {
+    cacheDirectory: true
+  }
+};
+
+const cssLoader = {
+  loader:'css-loader',
+  options: {
+    modules: true
+  }
+};
+
+const postCssLoader = {
+  loader: 'postcss-loader',
+  options: {
+    plugins: function () {
+      return [
+        autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] })
+      ];
+    }
+  }
+};
 
 module.exports = {
-  entry: ENTRY_PATH,
+  entry: './src/js/main.js',
   output: {
-    path: BUILD_PATH,
+    path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: 'bundle.js'
   },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Ekkiog',
-      template: TEMPLATE_PATH,
-      favicon: FAVICON_PATH
+      template: './src/index.html',
+      favicon: './src/icons/favicon.ico'
     }),
     new webpack.DefinePlugin({
       '__DEV__': debug,
       'process.env.NODE_ENV': debug ? '"development"' : '"production"'
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: !debug,
+      debug: debug
     }),
     new OfflinePlugin({
       caches: 'all',
       ServiceWorker: {
         events: true
       }
-    })
-  ].concat(debug ? [new DashboardPlugin()] : []),
+    }),
+    ...(debug ? [new DashboardPlugin()] : [])
+  ],
   resolve: {
-    root: [SRC_PATH]
+    modules: [
+      'src',
+      'node_modules'
+    ],
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
+  devtool: debug ? 'eval-source-map' : 'source-map',
   module: {
-    loaders: [
+    rules: [
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        loader: "source-map-loader",
+        include: /node_modules/
+      },
+      {
+        test: /\.tsx?$/,
+        use: [
+          babelLoader,
+          'ts-loader',
+        ],
+        exclude: /node_modules/
+      },
       {
         test: /\.jsx?$/,
-        include: [JS_PATH, ENNEA_PATH, BUDDY_PATH],
-        loader: 'babel',
-        query: {
-          cacheDirectory: true
-        }
+        exclude: /node_modules/,
+        use: [
+          babelLoader
+        ]
       },
       {
         test: /\.glsl$/,
-        loader: 'webpack-glsl'
+        loader: 'webpack-glsl-loader'
       },
       {
         test: /\.png$/,
-        loader: 'file?name=img/[name].[hash].[ext]'
+        loader: 'file-loader',
+        options: {
+          name: 'img/[name].[hash].[ext]'
+        }
       },
       {
         test: /\.css$/,
-        loader: 'style!css?modules=true!postcss'
+        use: [
+          'style-loader',
+          cssLoader,
+          postCssLoader
+        ]
       },
       {
         test: /manifest\.json$/,
-        loader: 'w3c-manifest?name=[name].[hash].[ext]&icon=icons/[name].[hash].[ext]&legacyAppleSupport=true'
-      },
-      {
-        test: /\.json$/,
-        exclude: [/manifest\.json/],
-        loader: 'json'
+        loader: 'w3c-manifest-loader',
+        options: {
+          name: '[name].[hash].[ext]',
+          icon: 'icons/[name].[hash].[ext]',
+          legacyAppleSupport: true
+        }
       }
     ]
-  },
-  debug: debug,
-  devtool: debug ? 'eval-source-map' : 'source-map',
-  postcss: function () {
-    return [autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] })];
   }
 };

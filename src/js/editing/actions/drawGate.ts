@@ -4,26 +4,28 @@ import {allocate} from 'buddy-tree';
 import {
   GATE,
   GROUND
-} from '../constants.js';
+} from '../constants';
 
-import getNetAt from '../query/getNetAt.js';
-import {getGateNeighbouringNets} from '../query/getNeighbouringNets.js';
-import floodFill from '../flooding/floodFill.js';
+import getNetAt from '../query/getNetAt';
+import {getGateNeighbouringNets} from '../query/getNeighbouringNets';
+import floodFill from '../flooding/floodFill';
 
-export default function drawGate(forest, x, y){
+import { Forest, TreeNode, Gate } from '../types';
+
+export default function drawGate(forest : Forest, x : number, y : number){
   const neighbouringNets = getGateNeighbouringNets(forest.enneaTree, x, y);
 
   if(neighbouringNets.length === 1){
     return forest;
   }
 
-  const [buddyTree, net] = allocate(forest.buddyTree);
+  const {tree: buddyTree, address: net} = allocate(forest.buddyTree);
   const data = {
     type: GATE,
     net,
     inputA: getNetAt(forest.enneaTree, x-4, y-1, 0, -1),
     inputB: getNetAt(forest.enneaTree, x-4, y+1, 0, -1)
-  };
+  } as Gate;
   const box = {left:x-3, top:y-1, width:4, height:3};
   let enneaTree = ennea.set(forest.enneaTree, data, box);
 

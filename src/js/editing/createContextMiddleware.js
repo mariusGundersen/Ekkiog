@@ -1,6 +1,4 @@
-import * as ennea from 'ennea-tree';
-
-import mutateContext from './mutateContext.js';
+import mutateContext from './mutateContext';
 import {
   SET_FOREST
 } from '../actions.js';
