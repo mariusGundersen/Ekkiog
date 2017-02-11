@@ -35,7 +35,7 @@ const postCssLoader = {
 module.exports = {
   entry: './src/js/main.js',
   output: {
-    path: 'dist',
+    path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: 'bundle.js'
   },

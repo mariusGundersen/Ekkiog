@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
-    "module": "commonjs",
+    "module": "es2015",
     "target": "es2015",
     "strictNullChecks": true,
     "noImplicitAny": true,
@@ -9,10 +9,11 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "jsx": "react",
-    "allowJs": true
+    "allowJs": true,
+    "moduleResolution": "node"
   },
   "include": [
-      "./src/js/**/*.ts"
+    "./src/js/**/*.ts"
   ],
   "exclude": [
     "node_modules"
