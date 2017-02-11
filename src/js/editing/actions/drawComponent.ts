@@ -1,5 +1,5 @@
 import * as ennea from 'ennea-tree';
-import {allocate} from 'buddy-tree';
+import * as buddy from 'buddy-tree';
 
 import {
   COMPONENT,
@@ -16,8 +16,8 @@ import { FloodSourceComponent } from '../flooding/types';
 export default function drawComponent(forest : Forest, x : number, y : number, source : ComponentSource){
   x -= source.width>>1;
   y -= source.height>>1;
-  const {tree: buddyTree, addresses} = allocate(forest.buddyTree, source.gates.length);
-  const nets = [...addresses];
+  const {tree: buddyTree, ...addresses} = buddy.allocate(forest.buddyTree, source.gates.length);
+  const nets = [...buddy.range(addresses)];
 
   const gates = source.gates.map((gate, index) => ({...gate, net: nets[index]}));
 

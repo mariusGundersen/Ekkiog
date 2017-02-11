@@ -1228,9 +1228,9 @@ browserslist@^1.0.1, browserslist@^1.4.0, browserslist@^1.5.2, browserslist@^1.7
     caniuse-db "^1.0.30000617"
     electron-to-chromium "^1.2.1"
 
-buddy-tree@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/buddy-tree/-/buddy-tree-1.1.0.tgz#7f7e612f4f30406725934f244fabb184827e1dd1"
+buddy-tree@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/buddy-tree/-/buddy-tree-2.0.0.tgz#ac36058e63b991fe7db2c12ce2ba0e2fdaadff2c"
 
 buf-compare@^1.0.0:
   version "1.0.1"
@@ -2063,9 +2063,9 @@ enhanced-resolve@^3.0.0, enhanced-resolve@^3.1.0:
     object-assign "^4.0.1"
     tapable "^0.2.5"
 
-ennea-tree@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/ennea-tree/-/ennea-tree-1.0.2.tgz#2eb011f36c68be824dddfadfd436f72149c5809a"
+ennea-tree@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ennea-tree/-/ennea-tree-2.0.0.tgz#cfbf20b686a9ede9b4ec109faad7c8dab8938510"
 
 entities@~1.1.1:
   version "1.1.1"
