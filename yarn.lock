@@ -1228,6 +1228,10 @@ browserslist@^1.0.1, browserslist@^1.4.0, browserslist@^1.5.2, browserslist@^1.7
     caniuse-db "^1.0.30000617"
     electron-to-chromium "^1.2.1"
 
+buddy-tree@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/buddy-tree/-/buddy-tree-2.0.0.tgz#ac36058e63b991fe7db2c12ce2ba0e2fdaadff2c"
+
 buf-compare@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/buf-compare/-/buf-compare-1.0.1.tgz#fef28da8b8113a0a0db4430b0b6467b69730b34a"
@@ -1976,6 +1980,13 @@ ejs@^2.3.4:
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.5.tgz#6ef4e954ea7dcf54f66aad2fe7aa421932d9ed77"
 
+ekkiog-editing@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-1.0.0.tgz#fa096a703a102a512ee9c5ee8bdf475818518f4e"
+  dependencies:
+    buddy-tree "^2.0.0"
+    ennea-tree "^2.0.0"
+
 electron-to-chromium@^1.2.1:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.2.tgz#e41bc9488c88e3cfa1e94bde28e8420d7d47c47c"
@@ -2058,6 +2069,10 @@ enhanced-resolve@^3.0.0, enhanced-resolve@^3.1.0:
     memory-fs "^0.4.0"
     object-assign "^4.0.1"
     tapable "^0.2.5"
+
+ennea-tree@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ennea-tree/-/ennea-tree-2.0.0.tgz#cfbf20b686a9ede9b4ec109faad7c8dab8938510"
 
 entities@~1.1.1:
   version "1.1.1"
