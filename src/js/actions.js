@@ -1,4 +1,4 @@
-import isEmpty from './editing/query/isEmpty.ts';
+import { isEmpty } from 'ekkiog-editing';
 
 export const RESIZE = 'resize';
 export const GL = 'gl';

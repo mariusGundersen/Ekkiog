@@ -1,12 +1,26 @@
-import createForest from './actions/createForest';
-
 import {
+  Forest,
+
   WIRE,
   GATE,
   UNDERPASS,
   BUTTON,
-  Tool
-} from './constants';
+
+  createForest,
+
+  getTypeAt,
+
+  drawWire,
+  drawGate,
+  drawUnderpass,
+  drawButton,
+  drawComponent,
+
+  clear,
+  toggleButton,
+} from 'ekkiog-editing';
+
+import { Tool } from './types';
 
 import {
   SET_FOREST,
@@ -16,19 +30,6 @@ import {
   TO_WIRE,
   INSERT_COMPONENT
 } from '../actions.js';
-
-import getTypeAt from './query/getTypeAt';
-
-import drawWire from './actions/drawWire';
-import drawGate from './actions/drawGate';
-import drawUnderpass from './actions/drawUnderpass';
-import drawButton from './actions/drawButton';
-import drawComponent from './actions/drawComponent';
-
-import clear from './actions/clear';
-import toggleButton from './actions/toggleButton';
-
-import { Forest } from './types';
 
 export default function reduce(forest=createForest(), action : any){
   switch(action.type){

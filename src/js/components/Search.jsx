@@ -1,6 +1,8 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
+import { drawComponent, createForest } from 'ekkiog-editing';
+
 import SearchResults from './SearchResults.jsx';
 import {
   insertComponent,
@@ -10,8 +12,6 @@ import {
   startSelection,
   stopSelection
 } from '../actions.js';
-import drawComponent from '../editing/actions/drawComponent.ts';
-import createForest from '../editing/actions/createForest.ts';
 
 const Search = connect(
   ({view, global, selection}) => ({

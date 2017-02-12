@@ -1980,6 +1980,13 @@ ejs@^2.3.4:
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.5.tgz#6ef4e954ea7dcf54f66aad2fe7aa421932d9ed77"
 
+ekkiog-editing@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-1.0.0.tgz#fa096a703a102a512ee9c5ee8bdf475818518f4e"
+  dependencies:
+    buddy-tree "^2.0.0"
+    ennea-tree "^2.0.0"
+
 electron-to-chromium@^1.2.1:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.2.tgz#e41bc9488c88e3cfa1e94bde28e8420d7d47c47c"

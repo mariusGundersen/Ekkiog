@@ -17,7 +17,7 @@ import {
   fromEmitter
 } from './emitterRedux.js';
 
-import createContextMiddleware from './editing/createContextMiddleware.js';
+import createContextMiddleware from './editing/createContextMiddleware';
 
 import {
   resize,
