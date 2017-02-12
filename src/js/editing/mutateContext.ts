@@ -1,6 +1,13 @@
-import { diffAndReconcile } from 'ekkiog-editing';
+import {
+  Forest,
+  diffAndReconcile
+} from 'ekkiog-editing';
 
-export default function mutateContext(context, renderer, before, after){
+import {
+  Context
+} from './types';
+
+export default function mutateContext(context : Context , renderer : any, before : Forest, after : Forest){
   if(!context) return;
   if(!renderer) return;
   if(before === after) return;
