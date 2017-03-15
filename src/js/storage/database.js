@@ -7,9 +7,10 @@ import upgradeFrom0 from './upgrade/from0.js';
 import upgradeFrom1 from './upgrade/from1.js';
 import upgradeFrom2 from './upgrade/from2.js';
 import upgradeFrom3 from './upgrade/from3.js';
+import upgradeFrom4 from './upgrade/from4.js';
 
 export async function open(){
-  const db = await idb.open('ekkiog', 4, async (db) => {
+  const db = await idb.open('ekkiog', 5, async (db) => {
     switch(db.oldVersion){
       case 0:
         await upgradeFrom0(db);
@@ -19,6 +20,8 @@ export async function open(){
         await upgradeFrom2(db);
       case 3:
         await upgradeFrom3(db);
+      case 4:
+        await upgradeFrom4(db);
     }
   });
 
@@ -30,13 +33,12 @@ class Storage{
     this.db = db;
   }
 
-  async save(map){
-    return await this.db.transaction('saves', 'readwrite').objectStore('saves').put(map, 'default');
+  async save(name, forest){
+    return await this.db.transaction('saves', 'readwrite').objectStore('saves').put(forest, name);
   }
 
-  async load(){
-    const result = await this.db.transaction('saves').objectStore('saves').get('default');
-    return result || xor;
+  async load(name){
+    return await this.db.transaction('saves').objectStore('saves').get(name).catch(x => null);
   }
 
   async saveComponent(name, forest){
