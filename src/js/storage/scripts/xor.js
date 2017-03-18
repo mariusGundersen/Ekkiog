@@ -3,7 +3,7 @@ import {
   drawButton,
   drawWire,
   drawGate,
-  drawDrain
+  drawLight
 } from 'ekkiog-editing';
 
 export default function xor(){
@@ -43,7 +43,7 @@ export default function xor(){
   forest = drawWire(forest ,70, 66);
 
   forest = drawGate(forest, 74, 64);
-  forest = drawDrain(forest, 75, 64, 1, 0);
+  forest = drawLight(forest, 76, 64);
 
   return forest;
 }
