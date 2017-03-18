@@ -1,6 +1,6 @@
 import {
   createForest,
-  drawSource,
+  drawButton,
   drawWire,
   drawGate,
   drawDrain
@@ -8,8 +8,8 @@ import {
 
 export default function xor(){
   let forest = createForest();
-  forest = drawSource(forest, 59, 62, 1, 0);
-  forest = drawSource(forest, 59, 66, 1, 0);
+  forest = drawButton(forest, 58, 62);
+  forest = drawButton(forest, 58, 66);
   forest = drawWire(forest, 60, 63);
   forest = drawWire(forest, 60, 62);
   forest = drawWire(forest, 60, 61);
@@ -43,8 +43,7 @@ export default function xor(){
   forest = drawWire(forest ,70, 66);
 
   forest = drawGate(forest, 74, 64);
-  forest = drawWire(forest, 75, 64);
-  forest = drawDrain(forest, 76, 64, 1, 0);
+  forest = drawDrain(forest, 75, 64, 1, 0);
 
   return forest;
 }
