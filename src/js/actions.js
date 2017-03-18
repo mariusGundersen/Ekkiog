@@ -49,6 +49,12 @@ export const setSelectedTool = (tool) => ({
   tool
 });
 
+export const loadComponent = (name) => async (dispatch, getState) => {
+  const database = getState().global.database;
+  const forest = await database.load(name);
+  dispatch(setForest(name, forest));
+};
+
 export const toggleMainMenu = () => ({
   type: TOGGLE_MAIN_MENU
 });
@@ -78,8 +84,9 @@ export const hideContextMenu = () => ({
   }
 });
 
-export const setForest = (forest) => ({
+export const setForest = (name, forest) => ({
   type: SET_FOREST,
+  name,
   forest
 });
 
