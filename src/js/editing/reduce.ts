@@ -5,6 +5,7 @@ import {
   GATE,
   UNDERPASS,
   BUTTON,
+  LIGHT,
 
   createForest,
 
@@ -15,6 +16,7 @@ import {
   drawUnderpass,
   drawButton,
   drawComponent,
+  drawLight,
 
   clear,
   toggleButton,
@@ -70,6 +72,8 @@ function tap(forest : Forest, tool : Tool, x : number, y : number) : Forest{
     return drawGate(forest, x, y);
   }else if(tool === BUTTON){
     return drawButton(forest, x, y);
+  }else if(tool === LIGHT){
+    return drawLight(forest, x, y);
   }else{
     return forest;
   }
