@@ -10,6 +10,14 @@ const vec2 COMPONENT_TOP = vec2(3.0, 8.0);
 const vec2 COMPONENT_LEFT = vec2(1.0, 9.0);
 const vec2 COMPONENT_RIGHT = vec2(4.0, 10.0);
 const vec2 COMPONENT_BOTTOM = vec2(2.0, 11.0);
+const vec2 SOURCE_TOP = vec2(12.0, 3.0);
+const vec2 SOURCE_LEFT = vec2(11.0, 3.0);
+const vec2 SOURCE_RIGHT = vec2(9.0, 3.0);
+const vec2 SOURCE_BOTTOM = vec2(10.0, 3.0);
+const vec2 DRAIN_TOP = vec2(12.0, 7.0);
+const vec2 DRAIN_LEFT = vec2(11.0, 7.0);
+const vec2 DRAIN_RIGHT = vec2(9.0, 7.0);
+const vec2 DRAIN_BOTTOM = vec2(10.0, 7.0);
 
 uniform sampler2D tilemap;
 uniform vec2 inverseTileTextureSize;
@@ -27,21 +35,29 @@ void main() {
     vec2 tileRight = lookup( 1.0,  0.0);
 
     float up = float(tileUp == WIRE
-                  || tileUp == COMPONENT_BOTTOM)
+                  || tileUp == COMPONENT_BOTTOM
+                  || tileUp == SOURCE_BOTTOM
+                  || tileUp == DRAIN_BOTTOM)
              + float(tileUp == UNDERPASS)*4.0;
     float down = float(tileDown == WIRE
-                    || tileDown == COMPONENT_TOP)
+                    || tileDown == COMPONENT_TOP
+                    || tileDown == SOURCE_TOP
+                    || tileDown == DRAIN_TOP)
              + float(tileDown == UNDERPASS)*4.0;
     float left = float(tileLeft == WIRE
                     || tileLeft == UNDERPASS
                     || tileLeft == GATE_OUTPUT
                     || tileLeft == BUTTON_OUTPUT
-                    || tileLeft == COMPONENT_RIGHT);
+                    || tileLeft == COMPONENT_RIGHT
+                    || tileLeft == SOURCE_RIGHT
+                    || tileLeft == DRAIN_RIGHT);
     float right = float(tileRight == WIRE
                     || tileRight == UNDERPASS
                     || tileRight == GATE_INPUT_A
                     || tileRight == GATE_INPUT_B
-                    || tileRight == COMPONENT_LEFT);
+                    || tileRight == COMPONENT_LEFT
+                    || tileRight == SOURCE_LEFT
+                    || tileRight == DRAIN_LEFT);
 
     vec2 tile = WIRE + vec2(
       up + right*2.0,
@@ -54,8 +70,10 @@ void main() {
     vec2 tileLeft  = lookup(-1.0,  0.0);
     vec2 tileRight = lookup( 1.0,  0.0);
 
-    float up = float(tileUp == WIRE || tileUp == UNDERPASS)*5.0;
-    float down = float(tileDown == WIRE || tileDown == UNDERPASS)*5.0;
+    float up = float(tileUp == WIRE
+                  || tileUp == UNDERPASS)*5.0;
+    float down = float(tileDown == WIRE
+                    || tileDown == UNDERPASS)*5.0;
     float left = float(tileLeft == WIRE
                     || tileLeft == UNDERPASS
                     || tileLeft == GATE_OUTPUT

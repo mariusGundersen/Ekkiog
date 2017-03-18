@@ -12,7 +12,7 @@ const SearchResults = connect({
 
   selectedResult
     .withLatestFrom(props)
-    .switchMap(([result, props]) => Rx.Observable.from(props.database.loadComponent(result)))
+    .switchMap(([result, props]) => Rx.Observable.from(props.database.loadPackage(result)))
     .withLatestFrom(props)
     .subscribe(([result, props]) => props.onSelect(result));
 

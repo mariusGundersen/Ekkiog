@@ -1,27 +1,24 @@
 import idb from 'idb';
 import Rx from 'rxjs/Rx.js';
 
-import xor from './xor.json';
+import {
+  packageComponent
+} from 'ekkiog-editing';
 
 import upgradeFrom0 from './upgrade/from0.js';
-import upgradeFrom1 from './upgrade/from1.js';
-import upgradeFrom2 from './upgrade/from2.js';
-import upgradeFrom3 from './upgrade/from3.js';
-import upgradeFrom4 from './upgrade/from4.js';
+import upgradeFrom5 from './upgrade/from5.js';
 
 export async function open(){
-  const db = await idb.open('ekkiog', 5, async (db) => {
+  const db = await idb.open('ekkiog', 6, async (db) => {
     switch(db.oldVersion){
       case 0:
         await upgradeFrom0(db);
       case 1:
-        await upgradeFrom1(db);
       case 2:
-        await upgradeFrom2(db);
       case 3:
-        await upgradeFrom3(db);
       case 4:
-        await upgradeFrom4(db);
+      case 5:
+        await upgradeFrom5(db);
     }
   });
 
@@ -34,28 +31,29 @@ class Storage{
   }
 
   async save(name, forest){
-    return await this.db.transaction('saves', 'readwrite').objectStore('saves').put(forest, name);
-  }
-
-  async load(name){
-    return await this.db.transaction('saves').objectStore('saves').get(name).catch(x => null);
-  }
-
-  async saveComponent(name, forest){
     return await this.db
       .transaction('components', 'readwrite')
       .objectStore('components')
       .put({
         name,
-        forest
+        ...forest
       });
   }
 
-  async loadComponent(name){
+  async load(name){
     return await this.db
       .transaction('components')
       .objectStore('components')
-      .get(name);
+      .get(name)
+      .catch(x => null);
+  }
+
+  async loadPackage(name){
+    return await this.db
+      .transaction('components')
+      .objectStore('components')
+      .get(name)
+      .then(packageComponent);
   }
 
   getComponentNames(){

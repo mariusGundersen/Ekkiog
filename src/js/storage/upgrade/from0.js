@@ -1,3 +1,3 @@
 export default async function upgradeFrom0(db){
-  return await db.createObjectStore('saves');
+  const components = db.createObjectStore('components', {keyPath: 'name'});
 }

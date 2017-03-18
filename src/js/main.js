@@ -55,7 +55,7 @@ openDatabase().then(database => {
 
     const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
 
-    store.dispatch(setForest(await database.load('welcome')));
+    store.dispatch(setForest(await database.load('xor')));
 
     fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), () => store.getState(), store.dispatch);
 

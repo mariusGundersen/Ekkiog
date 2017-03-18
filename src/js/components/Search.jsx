@@ -38,10 +38,10 @@ const Search = connect(
       cy={cy}
       database={database}
       onSelect={result => {
-        const top = centerTile.y - (result.source.height>>1);
-        const left = centerTile.x - (result.source.width>>1);
-        const right = centerTile.x - (result.source.width>>1) + result.source.width;
-        const bottom = centerTile.y - (result.source.height>>1) + result.source.height;
+        const top = centerTile.y - (result.height>>1);
+        const left = centerTile.x - (result.width>>1);
+        const right = centerTile.x - (result.width>>1) + result.width;
+        const bottom = centerTile.y - (result.height>>1) + result.height;
 
         dispatch(showOkCancelMenu(
           () => {
