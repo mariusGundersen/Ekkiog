@@ -81,4 +81,7 @@
 
 .searchResult .openComponent{
   flex: 0 0 auto;
+  display: flex;
+  font-size: 24px;
+  padding: 4px;
 }
