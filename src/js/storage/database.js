@@ -7,9 +7,10 @@ import {
 
 import upgradeFrom0 from './upgrade/from0.js';
 import upgradeFrom5 from './upgrade/from5.js';
+import upgradeFrom6 from './upgrade/from6.js';
 
 export async function open(){
-  const db = await idb.open('ekkiog', 6, async (db) => {
+  const db = await idb.open('ekkiog', 7, async (db) => {
     switch(db.oldVersion){
       case 0:
         await upgradeFrom0(db);
@@ -19,6 +20,8 @@ export async function open(){
       case 4:
       case 5:
         await upgradeFrom5(db);
+      case 6:
+        await upgradeFrom6(db);
     }
   });
 

@@ -1,10 +1,10 @@
 import xor from '../scripts/xor.js';
 
-export default function upgradeFrom3(db){
+export default function upgradeFrom5(db){
   return db.transaction
     .objectStore('components')
     .put({
-      name: 'xor',
+      name: 'XOR',
       ...xor()
     });
 }
