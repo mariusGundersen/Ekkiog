@@ -66,7 +66,8 @@ export default connect(state => ({
       database={props.database}
       query={query}
       insertPackage={actions.insertPackage}
-      openComponent={actions.openComponent} />
+      openComponent={actions.openComponent}
+      createComponent={actions.openComponent} />
     : null}
   </div>
 )));

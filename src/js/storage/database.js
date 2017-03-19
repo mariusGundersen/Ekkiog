@@ -2,7 +2,8 @@ import idb from 'idb';
 import Rx from 'rxjs/Rx.js';
 
 import {
-  packageComponent
+  packageComponent,
+  createForest
 } from 'ekkiog-editing';
 
 import upgradeFrom0 from './upgrade/from0.js';
@@ -48,7 +49,8 @@ class Storage{
       .transaction('components')
       .objectStore('components')
       .get(name)
-      .catch(x => null);
+      .then(x => x || createForest())
+      .catch(x => createForest());
   }
 
   async loadPackage(name){

@@ -62,7 +62,9 @@
   color: white;
 }
 
-.searchResult button{
+.searchResult .noExactMatch,
+.searchResult .insertPackage,
+.searchResult .openComponent{
   outline: none;
   background: none;
   border: none;
@@ -72,6 +74,7 @@
   padding: 8px;
 }
 
+.searchResult .noExactMatch,
 .searchResult .insertPackage{
   flex: 1 0 auto;
 }

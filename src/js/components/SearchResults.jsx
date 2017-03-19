@@ -3,36 +3,40 @@ import reax from 'reaxjs';
 import Rx from 'rxjs/Rx.js';
 
 import connect from 'reaxjs';
-import SearchResultView from './SearchResultView.jsx';
+import SearchResultView, {NoExactMatchView} from './SearchResultView.jsx';
 
 import style from './search.css';
 
 export default reax({
-  insertPackage: result => result,
-  openComponent: result => result
+  insertPackage: result => result
 }, ({
-  insertPackage,
-  openComponent
+  insertPackage
 }, props, initialProps) => {
 
   insertPackage
     .withLatestFrom(props)
     .subscribe(([name, props]) => props.database.loadPackage(name).then(props.insertPackage));
 
-  openComponent
+  const searchResults = searchDatabase(props);
+
+  const noExactMatch = searchResults
     .withLatestFrom(props)
-    .subscribe(([name, props]) => props.openComponent(name));
+    .map(([results, props]) => props.query && results.indexOf(props.query) === -1);
 
   return {
-    searchResults: searchResults(props)
+    searchResults,
+    noExactMatch
   };
-}, ({actions, searchResults, }) => (
+}, ({actions, searchResults, noExactMatch, ...props}) => (
   <div className={style.searchResults}>
-    {searchResults.map(r => <SearchResultView key={r} insertPackage={actions.insertPackage} openComponent={actions.openComponent} result={r} />)}
+    {searchResults.map(r => <SearchResultView key={r} insertPackage={actions.insertPackage} openComponent={props.openComponent} result={r} />)}
+    {noExactMatch
+    ? <NoExactMatchView key="no-exact-match" query={props.query} createComponent={props.createComponent} />
+    : null}
   </div>
 ));
 
-function searchResults(props){
+function searchDatabase(props){
   return props
     .switchMap(({database, query}) =>
       query
