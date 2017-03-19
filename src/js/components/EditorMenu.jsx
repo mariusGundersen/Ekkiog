@@ -21,9 +21,9 @@ import {
   menuItem
 } from './radialMenu/menuItems.js';
 
-import {toggleMainMenu} from '../actions.js';
+import {toggleEditorMenu} from '../actions.js';
 
-const MainMenu = connect(
+const EditorMenu = connect(
   (store) => ({
     store
   })
@@ -40,13 +40,13 @@ const MainMenu = connect(
     <RadialMenu
       cx={cx}
       cy={cy}
-      showMenu={store.mainMenu.open}
+      showMenu={store.editorMenu.open}
       center={getCenter(radius, store, dispatch)}
       menuTree={getMenuTree(radius+gap, width, store, dispatch)} />
   );
 });
 
-export default MainMenu;
+export default EditorMenu;
 
 function getCenter(radius, store, dispatch){
   const center = createCenter(store, dispatch);
@@ -61,7 +61,7 @@ function getMenuTree(radius, width, store, dispatch){
     store,
     dispatch
   ).map((ring, index) => ({
-    show: store.mainMenu.open,
+    show: store.editorMenu.open,
     radius,
     width,
     fromTurnFraction: 3/8,
@@ -72,7 +72,7 @@ function getMenuTree(radius, width, store, dispatch){
 }
 
 function createMenuTree(store, dispatch){
-  switch(store.mainMenu.menuType){
+  switch(store.editorMenu.menuType){
     case 'tools':
       return createToolsMenuTree(store, dispatch);
     case 'okCancel':
@@ -96,19 +96,19 @@ function createToolsMenuTree({editor}, dispatch){
   ];
 }
 
-function createOkCancelMenuTree({mainMenu}, dispatch){
+function createOkCancelMenuTree({editorMenu}, dispatch){
   return [
     {
       menuItems: [
-        menuItem('ok', <IconAccept />, () => mainMenu.okAction(), false, mainMenu.isValid),
-        menuItem('cancel', <IconRemove />, () => mainMenu.cancelAction())
+        menuItem('ok', <IconAccept />, () => editorMenu.okAction(), false, editorMenu.isValid),
+        menuItem('cancel', <IconRemove />, () => editorMenu.cancelAction())
       ]
     }
   ];
 }
 
 function createCenter(store, dispatch){
-  switch(store.mainMenu.menuType){
+  switch(store.editorMenu.menuType){
     case 'tools':
       return createToolsCenter(store, dispatch);
     default:
@@ -116,10 +116,10 @@ function createCenter(store, dispatch){
   }
 }
 
-function createToolsCenter({editor, mainMenu}, dispatch){
+function createToolsCenter({editor, editorMenu}, dispatch){
   return {
-    onClick: () => dispatch(toggleMainMenu()),
-    icon: mainMenu.open ? <IconReturn /> :
+    onClick: () => dispatch(toggleEditorMenu()),
+    icon: editorMenu.open ? <IconReturn /> :
       editor.selectedTool == 'wire' ? <IconWire /> :
       editor.selectedTool == 'button' ? <IconButton /> :
       editor.selectedTool == 'gate' ? <IconGate /> :

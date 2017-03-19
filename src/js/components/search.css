@@ -1,3 +1,7 @@
+.searchResults{
+  display: flex;
+}
+
 .search{
   display: flex;
   position: absolute;
@@ -16,11 +20,6 @@
 }
 
 .searchButton{
-  position: absolute;
-  background: #2a2d30;
-  border: 2px solid #446364;
-  color: white;
-  outline: none;
 }
 
 .results{
@@ -45,4 +44,38 @@
 
 .result:active{
   background: #446364;
+}
+
+/******************/
+
+.searchResults{
+  display: flex;
+  flex-direction: column;
+}
+
+.searchResult{
+  display: flex;
+  flex-direction: row;
+  background: #2a2d30;
+  border: 2px solid #446364;
+  border-top: none;
+  color: white;
+}
+
+.searchResult button{
+  outline: none;
+  background: none;
+  border: none;
+  text-align: left;
+  color: white;
+  font-size: 16px;
+  padding: 8px;
+}
+
+.searchResult .insertPackage{
+  flex: 1 0 auto;
+}
+
+.searchResult .openComponent{
+  flex: 0 0 auto;
 }

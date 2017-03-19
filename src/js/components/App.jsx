@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 
 import Menu from './Menu.jsx';
 import WebGLCanvas from './WebGLCanvas.jsx';
-import Search from './Search.jsx';
+import NavBar from './NavBar.jsx';
 
 import style from './main.css';
 
@@ -16,7 +16,7 @@ const App = connect(
   <div className={style.root}>
     <Menu />
     <WebGLCanvas />
-    <Search />
+    <NavBar />
   </div>
 ));
 

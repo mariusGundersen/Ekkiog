@@ -63,6 +63,7 @@
     "ndarray": "^1.0.18",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
+    "react-icons": "^2.2.3",
     "react-redux": "^4.4.5",
     "reaxjs": "^0.1.6",
     "redux": "^3.5.2",

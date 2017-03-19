@@ -11,38 +11,3 @@ body{
   touch-action: none;
   overflow: hidden; /* prevent scrollbars */
 }
-
-svg{
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  user-select: none; /* prevent firefox on android bug */
-  z-index: 2;
-  pointer-events: none; /* touch through the svg down to the canvas below */
-}
-
-canvas{
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  touch-action: none;
-}
-
-#viewStats{
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-#engineStats{
-  position: absolute;
-  top: 0;
-  right: 0;
-}
