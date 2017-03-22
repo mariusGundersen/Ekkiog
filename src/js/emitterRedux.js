@@ -9,7 +9,6 @@ import {
   hideContextMenu,
   showOkCancelMenu,
   setOkCancelMenuValid,
-  resetMainMenu,
   moveSelection
 } from './actions.js';
 

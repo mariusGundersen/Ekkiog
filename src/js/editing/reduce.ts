@@ -5,6 +5,7 @@ import {
   GATE,
   UNDERPASS,
   BUTTON,
+  LIGHT,
 
   createForest,
 
@@ -15,6 +16,7 @@ import {
   drawUnderpass,
   drawButton,
   drawComponent,
+  drawLight,
 
   clear,
   toggleButton,
@@ -44,7 +46,7 @@ export default function reduce(forest=createForest(), action : any){
     case TO_WIRE:
       return underpassToWire(forest, action.x, action.y);
     case INSERT_COMPONENT:
-      return drawComponent(forest, action.position.x, action.position.y, action.component.source);
+      return drawComponent(forest, action.position.x, action.position.y, action.component);
     default:
       return forest;
   }
@@ -70,6 +72,8 @@ function tap(forest : Forest, tool : Tool, x : number, y : number) : Forest{
     return drawGate(forest, x, y);
   }else if(tool === BUTTON){
     return drawButton(forest, x, y);
+  }else if(tool === LIGHT){
+    return drawLight(forest, x, y);
   }else{
     return forest;
   }

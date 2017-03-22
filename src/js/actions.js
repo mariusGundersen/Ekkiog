@@ -3,7 +3,7 @@ import { isEmpty } from 'ekkiog-editing';
 export const RESIZE = 'resize';
 export const GL = 'gl';
 export const SET_SELECTED_TOOL = 'setSelectedTool';
-export const TOGGLE_MAIN_MENU = 'toggleMainMenu';
+export const TOGGLE_EDITOR_MENU = 'toggleEditorMenu';
 
 export const LOAD_CONTEXT_MENU = 'loadContextMenu';
 export const SHOW_CONTEXT_MENU = 'showContextMenu';
@@ -22,7 +22,7 @@ export const MOVE_GATE = 'moveGate';
 
 export const SHOW_OK_CANCEL_MENU = 'showOkCancelMenu';
 export const SET_OK_CANCEL_MENU_VALID = 'setOkCancelMenuValid';
-export const RESET_MAIN_MENU = 'resetMainMenu';
+export const RESET_EDITOR_MENU = 'resetEditorMenu';
 
 export const INSERT_COMPONENT = 'insertComponent';
 export const SELECT_COMPONENT = 'selectComponent';
@@ -49,8 +49,14 @@ export const setSelectedTool = (tool) => ({
   tool
 });
 
-export const toggleMainMenu = () => ({
-  type: TOGGLE_MAIN_MENU
+export const loadComponent = (name) => async (dispatch, getState) => {
+  const database = getState().global.database;
+  const forest = await database.load(name);
+  dispatch(setForest(name, forest));
+};
+
+export const toggleEditorMenu = () => ({
+  type: TOGGLE_EDITOR_MENU
 });
 
 export const loadContextMenu = (x, y) => ({
@@ -78,8 +84,9 @@ export const hideContextMenu = () => ({
   }
 });
 
-export const setForest = (forest) => ({
+export const setForest = (name, forest) => ({
   type: SET_FOREST,
+  name,
   forest
 });
 
@@ -128,8 +135,8 @@ export const setOkCancelMenuValid = (isValid) => ({
   isValid
 });
 
-export const resetMainMenu = () => ({
-  type: RESET_MAIN_MENU
+export const resetEditorMenu = () => ({
+  type: RESET_EDITOR_MENU
 });
 
 export const insertComponent = (component, position) => (dispatch, getState) => {
@@ -184,3 +191,29 @@ export const stopSelection = () => ({
     dispatch: true
   }
 });
+
+export const insertComponentPackage = (componentPackage) => (dispatch, getState) => {
+  const state = getState();
+  const centerTile = {
+    x: state.view.centerTile.x|0,
+    y: state.view.centerTile.y|0
+  };
+  const top = centerTile.y - (componentPackage.height>>1);
+  const left = centerTile.x - (componentPackage.width>>1);
+  const right = centerTile.x - (componentPackage.width>>1) + componentPackage.width;
+  const bottom = centerTile.y - (componentPackage.height>>1) + componentPackage.height;
+
+  dispatch(showOkCancelMenu(
+    () => {
+      dispatch(stopSelection());
+      dispatch(insertComponent(componentPackage, centerTile));
+      dispatch(resetEditorMenu());
+    },
+    () => {
+      dispatch(stopSelection());
+      dispatch(resetEditorMenu());
+    }
+  ));
+  dispatch(startSelection(top, left, right, bottom));
+  dispatch(selectComponent(componentPackage, centerTile));
+}

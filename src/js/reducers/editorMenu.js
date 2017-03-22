@@ -1,19 +1,19 @@
 import {
-  TOGGLE_MAIN_MENU,
+  TOGGLE_EDITOR_MENU,
   SHOW_CONTEXT_MENU,
   HIDE_CONTEXT_MENU,
   SHOW_OK_CANCEL_MENU,
   SET_OK_CANCEL_MENU_VALID,
-  RESET_MAIN_MENU
+  RESET_EDITOR_MENU
 } from '../actions.js';
 
-export default function mainMenu(state={
+export default function editorMenu(state={
   open: false,
   menuType: 'tools',
   previousMenu: null
 }, action){
   switch(action.type){
-    case TOGGLE_MAIN_MENU:
+    case TOGGLE_EDITOR_MENU:
       return {
         ...state,
         open: !state.open
@@ -43,7 +43,7 @@ export default function mainMenu(state={
         ...state,
         isValid: action.isValid
       };
-    case RESET_MAIN_MENU:
+    case RESET_EDITOR_MENU:
       return state.previousMenu || state;
     default:
       return state;

@@ -35,6 +35,6 @@ function forestHandler(before : Forest, after : Forest, {global: {context, rende
 
 function saveHandler(before : Forest, after : Forest, state : any, action : any){
   if(before !== after && action.type !== SET_FOREST){
-    state.global.database.save('welcome', after);
+    state.global.database.save(state.editor.currentComponentName, after);
   }
 }

@@ -1,50 +1,47 @@
 import React from 'react';
+import reax from 'reaxjs';
 import Rx from 'rxjs/Rx.js';
 
 import connect from 'reaxjs';
-import SearchResultsView from './SearchResultsView.jsx';
+import SearchResultView, {NoExactMatchView} from './SearchResultView.jsx';
 
-const SearchResults = connect({
-  searchTerm: event => event.currentTarget.value,
-  toggleShow: event => 1,
-  selectedResult: result => result
-}, ({searchTerm, toggleShow, selectedResult}, props, initialProps) => {
+import style from './search.css';
 
-  selectedResult
+export default reax({
+  insertPackage: result => result
+}, ({
+  insertPackage
+}, props, initialProps) => {
+
+  insertPackage
     .withLatestFrom(props)
-    .switchMap(([result, props]) => Rx.Observable.from(props.database.loadComponent(result)))
+    .subscribe(([name, props]) => props.database.loadPackage(name).then(props.insertPackage));
+
+  const searchResults = searchDatabase(props);
+
+  const noExactMatch = searchResults
     .withLatestFrom(props)
-    .subscribe(([result, props]) => props.onSelect(result));
+    .map(([results, props]) => props.query && results.indexOf(props.query) === -1);
 
   return {
-    showSearch: showSearch(toggleShow.merge(selectedResult)),
-    searchResults: searchResults(searchTerm.merge(selectedResult.mapTo('')), initialProps.database)
+    searchResults,
+    noExactMatch
   };
-}, ({searchResults, showSearch, actions, ...props}) => (
-  <SearchResultsView
-    {...props}
-    show={showSearch}
-    onToggle={actions.toggleShow}
-    searchResults={searchResults}
-    onChange={actions.searchTerm}
-    onSelect={actions.selectedResult} />
+}, ({actions, searchResults, noExactMatch, ...props}) => (
+  <div className={style.searchResults}>
+    {searchResults.map(r => <SearchResultView key={r} insertPackage={actions.insertPackage} openComponent={props.openComponent} result={r} />)}
+    {noExactMatch
+    ? <NoExactMatchView key="no-exact-match" query={props.query} createComponent={props.createComponent} />
+    : null}
+  </div>
 ));
 
-export default SearchResults;
-
-function showSearch(toggleShow){
-  return toggleShow
-    .scan((prev, _) => !prev, false)
-    .startWith(false);
-}
-
-function searchResults(searchTerm, database){
-  return searchTerm
-    .map(term => term.toLowerCase())
-    .switchMap(term =>
-      term
+function searchDatabase(props){
+  return props
+    .switchMap(({database, query}) =>
+      query
       ? database.getComponentNames()
-        .filter(name => name.toLowerCase().indexOf(term) >= 0)
+        .filter(name => name.toLowerCase().indexOf(query.toLowerCase()) >= 0)
         .scan((acc, val) => [...acc, val], [])
         .startWith([])
       : Rx.Observable.of([]))

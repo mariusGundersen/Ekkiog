@@ -3,10 +3,12 @@ import {connect} from 'react-redux';
 
 import {
   SET_SELECTED_TOOL,
-  TOGGLE_MAIN_MENU
+  TOGGLE_EDITOR_MENU
 } from '../actions.js';
 
-import MainMenu from './MainMenu.jsx';
+import style from './main.css';
+
+import EditorMenu from './EditorMenu.jsx';
 import ContextMenu from './ContextMenu.jsx';
 
 const Menu = connect(
@@ -24,8 +26,12 @@ const Menu = connect(
   const cy = props.screenHeight - radius - gap;
 
   return (
-    <svg width={props.screenWidth} height={props.screenHeight} viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
-      <MainMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} />
+    <svg
+      className={style.svg}
+      width={props.screenWidth}
+      height={props.screenHeight}
+      viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
+      <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} />
       <ContextMenu radius={radius+gap} width={radius+gap} {...props.contextMenu} />
     </svg>
   )

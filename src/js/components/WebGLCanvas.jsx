@@ -1,6 +1,8 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
+import style from './main.css';
+
 import {
   GL
 } from '../actions.js';
@@ -39,6 +41,7 @@ const WebGLCanvas = connect(
   render(){
     return (
       <canvas
+        className={style.canvas}
         ref={c => this.canvas = c}
         width={this.props.width}
         height={this.props.height} />

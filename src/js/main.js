@@ -22,7 +22,7 @@ import createContextMiddleware from './editing/createContextMiddleware';
 import {
   resize,
   panZoom,
-  setForest
+  loadComponent
 } from './actions.js';
 
 import createReduce from './reduce.js';
@@ -55,7 +55,7 @@ openDatabase().then(database => {
 
     const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
 
-    store.dispatch(setForest(await database.load('welcome')));
+    store.dispatch(loadComponent('Welcome'));
 
     fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), () => store.getState(), store.dispatch);
 

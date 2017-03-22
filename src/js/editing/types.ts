@@ -4,7 +4,7 @@ import {
 } from 'ekkiog-editing';
 
 
-export type Tool = 'wire' | 'gate' | 'underpass' | 'button' | 'component';
+export type Tool = 'wire' | 'gate' | 'underpass' | 'button' | 'component' | 'light';
 
 export interface Context extends ContextToEdit{
   mapTexture : Texture,
