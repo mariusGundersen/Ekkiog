@@ -30,7 +30,7 @@
 
 .navbar input{
   border: none;
-  transition: flex .5s;
+  transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
   background: transparent;
   color: #aaa;
   font-size: 16px;
@@ -44,7 +44,7 @@
   overflow: hidden;
   display: flex;
   align-items: center;
-  transition: flex .5s ease-out;
+  transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
 }
 
 .navbar .bar.searchState .nameBox{
@@ -59,7 +59,7 @@
 .navbar .searchBox{
   flex: 0 1 0;
   width: 0;
-  transition: flex .5s ease-out;
+  transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
   display: flex;
 }
 
