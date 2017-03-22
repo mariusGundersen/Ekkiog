@@ -32,10 +32,14 @@ export default connect(state => ({
   insertPackage,
   openComponent
 }, props, initialProps) => ({
-  query: toggleSearch.switchMap(_ => query.startWith('')),
-  showSearch: toggleSearch.merge(
-    insertPackage.do(r => initialProps.dispatch(insertComponentPackage(r))),
-    openComponent.do(r => initialProps.dispatch(loadComponent(r))))
+  query: query
+    .merge(toggleSearch.map(_ => ''))
+    .startWith(''),
+  showSearch: toggleSearch
+    .merge(
+      insertPackage.do(r => initialProps.dispatch(insertComponentPackage(r))),
+      openComponent.do(r => initialProps.dispatch(loadComponent(r)))
+    )
     .scan((state, _) => !state, false)
     .startWith(false)
 }) , ({
