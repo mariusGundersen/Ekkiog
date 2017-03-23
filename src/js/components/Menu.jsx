@@ -12,12 +12,14 @@ import EditorMenu from './EditorMenu.jsx';
 import ContextMenu from './ContextMenu.jsx';
 
 const Menu = connect(
-  ({view, editor, contextMenu}) => ({
+  ({view, contextMenu, editor, editorMenu}) => ({
     pixelWidth: view.pixelWidth,
     pixelHeight: view.pixelHeight,
     screenWidth: view.screenWidth,
     screenHeight: view.screenHeight,
-    contextMenu: contextMenu
+    contextMenu,
+    editor,
+    editorMenu
   })
 )(({dispatch, ...props}) => {
   const radius = 40;
@@ -31,8 +33,8 @@ const Menu = connect(
       width={props.screenWidth}
       height={props.screenHeight}
       viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
-      <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} />
-      <ContextMenu radius={radius+gap} width={radius+gap} {...props.contextMenu} />
+      <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} editor={props.editor} editorMenu={props.editorMenu} dispatch={dispatch} />
+      <ContextMenu radius={radius+gap} width={radius+gap} dispatch={dispatch} {...props.contextMenu} />
     </svg>
   )
 });

@@ -18,45 +18,85 @@ import {
   moveMenuItem
 } from './radialMenu/menuItems.js';
 
-const ContextMenu = connect()(({
-  x,
-  y,
-  tx,
-  ty,
-  tile,
-  loading,
-  show,
-  radius,
-  width,
-  dispatch
-}) => (
-  <g transform={`translate(${x} ${y})`}>
-    {loading ? <Loading radius={radius} width={width+2} /> : null}
-    {show ? <RadialMenu
-      cx={0}
-      cy={0}
-      showMenu={true}
-      center={null}
-      menuTree={[
-        createRing(radius, width, [
-          ...tileMenuItems(tile, Math.floor(tx), Math.floor(ty), dispatch)
-        ]),
-        {
-          ringKey: 2,
-          radius: radius,
-          width: width,
-          fromTurnFraction: 1/8,
-          toTurnFraction: 3/8,
-          show: true,
-          menuItems: [
-            acceptMenuItem(dispatch)
-          ]
-        }
-      ]} /> : null}
-  </g>
-));
+export default class ContextMenu extends React.Component{
 
-export default ContextMenu;
+  shouldComponentUpdate(nextProps, nextState){
+    if(nextProps.loading){
+      return nextProps.x !== this.props.x
+        || nextProps.y !== this.props.y
+        || nextProps.loading !== this.props.loading
+        || nextProps.radius !== this.props.radius
+        || nextProps.width !== this.props.width;
+    }
+
+    if(nextProps.show){
+      return nextProps.x !== this.props.x
+        || nextProps.y !== this.props.y
+        || nextProps.tx !== this.props.tx
+        || nextProps.ty !== this.props.ty
+        || nextProps.tile !== this.props.tile
+        || nextProps.show !== this.props.show
+        || nextProps.radius !== this.props.radius
+        || nextProps.width !== this.props.width;
+    }
+
+    return nextProps.loading !== this.props.loading
+      || nextProps.show !== this.props.show;
+  }
+
+  render(){
+    const {
+      x,
+      y,
+      tx,
+      ty,
+      tile,
+      loading,
+      show,
+      radius,
+      width,
+      dispatch
+    } = this.props;
+
+    if(loading){
+      return (
+        <g transform={`translate(${x} ${y})`}>
+          <Loading radius={radius} width={width+2} />
+        </g>
+      );
+    }
+
+    if(show){
+      return (
+        <g transform={`translate(${x} ${y})`}>
+          <RadialMenu
+          cx={0}
+          cy={0}
+          showMenu={true}
+          center={null}
+          menuTree={[
+            createRing(radius, width, [
+              ...tileMenuItems(tile, Math.floor(tx), Math.floor(ty), dispatch)
+            ]),
+            {
+              ringKey: 2,
+              radius: radius,
+              width: width,
+              fromTurnFraction: 1/8,
+              toTurnFraction: 3/8,
+              show: true,
+              menuItems: [
+                acceptMenuItem(dispatch)
+              ]
+            }
+          ]} />
+        </g>
+      );
+    }
+
+    return null;
+  }
+}
 
 function createRing(radius, width, items){
   return {

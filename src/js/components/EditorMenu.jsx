@@ -23,45 +23,54 @@ import {
 
 import {toggleEditorMenu} from '../actions.js';
 
-const EditorMenu = connect(
-  (store) => ({
-    store
-  })
-)(({
-  cx,
-  cy,
-  radius,
-  gap,
-  width,
-  store,
-  dispatch
-}) => {
-  return (
-    <RadialMenu
-      cx={cx}
-      cy={cy}
-      showMenu={store.editorMenu.open}
-      center={getCenter(radius, store, dispatch)}
-      menuTree={getMenuTree(radius+gap, width, store, dispatch)} />
-  );
-});
+export default class EditorMenu extends React.Component {
+  shouldComponentUpdate(nextProps){
+    return nextProps.cx !== this.props.cx
+      || nextProps.cy !== this.props.cy
+      || nextProps.radius !== this.props.radius
+      || nextProps.gap !== this.props.gap
+      || nextProps.width !== this.props.width
+      || nextProps.editor !== this.props.editor
+      || nextProps.editorMenu !== this.props.editorMenu;
+  }
 
-export default EditorMenu;
+  render(){
+    const {
+      cx,
+      cy,
+      radius,
+      gap,
+      width,
+      editor,
+      editorMenu,
+      dispatch
+    } = this.props;
+    return (
+      <RadialMenu
+        cx={cx}
+        cy={cy}
+        showMenu={editorMenu.open}
+        center={getCenter(radius, editor, editorMenu, dispatch)}
+        menuTree={getMenuTree(radius+gap, width, editor, editorMenu, dispatch)} />
+    );
+  };
+}
 
-function getCenter(radius, store, dispatch){
-  const center = createCenter(store, dispatch);
+function getCenter(radius, editor, editorMenu, dispatch){
+  const center = createCenter(editor, editorMenu, dispatch);
   return center && {
     radius,
     ...center
   };
 }
 
-function getMenuTree(radius, width, store, dispatch){
+function getMenuTree(radius, width, editor, editorMenu, dispatch){
   return createMenuTree(
-    store,
+    editor,
+    editorMenu,
     dispatch
   ).map((ring, index) => ({
-    show: store.editorMenu.open,
+    show: editorMenu.open,
     radius,
     width,
     fromTurnFraction: 3/8,
@@ -71,18 +80,18 @@ function getMenuTree(radius, width, store, dispatch){
   }));
 }
 
-function createMenuTree(store, dispatch){
-  switch(store.editorMenu.menuType){
+function createMenuTree(editor, editorMenu, dispatch){
+  switch(editorMenu.menuType){
     case 'tools':
-      return createToolsMenuTree(store, dispatch);
+      return createToolsMenuTree(editor, dispatch);
     case 'okCancel':
-      return createOkCancelMenuTree(store, dispatch);
+      return createOkCancelMenuTree(editorMenu, dispatch);
     default:
       return [];
   }
 }
 
-function createToolsMenuTree({editor}, dispatch){
+function createToolsMenuTree(editor, dispatch){
   return [
     {
       menuItems: [
@@ -96,7 +105,7 @@ function createToolsMenuTree({editor}, dispatch){
   ];
 }
 
-function createOkCancelMenuTree({editorMenu}, dispatch){
+function createOkCancelMenuTree(editorMenu, dispatch){
   return [
     {
       menuItems: [
@@ -107,16 +116,16 @@ function createOkCancelMenuTree({editorMenu}, dispatch){
   ];
 }
 
-function createCenter(store, dispatch){
-  switch(store.editorMenu.menuType){
+function createCenter(editor, editorMenu, dispatch){
+  switch(editorMenu.menuType){
     case 'tools':
-      return createToolsCenter(store, dispatch);
+      return createToolsCenter(editor, editorMenu, dispatch);
     default:
       return null;
   }
 }
 
-function createToolsCenter({editor, editorMenu}, dispatch){
+function createToolsCenter(editor, editorMenu, dispatch){
   return {
     onClick: () => dispatch(toggleEditorMenu()),
     icon: editorMenu.open ? <IconReturn /> :
