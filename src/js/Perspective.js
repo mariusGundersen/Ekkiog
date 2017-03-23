@@ -109,6 +109,13 @@ export default class Perspective{
   }
 
   recalculateViewportToMapCenterMatrix(){
+    const aspect = this.viewportAspectRatio[1];
+    const scale = minmax(0.1, this.mapToViewportMatrix[0], 100);
+    this.mapToViewportMatrix[0] = scale;
+    this.mapToViewportMatrix[4] = scale/aspect;
+    this.mapToViewportMatrix[6] = minmax(-1, this.mapToViewportMatrix[6]/scale, 1)*scale;
+    this.mapToViewportMatrix[7] = minmax(-1, this.mapToViewportMatrix[7]/scale*aspect, 1)*scale/aspect;
+
     mat3.invert(this.viewportToMapCenterMatrix, this.mapToViewportMatrix);
     mat3.multiply(this.viewportToMapCenterMatrix, this.viewportToMapCenterMatrix, this.toClipSpaceMatrix);
 
@@ -153,4 +160,8 @@ function scaleSelfByScalar(matrix, r){
 
 function scaleSelfByInverseScalar(matrix, r){
   return mat3.scale(matrix, matrix, [1/r, 1/r]);
+}
+
+function minmax(min, v, max){
+  return v < min ? min : v > max ? max : v;
 }
