@@ -1,7 +1,8 @@
 import {EventEmitter} from 'events';
 
 import {
-  GL
+  GL,
+  SET_FOREST
 } from '../actions.js';
 
 import Context from '../Context.js';
@@ -23,6 +24,9 @@ export default database => function global(state={
         emitter: new EventEmitter(),
         perspective: new Perspective()
       };
+    case SET_FOREST:
+      state.perspective.reset();
+      return state;
     default:
       return state;
   }

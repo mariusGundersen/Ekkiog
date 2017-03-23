@@ -90,8 +90,9 @@ openDatabase().then(database => {
 
       resize(pixelWidth, pixelHeight, screenWidth, screenHeight) {
         store.dispatch(resize(pixelWidth, pixelHeight, screenWidth, screenHeight));
+        const prevWidth = perspective.viewportWidth;
         perspective.setViewport(pixelWidth, pixelHeight);
-        perspective.scale = context.tileSize * context.width / screenWidth;
+        perspective.scaleBy(prevWidth/pixelWidth)
         store.dispatch(panZoom(perspective.tileToViewportMatrix, perspective.viewportToTileMatrix));
       }
     });

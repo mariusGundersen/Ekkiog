@@ -29,6 +29,17 @@ export default class Perspective{
     this.scaleBy(scale/this.mapToViewportMatrix[0]);
   }
 
+  get viewportWidth(){
+    return this.viewportSize[0];
+  }
+
+  reset(){
+    this.mapToViewportMatrix[6] = 0;
+    this.mapToViewportMatrix[7] = 0;
+    this.scale = 16*128/this.viewportSize[0];
+    this.recalculateViewportToMapCenterMatrix();
+  }
+
   scaleBy(r){
     this.panZoomInMapSpace({
       pos: [0,0],
