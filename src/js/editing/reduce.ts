@@ -38,7 +38,7 @@ export default function reduce(forest=createForest(), action : any){
     case SET_FOREST:
       return action.forest || forest;
     case TAP_TILE:
-      return tap(forest, action.tool, action.x, action.y);
+      return tap(forest, action.tool, toDirection(action.direction), action.x, action.y);
     case REMOVE_TILE_AT:
       return clear(forest, action.x, action.y);
     case TO_UNDERPASS:
@@ -52,7 +52,7 @@ export default function reduce(forest=createForest(), action : any){
   }
 }
 
-function tap(forest : Forest, tool : Tool, x : number, y : number) : Forest{
+function tap(forest : Forest, tool : Tool, direction : Direction, x : number, y : number) : Forest{
   const type = getTypeAt(forest.enneaTree, x, y);
   if(type === BUTTON){
     return toggleButton(forest, x, y);
@@ -71,9 +71,9 @@ function tap(forest : Forest, tool : Tool, x : number, y : number) : Forest{
   }else if(tool === GATE){
     return drawGate(forest, x, y);
   }else if(tool === BUTTON){
-    return drawButton(forest, x, y);
+    return drawButton(forest, x, y, direction);
   }else if(tool === LIGHT){
-    return drawLight(forest, x, y);
+    return drawLight(forest, x, y, direction);
   }else{
     return forest;
   }
@@ -111,4 +111,16 @@ function underpassToWire(forest : Forest, x : number, y : number){
   if(result === tempForest) return forest;
 
   return result;
+}
+
+type Direction = 'leftwards' | 'rightwards' | 'downwards' | 'upwards';
+
+function toDirection(direction : string) : Direction {
+  switch(direction){
+    case 'left' : return 'leftwards'
+    case 'right' : return 'rightwards'
+    case 'down' : return 'downwards'
+    case 'up' : return 'upwards'
+    default: return 'oops' as never;
+  }
 }

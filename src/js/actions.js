@@ -3,6 +3,7 @@ import { isEmpty } from 'ekkiog-editing';
 export const RESIZE = 'resize';
 export const GL = 'gl';
 export const SET_SELECTED_TOOL = 'setSelectedTool';
+export const SET_TOOL_DIRECTION = 'setToolDirection';
 export const TOGGLE_EDITOR_MENU = 'toggleEditorMenu';
 
 export const LOAD_CONTEXT_MENU = 'loadContextMenu';
@@ -49,6 +50,11 @@ export const setSelectedTool = (tool) => ({
   tool
 });
 
+export const setToolDirection = (direction) => ({
+  type: SET_TOOL_DIRECTION,
+  direction
+});
+
 export const loadComponent = (name) => async (dispatch, getState) => {
   const database = getState().global.database;
   const forest = await database.load(name);
@@ -90,11 +96,12 @@ export const setForest = (name, forest) => ({
   forest
 });
 
-export const tapTile = (tx, ty, tool) => ({
+export const tapTile = (tx, ty, tool, direction) => ({
   type: TAP_TILE,
   x: tx,
   y: ty,
-  tool
+  tool,
+  direction
 });
 
 export const removeTileAt = (tx, ty) => ({

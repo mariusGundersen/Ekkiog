@@ -24,8 +24,8 @@ const Menu = connect(
 )(({dispatch, ...props}) => {
   const radius = 40;
   const gap = 10;
-  const cx = props.screenWidth - radius - gap;
-  const cy = props.screenHeight - radius - gap;
+  const cx = props.screenWidth;
+  const cy = props.screenHeight;
 
   return (
     <svg

@@ -18,6 +18,10 @@
   transition: transform 0.5s;
 }
 
+.pieCenter{
+  transition: radius 0.5s;
+}
+
 .svg{
   position: absolute;
   top: 0;

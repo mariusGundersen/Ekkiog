@@ -10,11 +10,11 @@ export default props => (
       stroke="#fed37f"
       strokeWidth="2"
       fill="#fed37f"
-      d="M0,-20 l0,12 a 2,2 0 0,0 0,-4 a 2,2 0 0,0 0,4"/>
+      d="M0,-15 l0,10 a 2,2 0 0,0 0,-4 a 2,2 0 0,0 0,4"/>
     <path
       stroke="#fed37f"
       strokeWidth="2"
       fill="#fed37f"
-      d="M0,20 l0,-12 a 2,2 0 0,0 0,4 a 2,2 0 0,0 0,-4"/>
+      d="M0,15 l0,-10 a 2,2 0 0,0 0,4 a 2,2 0 0,0 0,-4"/>
   </g>
 );

@@ -1980,9 +1980,9 @@ ejs@^2.3.4:
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.5.tgz#6ef4e954ea7dcf54f66aad2fe7aa421932d9ed77"
 
-ekkiog-editing@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-2.0.2.tgz#8723f1cae78720c32eb60684dd6902dda90e8c0c"
+ekkiog-editing@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-2.0.3.tgz#cb7952b8270a17f374e54ac218f1cb7452a63d3c"
   dependencies:
     buddy-tree "^2.0.0"
     ennea-tree "^2.0.1"

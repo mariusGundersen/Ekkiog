@@ -21,7 +21,7 @@ import {
   menuItem
 } from './radialMenu/menuItems.js';
 
-import {toggleEditorMenu} from '../actions.js';
+import {toggleEditorMenu, setToolDirection} from '../actions.js';
 
 export default class EditorMenu extends React.Component {
   shouldComponentUpdate(nextProps){
@@ -50,17 +50,9 @@ export default class EditorMenu extends React.Component {
         cx={cx}
         cy={cy}
         showMenu={editorMenu.open}
-        center={getCenter(radius, editor, editorMenu, dispatch)}
+        center={createCenter(radius, editor, editorMenu, dispatch)}
         menuTree={getMenuTree(radius+gap, width, editor, editorMenu, dispatch)} />
     );
-  };
-}
-
-function getCenter(radius, editor, editorMenu, dispatch){
-  const center = createCenter(editor, editorMenu, dispatch);
-  return center && {
-    radius,
-    ...center
   };
 }
 
@@ -71,10 +63,10 @@ function getMenuTree(radius, width, editor, editorMenu, dispatch){
     dispatch
   ).map((ring, index) => ({
     show: editorMenu.open,
-    radius,
+    radius: radius + (width+20)*index,
     width,
-    fromTurnFraction: 3/8,
-    toTurnFraction: 7/8,
+    fromTurnFraction: 1/2,
+    toTurnFraction: 3/4,
     ringKey: index,
     ...ring
   }));
@@ -83,7 +75,7 @@ function getMenuTree(radius, width, editor, editorMenu, dispatch){
 function createMenuTree(editor, editorMenu, dispatch){
   switch(editorMenu.menuType){
     case 'tools':
-      return createToolsMenuTree(editor, dispatch);
+      return [...createToolsMenuTree(editor, dispatch)];
     case 'okCancel':
       return createOkCancelMenuTree(editorMenu, dispatch);
     default:
@@ -91,18 +83,42 @@ function createMenuTree(editor, editorMenu, dispatch){
   }
 }
 
-function createToolsMenuTree(editor, dispatch){
-  return [
-    {
+function* createToolsMenuTree(editor, dispatch){
+  yield {
+    menuItems: [
+      menuItem('return', <IconReturn />, () => dispatch(toggleEditorMenu()))
+    ]
+  };
+
+  yield {
+    menuItems: [
+      buttonMenuItem(editor.selectedTool, dispatch),
+      lightMenuItem(editor.selectedTool, dispatch),
+      gateMenuItem(editor.selectedTool, dispatch),
+      underpassMenuItem(editor.selectedTool, dispatch),
+      wireMenuItem(editor.selectedTool, dispatch)
+    ]
+  };
+
+  if(editor.selectedTool === 'button'){
+    yield {
       menuItems: [
-        wireMenuItem(editor.selectedTool, dispatch),
-        buttonMenuItem(editor.selectedTool, dispatch),
-        gateMenuItem(editor.selectedTool, dispatch),
-        underpassMenuItem(editor.selectedTool, dispatch),
-        lightMenuItem(editor.selectedTool, dispatch)
+        menuItem('down', <IconButton rotate={90} />, () => dispatch(setToolDirection('down')), editor.toolDirection == 'down'),
+        menuItem('left', <IconButton rotate={180} />, () => dispatch(setToolDirection('left')), editor.toolDirection == 'left'),
+        menuItem('up', <IconButton rotate={270} />, () => dispatch(setToolDirection('up')), editor.toolDirection == 'up'),
+        menuItem('right', <IconButton rotate={0} />, () => dispatch(setToolDirection('right')), editor.toolDirection == 'right')
       ]
-    }
-  ];
+    };
+  }else if(editor.selectedTool === 'light'){
+    yield {
+      menuItems: [
+        menuItem('down', <IconLight rotate={90} />, () => dispatch(setToolDirection('down')), editor.toolDirection == 'down'),
+        menuItem('left', <IconLight rotate={180} />, () => dispatch(setToolDirection('left')), editor.toolDirection == 'left'),
+        menuItem('up', <IconLight rotate={270} />, () => dispatch(setToolDirection('up')), editor.toolDirection == 'up'),
+        menuItem('right', <IconLight rotate={0} />, () => dispatch(setToolDirection('right')), editor.toolDirection == 'right')
+      ]
+    };
+  }
 }
 
 function createOkCancelMenuTree(editorMenu, dispatch){
@@ -116,19 +132,22 @@ function createOkCancelMenuTree(editorMenu, dispatch){
   ];
 }
 
-function createCenter(editor, editorMenu, dispatch){
+function createCenter(radius, editor, editorMenu, dispatch){
   switch(editorMenu.menuType){
     case 'tools':
-      return createToolsCenter(editor, editorMenu, dispatch);
+      return createToolsCenter(radius, editor, editorMenu, dispatch);
     default:
       return null;
   }
 }
 
-function createToolsCenter(editor, editorMenu, dispatch){
+function createToolsCenter(radius, editor, editorMenu, dispatch){
   return {
+    radius: radius,
+    cx: editorMenu.open ? radius : -radius*1.5,
+    cy: editorMenu.open ? radius : -radius*1.5,
     onClick: () => dispatch(toggleEditorMenu()),
-    icon: editorMenu.open ? <IconReturn /> :
+    icon:
       editor.selectedTool == 'wire' ? <IconWire /> :
       editor.selectedTool == 'button' ? <IconButton /> :
       editor.selectedTool == 'gate' ? <IconGate /> :

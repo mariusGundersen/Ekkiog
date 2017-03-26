@@ -5,5 +5,5 @@ export default props => (
     stroke="#a9d3ab"
     strokeWidth="2"
     fill="none"
-    d="M-15,-15 l0,10 l5,5 l20,0 l5,5 l0,10"/>
+    d="M-12,-10 l0,7 l5,5 l10,0 l5,5 l0,7"/>
 );

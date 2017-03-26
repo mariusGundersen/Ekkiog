@@ -46,10 +46,10 @@ export function fromEmitter(emitter, viewportToTile, getState, dispatch){
 export function handleTap(viewportToTile, dispatch, getState){
   return ({x, y}) => {
     const [tx, ty] = viewportToTile(x, y);
-    const tool = getState().editor.selectedTool;
+    const {selectedTool, toolDirection} = getState().editor;
 
     window.requestAnimationFrame(() => {
-      dispatch(tapTile(Math.floor(tx), Math.floor(ty), tool));
+      dispatch(tapTile(Math.floor(tx), Math.floor(ty), selectedTool, toolDirection));
     });
   };
 }
