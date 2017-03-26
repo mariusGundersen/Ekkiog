@@ -28,11 +28,13 @@ export default reax({
     noExactMatch
   };
 }, ({actions, searchResults, noExactMatch, ...props}) => (
-  <div className={style.searchResults}>
-    {searchResults.map(r => <SearchResultView key={r} insertPackage={actions.insertPackage} openComponent={props.openComponent} result={r} />)}
-    {noExactMatch
-    ? <NoExactMatchView key="no-exact-match" query={props.query} createComponent={props.createComponent} />
-    : null}
+  <div className={style.searchResultsContainer}>
+    <div className={style.searchResults}>
+      {noExactMatch
+      ? <NoExactMatchView key="no-exact-match" query={props.query} createComponent={props.createComponent} />
+      : null}
+      {searchResults.map(r => <SearchResultView key={r} insertPackage={actions.insertPackage} openComponent={props.openComponent} result={r} />)}
+    </div>
   </div>
 ));
 
