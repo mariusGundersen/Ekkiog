@@ -9,11 +9,11 @@ import {
   LOAD_CONTEXT_MENU,
   POTENTIAL_LONG_PRESS_CANCEL,
   ABORT_LOAD_CONTEXT_MENU
-} from '../events.js';
+} from '../events';
 
 import {
   HIDE_CONTEXT_MENU
-} from '../actions.js';
+} from '../actions';
 
 export default class PointerSaga{
   constructor(emitter){

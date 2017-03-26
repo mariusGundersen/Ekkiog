@@ -17,7 +17,8 @@ const babelLoader = {
 const cssLoader = {
   loader:'css-loader',
   options: {
-    modules: true
+    modules: true,
+    camelCase: true
   }
 };
 

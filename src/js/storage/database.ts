@@ -1,13 +1,15 @@
-import idb from 'idb';
-import Rx from 'rxjs/Rx.js';
+import idb, {DB} from 'idb';
+import * as Rx from 'rxjs/Rx.js';
 
 import {
   packageComponent,
-  createForest
+  createForest,
+  Forest,
+  CompiledComponent
 } from 'ekkiog-editing';
 
-import upgradeFrom0 from './upgrade/from0.js';
-import upgradeFrom5 from './upgrade/from5.js';
+import upgradeFrom0 from './upgrade/from0';
+import upgradeFrom5 from './upgrade/from5';
 
 export async function open(){
   const db = await idb.open('ekkiog', 6, async (db) => {
@@ -27,11 +29,12 @@ export async function open(){
 }
 
 class Storage{
-  constructor(db){
+  db : DB;
+  constructor(db : DB){
     this.db = db;
   }
 
-  async save(name, forest){
+  async save(name : string, forest : Forest){
     return await this.db
       .transaction('components', 'readwrite')
       .objectStore('components')
@@ -41,16 +44,17 @@ class Storage{
       });
   }
 
-  async load(name){
+  async load(name : string) : Promise<Forest>{
     return await this.db
       .transaction('components')
       .objectStore('components')
       .get(name)
-      .then(x => x || createForest())
-      .catch(x => createForest());
+      .then(
+        x => x || createForest(),
+        x => createForest());
   }
 
-  async loadPackage(name){
+  async loadPackage(name : string) : Promise<CompiledComponent>{
     return await this.db
       .transaction('components')
       .objectStore('components')
@@ -59,11 +63,11 @@ class Storage{
   }
 
   getComponentNames(){
-    return new Rx.Observable(s => {
+    return new Rx.Observable<string>(s => {
       const tx = this.db.transaction('components');
       tx.objectStore('components').iterateCursor(cursor => {
         if (!cursor) return;
-        s.next(cursor.key);
+        s.next(cursor.key as string);
         cursor.continue();
       });
       const abort = s.add(() => tx.abort());

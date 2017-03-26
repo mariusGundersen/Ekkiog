@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {
   SET_SELECTED_TOOL,
   TOGGLE_EDITOR_MENU
-} from '../actions.js';
+} from '../actions';
 
 import style from './main.css';
 

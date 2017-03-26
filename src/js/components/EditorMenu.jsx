@@ -21,7 +21,7 @@ import {
   menuItem
 } from './radialMenu/menuItems.js';
 
-import {toggleEditorMenu, setToolDirection} from '../actions.js';
+import {toggleEditorMenu, setToolDirection} from '../actions';
 
 export default class EditorMenu extends React.Component {
   shouldComponentUpdate(nextProps){

@@ -7,7 +7,7 @@ import {
   toUnderpass,
   toWire,
   moveGate
-} from '../../actions.js';
+} from '../../actions';
 
 import IconWire from '../icons/IconWire.jsx';
 import IconButton from '../icons/IconButton.jsx';

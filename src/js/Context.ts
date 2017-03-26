@@ -1,20 +1,34 @@
-import DataTexture from './textures/DataTexture.js';
-import RenderTexture from './textures/RenderTexture.js';
-import ImageTexture from './textures/ImageTexture.js';
+import { MutableContext, Item, Area } from 'ekkiog-editing';
 
-import QuadList from './textures/QuadList.js';
+import DataTexture from './textures/DataTexture';
+import RenderTexture from './textures/RenderTexture';
+import ImageTexture from './textures/ImageTexture';
+
+import QuadList from './textures/QuadList';
 import TextScene from './text/TextScene';
 
-import loadImage from './loadImage.js';
+import loadImage from './loadImage';
 import tiles from '../img/tiles.png';
 
 const MAP_SIZE = 128;
 const TILE_SIZE = 16;
 const SQRT_NET_COUNT = 256;
-const WORD_TEXTURE_SIZE = 64;
 
-export default class Context{
-  constructor(gl){
+export default class Context implements MutableContext{
+  gl : WebGLRenderingContext;
+  width : number;
+  height : number;
+  tileSize : number;
+  wordQuadList : QuadList;
+  textScene : TextScene;
+  spriteSheetTexture : ImageTexture;
+  mapTexture : DataTexture;
+  netMapTexture : DataTexture;
+  gatesTexture : DataTexture;
+  tileMapTexture : RenderTexture;
+  chargeMapTexture : RenderTexture;
+  netChargeTextures : [RenderTexture, RenderTexture];
+  constructor(gl : WebGLRenderingContext){
     this.gl = gl;
     this.width = MAP_SIZE;
     this.height = MAP_SIZE;
@@ -24,7 +38,6 @@ export default class Context{
     this.textScene = new TextScene(this.wordQuadList);
 
     this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
-    this.wordTexture = new RenderTexture(gl, WORD_TEXTURE_SIZE, WORD_TEXTURE_SIZE);
 
     this.mapTexture = new DataTexture(gl, MAP_SIZE, MAP_SIZE);
     this.netMapTexture = new DataTexture(gl, MAP_SIZE, MAP_SIZE);
@@ -38,27 +51,27 @@ export default class Context{
     ];
   }
 
-  setMap(x, y, tile){
+  setMap(x : number, y : number, tile : number){
     this.mapTexture.set(x, y, tile);
   }
 
-  setNet(x, y, net){
+  setNet(x : number, y : number, net : number){
     this.netMapTexture.set(x, y, net);
   }
 
-  setGate(v, a, b){
+  setGate(v : number, a : number, b : number){
     this.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
   }
 
-  insertText(item, area){
+  insertText(item : Item, area : Area){
     this.textScene.insertItem(item, area);
   }
 
-  removeText(item){
+  removeText(item : Item){
     this.textScene.removeItem(item);
   }
 
-  updateText(before, after){
+  updateText(before : Item, after : Item){
     this.textScene.updateItem(before, after);
   }
 

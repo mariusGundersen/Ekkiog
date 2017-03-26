@@ -5,7 +5,7 @@ import {
   POINTER_MOVE,
   POINTER_UP,
   CANCEL_PAN_ZOOM
-} from '../events.js';
+} from '../events';
 
 export default class PanZoomSaga{
   constructor(eventEmitter){

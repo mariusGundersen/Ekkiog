@@ -9,13 +9,13 @@ import '../manifest.json';
 import offline from 'offline-plugin/runtime';
 
 import Shell from './Shell.js';
-import {open as openDatabase} from './storage/database.js';
+import {open as openDatabase} from './storage/database';
 import TouchControls from './interaction/TouchControls.js';
 
 import {
   createEmitterMiddleware,
   fromEmitter
-} from './emitterRedux.js';
+} from './emitterRedux';
 
 import createContextMiddleware from './editing/createContextMiddleware';
 
@@ -23,7 +23,7 @@ import {
   resize,
   panZoom,
   loadComponent
-} from './actions.js';
+} from './actions';
 
 import createReduce from './reduce.js';
 import App from './components/App.jsx';
@@ -57,7 +57,7 @@ openDatabase().then(database => {
 
     store.dispatch(loadComponent('Welcome'));
 
-    fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), () => store.getState(), store.dispatch);
+    fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), store.dispatch, () => store.getState());
 
     const shell = new Shell({
       tickInterval: 500,

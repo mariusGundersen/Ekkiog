@@ -4,7 +4,7 @@ import {
   SELECT_COMPONENT,
   MOVE_SELECTION,
   STOP_SELECTION
-} from '../actions.js';
+} from '../actions';
 
 export default function reduce(state={
   forest: createForest(),

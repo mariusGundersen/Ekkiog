@@ -6,7 +6,7 @@ import {
   ABORT_LOAD_CONTEXT_MENU,
   PAN_ZOOM,
   HIDE_CONTEXT_MENU
-} from '../actions.js';
+} from '../actions';
 
 export default function contextMenu(state={
   loading: false,

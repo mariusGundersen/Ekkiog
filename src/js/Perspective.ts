@@ -1,6 +1,27 @@
 import {vec2, mat3} from 'gl-matrix';
 
+export interface XYScale {
+  x : number,
+  y : number,
+  r : number
+};
+
+export interface PosScale {
+  pos : [number, number],
+  r : number
+};
+
 export default class Perspective{
+  mapToViewportMatrix : mat3;
+  toClipSpaceMatrix : mat3;
+  viewportToMapCenterMatrix : mat3;
+  viewportToTileMatrix : mat3;
+  tileToViewportMatrix : mat3;
+  mapSize : vec2;
+  halfMapSize : vec2;
+  viewportSize : vec2;
+  viewportAspectRatio : vec2;
+  inverseViewportAspectRatio : vec2;
   constructor(){
     this.mapToViewportMatrix = mat3.create();
 
@@ -40,7 +61,7 @@ export default class Perspective{
     this.recalculateViewportToMapCenterMatrix();
   }
 
-  scaleBy(r){
+  scaleBy(r : number){
     this.panZoomInMapSpace({
       pos: [0,0],
       r: 1
@@ -50,7 +71,7 @@ export default class Perspective{
     });
   }
 
-  panZoom(previous, next){
+  panZoom(previous : XYScale, next : XYScale){
     const previousCoord = transformPos(this.viewportToMapCenterMatrix, previous.x, previous.y);
     const nextCoord = transformPos(this.viewportToMapCenterMatrix, next.x, next.y);
 
@@ -63,7 +84,7 @@ export default class Perspective{
     });
   }
 
-  panZoomInMapSpace(previous, next){
+  panZoomInMapSpace(previous : PosScale, next : PosScale){
     translateSelf(this.mapToViewportMatrix, next.pos);
     scaleSelf(this.mapToViewportMatrix, this.viewportAspectRatio);
     scaleSelfByInverseScalar(this.mapToViewportMatrix, previous.r);
@@ -74,7 +95,7 @@ export default class Perspective{
     this.recalculateViewportToMapCenterMatrix();
   }
 
-  setViewport(width, height){
+  setViewport(width : number, height : number){
     vec2.set(this.viewportSize, width, height);
 
     mat3.fromTranslation(this.toClipSpaceMatrix, [-1, -1]);
@@ -88,23 +109,23 @@ export default class Perspective{
     this.recalculateViewportToMapCenterMatrix();
   }
 
-  setMapSize(width, height){
+  setMapSize(width : number, height : number){
     vec2.set(this.mapSize, width, height);
     vec2.set(this.halfMapSize, width/2, height/2);
 
     this.recalculateViewportToTileMatrix();
   }
 
-  tileToViewport(...pos){
-    return vec2.transformMat3(pos, pos, this.tileToViewportMatrix);
+  tileToViewport(...pos : Array<number>){
+    return vec2.transformMat3(pos as any, pos, this.tileToViewportMatrix);
   }
 
-  viewportToTile(...pos){
-    return vec2.transformMat3(pos, pos, this.viewportToTileMatrix);
+  viewportToTile(...pos : number[]){
+    return vec2.transformMat3(pos as any, pos, this.viewportToTileMatrix);
   }
 
-  viewportToTileFloored(...pos){
-    pos = this.viewportToTile(...pos);
+  viewportToTileFloored(...pos : number[]){
+    pos = this.viewportToTile(...pos) as any;
     return [Math.floor(pos[0]), Math.floor(pos[1])];
   }
 
@@ -138,30 +159,30 @@ export default class Perspective{
   }
 }
 
-function transformPos(matrix, ...pos){
-  return vec2.transformMat3(pos, pos, matrix);
+function transformPos(matrix : mat3, ...pos : number[]) : [number, number] {
+  return vec2.transformMat3(pos as any, pos, matrix) as any;
 }
 
-function translateSelf(matrix, pos){
-  return mat3.translate(matrix, matrix, pos);
+function translateSelf(matrix : mat3, pos : [number, number]){
+  return mat3.translate(matrix, matrix, pos as any);
 }
 
-function translateSelfNegative(matrix, [x, y]){
+function translateSelfNegative(matrix : mat3, [x, y] : [number, number]){
   return mat3.translate(matrix, matrix, [-x, -y]);
 }
 
-function scaleSelf(matrix, scale){
+function scaleSelf(matrix : mat3, scale : number[] | vec2){
   return mat3.scale(matrix, matrix, scale);
 }
 
-function scaleSelfByScalar(matrix, r){
+function scaleSelfByScalar(matrix : mat3, r : number){
   return mat3.scale(matrix, matrix, [r, r]);
 }
 
-function scaleSelfByInverseScalar(matrix, r){
+function scaleSelfByInverseScalar(matrix : mat3, r : number){
   return mat3.scale(matrix, matrix, [1/r, 1/r]);
 }
 
-function minmax(min, v, max){
+function minmax(min : number, v : number, max : number){
   return v < min ? min : v > max ? max : v;
 }

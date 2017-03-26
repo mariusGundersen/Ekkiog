@@ -2,6 +2,8 @@ import { Item, Area } from 'ekkiog-editing';
 
 import textFromItem from './textFromItem';
 
+import QuadList from '../textures/QuadList';
+
 export type ItemTexts = {
   next? : ItemTexts,
   size : number,
@@ -11,9 +13,9 @@ export type ItemTexts = {
 type ItemChain = ItemTexts | {next? : ItemTexts, size : number, item : null};
 
 export default class TextScene{
-  quadList : any;
+  quadList : QuadList;
   itemChain : ItemChain;
-  constructor(quadList : any){
+  constructor(quadList : QuadList){
     this.quadList = quadList;
     this.itemChain = {
       size: 0,

@@ -1,9 +1,21 @@
-import ndarray from 'ndarray';
-import createBuffer from 'gl-buffer';
-import createVAO from 'gl-vao';
+import ndarray, { NdArray } from 'ndarray';
+import createBuffer, { GlBuffer} from 'gl-buffer';
+import createVAO, { GlVAO } from 'gl-vao';
+
+import { Quad } from '../text/types';
 
 export default class QuadList {
-  constructor(gl, size){
+  gl : WebGLRenderingContext;
+  size : number;
+  vertices : Float32Array;
+  vertexBuffer : GlBuffer;
+  indecies : Uint16Array;
+  indexBuffer : GlBuffer;
+  vao : GlVAO;
+  map : NdArray;
+  count : number;
+  prevCount : number;
+  constructor(gl : WebGLRenderingContext, size : number){
     this.gl = gl;
     this.size = size;
     this.vertices = new Float32Array(size*16);
@@ -22,7 +34,7 @@ export default class QuadList {
     this.prevCount = 0;
   }
 
-  set(index, quad){
+  set(index : number, quad : Quad){
     this.map.set(index, 0, 0, 0, quad.pos.x);
     this.map.set(index, 0, 0, 1, quad.pos.y);
     this.map.set(index, 0, 1, 0, quad.uv.x);
@@ -45,7 +57,7 @@ export default class QuadList {
     this.count++;
   }
 
-  remove(start, count){
+  remove(start : number, count : number){
     this.vertices.copyWithin(start*16, (start+count)*16, this.count*16);
     this.count -= count;
   }
@@ -68,7 +80,7 @@ export default class QuadList {
   }
 }
 
-export function* createQuads(size){
+export function* createQuads(size : number){
   for(let i=0; i<size; i++){
     yield i*4 + 0;
     yield i*4 + 1;

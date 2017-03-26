@@ -31,9 +31,9 @@ import {
   TO_UNDERPASS,
   TO_WIRE,
   INSERT_COMPONENT
-} from '../actions.js';
+} from '../actions';
 
-export default function reduce(forest=createForest(), action : any){
+export default function reduce(forest=createForest(), action : any) : Forest{
   switch(action.type){
     case SET_FOREST:
       return action.forest || forest;

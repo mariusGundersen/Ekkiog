@@ -5,13 +5,13 @@ import style from './main.css';
 
 import {
   GL
-} from '../actions.js';
+} from '../actions';
 
 import {
   TOUCH_START,
   TOUCH_MOVE,
   TOUCH_END
-} from '../events.js';
+} from '../events';
 
 const WebGLCanvas = connect(
   ({view}) => ({

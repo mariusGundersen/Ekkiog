@@ -1,15 +1,20 @@
-import createShader from 'gl-shader';
+import createShader, { GlShader } from 'gl-shader';
+import { mat3 } from 'gl-matrix';
 
 import textVS from './textVS.glsl';
 import textFS from './textFS.glsl';
 
+import Context from '../../Context';
+
 export default class TextEngine {
-  constructor(gl) {
+  gl : WebGLRenderingContext;
+  shader : GlShader;
+  constructor(gl : WebGLRenderingContext) {
     this.gl = gl;
     this.shader = createShader(gl, textVS, textFS);
   }
 
-  render(context, matrix) {
+  render(context : Context, matrix : mat3) {
     if(!context.spriteSheetTexture.ready) return;
 
     this.shader.bind();

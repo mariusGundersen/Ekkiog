@@ -5,7 +5,7 @@ import {
   SHOW_OK_CANCEL_MENU,
   SET_OK_CANCEL_MENU_VALID,
   RESET_EDITOR_MENU
-} from '../actions.js';
+} from '../actions';
 
 export default function editorMenu(state={
   open: false,

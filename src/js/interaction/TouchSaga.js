@@ -12,7 +12,7 @@ import {
   LONG_PRESS,
   POTENTIAL_LONG_PRESS,
   POTENTIAL_LONG_PRESS_CANCEL
-} from '../events.js';
+} from '../events';
 
 const TAP_TOO_SLOW_TIMEOUT = 'tapTooSlowTimeout';
 const LONG_PRESS_TIMEOUT = 'longPressTimeout';

@@ -2,7 +2,7 @@ import {
   SET_SELECTED_TOOL,
   SET_TOOL_DIRECTION,
   SET_FOREST
-} from '../actions.js';
+} from '../actions';
 
 export default function editor(state={
   toolDirection: 'right',

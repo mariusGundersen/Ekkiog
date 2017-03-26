@@ -1,5 +1,7 @@
 import { getTypeAt, isEmpty } from 'ekkiog-editing';
 
+import {Dispatch, Store} from 'react-redux';
+
 import {
   MOVE_GATE,
   tapTile,
@@ -10,7 +12,7 @@ import {
   showOkCancelMenu,
   setOkCancelMenuValid,
   moveSelection
-} from './actions.js';
+} from './actions';
 
 import {
   TAP,
@@ -20,10 +22,12 @@ import {
   START_SELECTION,
   MOVE_SELECTION,
   STOP_SELECTION
-} from './events.js';
+} from './events';
+
+type ViewportToTile = (x : number, y : number) => [number, number];
 
 export function createEmitterMiddleware(){
-  return ({getState}) => next => action => {
+  return ({getState} : Store<any>) => (next : (action : any) => any) => (action : any) => {
     if(action.meta && typeof(action.meta) == 'object' && action.meta.emit === true){
       getState().global.emitter.emit(action.type, action);
       if(action.meta.dispatch === true){
@@ -35,7 +39,7 @@ export function createEmitterMiddleware(){
   };
 }
 
-export function fromEmitter(emitter, viewportToTile, getState, dispatch){
+export function fromEmitter(emitter : any, viewportToTile : ViewportToTile, dispatch : Dispatch<any>, getState : () => any){
   emitter.on(TAP, handleTap(viewportToTile, dispatch, getState));
   emitter.on(SHOW_CONTEXT_MENU, handleShowContextMenu(viewportToTile, dispatch, getState));
   emitter.on(LOAD_CONTEXT_MENU, handleLoadContextMenu(dispatch));
@@ -43,8 +47,8 @@ export function fromEmitter(emitter, viewportToTile, getState, dispatch){
   emitter.on(MOVE_SELECTION, handleMoveSelection(dispatch, getState));
 }
 
-export function handleTap(viewportToTile, dispatch, getState){
-  return ({x, y}) => {
+export function handleTap(viewportToTile : ViewportToTile, dispatch : Dispatch<any>, getState : () => any){
+  return ({x, y} : {x : number, y : number}) => {
     const [tx, ty] = viewportToTile(x, y);
     const {selectedTool, toolDirection} = getState().editor;
 
@@ -54,8 +58,8 @@ export function handleTap(viewportToTile, dispatch, getState){
   };
 }
 
-export function handleShowContextMenu(viewportToTile, dispatch, getState){
-  return ({x, y}) => {
+export function handleShowContextMenu(viewportToTile : ViewportToTile, dispatch : Dispatch<any>, getState : () => any){
+  return ({x, y} : {x : number, y : number}) => {
     const [tx, ty] = viewportToTile(x, y);
     const enneaTree = getState().forest.enneaTree;
     const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
@@ -66,22 +70,22 @@ export function handleShowContextMenu(viewportToTile, dispatch, getState){
   };
 }
 
-export function handleLoadContextMenu(dispatch){
-  return ({x, y}) => {
+export function handleLoadContextMenu(dispatch : Dispatch<any>){
+  return ({x, y} : {x : number, y : number}) => {
     dispatch(loadContextMenu(
       x/window.devicePixelRatio,
       y/window.devicePixelRatio));
   };
 }
 
-export function handleAbortContextMenu(dispatch){
-  return ({x, y}) => {
+export function handleAbortContextMenu(dispatch : Dispatch<any>){
+  return ({x, y} : {x : number, y : number}) => {
     dispatch(abortLoadContextMenu());
   };
 }
 
-export function handleMoveSelection(dispatch, getState){
-  return ({dx, dy}) => {
+export function handleMoveSelection(dispatch : Dispatch<any>, getState : () => any){
+  return ({dx, dy} : {dx : number, dy : number}) => {
     dispatch(moveSelection(dx, dy));
     const state = getState();
     const selection = state.selection;

@@ -15,6 +15,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/gl-matrix": "^2.2.34",
+    "@types/ndarray": "^1.0.1",
+    "@types/react-redux": "^4.4.38",
+    "@types/redux-thunk": "^2.1.0",
     "autoprefixer": "^6.4.0",
     "ava": "^0.15.2",
     "awesome-typescript-loader": "^3.0.2",
@@ -48,13 +52,13 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
+    "a-big-triangle": "^1.0.3",
     "array-unique": "^0.2.1",
     "babel-runtime": "^6.11.6",
     "base64-arraybuffer": "^0.1.5",
     "ekkiog-editing": "^3.0.0",
     "event-saga": "^3.0.0",
     "express": "^4.14.0",
-    "gl-big-triangle": "^1.0.0",
     "gl-buffer": "^2.1.2",
     "gl-matrix": "^2.3.2",
     "gl-shader": "^4.2.0",

@@ -8,7 +8,7 @@ import {
   POINTER_MOVE,
   POINTER_UP,
   CANCEL_PAN_ZOOM
-} from '../events.js';
+} from '../events';
 
 export default class SelectionSaga extends EventSaga {
   constructor(eventEmitter, viewportToTile){

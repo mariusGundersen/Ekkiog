@@ -3,7 +3,7 @@ import { vec2 } from 'gl-matrix';
 import {
   RESIZE,
   PAN_ZOOM
-} from '../actions.js';
+} from '../actions';
 
 export default function view(state={
   pixelWidth: 100,

@@ -1,10 +1,17 @@
-
 import {vec2} from 'gl-matrix';
 
 export default class Texture{
-  constructor(gl, width=0, height=0){
+
+  gl : WebGLRenderingContext;
+  texture : WebGLTexture;
+  width : number;
+  height : number;
+  size : vec2;
+  halfSize : vec2;
+  inverseSize : vec2;
+  constructor(gl : WebGLRenderingContext, width=0, height=0){
     this.gl = gl;
-    this.texture = gl.createTexture();
+    this.texture = gl.createTexture() || (() => {throw new Error("Could not make texture")})();
 
     this.width = width;
     this.height = height;
@@ -22,7 +29,7 @@ export default class Texture{
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
   }
 
-  activate(target){
+  activate(target : number){
     this.gl.activeTexture(target + this.gl.TEXTURE0);
   }
 
@@ -30,7 +37,7 @@ export default class Texture{
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
   }
 
-  sampler2D(target){
+  sampler2D(target : number){
     this.activate(target);
     this.bind();
     return target;

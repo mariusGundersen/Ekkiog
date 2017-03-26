@@ -1,7 +1,9 @@
-import xor from '../scripts/xor.js';
-import and from '../scripts/and.js';
+import xor from '../scripts/xor';
+import and from '../scripts/and';
 
-export default async function upgradeFrom5(db){
+import {UpgradeDB} from 'idb';
+
+export default async function upgradeFrom5(db : UpgradeDB){
   const components = db.transaction.objectStore('components');
 
   await components

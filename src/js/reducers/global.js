@@ -3,11 +3,11 @@ import {EventEmitter} from 'events';
 import {
   GL,
   SET_FOREST
-} from '../actions.js';
+} from '../actions';
 
-import Context from '../Context.js';
-import Renderer from '../engines/Renderer.js';
-import Perspective from '../Perspective.js';
+import Context from '../Context';
+import Renderer from '../engines/Renderer';
+import Perspective from '../Perspective';
 
 export default database => function global(state={
   gl: null,

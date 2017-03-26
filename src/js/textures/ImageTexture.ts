@@ -1,9 +1,11 @@
 import {vec2} from 'gl-matrix';
 
-import Texture from './Texture.js';
+import Texture from './Texture';
 
 export default class ImageTexture extends Texture{
-  constructor(gl, image){
+  image? : HTMLImageElement;
+  loading : Promise<ImageTexture>;
+  constructor(gl : WebGLRenderingContext, image : Promise<HTMLImageElement>){
     super(gl, 0, 0);
     this.image = undefined;
     this.loading = image.then(image => {

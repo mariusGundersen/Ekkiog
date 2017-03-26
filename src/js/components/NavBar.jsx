@@ -16,7 +16,7 @@ import SearchResults from './SearchResults.jsx';
 
 import style from './navbar.css';
 
-import {insertComponentPackage, loadComponent} from '../actions.js';
+import {insertComponentPackage, loadComponent} from '../actions';
 
 export default connect(state => ({
   currentComponentName: state.editor.currentComponentName,

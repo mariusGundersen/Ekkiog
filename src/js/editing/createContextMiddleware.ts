@@ -5,7 +5,7 @@ import {
 import mutateContext from './mutateContext';
 import {
   SET_FOREST
-} from '../actions.js';
+} from '../actions';
 
 export default function createContextMiddleware(){
   return (store : any) => (next : any) => (action : any) => {
