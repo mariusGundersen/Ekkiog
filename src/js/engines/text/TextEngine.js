@@ -12,21 +12,52 @@ export default class TextEngine {
     this.shader = createShader(gl, textVS, textFS);
     this.texts = [{
       x: 65,
-      y: 64,
-      w: 5,
-      h: 7
+      y: 52,
+      w: 16,
+      h: 8,
+      direction: 'rightward'
     },
     {
-      x: 66,
-      y: 63,
-      w: 9,
-      h: 7
+      x: 63,
+      y: 53,
+      w: 32,
+      h: 8,
+      direction: 'leftward'
     },
     {
-      x: 66,
-      y: 65,
-      w: 9,
-      h: 7
+      x: 63,
+      y: 51,
+      w: 64,
+      h: 8,
+      direction: 'leftward'
+    },
+    {
+      x: 62,
+      y: 53,
+      w: 32,
+      h: 8,
+      direction: 'rightward'
+    },
+    {
+      x: 62,
+      y: 51,
+      w: 64,
+      h: 8,
+      direction: 'rightward'
+    },
+    {
+      x: 64,
+      y: 39,
+      w: 64,
+      h: 8,
+      direction: 'downward'
+    },
+    {
+      x: 64,
+      y: 40,
+      w: 16,
+      h: 8,
+      direction: 'upward'
     }];
     const verts = [...toQuads(...this.texts)];
     this.vao = createVAO(gl, [{
@@ -45,6 +76,7 @@ export default class TextEngine {
     this.shader.uniforms.matrix = matrix;
 
     this.shader.uniforms.spriteSheet = context.spriteSheetTexture.sampler2D(0);
+    this.shader.uniforms.chargeMap = context.chargeMapTexture.sampler2D(1);
 
     this.vao.bind();
     this.vao.draw(this.gl.TRIANGLES, this.texts.length * 6);
@@ -52,35 +84,63 @@ export default class TextEngine {
 }
 
 function* toQuads(...positions){
-  for(const {x, y, w, h} of positions){
+  for(const {x, y, w, h, direction} of positions){
+    const scaleW = 16/w;
+    const scale = scaleW > 0.5
+      ? 1/2/16
+      : scaleW/16;
+
+    const tx = x + 1/2 + w*scale*(
+      direction === 'leftward'
+      ? -1
+      : direction === 'rightward'
+      ? 0
+      : -1/2
+    );
+    const ty = y+(
+      direction === 'rightward'
+      ? 7/16-h*scale
+      : direction === 'leftward'
+      ? 9/16
+      : direction === 'downward'
+      ? 11/16
+      : 7/16-h*scale
+    );
+    yield* interleave(
+      quad(tx, ty, w*scale, h*scale),
+      quad(0, 0, w, h)
+    );
+  }
+}
+
+function* quad(x, y, w, h){
     yield x;
     yield y;
-    yield 0;
-    yield 0;
 
-    yield x + w/16;
+    yield x + w;
     yield y;
-    yield w;
-    yield 0;
 
     yield x;
-    yield y + h/16;
-    yield 0;
-    yield h;
+    yield y + h;
 
     yield x;
-    yield y + h/16;
-    yield 0;
-    yield h;
+    yield y + h;
 
-    yield x + w/16;
+    yield x + w;
     yield y;
-    yield w;
-    yield 0;
 
-    yield x + w/16;
-    yield y + h/16;
-    yield w;
-    yield h;
+    yield x + w;
+    yield y + h;
+}
+
+function* interleave(a, b){
+  while(true){
+    let next = a.next();
+    if(next.done) break;
+    yield next.value;
+    yield a.next().value;
+
+    yield b.next().value;
+    yield b.next().value;
   }
 }

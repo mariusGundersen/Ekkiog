@@ -1,11 +1,12 @@
 precision mediump float;
 
 attribute vec2 position;
-varying vec2 pixelCoord;
-varying vec2 texCoord;
 uniform mat3 matrix;
 uniform vec2 mapTextureSize;
 uniform float tileSize;
+
+varying vec2 pixelCoord;
+varying vec2 texCoord;
 
 void main(void) {
   vec2 clipSpace = (matrix * vec3(position, 1)).xy * vec2(1, -1);
