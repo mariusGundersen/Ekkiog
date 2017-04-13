@@ -4,6 +4,7 @@ import ChargeMapEngine from './chargeMap/ChargeMapEngine.js';
 import NetChargeEngine from './netCharges/NetChargeEngine.js';
 import MoveEngine from './move/MoveEngine.js';
 import TextEngine from './text/TextEngine.js';
+import DebugEngine from './debug/DebugEngine.js';
 import * as triangle from './triangle.js';
 
 export default class Renderer {
@@ -20,6 +21,7 @@ export default class Renderer {
     this.viewEngine = new ViewEngine(gl);
     this.moveEngine = new MoveEngine(gl);
     this.textEngine = new TextEngine(gl);
+    this.debugEngine = new DebugEngine(gl);
     triangle.initialize(gl);
   }
 
@@ -52,7 +54,9 @@ export default class Renderer {
   renderView(context, mapToViewportMatrix, viewportSize) {
     this.gl.viewport(0, 0, ...viewportSize);
     this.viewEngine.render(context, mapToViewportMatrix);
-    this.textEngine.render(context, mapToViewportMatrix);
+    if(window.debug){
+      this.debugEngine.render(context.netChargeTextures[this.currentTick%2], mapToViewportMatrix);
+    }
     triangle.bind();
   }
 
