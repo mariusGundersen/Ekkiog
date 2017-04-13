@@ -24,7 +24,6 @@ export default class WordEngine {
 
     this.shader.uniforms.spriteSheet = context.spriteSheetTexture.sampler2D(0);
 
-    console.log('draw');
     context.wordQuadList.draw();
     context.wordTexture.unbindFramebuffer();
   }

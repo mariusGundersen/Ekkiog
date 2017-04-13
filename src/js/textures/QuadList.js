@@ -6,16 +6,18 @@ export default class QuadList {
   constructor(gl, size){
     this.gl = gl;
     this.size = size;
-    this.vertices = new Float32Array(size*24);
+    this.vertices = new Float32Array(size*16);
     this.vertexBuffer = createBuffer(gl, this.vertices);
+    this.indecies = new Uint16Array(createQuads(size));
+    this.indexBuffer = createBuffer(gl, this.indecies, gl.ELEMENT_ARRAY_BUFFER);
     this.vao = createVAO(gl, [
       {
         buffer: this.vertexBuffer,
         type: gl.FLOAT,
         size: 4
       }
-    ]);
-    this.map = ndarray(this.vertices, [size, 6, 2, 2]);
+    ], this.indexBuffer, gl.UNSIGNED_SHORT);
+    this.map = ndarray(this.vertices, [size, 4, 2, 2]);
     this.count = 0;
   }
 
@@ -35,20 +37,10 @@ export default class QuadList {
     this.map.set(index, 2, 1, 0, quad.uv.x);
     this.map.set(index, 2, 1, 1, quad.uv.y+quad.uv.h);
 
-    this.map.set(index, 3, 0, 0, quad.pos.x);
+    this.map.set(index, 3, 0, 0, quad.pos.x+quad.pos.w);
     this.map.set(index, 3, 0, 1, quad.pos.y+quad.pos.h);
-    this.map.set(index, 3, 1, 0, quad.uv.x);
+    this.map.set(index, 3, 1, 0, quad.uv.x+quad.uv.w);
     this.map.set(index, 3, 1, 1, quad.uv.y+quad.uv.h);
-
-    this.map.set(index, 4, 0, 0, quad.pos.x+quad.pos.w);
-    this.map.set(index, 4, 0, 1, quad.pos.y);
-    this.map.set(index, 4, 1, 0, quad.uv.x+quad.uv.w);
-    this.map.set(index, 4, 1, 1, quad.uv.y);
-
-    this.map.set(index, 5, 0, 0, quad.pos.x+quad.pos.w);
-    this.map.set(index, 5, 0, 1, quad.pos.y+quad.pos.h);
-    this.map.set(index, 5, 1, 0, quad.uv.x+quad.uv.w);
-    this.map.set(index, 5, 1, 1, quad.uv.y+quad.uv.h);
   }
 
   bind(){
@@ -63,6 +55,17 @@ export default class QuadList {
 
   draw(){
     this.bind();
-    this.vao.draw(this.gl.TRIANGLES, this.count*6);
+    this.vao.draw(this.gl.TRIANGLES, this.count*4);
+  }
+}
+
+export function* createQuads(size){
+  for(let i=0; i<size; i++){
+    yield i*4 + 0;
+    yield i*4 + 1;
+    yield i*4 + 2;
+    yield i*4 + 2;
+    yield i*4 + 1;
+    yield i*4 + 3;
   }
 }
