@@ -59,6 +59,19 @@ openDatabase().then(database => {
 
     fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), () => store.getState(), store.dispatch);
 
+    context.spriteSheetTexture.loading.then(t => {
+      context.wordQuadList.set(0, {
+        pos: {x:24, y:28, w:7, h:8},
+        uv: {x:7, y:248, w:7, h:8}
+      });
+      context.wordQuadList.set(1, {
+        pos: {x:32, y:28, w:7, h:8},
+        uv: {x:0, y:248, w:7, h:8}
+      });
+      context.wordQuadList.update(2);
+      renderer.renderWord(context);
+    });
+
     const shell = new Shell({
       tickInterval: 500,
       tick(tickCount) {
