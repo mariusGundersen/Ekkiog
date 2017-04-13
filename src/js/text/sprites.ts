@@ -1,51 +1,69 @@
+export interface CharacterSprite {
+  x : number,
+  y : number,
+  w : number,
+  h : number
+}
+
 export default function* sprites(text : string){
   for(const char of text){
     yield character(char);
   }
 }
 
-export function character(char : number){
-  return characters[char] || characters[' '];
+export function character(char : string){
+  return characters.get(char) || characters.get(' ')  || {x: 0, y: 0, w: 0, h: 0};
 }
 
-const characters = {
-  ' ': {x: 250, y: 248, w: 4, h: 8},
-  'A': {x:   0, y: 248, w: 7, h: 8},
-  'B': {x:   7, y: 248, w: 6, h: 8},
-  'C': {x:  13, y: 248, w: 7, h: 8},
-  'D': {x:  20, y: 248, w: 7, h: 8},
-  'E': {x:  27, y: 248, w: 7, h: 8},
-  'F': {x:  34, y: 248, w: 7, h: 8},
-  'G': {x:  40, y: 248, w: 6, h: 8},
-  'H': {x:  47, y: 248, w: 7, h: 8},
-  'I': {x:  54, y: 248, w: 7, h: 8},
-  'J': {x:  60, y: 248, w: 6, h: 8},
-  'K': {x:  67, y: 248, w: 7, h: 8},
-  'L': {x:  74, y: 248, w: 7, h: 8},
-  'M': {x:  80, y: 248, w: 7, h: 8},
-  'N': {x:  87, y: 248, w: 7, h: 8},
-  'O': {x:  94, y: 248, w: 7, h: 8},
-  'P': {x: 101, y: 248, w: 7, h: 8},
-  'Q': {x: 108, y: 248, w: 7, h: 8},
-  'R': {x: 115, y: 248, w: 7, h: 8},
-  'S': {x: 122, y: 248, w: 7, h: 8},
-  'T': {x: 129, y: 248, w: 7, h: 8},
-  'U': {x: 135, y: 248, w: 7, h: 8},
-  'V': {x: 142, y: 248, w: 5, h: 8},
-  'W': {x: 149, y: 248, w: 7, h: 8},
-  'X': {x: 156, y: 248, w: 7, h: 8},
-  'Y': {x: 163, y: 248, w: 6, h: 8},
-  'Z': {x: 169, y: 248, w: 7, h: 8},
+const characters = new Map(createCharacteMap(0, 248, 8, [
+  ['A', 7],
+  ['B', 7],
+  ['C', 7],
+  ['D', 7],
+  ['E', 6],
+  ['F', 6],
+  ['G', 7],
+  ['H', 7],
+  ['I', 6],
+  ['J', 7],
+  ['K', 7],
+  ['L', 6],
+  ['M', 7],
+  ['N', 7],
+  ['O', 7],
+  ['P', 7],
+  ['Q', 7],
+  ['R', 7],
+  ['S', 7],
+  ['T', 6],
+  ['U', 7],
+  ['V', 7],
+  ['W', 7],
+  ['X', 7],
+  ['Y', 6],
+  ['Z', 7],
+  ['0', 7],
+  ['1', 6],
+  ['2', 7],
+  ['3', 7],
+  ['4', 7],
+  ['5', 7],
+  ['6', 7],
+  ['7', 7],
+  ['8', 7],
+  ['9', 7],
+  ['-', 5],
+  [' ', 4]
+]));
 
-  '0': {x: 171, y: 240, w: 7, h: 8},
-  '1': {x: 183, y: 240, w: 6, h: 8},
-  '2': {x: 189, y: 240, w: 7, h: 8},
-  '3': {x: 196, y: 240, w: 7, h: 8},
-  '4': {x: 203, y: 240, w: 7, h: 8},
-  '5': {x: 210, y: 240, w: 7, h: 8},
-  '6': {x: 217, y: 240, w: 7, h: 8},
-  '7': {x: 224, y: 240, w: 7, h: 8},
-  '8': {x: 231, y: 240, w: 7, h: 8},
-  '9': {x: 238, y: 240, w: 7, h: 8},
-  '-': {x: 245, y: 240, w: 5, h: 8},
-};
+function* createCharacteMap(x : number, y : number, h : number, charWidths : [string, number][]){
+  for(const [c, w] of charWidths){
+    yield [c, {
+      x,
+      y,
+      w,
+      h
+    }] as [string, CharacterSprite];
+    x += w;
+  }
+}
