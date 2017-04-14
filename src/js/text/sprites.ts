@@ -12,7 +12,7 @@ export default function* sprites(text : string){
 }
 
 export function character(char : string){
-  return characters.get(char) || characters.get(' ')  || {x: 0, y: 0, w: 0, h: 0};
+  return characters.get(char.toUpperCase()) || characters.get(' ')  || {x: 0, y: 0, w: 0, h: 0};
 }
 
 const characters = new Map(createCharacteMap(0, 248, 8, [

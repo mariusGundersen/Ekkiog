@@ -39,6 +39,8 @@ export default class Renderer {
     const prevousCharges = context.netChargeTextures[(tick+1)%2];
     const nextCharges = context.netChargeTextures[tick%2];
 
+    triangle.bind();
+
     this.netChargeEngine.render(
       prevousCharges,
       context.gatesTexture,
@@ -55,13 +57,16 @@ export default class Renderer {
 
   renderView(context, mapToViewportMatrix, viewportSize) {
     this.gl.viewport(0, 0, ...viewportSize);
+    triangle.bind();
     this.viewEngine.render(context, mapToViewportMatrix);
+    this.textEngine.render(context, mapToViewportMatrix);
     if(window.debug){
       this.debugEngine.render(context.wordTexture, mapToViewportMatrix);
     }
   }
 
   renderMove(context, mapToViewportMatrix, {top, left, right, bottom}, dx, dy){
+    triangle.bind();
     this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
   }
 

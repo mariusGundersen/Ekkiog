@@ -28,8 +28,6 @@ import {
 import createReduce from './reduce.js';
 import App from './components/App.jsx';
 
-import drawText from './text/drawText';
-
 if(!__DEV__){
   offline.install({
     onInstalled: () => {
@@ -60,11 +58,6 @@ openDatabase().then(database => {
     store.dispatch(loadComponent('Welcome'));
 
     fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), () => store.getState(), store.dispatch);
-
-    context.spriteSheetTexture.loading.then(t => {
-      drawText(0, 28, context, '74181-BIT-0');
-      renderer.renderWord(context);
-    });
 
     const shell = new Shell({
       tickInterval: 500,

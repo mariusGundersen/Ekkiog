@@ -9,7 +9,7 @@ varying vec2 uv;
 varying vec2 texCoord;
 
 void main(void) {
-  vec4 color = texture2D(spriteSheet, vec2(12.0/16.0, 15.0/16.0) + uv*inverseSpriteTextureSize);
+  vec4 color = texture2D(spriteSheet, uv*inverseSpriteTextureSize);
 
   if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, texCoord);

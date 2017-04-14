@@ -41,16 +41,21 @@ export default class QuadList {
     this.map.set(index, 3, 0, 1, quad.pos.y+quad.pos.h);
     this.map.set(index, 3, 1, 0, quad.uv.x+quad.uv.w);
     this.map.set(index, 3, 1, 1, quad.uv.y+quad.uv.h);
+    this.count += 4;
+  }
+
+  remove(start, count, length){
+    this.vertices.copyWithin(start*4, (start+count)*4, (start+count+length)*4);
+    this.count -= count*4;
   }
 
   bind(){
     this.vao.bind();
   }
 
-  update(count){
+  update(){
     this.vertexBuffer.bind();
     this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
-    this.count = count;
   }
 
   draw(){

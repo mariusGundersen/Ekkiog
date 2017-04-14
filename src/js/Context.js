@@ -3,6 +3,7 @@ import RenderTexture from './textures/RenderTexture.js';
 import ImageTexture from './textures/ImageTexture.js';
 
 import QuadList from './textures/QuadList.js';
+import TextScene from './text/TextScene';
 
 import loadImage from './loadImage.js';
 import tiles from '../img/tiles.png';
@@ -19,7 +20,8 @@ export default class Context{
     this.height = MAP_SIZE;
     this.tileSize = TILE_SIZE;
 
-    this.wordQuadList = new QuadList(gl, 16);
+    this.wordQuadList = new QuadList(gl, 256);
+    this.textScene = new TextScene(this.wordQuadList);
 
     this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
     this.wordTexture = new RenderTexture(gl, WORD_TEXTURE_SIZE, WORD_TEXTURE_SIZE);
@@ -48,9 +50,22 @@ export default class Context{
     this.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
   }
 
+  insertText(item, area){
+    this.textScene.insertItem(item, area);
+  }
+
+  removeText(item){
+    this.textScene.removeItem(item);
+  }
+
+  updateText(before, after){
+    this.textScene.updateItem(before, after);
+  }
+
   updateDataTextures(){
     this.mapTexture.update();
     this.netMapTexture.update();
     this.gatesTexture.update();
+    this.wordQuadList.update();
   }
 }
