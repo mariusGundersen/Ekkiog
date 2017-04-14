@@ -1,17 +1,10 @@
 import {
-  Context as ContextToEdit,
-  Texture as TextureToEdit
+  MutableContext as ContextToEdit
 } from 'ekkiog-editing';
 
 
 export type Tool = 'wire' | 'gate' | 'underpass' | 'button' | 'component' | 'light';
 
-export interface Context extends ContextToEdit{
-  mapTexture : Texture,
-  netMapTexture : Texture,
-  gatesTexture : Texture
-}
-
-export interface Texture extends TextureToEdit {
-  update() : void
+export interface MutableContext extends ContextToEdit{
+  updateDataTextures() : void;
 }

@@ -2,10 +2,6 @@ import {
   Forest
 } from 'ekkiog-editing';
 
-import {
-  Context
-} from './types';
-
 import mutateContext from './mutateContext';
 import {
   SET_FOREST

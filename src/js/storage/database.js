@@ -55,7 +55,7 @@ class Storage{
       .transaction('components')
       .objectStore('components')
       .get(name)
-      .then(packageComponent);
+      .then(component => packageComponent(component, name));
   }
 
   getComponentNames(){

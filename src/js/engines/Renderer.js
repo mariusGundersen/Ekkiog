@@ -3,6 +3,8 @@ import TileMapEngine from './tileMap/TileMapEngine.js';
 import ChargeMapEngine from './chargeMap/ChargeMapEngine.js';
 import NetChargeEngine from './netCharges/NetChargeEngine.js';
 import MoveEngine from './move/MoveEngine.js';
+import TextEngine from './text/TextEngine.js';
+import DebugEngine from './debug/DebugEngine.js';
 import * as triangle from './triangle.js';
 
 export default class Renderer {
@@ -18,6 +20,8 @@ export default class Renderer {
     this.tileMapEngine = new TileMapEngine(gl);
     this.viewEngine = new ViewEngine(gl);
     this.moveEngine = new MoveEngine(gl);
+    this.textEngine = new TextEngine(gl);
+    this.debugEngine = new DebugEngine(gl);
     triangle.initialize(gl);
   }
 
@@ -32,6 +36,8 @@ export default class Renderer {
 
     const prevousCharges = context.netChargeTextures[(tick+1)%2];
     const nextCharges = context.netChargeTextures[tick%2];
+
+    triangle.bind();
 
     this.netChargeEngine.render(
       prevousCharges,
@@ -49,10 +55,16 @@ export default class Renderer {
 
   renderView(context, mapToViewportMatrix, viewportSize) {
     this.gl.viewport(0, 0, ...viewportSize);
+    triangle.bind();
     this.viewEngine.render(context, mapToViewportMatrix);
+    this.textEngine.render(context, mapToViewportMatrix);
+    if(window.debug){
+      this.debugEngine.render(context.wordTexture, mapToViewportMatrix);
+    }
   }
 
   renderMove(context, mapToViewportMatrix, {top, left, right, bottom}, dx, dy){
+    triangle.bind();
     this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
   }
 }

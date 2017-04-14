@@ -4,10 +4,10 @@ import {
 } from 'ekkiog-editing';
 
 import {
-  Context
+  MutableContext
 } from './types';
 
-export default function mutateContext(context : Context , renderer : any, before : Forest, after : Forest){
+export default function mutateContext(context : MutableContext , renderer : any, before : Forest, after : Forest){
   if(!context) return;
   if(!renderer) return;
   if(before === after) return;
@@ -15,9 +15,7 @@ export default function mutateContext(context : Context , renderer : any, before
   const changed = diffAndReconcile(before.enneaTree, after.enneaTree, context);
   if(!changed) return;
 
-  context.mapTexture.update();
-  context.netMapTexture.update();
-  context.gatesTexture.update();
+  context.updateDataTextures();
 
   renderer.simulateTick(context);
   renderer.renderMap(context);
