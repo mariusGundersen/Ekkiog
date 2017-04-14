@@ -2,20 +2,63 @@ export interface CharacterSprite {
   x : number,
   y : number,
   w : number,
-  h : number
+  h : number,
+  s : number
 }
 
-export default function* sprites(text : string){
+export function* spritesFlat(text : string){
   for(const char of text){
-    yield character(char);
+    yield fontFlat.get(char.toUpperCase()) || {x: 0, y: 0, w: 0, h: 0, s:0};
   }
 }
 
-export function character(char : string){
-  return characters.get(char.toUpperCase()) || characters.get(' ')  || {x: 0, y: 0, w: 0, h: 0};
+export function* spritesThick(text : string){
+  for(const char of text){
+    yield fontThick.get(char.toUpperCase()) || {x: 0, y: 0, w: 0, h: 0, s:0};
+  }
 }
 
-const characters = new Map(createCharacteMap(0, 248, 8, [
+const fontThick = new Map(createCharacteMap(0, 240, 8, -1, [
+  ['A', 7],
+  ['B', 7],
+  ['C', 7],
+  ['D', 7],
+  ['E', 7],
+  ['F', 7],
+  ['G', 7],
+  ['H', 7],
+  ['I', 4],
+  ['J', 7],
+  ['K', 7],
+  ['L', 7],
+  ['M', 9],
+  ['N', 8],
+  ['O', 7],
+  ['P', 7],
+  ['Q', 8],
+  ['R', 7],
+  ['S', 7],
+  ['T', 6],
+  ['U', 7],
+  ['V', 7],
+  ['W', 9],
+  ['X', 7],
+  ['Y', 8],
+  ['Z', 6],
+  ['0', 7],
+  ['1', 5],
+  ['2', 7],
+  ['3', 7],
+  ['4', 7],
+  ['5', 6],
+  ['6', 7],
+  ['7', 7],
+  ['8', 7],
+  ['9', 7],
+  ['-', 5]
+]));
+
+const fontFlat = new Map(createCharacteMap(0, 248, 8, 1, [
   ['A', 7],
   ['B', 7],
   ['C', 7],
@@ -56,13 +99,14 @@ const characters = new Map(createCharacteMap(0, 248, 8, [
   [' ', 4]
 ]));
 
-function* createCharacteMap(x : number, y : number, h : number, charWidths : [string, number][]){
+function* createCharacteMap(x : number, y : number, h : number, s : number, charWidths : [string, number][]){
   for(const [c, w] of charWidths){
     yield [c, {
       x,
       y,
       w,
-      h
+      h,
+      s
     }] as [string, CharacterSprite];
     x += w;
   }

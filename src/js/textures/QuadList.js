@@ -19,6 +19,7 @@ export default class QuadList {
     ], this.indexBuffer, gl.UNSIGNED_SHORT);
     this.map = ndarray(this.vertices, [size, 4, 2, 2]);
     this.count = 0;
+    this.prevCount = 0;
   }
 
   set(index, quad){
@@ -45,7 +46,7 @@ export default class QuadList {
   }
 
   remove(start, count){
-    this.vertices.copyWithin(start*16, (start+count)*16, (this.count)*16);
+    this.vertices.copyWithin(start*16, (start+count)*16, this.count*16);
     this.count -= count;
   }
 
@@ -54,8 +55,11 @@ export default class QuadList {
   }
 
   update(){
-    this.vertexBuffer.bind();
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
+    if(this.count !== this.prevCount){
+      this.vertexBuffer.bind();
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
+      this.prevCount = this.count;
+    }
   }
 
   draw(){
