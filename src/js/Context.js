@@ -35,4 +35,22 @@ export default class Context{
       new RenderTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT)
     ];
   }
+
+  setMap(x, y, tile){
+    this.mapTexture.set(x, y, tile);
+  }
+
+  setNet(x, y, net){
+    this.netMapTexture.set(x, y, net);
+  }
+
+  setGate(v, a, b){
+    this.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
+  }
+
+  updateDataTextures(){
+    this.mapTexture.update();
+    this.netMapTexture.update();
+    this.gatesTexture.update();
+  }
 }
