@@ -3,7 +3,6 @@ import TileMapEngine from './tileMap/TileMapEngine.js';
 import ChargeMapEngine from './chargeMap/ChargeMapEngine.js';
 import NetChargeEngine from './netCharges/NetChargeEngine.js';
 import MoveEngine from './move/MoveEngine.js';
-import WordEngine from './word/WordEngine.js';
 import TextEngine from './text/TextEngine.js';
 import DebugEngine from './debug/DebugEngine.js';
 import * as triangle from './triangle.js';
@@ -21,7 +20,6 @@ export default class Renderer {
     this.tileMapEngine = new TileMapEngine(gl);
     this.viewEngine = new ViewEngine(gl);
     this.moveEngine = new MoveEngine(gl);
-    this.wordEngine = new WordEngine(gl);
     this.textEngine = new TextEngine(gl);
     this.debugEngine = new DebugEngine(gl);
     triangle.initialize(gl);
@@ -68,10 +66,5 @@ export default class Renderer {
   renderMove(context, mapToViewportMatrix, {top, left, right, bottom}, dx, dy){
     triangle.bind();
     this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
-  }
-
-  renderWord(context){
-    this.wordEngine.render(context);
-    triangle.bind();
   }
 }
