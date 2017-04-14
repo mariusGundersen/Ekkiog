@@ -41,12 +41,12 @@ export default class QuadList {
     this.map.set(index, 3, 0, 1, quad.pos.y+quad.pos.h);
     this.map.set(index, 3, 1, 0, quad.uv.x+quad.uv.w);
     this.map.set(index, 3, 1, 1, quad.uv.y+quad.uv.h);
-    this.count += 4;
+    this.count++;
   }
 
-  remove(start, count, length){
-    this.vertices.copyWithin(start*4, (start+count)*4, (start+count+length)*4);
-    this.count -= count*4;
+  remove(start, count){
+    this.vertices.copyWithin(start*16, (start+count)*16, (this.count)*16);
+    this.count -= count;
   }
 
   bind(){
@@ -60,7 +60,7 @@ export default class QuadList {
 
   draw(){
     this.bind();
-    this.vao.draw(this.gl.TRIANGLES, this.count*4);
+    this.vao.draw(this.gl.TRIANGLES, this.count*6);
   }
 }
 

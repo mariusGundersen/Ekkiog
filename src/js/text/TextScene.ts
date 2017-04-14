@@ -3,54 +3,65 @@ import { Item, Area } from 'ekkiog-editing';
 import textFromItem from './textFromItem';
 
 export type ItemTexts = {
+  next? : ItemTexts,
   size : number,
   item : Item
-}
+};
+
+type ItemChain = ItemTexts | {next? : ItemTexts, size : number, item : null};
 
 export default class TextScene{
   quadList : any;
-  itemList : ItemTexts[];
+  itemChain : ItemChain;
   constructor(quadList : any){
     this.quadList = quadList;
-    this.itemList = new Array<ItemTexts>();
+    this.itemChain = {
+      size: 0,
+      item: null
+    };
   }
 
   insertItem(item : Item, area : Area){
     const characters = textFromItem(item, area);
     if(characters.length == 0) return;
 
-    const size = this.itemList.reduce((sum, i) => sum + i.size, 0);
+    let size = 0;
+    let itemLink = this.itemChain;
+    while(itemLink.next){
+      itemLink = itemLink.next;
+      size += itemLink.size;
+    }
 
     characters.forEach((char, i) => this.quadList.set(size + i, char));
-    this.itemList.push({
+    itemLink.next = {
       item,
       size: characters.length
-    });
+    };
   }
 
   removeItem(item : Item){
-    let size = 0;
-    let start = 0;
     let count = 0;
-    let index = 0;
-    for(const entry of this.itemList){
-      if(entry.item === item){
-        this.itemList.splice(index, 1);
-        start = size;
-        count = entry.size;
-        size = 0;
-      }else{
-        size += entry.size;
+    let size = 0;
+    let itemLink = this.itemChain;
+    while(itemLink.next){
+      if(itemLink.next.item === item){
+        count = itemLink.next.size;
+        itemLink.next = itemLink.next.next;
+        break;
       }
-      index++;
+      itemLink = itemLink.next;
+      size += itemLink.size;
     }
-    this.quadList.remove(start, count, size);
+    this.quadList.remove(size, count);
   }
 
   updateItem(before : Item, after : Item){
-    for(const entry of this.itemList){
-      if(entry.item === before){
-        entry.item = after;
+    let itemLink = this.itemChain;
+    while(itemLink.next){
+      itemLink = itemLink.next;
+      if(itemLink.item === before){
+        itemLink.item = after;
+        break;
       }
     }
   }
