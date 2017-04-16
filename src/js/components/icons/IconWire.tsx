@@ -1,6 +1,6 @@
-import React from 'react';
+import * as React from 'react';
 
-export default props => (
+export default (props : {}) => (
   <path
     stroke="#a9d3ab"
     strokeWidth="2"

@@ -22,11 +22,11 @@ import createContextMiddleware from './editing/createContextMiddleware';
 import {
   resize,
   panZoom,
-  loadComponent
+  setForest
 } from './actions';
 
-import createReduce from './reduce.js';
-import App from './components/App.jsx';
+import createReduce from './reduce';
+import App from './components/App';
 
 if(!__DEV__){
   offline.install({
@@ -55,7 +55,7 @@ openDatabase().then(database => {
 
     const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
 
-    store.dispatch(loadComponent('Welcome'));
+    database.load('Welcome').then(forest => store.dispatch(setForest(forest.name, forest)));
 
     fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), store.dispatch, () => store.getState());
 

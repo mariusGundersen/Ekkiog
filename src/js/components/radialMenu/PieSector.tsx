@@ -1,7 +1,20 @@
-import React from 'react';
+import * as React from 'react';
 import {mat4, vec2} from 'gl-matrix';
 
 import style from '../main.css';
+
+export interface Props {
+  innerRadius : number;
+  outerRadius : number;
+  selected : boolean;
+  turnFractionCenter : number;
+  turnFractionSection : number;
+  gap : number;
+  itemKey : string;
+  onClick() : void;
+  icon : JSX.Element;
+  visible : boolean;
+}
 
 export default ({
   innerRadius,
@@ -14,7 +27,7 @@ export default ({
   onClick,
   icon,
   visible
-}) => {
+} : Props) => {
   const averageRadius = (innerRadius + outerRadius)/2;
 
   const radiansStart = -turnFractionSection*Math.PI;

@@ -1,11 +1,22 @@
 declare module "*.glsl" {
-  var content : string;
+  const content : string;
   export default content;
 }
 
 declare module "*.png" {
-  var content : string;
+  const content : string;
   export default content;
+}
+
+declare module "*.css" {
+  const style : {
+    [key : string] : string
+  }
+  export default style;
+}
+
+declare module "react-icons/lib/md" {
+  export * from "react-icons/md";
 }
 
 declare module "gl-shader" {

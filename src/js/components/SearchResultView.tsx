@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 import {
   MdEdit,
@@ -7,7 +7,13 @@ import {
 
 import style from './search.css';
 
-export default function SearchResultView({insertPackage, openComponent, result}){
+export interface SearchResultViewProps {
+  insertPackage(result : string) : void;
+  openComponent(result : string) : void;
+  result : string
+}
+
+export default function SearchResultView<T>({insertPackage, openComponent, result} : SearchResultViewProps){
   return (
     <div className={style.searchResult}>
       <button
@@ -24,7 +30,12 @@ export default function SearchResultView({insertPackage, openComponent, result})
   );
 }
 
-export function NoExactMatchView({query, createComponent}){
+export interface NoExactMatchViewProps {
+  query : string;
+  createComponent(name : string) : void;
+}
+
+export function NoExactMatchView({query, createComponent} : NoExactMatchViewProps){
   return (
     <div className={style.searchResult}>
       <span className={style.noExactMatch}>

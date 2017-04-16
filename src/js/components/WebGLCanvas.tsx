@@ -1,5 +1,6 @@
-import React from 'react';
-import {connect} from 'react-redux';
+import * as React from 'react';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import style from './main.css';
 
@@ -10,15 +11,23 @@ import {
 import {
   TOUCH_START,
   TOUCH_MOVE,
-  TOUCH_END
+  TOUCH_END,
+  TouchType
 } from '../events';
+
+export interface Props{
+  dispatch : Dispatch<any>,
+  width : number,
+  height : number
+}
 
 const WebGLCanvas = connect(
   ({view}) => ({
     width: view.pixelWidth,
     height: view.pixelHeight
   })
-)(class extends React.Component{
+)(class WebGLCanvas extends React.Component<Props, any> {
+  canvas : HTMLCanvasElement
   componentDidMount(){
     const gl = getContext(this.canvas);
 
@@ -33,7 +42,7 @@ const WebGLCanvas = connect(
     });
   }
 
-  shouldComponentUpdate(nextProps, nextState){
+  shouldComponentUpdate(nextProps : Props, nextState : Props){
     return nextProps.width != this.props.width
         || nextProps.height != this.props.height;
   }
@@ -51,13 +60,13 @@ const WebGLCanvas = connect(
 
 export default WebGLCanvas;
 
-function getContext(canvas) {
+function getContext(canvas : HTMLCanvasElement) {
   return canvas.getContext("webgl", {})
       || canvas.getContext("experimental-webgl", {});
 }
 
-function dispatchTouchEvents(dispatch, type){
-  return event => {
+function dispatchTouchEvents(dispatch : Dispatch<any>, type : TouchType){
+  return (event : TouchEvent) => {
     for(let i=0; i < event.changedTouches.length; i++){
       let touch = event.changedTouches[i];
       dispatch({

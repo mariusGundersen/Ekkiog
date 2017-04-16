@@ -1,11 +1,11 @@
-import React from 'react';
+import * as React from 'react';
 
 const A = 10;
 const B = 2;
 const C = 4;
 const D = B+C;
 
-export default props => (
+export default (props : {}) => (
   <g>
     <path
       stroke="none"

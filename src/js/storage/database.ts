@@ -28,7 +28,11 @@ export async function open(){
   return new Storage(db);
 }
 
-class Storage{
+export interface NamedForest extends Forest {
+  name : string
+};
+
+export class Storage{
   db : DB;
   constructor(db : DB){
     this.db = db;
@@ -44,7 +48,7 @@ class Storage{
       });
   }
 
-  async load(name : string) : Promise<Forest>{
+  async load(name : string) : Promise<NamedForest>{
     return await this.db
       .transaction('components')
       .objectStore('components')
@@ -55,11 +59,8 @@ class Storage{
   }
 
   async loadPackage(name : string) : Promise<CompiledComponent>{
-    return await this.db
-      .transaction('components')
-      .objectStore('components')
-      .get(name)
-      .then(component => packageComponent(component, name));
+    return await this.load(name)
+      .then(component => packageComponent(component, component.name));
   }
 
   getComponentNames(){

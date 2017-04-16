@@ -14,7 +14,7 @@
   },
   "include": [
     "./src/js/**/*.ts",
-    "./src/js/**/*.glsl"
+    "./src/js/**/*.tsx"
   ],
   "exclude": [
     "node_modules"

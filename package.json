@@ -52,6 +52,7 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
+    "@types/react-icons": "^2.2.1",
     "a-big-triangle": "^1.0.3",
     "array-unique": "^0.2.1",
     "babel-runtime": "^6.11.6",
@@ -70,7 +71,7 @@
     "react-dom": "^15.3.0",
     "react-icons": "^2.2.3",
     "react-redux": "^4.4.5",
-    "reaxjs": "^0.1.7",
+    "reaxjs": "^0.3.0",
     "redux": "^3.5.2",
     "redux-thunk": "^2.2.0",
     "rxjs": "^5.0.3",

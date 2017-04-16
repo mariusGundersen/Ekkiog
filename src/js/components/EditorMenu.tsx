@@ -1,16 +1,17 @@
-import React from 'react';
-import {connect} from 'react-redux';
+import * as React from 'react';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
-import RadialMenu from './RadialMenu.jsx';
+import RadialMenu from './RadialMenu';
 
-import IconWire from './icons/IconWire.jsx';
-import IconUnderpass from './icons/IconUnderpass.jsx';
-import IconButton from './icons/IconButton.jsx';
-import IconGate from './icons/IconGate.jsx';
-import IconLight from './icons/IconLight.jsx';
-import IconReturn from './icons/IconReturn.jsx';
-import IconAccept from './icons/IconAccept.jsx';
-import IconRemove from './icons/IconRemove.jsx';
+import IconWire from './icons/IconWire';
+import IconUnderpass from './icons/IconUnderpass';
+import IconButton from './icons/IconButton';
+import IconGate from './icons/IconGate';
+import IconLight from './icons/IconLight';
+import IconReturn from './icons/IconReturn';
+import IconAccept from './icons/IconAccept';
+import IconRemove from './icons/IconRemove';
 
 import {
   wireMenuItem,
@@ -19,12 +20,25 @@ import {
   underpassMenuItem,
   lightMenuItem,
   menuItem
-} from './radialMenu/menuItems.js';
+} from './radialMenu/menuItems';
 
-import {toggleEditorMenu, setToolDirection} from '../actions';
+import { toggleEditorMenu, setToolDirection } from '../actions';
 
-export default class EditorMenu extends React.Component {
-  shouldComponentUpdate(nextProps){
+import { Tool } from '../editing/types';
+
+export interface Props {
+  cx : number,
+  cy : number,
+  radius : number,
+  gap : number,
+  width : number,
+  editor : any,
+  editorMenu : any,
+  dispatch : Dispatch<any>
+}
+
+export default class EditorMenu extends React.Component<Props, any> {
+  shouldComponentUpdate(nextProps : Props){
     return nextProps.cx !== this.props.cx
       || nextProps.cy !== this.props.cy
       || nextProps.radius !== this.props.radius
@@ -56,7 +70,7 @@ export default class EditorMenu extends React.Component {
   };
 }
 
-function getMenuTree(radius, width, editor, editorMenu, dispatch){
+function getMenuTree(radius : number, width : number, editor : any, editorMenu : any, dispatch : Dispatch<any>){
   return createMenuTree(
     editor,
     editorMenu,
@@ -72,7 +86,7 @@ function getMenuTree(radius, width, editor, editorMenu, dispatch){
   }));
 }
 
-function createMenuTree(editor, editorMenu, dispatch){
+function createMenuTree(editor : any, editorMenu : any, dispatch : Dispatch<any>){
   switch(editorMenu.menuType){
     case 'tools':
       return [...createToolsMenuTree(editor, dispatch)];
@@ -83,7 +97,7 @@ function createMenuTree(editor, editorMenu, dispatch){
   }
 }
 
-function* createToolsMenuTree(editor, dispatch){
+function* createToolsMenuTree(editor : any, dispatch : Dispatch<any>){
   yield {
     menuItems: [
       menuItem('return', <IconReturn />, () => dispatch(toggleEditorMenu()))
@@ -121,7 +135,7 @@ function* createToolsMenuTree(editor, dispatch){
   }
 }
 
-function createOkCancelMenuTree(editorMenu, dispatch){
+function createOkCancelMenuTree(editorMenu : any, dispatch : Dispatch<any>){
   return [
     {
       menuItems: [
@@ -132,26 +146,26 @@ function createOkCancelMenuTree(editorMenu, dispatch){
   ];
 }
 
-function createCenter(radius, editor, editorMenu, dispatch){
+function createCenter(radius : number, editor : any, editorMenu : any, dispatch : Dispatch<any>){
   switch(editorMenu.menuType){
     case 'tools':
-      return createToolsCenter(radius, editor, editorMenu, dispatch);
+      return createToolsCenter(radius, editor.selectedTool, editorMenu.open, dispatch);
     default:
-      return null;
+      return undefined;
   }
 }
 
-function createToolsCenter(radius, editor, editorMenu, dispatch){
+function createToolsCenter(radius : number, selectedTool : Tool, open : boolean, dispatch : Dispatch<any>){
   return {
     radius: radius,
-    cx: editorMenu.open ? radius : -radius*1.5,
-    cy: editorMenu.open ? radius : -radius*1.5,
+    cx: open ? radius : -radius*1.5,
+    cy: open ? radius : -radius*1.5,
     onClick: () => dispatch(toggleEditorMenu()),
     icon:
-      editor.selectedTool == 'wire' ? <IconWire /> :
-      editor.selectedTool == 'button' ? <IconButton /> :
-      editor.selectedTool == 'gate' ? <IconGate /> :
-      editor.selectedTool == 'underpass' ? <IconUnderpass /> :
-      editor.selectedTool == 'light' ? <IconLight /> : ''
+      selectedTool == 'wire' ? <IconWire /> :
+      selectedTool == 'button' ? <IconButton /> :
+      selectedTool == 'gate' ? <IconGate /> :
+      selectedTool == 'underpass' ? <IconUnderpass /> :
+      selectedTool == 'light' ? <IconLight /> : <g />
   };
 }

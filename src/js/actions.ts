@@ -61,12 +61,6 @@ export const setToolDirection = (direction : 'left' | 'up' | 'right' | 'down') =
   direction
 });
 
-export const loadComponent = (name : string) => async (dispatch : Dispatch<any>, getState : () => any) => {
-  const database = getState().global.database;
-  const forest = await database.load(name);
-  dispatch(setForest(name, forest));
-};
-
 export const toggleEditorMenu = () => ({
   type: TOGGLE_EDITOR_MENU
 });
@@ -230,3 +224,9 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
   dispatch(startSelection(top, left, right, bottom));
   dispatch(selectComponent(componentPackage, centerTile));
 }
+
+
+export const hideContextMenuAfter = (action : any) => (dispatch : Dispatch<any>, getState : () => any) => {
+  dispatch(action);
+  dispatch(hideContextMenu());
+};

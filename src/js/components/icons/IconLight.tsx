@@ -1,4 +1,8 @@
-import React from 'react';
+import * as React from 'react';
+
+export interface Props {
+  rotate? : number
+}
 
 export default ({rotate=0}) => (
   <g transform={`rotate(${rotate})`}>

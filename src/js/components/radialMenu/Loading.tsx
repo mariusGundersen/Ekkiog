@@ -1,7 +1,14 @@
-import React from 'react';
+import * as React from 'react';
 
-export default class Loading extends React.Component{
-  constructor(props){
+export interface Props {
+  radius : number;
+  width : number;
+}
+
+export default class Loading extends React.Component<Props, any> {
+  circumference : number;
+  circle? : SVGCircleElement;
+  constructor(props : Props){
     super(props);
     this.circumference = Math.PI*2*(props.radius+props.width/2);
   }

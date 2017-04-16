@@ -1,6 +1,6 @@
-import React from 'react';
+import * as React from 'react';
 
-export default props => (
+export default (props : {}) => (
   <g>
     <path
       stroke="#f58e8e"

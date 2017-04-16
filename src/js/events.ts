@@ -2,6 +2,8 @@ export const TOUCH_START : 'touchStart' = 'touchStart';
 export const TOUCH_MOVE : 'touchMove' = 'touchMove';
 export const TOUCH_END : 'touchEnd' = 'touchEnd';
 
+export type TouchType = 'touchStart' | 'touchMove' | 'touchEnd';
+
 export const POINTER_DOWN : 'pointerDown' = 'pointerDown';
 export const POINTER_MOVE : 'pointerMove' = 'pointerMove';
 export const POINTER_UP : 'pointerUp' = 'pointerUp';

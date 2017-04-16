@@ -1,6 +1,18 @@
-import React from 'react';
+import * as React from 'react';
 
-import PieSector from './PieSector.jsx';
+import PieSector from './PieSector';
+
+import { MenuItem } from './menuItems';
+
+export interface Props {
+  fromTurnFraction : number;
+  toTurnFraction : number;
+  radius : number;
+  width : number;
+  show : boolean;
+  menuItems : MenuItem[];
+  ringKey : number;
+}
 
 export default ({
   fromTurnFraction,
@@ -10,7 +22,7 @@ export default ({
   show,
   menuItems,
   ringKey
-}) => {
+} : Props) => {
   const sectionTurnFraction = (toTurnFraction-fromTurnFraction)/menuItems.length;
   return (
     <g key={ringKey}>

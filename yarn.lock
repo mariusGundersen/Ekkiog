@@ -10,6 +10,19 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/ndarray/-/ndarray-1.0.1.tgz#1f0776a57e17e02b110c4715260e9675ad8c6725"
 
+"@types/react-icon-base@*":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/react-icon-base/-/react-icon-base-2.0.1.tgz#5fb3152703c38dc38638b2eb316de925f16c3f6b"
+  dependencies:
+    "@types/react" "*"
+
+"@types/react-icons@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@types/react-icons/-/react-icons-2.2.1.tgz#58096f620f257a367d08d74e327540d23357755b"
+  dependencies:
+    "@types/react" "*"
+    "@types/react-icon-base" "*"
+
 "@types/react-redux@^4.4.38":
   version "4.4.38"
   resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-4.4.38.tgz#771c9293fa835107eb5ac2e4ef8d52e54f2ed4ff"
@@ -2482,13 +2495,6 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-gl-big-triangle@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/gl-big-triangle/-/gl-big-triangle-1.0.0.tgz#a3062b2141f46c4686b51b48b68f7c8e47458130"
-  dependencies:
-    gl-buffer "^2.1.2"
-    gl-vao "^1.2.1"
-
 gl-buffer@^2.1.1, gl-buffer@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/gl-buffer/-/gl-buffer-2.1.2.tgz#2db8d9c1a5527fba0cdb91289c206e882b889cdb"
@@ -2521,7 +2527,7 @@ gl-shader@^4.2.0:
     gl-format-compiler-error "^1.0.2"
     weakmap-shim "^1.1.0"
 
-gl-vao@^1.2.0, gl-vao@^1.2.1, gl-vao@^1.3.0:
+gl-vao@^1.2.0, gl-vao@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/gl-vao/-/gl-vao-1.3.0.tgz#e9e92aa95588cab9d5c2f04b693440c3df691923"
 
@@ -4524,9 +4530,9 @@ readdirp@^2.0.0:
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
 
-reaxjs@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/reaxjs/-/reaxjs-0.1.7.tgz#89431f3bf0a3007e2326ec78a1bb67a03c66a385"
+reaxjs@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/reaxjs/-/reaxjs-0.3.0.tgz#4c94d9bb373c02f093bbaf31b9a0012fba0e654a"
 
 redbox-react@^1.2.2:
   version "1.3.4"

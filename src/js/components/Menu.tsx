@@ -1,5 +1,6 @@
-import React from 'react';
-import {connect} from 'react-redux';
+import * as React from 'react';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import {
   SET_SELECTED_TOOL,
@@ -8,10 +9,21 @@ import {
 
 import style from './main.css';
 
-import EditorMenu from './EditorMenu.jsx';
-import ContextMenu from './ContextMenu.jsx';
+import EditorMenu from './EditorMenu';
+import ContextMenu from './ContextMenu';
 
-const Menu = connect(
+export interface Props {
+  dispatch : Dispatch<any>,
+  pixelWidth : number,
+  pixelHeight : number,
+  screenWidth : number,
+  screenHeight : number,
+  contextMenu : any,
+  editor : any,
+  editorMenu : any
+}
+
+export default connect(
   ({view, contextMenu, editor, editorMenu}) => ({
     pixelWidth: view.pixelWidth,
     pixelHeight: view.pixelHeight,
@@ -21,7 +33,7 @@ const Menu = connect(
     editor,
     editorMenu
   })
-)(({dispatch, ...props}) => {
+)(({dispatch, ...props} : Props) => {
   const radius = 40;
   const gap = 10;
   const cx = props.screenWidth;
@@ -38,5 +50,3 @@ const Menu = connect(
     </svg>
   )
 });
-
-export default Menu;

@@ -1,26 +1,44 @@
-import React from 'react';
-import {connect} from 'react-redux';
+import * as React from 'react';
+import { connect, Dispatch } from 'react-redux';
 
-import Loading from './radialMenu/Loading.jsx';
-import RadialMenu from './RadialMenu.jsx';
+import Loading from './radialMenu/Loading';
+import RadialMenu, { PieCenterProps ,PieRingProps } from './RadialMenu';
 
-import IconWire from './icons/IconWire.jsx';
-import IconUnderpass from './icons/IconUnderpass.jsx';
-import IconButton from './icons/IconButton.jsx';
-import IconGate from './icons/IconGate.jsx';
-import IconReturn from './icons/IconReturn.jsx';
+import IconWire from './icons/IconWire';
+import IconUnderpass from './icons/IconUnderpass';
+import IconButton from './icons/IconButton';
+import IconGate from './icons/IconGate';
+import IconReturn from './icons/IconReturn';
 
 import {
   acceptMenuItem,
   removeMenuItem,
   toUnderpassMenuItem,
   toWireMenuItem,
-  moveMenuItem
-} from './radialMenu/menuItems.js';
+  moveMenuItem,
+  MenuItem
+} from './radialMenu/menuItems';
 
-export default class ContextMenu extends React.Component{
+export interface Props {
+  loading : boolean;
+  x : number;
+  y : number;
+  radius : number;
+  width : number;
+  show : boolean;
+  tx : number;
+  ty : number;
+  tile : string;
+  dispatch : Dispatch<any>
+}
 
-  shouldComponentUpdate(nextProps, nextState){
+interface State {
+
+}
+
+export default class ContextMenu extends React.Component<Props, State>{
+
+  shouldComponentUpdate(nextProps : Props, nextState : State){
     if(nextProps.loading){
       return nextProps.x !== this.props.x
         || nextProps.y !== this.props.y
@@ -73,7 +91,7 @@ export default class ContextMenu extends React.Component{
           cx={0}
           cy={0}
           showMenu={true}
-          center={null}
+          center={undefined}
           menuTree={[
             createRing(radius, width, [
               ...tileMenuItems(tile, Math.floor(tx), Math.floor(ty), dispatch)
@@ -98,7 +116,7 @@ export default class ContextMenu extends React.Component{
   }
 }
 
-function createRing(radius, width, items){
+function createRing(radius : number, width : number, items : MenuItem[]) : PieRingProps {
   return {
     ringKey: 1,
     radius: radius,
@@ -110,7 +128,7 @@ function createRing(radius, width, items){
   };
 }
 
-function *tileMenuItems(tile, tx, ty, dispatch){
+function *tileMenuItems(tile : string, tx : number, ty : number, dispatch : Dispatch<any>){
   if(tile == 'wire' || tile == 'empty'){
     yield toUnderpassMenuItem(dispatch, tx, ty);
   }
