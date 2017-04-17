@@ -342,6 +342,11 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
   const right = centerTile.x - (componentPackage.width>>1) + componentPackage.width;
   const bottom = centerTile.y - (componentPackage.height>>1) + componentPackage.height;
 
+  if(state.selection.selection){
+    dispatch(stopSelection());
+    dispatch(resetEditorMenu());
+  }
+
   dispatch(showOkCancelMenu(
     () => {
       const selection = getState().selection;

@@ -141,8 +141,8 @@ function createOkCancelMenuTree(editorMenu : OkCancelMenuState, dispatch : Dispa
   return [
     {
       menuItems: [
-        menuItem('ok', <IconAccept />, () => editorMenu.okAction(), false, editorMenu.isValid),
-        menuItem('cancel', <IconRemove />, () => editorMenu.cancelAction())
+        menuItem('ok', <IconAccept />, editorMenu.okAction, false, editorMenu.isValid),
+        menuItem('cancel', <IconRemove />, editorMenu.cancelAction)
       ]
     }
   ];

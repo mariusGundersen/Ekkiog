@@ -10,8 +10,6 @@ import {
   loadContextMenu,
   abortLoadContextMenu,
   showContextMenu,
-  hideContextMenu,
-  showOkCancelMenu,
   setOkCancelMenuValid,
   moveSelection
 } from './actions';
