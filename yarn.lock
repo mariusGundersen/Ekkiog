@@ -44,12 +44,6 @@
   version "15.0.21"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.21.tgz#29d849427237c1463abfb7b370755ee3e5b5b375"
 
-"@types/redux-thunk@^2.1.0":
-  version "2.1.32"
-  resolved "https://registry.yarnpkg.com/@types/redux-thunk/-/redux-thunk-2.1.32.tgz#27fac368ced9ea170bf15e5fa4a21d9201f73102"
-  dependencies:
-    redux "^3.6.0"
-
 a-big-triangle@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/a-big-triangle/-/a-big-triangle-1.0.3.tgz#eefd30b02a8f525e8b1f72bb6bb1b0c16751c794"
@@ -2044,9 +2038,9 @@ ejs@^2.3.4:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.6.tgz#479636bfa3fe3b1debd52087f0acb204b4f19c88"
 
-ekkiog-editing@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-3.0.0.tgz#e3fb0ebe5f398477009761d8307a811b1f46c52c"
+ekkiog-editing@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-3.0.1.tgz#ffeb8386e3c240da47f49740b384c554d44d073b"
   dependencies:
     buddy-tree "^2.0.0"
     ennea-tree "^2.0.1"
