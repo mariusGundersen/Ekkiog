@@ -1,4 +1,5 @@
-import {mat3, vec2} from 'gl-matrix';
+import { mat3, vec2 } from 'gl-matrix';
+import { Box } from 'ekkiog-editing';
 
 import ViewEngine from './view/ViewEngine';
 import TileMapEngine from './tileMap/TileMapEngine';
@@ -71,9 +72,7 @@ export default class Renderer {
     }
   }
 
-  renderMove(context : Context, mapToViewportMatrix : mat3, {top, left, right, bottom} : Area, dx : number, dy : number){
+  renderMove(context : Context, mapToViewportMatrix : mat3, {top, left, right, bottom} : Box, dx : number, dy : number){
     this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
   }
 }
-
-type Area = {top : number, left : number, right : number, bottom : number};

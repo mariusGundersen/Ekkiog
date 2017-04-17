@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import { Tool } from 'ekkiog-editing';
 
 import RadialMenu from './RadialMenu';
 
@@ -24,7 +25,6 @@ import {
 
 import { toggleEditorMenu, setToolDirection } from '../actions';
 import { State } from '../reduce';
-import { Tool } from '../editing/types';
 import { EditorState } from '../reducers/editor';
 import { EditorMenuState, OkCancelMenuState, ToolsMenuState, ContextMenuState } from '../reducers/editorMenu';
 

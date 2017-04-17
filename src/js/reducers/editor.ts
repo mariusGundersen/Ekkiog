@@ -1,6 +1,4 @@
-import { Direction } from 'ekkiog-editing';
-
-import { Tool } from '../editing/types';
+import { Tool, Direction } from 'ekkiog-editing';
 
 import {
   EditorActions

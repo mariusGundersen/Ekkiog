@@ -22,17 +22,17 @@ import {
 type State = StateSelection | StateNoSelection;
 
 interface StateNoSelection {
-  selection : false
+  readonly selection : false
 }
 
 interface StateSelection {
-  selection : true;
-  top : number;
-  left : number;
-  right : number;
-  bottom : number;
-  dx : number;
-  dy : number;
+  readonly selection : true;
+  readonly top : number;
+  readonly left : number;
+  readonly right : number;
+  readonly bottom : number;
+  readonly dx : number;
+  readonly dy : number;
 }
 
 export default class SelectionSaga extends EventSaga<any, any> {

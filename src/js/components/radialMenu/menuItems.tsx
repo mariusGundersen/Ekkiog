@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Dispatch } from 'redux';
+import { Tool } from 'ekkiog-editing';
 
 import {
   setSelectedTool,
@@ -11,9 +12,6 @@ import {
   toWire
 } from '../../actions';
 import { State } from '../../reduce';
-import {
-  Tool
-} from '../../editing/types';
 
 import IconWire from '../icons/IconWire';
 import IconButton from '../icons/IconButton';

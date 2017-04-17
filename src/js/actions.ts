@@ -1,8 +1,7 @@
-import { isEmpty, Forest, Item, CompiledComponent, Direction } from 'ekkiog-editing';
+import { isEmpty, Forest, Item, CompiledComponent, Direction, Tool } from 'ekkiog-editing';
 import { vec2, mat3 } from 'gl-matrix';
 import { Dispatch } from 'redux';
 
-import { Tool } from './editing/types';
 import { State } from './reduce';
 
 export interface Meta {

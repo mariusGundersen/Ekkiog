@@ -1,6 +1,7 @@
 import {
   Forest,
   Direction,
+  Tool,
 
   WIRE,
   GATE,
@@ -22,8 +23,6 @@ import {
   clear,
   toggleButton,
 } from 'ekkiog-editing';
-
-import { Tool } from './types';
 
 import {
   EditingActions
