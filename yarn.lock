@@ -10,6 +10,16 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/ndarray/-/ndarray-1.0.1.tgz#1f0776a57e17e02b110c4715260e9675ad8c6725"
 
+"@types/node@^7.0.12":
+  version "7.0.12"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.12.tgz#ae5f67a19c15f752148004db07cbbb372e69efc9"
+
+"@types/react-dom@^0.14.23":
+  version "0.14.23"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-0.14.23.tgz#cecfcfad754b4c2765fe5d29b81b301889ad6c2e"
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-icon-base@*":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/react-icon-base/-/react-icon-base-2.0.1.tgz#5fb3152703c38dc38638b2eb316de925f16c3f6b"

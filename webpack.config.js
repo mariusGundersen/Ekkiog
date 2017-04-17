@@ -34,7 +34,7 @@ const postCssLoader = {
 };
 
 module.exports = {
-  entry: './src/js/main.js',
+  entry: './src/js/main.tsx',
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
@@ -74,7 +74,7 @@ module.exports = {
     rules: [
       {
         enforce: 'pre',
-        test: /\.js$/,
+        test: /\.tsx?$|\.js$/,
         loader: "source-map-loader",
         include: /node_modules/
       },
@@ -85,13 +85,6 @@ module.exports = {
           'ts-loader',
         ],
         exclude: /node_modules/
-      },
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: [
-          babelLoader
-        ]
       },
       {
         test: /\.glsl$/,

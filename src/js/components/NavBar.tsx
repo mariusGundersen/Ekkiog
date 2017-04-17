@@ -18,17 +18,17 @@ import SearchResults from './SearchResults';
 import style from './navbar.css';
 
 import { insertComponentPackage, setForest } from '../actions';
-
+import { State } from '../reduce';
 import { Storage, NamedForest } from '../storage/database';
 
 export interface Props {
-  dispatch : Dispatch<any>;
+  dispatch : Dispatch<State>;
   currentComponentName : string;
   database : Storage
 }
 
 const result = reax<Props>()({
-  toggleSearch: (event : React.SyntheticEvent<any>) => true,
+  toggleSearch: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   query: (event : React.SyntheticEvent<HTMLInputElement>) => event.currentTarget.value,
   insertPackage: (result : CompiledComponent) => result,
   openComponent: (result : NamedForest) => result,

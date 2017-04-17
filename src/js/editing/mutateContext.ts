@@ -3,13 +3,11 @@ import {
   diffAndReconcile
 } from 'ekkiog-editing';
 
-import {
-  MutableContext
-} from './types';
+import Renderer from '../engines/Renderer';
 
-export default function mutateContext(context : MutableContext , renderer : any, before : Forest, after : Forest){
-  if(!context) return;
-  if(!renderer) return;
+import  Context from '../Context';
+
+export default function mutateContext(context : Context , renderer : Renderer, before : Forest, after : Forest){
   if(before === after) return;
 
   const changed = diffAndReconcile(before.enneaTree, after.enneaTree, context);

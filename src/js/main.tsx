@@ -1,16 +1,16 @@
-import React from 'react';
-import reactDom from 'react-dom';
-import {Provider} from 'react-redux';
-import {createStore, applyMiddleware} from 'redux';
+import * as React from 'react';
+import * as reactDom from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, Store } from 'redux';
 import thunk from 'redux-thunk';
 
 import '../css/main.css';
 import '../manifest.json';
 import offline from 'offline-plugin/runtime';
 
-import Shell from './Shell.js';
+import startShell from './shell';
 import {open as openDatabase} from './storage/database';
-import TouchControls from './interaction/TouchControls.js';
+import TouchControls from './interaction/TouchControls';
 
 import {
   createEmitterMiddleware,
@@ -25,7 +25,8 @@ import {
   setForest
 } from './actions';
 
-import createReduce from './reduce';
+import { GlobalState, GlobalStateInitialized } from './reducers/global';
+import createReduce, { State } from './reduce';
 import App from './components/App';
 
 if(!__DEV__){
@@ -41,7 +42,7 @@ if(!__DEV__){
 }
 
 openDatabase().then(database => {
-  const store = createStore(
+  const store = createStore<State>(
     createReduce(database),
     applyMiddleware(
       thunk,
@@ -50,7 +51,7 @@ openDatabase().then(database => {
     )
   );
 
-  initialize(store, async ({gl, renderer, context, selectionContext, emitter, perspective}) => {
+  initialize(store, async ({gl, renderer, context, selectionContext, emitter, perspective} : GlobalStateInitialized) => {
     perspective.setMapSize(context.width, context.height);
 
     const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
@@ -59,7 +60,7 @@ openDatabase().then(database => {
 
     fromEmitter(emitter, (x, y) => perspective.viewportToTile(x, y), store.dispatch, () => store.getState());
 
-    const shell = new Shell({
+    const shellConfig = startShell({
       tickInterval: 500,
       tick(tickCount) {
         renderer.simulateTick(context, tickCount);
@@ -107,10 +108,10 @@ openDatabase().then(database => {
 });
 
 
-function initialize(store, listener){
+function initialize(store : Store<State>, listener : (global : GlobalStateInitialized) => Promise<void>){
   const unsubscribe = store.subscribe(() => {
     const state = store.getState();
-    if(state.global.gl != null){
+    if(state.global.initialized){
       unsubscribe();
       listener(state.global).catch(e => console.error(e));
     }

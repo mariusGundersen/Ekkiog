@@ -1,205 +1,338 @@
-import { isEmpty, Forest, Item, CompiledComponent } from 'ekkiog-editing';
-import {vec2, mat3} from 'gl-matrix';
+import { isEmpty, Forest, Item, CompiledComponent, Direction } from 'ekkiog-editing';
+import { vec2, mat3 } from 'gl-matrix';
+import { Dispatch } from 'redux';
 
-import {Tool} from './editing/types';
+import { Tool } from './editing/types';
+import { State } from './reduce';
 
-import {Dispatch} from 'redux';
+export interface Meta {
+  emit? : boolean,
+  dispatch? : boolean
+}
 
-import 'redux-thunk';
+export type Dispatch = Dispatch<State>;
 
-export const RESIZE : 'resize' = 'resize';
-export const GL : 'gl' = 'gl';
-export const SET_SELECTED_TOOL : 'setSelectedTool' = 'setSelectedTool';
-export const SET_TOOL_DIRECTION = 'setToolDirection';
-export const TOGGLE_EDITOR_MENU : 'toggleEditorMenu' = 'toggleEditorMenu';
 
-export const LOAD_CONTEXT_MENU : 'loadContextMenu' = 'loadContextMenu';
-export const SHOW_CONTEXT_MENU : 'showContextMenu' = 'showContextMenu';
-export const ABORT_LOAD_CONTEXT_MENU : 'abortLoadContextMenu' = 'abortLoadContextMenu';
-export const HIDE_CONTEXT_MENU : 'hideContextMenu' = 'hideContextMenu';
-
-export const PAN_ZOOM : 'panZoom' = 'panZoom';
-
-export const SET_FOREST : 'set-forest' = 'set-forest';
-export const TAP_TILE : 'tap-tile' = 'tap-tile';
-export const REMOVE_TILE_AT : 'remove-tile-at' = 'remove-tile-at';
-export const TO_UNDERPASS : 'convert-wire-to-underpass' = 'convert-wire-to-underpass';
-export const TO_WIRE : 'convert-underpass-to-wire' = 'convert-underpass-to-wire';
-
-export const MOVE_GATE : 'moveGate' = 'moveGate';
-
-export const SHOW_OK_CANCEL_MENU : 'showOkCancelMenu' = 'showOkCancelMenu';
-export const SET_OK_CANCEL_MENU_VALID : 'setOkCancelMenuValid' = 'setOkCancelMenuValid';
-export const RESET_EDITOR_MENU : 'resetEditorMenu' = 'resetEditorMenu';
-
-export const INSERT_COMPONENT : 'insertComponent' = 'insertComponent';
-export const SELECT_COMPONENT : 'selectComponent' = 'selectComponent';
-export const START_SELECTION : 'startSelection' = 'startSelection';
-export const STOP_SELECTION : 'stopSelection' = 'stopSelection';
-export const MOVE_SELECTION : 'moveSelection' = 'moveSelection';
-
-export const resize = (pixelWidth : number, pixelHeight : number, screenWidth : number, screenHeight : number) => ({
-  type: RESIZE,
+export type ResizeAction = {
+  readonly type : 'resize',
+  readonly pixelWidth : number,
+  readonly pixelHeight : number,
+  readonly screenWidth : number,
+  readonly screenHeight : number
+}
+export const resize = (pixelWidth : number, pixelHeight : number, screenWidth : number, screenHeight : number) : ResizeAction => ({
+  type: 'resize',
   pixelWidth,
   pixelHeight,
   screenWidth,
   screenHeight
 });
 
-export const panZoom = (matrix : mat3, inverse : mat3) => ({
-  type: PAN_ZOOM,
-  matrix,
-  inverse
+export type InitGlAction = {
+  readonly type : 'gl',
+  readonly gl : WebGLRenderingContext
+}
+export const initGl = (gl : WebGLRenderingContext) : InitGlAction => ({
+  type: 'gl',
+  gl
 });
 
-export const setSelectedTool = (tool : Tool) => ({
-  type: SET_SELECTED_TOOL,
-  tool
-});
-export const setToolDirection = (direction : 'left' | 'up' | 'right' | 'down') => ({
-  type: SET_TOOL_DIRECTION,
-  direction
-});
-
-export const toggleEditorMenu = () => ({
-  type: TOGGLE_EDITOR_MENU
+export type SetForestAction = {
+  readonly type : 'set-forest',
+  readonly name : string,
+  readonly forest : Forest
+}
+export const setForest = (name : string, forest : Forest) : SetForestAction => ({
+  type: 'set-forest',
+  name,
+  forest
 });
 
-export const loadContextMenu = (x : number, y : number) => ({
-  type: LOAD_CONTEXT_MENU,
+export type PanZoomAction = {
+  readonly type : 'panZoom',
+  readonly tileToViewportMatrix : mat3,
+  readonly viewportToTileMatrix : mat3
+}
+export const panZoom = (tileToViewportMatrix : mat3, viewportToTileMatrix : mat3) : PanZoomAction => ({
+  type: 'panZoom',
+  tileToViewportMatrix,
+  viewportToTileMatrix
+});
+
+export type LoadContextMenuAction = {
+  readonly type : 'loadContextMenu',
+  readonly x : number,
+  readonly y : number
+}
+export const loadContextMenu = (x : number, y : number) : LoadContextMenuAction => ({
+  type: 'loadContextMenu',
   x,
   y
 });
 
-export const abortLoadContextMenu = () => ({
-  type: ABORT_LOAD_CONTEXT_MENU
+export type AbortLoadContextMenuAction = {
+  readonly type : 'abortLoadContextMenu'
+}
+export const abortLoadContextMenu = () : AbortLoadContextMenuAction => ({
+  type: 'abortLoadContextMenu'
 });
 
-export const showContextMenu = (tile : string, tx : number, ty : number) => ({
-  type: SHOW_CONTEXT_MENU,
+export type ShowContextMenuAction = {
+  readonly type : 'showContextMenu',
+  readonly tile : string,
+  readonly tx : number,
+  readonly ty : number
+}
+export const showContextMenu = (tile : string, tx : number, ty : number) :ShowContextMenuAction => ({
+  type: 'showContextMenu',
   tile,
   tx,
   ty
 });
 
-export const hideContextMenu = () => ({
-  type: HIDE_CONTEXT_MENU,
+export type HideContextMenuAction = {
+  readonly type : 'hideContextMenu',
+  readonly meta : Meta
+}
+export const hideContextMenu = () : HideContextMenuAction => ({
+  type: 'hideContextMenu',
   meta: {
     emit: true,
     dispatch: true
   }
 });
 
-export const setForest = (name : string, forest : Forest) => ({
-  type: SET_FOREST,
-  name,
-  forest
+export type SetSelectedToolAction = {
+  readonly type : 'setSelectedTool',
+  readonly tool : Tool
+}
+export const setSelectedTool = (tool : Tool) : SetSelectedToolAction => ({
+  type: 'setSelectedTool',
+  tool
 });
 
-export const tapTile = (tx : number, ty : number, tool : Tool, direction : 'up' | 'down' | 'left' | 'right') => ({
-  type: TAP_TILE,
+export type SetToolDirectionAction = {
+  readonly type : 'setToolDirection',
+  readonly direction : Direction
+}
+export const setToolDirection = (direction : Direction) : SetToolDirectionAction => ({
+  type: 'setToolDirection',
+  direction
+});
+
+export type ToggleEditorMenuAction = {
+  type: 'toggleEditorMenu'
+}
+export const toggleEditorMenu = () : ToggleEditorMenuAction => ({
+  type: 'toggleEditorMenu'
+});
+
+export type ShowOkCancelMenuAction = {
+  readonly type : 'showOkCancelMenu',
+  okAction() : void,
+  cancelAction() : void
+}
+export const showOkCancelMenu = (okAction : () => void, cancelAction : () => void) : ShowOkCancelMenuAction => ({
+  type: 'showOkCancelMenu',
+  okAction,
+  cancelAction
+});
+
+export type SetOkCancelMenuValidAction = {
+  readonly type : 'setOkCancelMenuValid',
+  readonly isValid : boolean
+}
+export const setOkCancelMenuValid = (isValid : boolean) : SetOkCancelMenuValidAction => ({
+  type: 'setOkCancelMenuValid',
+  isValid
+});
+
+export type ResetEditorMenuAction = {
+  type  : 'resetEditorMenu'
+}
+export const resetEditorMenu = () => ({
+  type: 'resetEditorMenu'
+});
+
+export type TapTileAction = {
+  readonly type : 'tap-tile',
+  readonly x : number,
+  readonly y : number,
+  readonly tool : Tool,
+  readonly direction : Direction
+}
+export const tapTile = (tx : number, ty : number, tool : Tool, direction : Direction) : TapTileAction => ({
+  type: 'tap-tile',
   x: tx,
   y: ty,
   tool,
   direction
 });
 
-export const removeTileAt = (tx : number, ty : number) => ({
-  type: REMOVE_TILE_AT,
+export type RemoveTileAtAction = {
+  readonly type : 'remove-tile-at',
+  readonly x : number,
+  readonly y : number
+}
+export const removeTileAt = (tx : number, ty : number) : RemoveTileAtAction => ({
+  type: 'remove-tile-at',
   x: tx,
   y: ty
 });
 
-export const toUnderpass = (tx : number, ty : number) => ({
-  type: TO_UNDERPASS,
+export type ToUnderpassAction = {
+  readonly type : 'convert-wire-to-underpass',
+  readonly x : number,
+  readonly y : number
+}
+export const toUnderpass = (tx : number, ty : number) : ToUnderpassAction => ({
+  type: 'convert-wire-to-underpass',
   x: tx,
   y: ty
 });
 
-export const toWire = (tx : number, ty : number) => ({
-  type: TO_WIRE,
+export type ToWireAction = {
+  readonly type : 'convert-underpass-to-wire',
+  readonly x : number,
+  readonly y : number
+}
+export const toWire = (tx : number, ty : number) : ToWireAction => ({
+  type: 'convert-underpass-to-wire',
   x: tx,
   y: ty
 });
 
-export const moveGate = (tx : number, ty : number) => ({
-  type: MOVE_GATE,
-  meta: {
-    emit: true
-  },
-  tx,
-  ty
+export type InsertComponentAction = {
+  readonly type : 'insert-component',
+  readonly component : CompiledComponent,
+  readonly position : {
+    readonly x : number,
+    readonly y : number
+  }
+}
+export const insertComponent = (component : CompiledComponent, position : {x : number, y : number}, selection : {dx : number, dy : number}) : InsertComponentAction => ({
+  type: 'insert-component',
+  component,
+  position: {
+    x: (position.x|0) + selection.dx,
+    y: (position.y|0) + selection.dy
+  }
 });
 
-export const showOkCancelMenu = (okAction : () => void, cancelAction : () => void) => ({
-  type: SHOW_OK_CANCEL_MENU,
-  okAction,
-  cancelAction
-});
-
-export const setOkCancelMenuValid = (isValid : boolean) => ({
-  type: SET_OK_CANCEL_MENU_VALID,
-  isValid
-});
-
-export const resetEditorMenu = () => ({
-  type: RESET_EDITOR_MENU
-});
-
-export const insertComponent = (component : CompiledComponent, position : {x : number, y : number}) => (dispatch : Dispatch<any>, getState : () => any) => {
-  const selection = getState().selection;
-  dispatch({
-    type: INSERT_COMPONENT,
-    component,
-    position: {
-      x: (position.x|0) + selection.dx,
-      y: (position.y|0) + selection.dy
-    }
-  })
-};
-
-export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) => ({
-  type: SELECT_COMPONENT,
+export type SelectComponentAction = {
+  readonly type : 'selectComponent',
+  readonly component : CompiledComponent,
+  readonly position : {
+    readonly x : number,
+    readonly y : number
+  }
+}
+export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) : SelectComponentAction => ({
+  type: 'selectComponent',
   component,
   position
 });
 
-export const startSelection = (top : number, left : number, right : number, bottom : number) => (dispatch : Dispatch<any>, getState : () => any) => {
-  dispatch({
-    type: START_SELECTION,
-    meta: {
-      emit: true
-    },
-    top,
-    left,
-    right,
-    bottom
-  });
-  const state = getState();
-  const isValid = isEmpty(
-    state.forest.enneaTree,
-    top,
-    left,
-    right,
-    bottom);
-  dispatch(setOkCancelMenuValid(isValid));
-};
-
-export const moveSelection = (dx : number, dy : number) => ({
-  type: MOVE_SELECTION,
+export type MoveSelectionAction = {
+  readonly type : 'moveSelection',
+  readonly dx : number,
+  readonly dy : number
+}
+export const moveSelection = (dx : number, dy : number) : MoveSelectionAction => ({
+  type: 'moveSelection',
   dx,
   dy
 });
 
-export const stopSelection = () => ({
-  type: STOP_SELECTION,
+export type StopSelectionAction = {
+  readonly type : 'stopSelection',
+  readonly meta : Meta
+}
+export const stopSelection = () : StopSelectionAction => ({
+  type: 'stopSelection',
   meta: {
     emit: true,
     dispatch: true
   }
 });
 
-export const insertComponentPackage = (componentPackage : CompiledComponent) => (dispatch : Dispatch<any>, getState : () => any) => {
+
+export type ContextMenuActions =
+  LoadContextMenuAction |
+  AbortLoadContextMenuAction |
+  ShowContextMenuAction |
+  HideContextMenuAction |
+  PanZoomAction;
+
+export type EditorActions =
+  SetSelectedToolAction |
+  SetToolDirectionAction |
+  SetForestAction;
+
+export type EditorMenuActions =
+  ShowContextMenuAction |
+  HideContextMenuAction |
+  ToggleEditorMenuAction |
+  ShowOkCancelMenuAction |
+  SetOkCancelMenuValidAction |
+  ResetEditorMenuAction;
+
+export type EditingActions =
+  SetForestAction |
+  TapTileAction |
+  RemoveTileAtAction |
+  ToUnderpassAction |
+  ToWireAction |
+  InsertComponentAction;
+
+export type GlobalActions =
+  InitGlAction |
+  SetForestAction;
+
+export type SelectionActions =
+  SelectComponentAction |
+  MoveSelectionAction |
+  StopSelectionAction;
+
+export type ViewActions =
+  ResizeAction |
+  PanZoomAction;
+
+export type Action =
+  ContextMenuActions |
+  EditorActions |
+  EditorMenuActions |
+  EditingActions |
+  GlobalActions |
+  ViewActions;
+
+
+
+
+
+
+
+
+export type StartSelectionAction = {
+  readonly type : 'startSelection',
+  readonly meta : Meta,
+  readonly top : number,
+  readonly left : number,
+  readonly right : number,
+  readonly bottom : number
+}
+export const startSelection = (top : number, left : number, right : number, bottom : number) : StartSelectionAction => ({
+  type: 'startSelection',
+  meta: {
+    emit: true
+  },
+  top,
+  left,
+  right,
+  bottom
+});
+
+export const insertComponentPackage = (componentPackage : CompiledComponent) => (dispatch : Dispatch<State>, getState : () => State) => {
   const state = getState();
   const centerTile = {
     x: state.view.centerTile.x|0,
@@ -212,8 +345,10 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
 
   dispatch(showOkCancelMenu(
     () => {
+      const selection = getState().selection;
+      if(selection.selection == false) return;
+      dispatch(insertComponent(componentPackage, centerTile, selection));
       dispatch(stopSelection());
-      dispatch(insertComponent(componentPackage, centerTile));
       dispatch(resetEditorMenu());
     },
     () => {
@@ -221,12 +356,14 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
       dispatch(resetEditorMenu());
     }
   ));
+  const isValid = isEmpty(state.forest.enneaTree, top, left, right, bottom);
+  dispatch(setOkCancelMenuValid(isValid));
   dispatch(startSelection(top, left, right, bottom));
   dispatch(selectComponent(componentPackage, centerTile));
 }
 
 
-export const hideContextMenuAfter = (action : any) => (dispatch : Dispatch<any>, getState : () => any) => {
+export const hideContextMenuAfter = (action : Action) => (dispatch : Dispatch<State>) => {
   dispatch(action);
   dispatch(hideContextMenu());
 };

@@ -23,8 +23,10 @@ import {
 } from './radialMenu/menuItems';
 
 import { toggleEditorMenu, setToolDirection } from '../actions';
-
+import { State } from '../reduce';
 import { Tool } from '../editing/types';
+import { EditorState } from '../reducers/editor';
+import { EditorMenuState, OkCancelMenuState, ToolsMenuState, ContextMenuState } from '../reducers/editorMenu';
 
 export interface Props {
   cx : number,
@@ -32,12 +34,12 @@ export interface Props {
   radius : number,
   gap : number,
   width : number,
-  editor : any,
-  editorMenu : any,
-  dispatch : Dispatch<any>
+  editor : EditorState,
+  editorMenu : EditorMenuState,
+  dispatch : Dispatch<State>
 }
 
-export default class EditorMenu extends React.Component<Props, any> {
+export default class EditorMenu extends React.Component<Props, void> {
   shouldComponentUpdate(nextProps : Props){
     return nextProps.cx !== this.props.cx
       || nextProps.cy !== this.props.cy
@@ -63,20 +65,20 @@ export default class EditorMenu extends React.Component<Props, any> {
       <RadialMenu
         cx={cx}
         cy={cy}
-        showMenu={editorMenu.open}
+        showMenu={editorMenu.menuType != null && editorMenu.open}
         center={createCenter(radius, editor, editorMenu, dispatch)}
         menuTree={getMenuTree(radius+gap, width, editor, editorMenu, dispatch)} />
     );
   };
 }
 
-function getMenuTree(radius : number, width : number, editor : any, editorMenu : any, dispatch : Dispatch<any>){
+function getMenuTree(radius : number, width : number, editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<State>){
   return createMenuTree(
     editor,
     editorMenu,
     dispatch
   ).map((ring, index) => ({
-    show: editorMenu.open,
+    show: editorMenu.menuType != null && editorMenu.open,
     radius: radius + (width+20)*index,
     width,
     fromTurnFraction: 1/2,
@@ -86,7 +88,7 @@ function getMenuTree(radius : number, width : number, editor : any, editorMenu :
   }));
 }
 
-function createMenuTree(editor : any, editorMenu : any, dispatch : Dispatch<any>){
+function createMenuTree(editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<State>){
   switch(editorMenu.menuType){
     case 'tools':
       return [...createToolsMenuTree(editor, dispatch)];
@@ -97,7 +99,7 @@ function createMenuTree(editor : any, editorMenu : any, dispatch : Dispatch<any>
   }
 }
 
-function* createToolsMenuTree(editor : any, dispatch : Dispatch<any>){
+function* createToolsMenuTree(editor : EditorState, dispatch : Dispatch<State>){
   yield {
     menuItems: [
       menuItem('return', <IconReturn />, () => dispatch(toggleEditorMenu()))
@@ -117,25 +119,25 @@ function* createToolsMenuTree(editor : any, dispatch : Dispatch<any>){
   if(editor.selectedTool === 'button'){
     yield {
       menuItems: [
-        menuItem('down', <IconButton rotate={90} />, () => dispatch(setToolDirection('down')), editor.toolDirection == 'down'),
-        menuItem('left', <IconButton rotate={180} />, () => dispatch(setToolDirection('left')), editor.toolDirection == 'left'),
-        menuItem('up', <IconButton rotate={270} />, () => dispatch(setToolDirection('up')), editor.toolDirection == 'up'),
-        menuItem('right', <IconButton rotate={0} />, () => dispatch(setToolDirection('right')), editor.toolDirection == 'right')
+        menuItem('downwards', <IconButton rotate={90} />, () => dispatch(setToolDirection('downwards')), editor.toolDirection == 'downwards'),
+        menuItem('leftwards', <IconButton rotate={180} />, () => dispatch(setToolDirection('leftwards')), editor.toolDirection == 'leftwards'),
+        menuItem('upwards', <IconButton rotate={270} />, () => dispatch(setToolDirection('upwards')), editor.toolDirection == 'upwards'),
+        menuItem('rightwards', <IconButton rotate={0} />, () => dispatch(setToolDirection('rightwards')), editor.toolDirection == 'rightwards')
       ]
     };
   }else if(editor.selectedTool === 'light'){
     yield {
       menuItems: [
-        menuItem('down', <IconLight rotate={90} />, () => dispatch(setToolDirection('down')), editor.toolDirection == 'down'),
-        menuItem('left', <IconLight rotate={180} />, () => dispatch(setToolDirection('left')), editor.toolDirection == 'left'),
-        menuItem('up', <IconLight rotate={270} />, () => dispatch(setToolDirection('up')), editor.toolDirection == 'up'),
-        menuItem('right', <IconLight rotate={0} />, () => dispatch(setToolDirection('right')), editor.toolDirection == 'right')
+        menuItem('downwards', <IconLight rotate={90} />, () => dispatch(setToolDirection('downwards')), editor.toolDirection == 'downwards'),
+        menuItem('leftwards', <IconLight rotate={180} />, () => dispatch(setToolDirection('leftwards')), editor.toolDirection == 'leftwards'),
+        menuItem('upwards', <IconLight rotate={270} />, () => dispatch(setToolDirection('upwards')), editor.toolDirection == 'upwards'),
+        menuItem('rightwards', <IconLight rotate={0} />, () => dispatch(setToolDirection('rightwards')), editor.toolDirection == 'rightwards')
       ]
     };
   }
 }
 
-function createOkCancelMenuTree(editorMenu : any, dispatch : Dispatch<any>){
+function createOkCancelMenuTree(editorMenu : OkCancelMenuState, dispatch : Dispatch<State>){
   return [
     {
       menuItems: [
@@ -146,7 +148,7 @@ function createOkCancelMenuTree(editorMenu : any, dispatch : Dispatch<any>){
   ];
 }
 
-function createCenter(radius : number, editor : any, editorMenu : any, dispatch : Dispatch<any>){
+function createCenter(radius : number, editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<State>){
   switch(editorMenu.menuType){
     case 'tools':
       return createToolsCenter(radius, editor.selectedTool, editorMenu.open, dispatch);
@@ -155,7 +157,7 @@ function createCenter(radius : number, editor : any, editorMenu : any, dispatch 
   }
 }
 
-function createToolsCenter(radius : number, selectedTool : Tool, open : boolean, dispatch : Dispatch<any>){
+function createToolsCenter(radius : number, selectedTool : Tool, open : boolean, dispatch : Dispatch<State>){
   return {
     radius: radius,
     cx: open ? radius : -radius*1.5,

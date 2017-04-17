@@ -1,3 +1,5 @@
+declare const __DEV__ : boolean;
+
 declare module "*.glsl" {
   const content : string;
   export default content;
@@ -83,4 +85,47 @@ declare module "ndarray" {
   }
 
   export default ndarray;
+}
+
+
+declare module "event-saga" {
+  import { EventEmitter } from 'events';
+
+  export interface Identifiable<T> {
+    id : T
+  }
+
+  export interface Saga<Data, T> extends Identifiable<T> {
+    data : Data;
+    emit<EventData>(event : string, data : EventData) : void;
+    setTimeout(event : string, time : number) : void;
+    setTimeout<TimeoutData>(event : string, data : TimeoutData, time : number) : void;
+    clearTimeout(event : string) : void;
+    done() : void;
+  }
+
+  export interface SagaFactory<Data, T> {
+    createOn<EventData>(event : string, handle : (this : Saga<Data, T>, data : EventData, actor : Saga<Data, T>) => void) : void;
+
+    on<EventData>(event : string, handle : (this : Saga<Data, T>, data : EventData, actor : Saga<Data, T>) => void) : void;
+  }
+
+  export default class EventSaga<Data, T>{
+    constructor(eventEmitter : EventEmitter, factory : (saga : SagaFactory<Data, T>) => void);
+  }
+}
+
+declare module "offline-plugin/runtime" {
+  export interface InstallParams {
+    onInstalled? : () => void;
+    onUpdating? : () => void;
+    onUpdateReady? : () => void;
+  }
+
+  class Offline {
+    install(params : InstallParams) : void;
+    applyUpdate() : void;
+  }
+
+  export default new Offline;
 }

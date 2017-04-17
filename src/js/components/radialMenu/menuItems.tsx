@@ -8,10 +8,9 @@ import {
   hideContextMenuAfter,
   removeTileAt,
   toUnderpass,
-  toWire,
-  moveGate
+  toWire
 } from '../../actions';
-
+import { State } from '../../reduce';
 import {
   Tool
 } from '../../editing/types';
@@ -21,50 +20,45 @@ import IconButton from '../icons/IconButton';
 import IconGate from '../icons/IconGate';
 import IconUnderpass from '../icons/IconUnderpass';
 import IconLight from '../icons/IconLight';
-import IconMove from '../icons/IconMove';
 import IconRemove from '../icons/IconRemove';
 import IconAccept from '../icons/IconAccept';
 
-export function wireMenuItem(selectedTool : Tool, dispatch : Dispatch<any>){
+export function wireMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
   return toolMenuItem('wire', <IconWire />, selectedTool, dispatch);
 }
 
-export function buttonMenuItem(selectedTool : Tool, dispatch : Dispatch<any>){
+export function buttonMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
   return toolMenuItem('button', <IconButton />, selectedTool, dispatch);
 }
 
-export function gateMenuItem(selectedTool : Tool, dispatch : Dispatch<any>){
+export function gateMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
   return toolMenuItem('gate', <IconGate />, selectedTool, dispatch);
 }
 
-export function underpassMenuItem(selectedTool : Tool, dispatch : Dispatch<any>){
+export function underpassMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
   return toolMenuItem('underpass', <IconUnderpass />, selectedTool, dispatch);
 }
 
-export function lightMenuItem(selectedTool : Tool, dispatch : Dispatch<any>){
+export function lightMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
   return toolMenuItem('light', <IconLight />, selectedTool, dispatch);
 }
 
-export function moveMenuItem(dispatch : Dispatch<any>, tx : number, ty : number){
-  return menuItem('move', <IconMove />, () => dispatch(moveGate(tx, ty)));
-}
-
-export function removeMenuItem(dispatch : Dispatch<any>, tx : number, ty : number){
+export function removeMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
   return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(removeTileAt(tx, ty))));
 }
 
-export function toUnderpassMenuItem(dispatch : Dispatch<any>, tx : number, ty : number){
+export function toUnderpassMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
   return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(hideContextMenuAfter(toUnderpass(tx, ty))));
 }
-export function toWireMenuItem(dispatch : Dispatch<any>, tx : number, ty : number){
+export function toWireMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
   return menuItem('toWire', <IconWire />, () => dispatch(hideContextMenuAfter(toWire(tx, ty))));
 }
 
-export function acceptMenuItem(dispatch : Dispatch<any>){
+export function acceptMenuItem(dispatch : Dispatch<State>){
   return menuItem('accept', <IconAccept />, () => dispatch(hideContextMenu()));
 }
 
-export function toolMenuItem(tool : Tool, icon : JSX.Element, selectedTool : Tool, dispatch : Dispatch<any>){
+export function toolMenuItem(tool : Tool, icon : JSX.Element, selectedTool : Tool, dispatch : Dispatch<State>){
   return menuItem(tool, icon, () => dispatch(setSelectedTool(tool)), selectedTool === tool);
 }
 

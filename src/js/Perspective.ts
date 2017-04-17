@@ -121,11 +121,11 @@ export default class Perspective{
   }
 
   viewportToTile(...pos : number[]){
-    return vec2.transformMat3(pos as any, pos, this.viewportToTileMatrix);
+    return vec2.transformMat3(pos as any, pos, this.viewportToTileMatrix) as any as [number, number];
   }
 
   viewportToTileFloored(...pos : number[]){
-    pos = this.viewportToTile(...pos) as any;
+    pos = this.viewportToTile(...pos);
     return [Math.floor(pos[0]), Math.floor(pos[1])];
   }
 

@@ -5,7 +5,7 @@ export interface Props {
   width : number;
 }
 
-export default class Loading extends React.Component<Props, any> {
+export default class Loading extends React.Component<Props, void> {
   circumference : number;
   circle? : SVGCircleElement;
   constructor(props : Props){

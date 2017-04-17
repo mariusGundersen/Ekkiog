@@ -17,8 +17,10 @@
   "devDependencies": {
     "@types/gl-matrix": "^2.2.34",
     "@types/ndarray": "^1.0.1",
+    "@types/node": "^7.0.12",
+    "@types/react-dom": "^0.14.23",
+    "@types/react-icons": "^2.2.1",
     "@types/react-redux": "^4.4.38",
-    "@types/redux-thunk": "^2.1.0",
     "autoprefixer": "^6.4.0",
     "ava": "^0.15.2",
     "awesome-typescript-loader": "^3.0.2",
@@ -52,7 +54,6 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
-    "@types/react-icons": "^2.2.1",
     "a-big-triangle": "^1.0.3",
     "array-unique": "^0.2.1",
     "babel-runtime": "^6.11.6",

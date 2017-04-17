@@ -1,4 +1,6 @@
+import { EventEmitter } from 'events';
 import EventSaga from 'event-saga';
+import { mat3 } from 'gl-matrix';
 
 import {
   START_SELECTION,
@@ -10,10 +12,34 @@ import {
   CANCEL_PAN_ZOOM
 } from '../events';
 
-export default class SelectionSaga extends EventSaga {
-  constructor(eventEmitter, viewportToTile){
+import {
+  PointerDownEvent,
+  PointerMoveEvent,
+  PointerUpEvent,
+  StartSelectionEvent
+} from './types';
+
+type State = StateSelection | StateNoSelection;
+
+interface StateNoSelection {
+  selection : false
+}
+
+interface StateSelection {
+  selection : true;
+  top : number;
+  left : number;
+  right : number;
+  bottom : number;
+  dx : number;
+  dy : number;
+}
+
+export default class SelectionSaga extends EventSaga<any, any> {
+  state : State;
+  constructor(eventEmitter : EventEmitter, viewportToTile : (x : number, y : number) => [number, number]){
     super(eventEmitter, saga => {
-      saga.createOn(POINTER_DOWN, (data, actor) => {
+      saga.createOn<PointerDownEvent>(POINTER_DOWN, (data, actor) => {
         if(!this.state.selection) {
           actor.done();
           return;
@@ -39,7 +65,7 @@ export default class SelectionSaga extends EventSaga {
         }
       });
 
-      saga.on(POINTER_MOVE, (data, actor) => {
+      saga.on<PointerMoveEvent>(POINTER_MOVE, (data, actor) => {
         if(!this.state.selection) {
           actor.done();
           return;
@@ -54,7 +80,7 @@ export default class SelectionSaga extends EventSaga {
         });
       });
 
-      saga.on(POINTER_UP, (data, actor) => {
+      saga.on<PointerUpEvent>(POINTER_UP, (data, actor) => {
         if(!this.state.selection) {
           actor.done();
           return;
@@ -71,7 +97,7 @@ export default class SelectionSaga extends EventSaga {
       selection: false
     };
 
-    eventEmitter.on(START_SELECTION, (data) => {
+    eventEmitter.on(START_SELECTION, (data : StartSelectionEvent) => {
       this.state = {
         selection: true,
         top: data.top,
@@ -88,18 +114,5 @@ export default class SelectionSaga extends EventSaga {
         selection: false
       };
     });
-  }
-
-  get isSelectionActive(){
-    return this.state.selection;
-  }
-  get dx(){
-    return this.state.dx;
-  }
-  get dy(){
-    return this.state.dy;
-  }
-  get boundingBox(){
-    return [this.state.top, this.state.left, this.state.right, this.state.bottom];
   }
 }

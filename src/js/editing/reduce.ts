@@ -1,5 +1,6 @@
 import {
   Forest,
+  Direction,
 
   WIRE,
   GATE,
@@ -25,27 +26,24 @@ import {
 import { Tool } from './types';
 
 import {
-  SET_FOREST,
-  TAP_TILE,
-  REMOVE_TILE_AT,
-  TO_UNDERPASS,
-  TO_WIRE,
-  INSERT_COMPONENT
+  EditingActions
 } from '../actions';
 
-export default function reduce(forest=createForest(), action : any) : Forest{
+export { Forest };
+
+export default function reduce(forest=createForest(), action : EditingActions) : Forest{
   switch(action.type){
-    case SET_FOREST:
+    case 'set-forest':
       return action.forest || forest;
-    case TAP_TILE:
-      return tap(forest, action.tool, toDirection(action.direction), action.x, action.y);
-    case REMOVE_TILE_AT:
+    case 'tap-tile':
+      return tap(forest, action.tool, action.direction, action.x, action.y);
+    case 'remove-tile-at':
       return clear(forest, action.x, action.y);
-    case TO_UNDERPASS:
+    case 'convert-wire-to-underpass':
       return wireToUnderpass(forest, action.x, action.y);
-    case TO_WIRE:
+    case 'convert-underpass-to-wire':
       return underpassToWire(forest, action.x, action.y);
-    case INSERT_COMPONENT:
+    case 'insert-component':
       return drawComponent(forest, action.position.x, action.position.y, action.component);
     default:
       return forest;
@@ -111,16 +109,4 @@ function underpassToWire(forest : Forest, x : number, y : number){
   if(result === tempForest) return forest;
 
   return result;
-}
-
-type Direction = 'leftwards' | 'rightwards' | 'downwards' | 'upwards';
-
-function toDirection(direction : string) : Direction {
-  switch(direction){
-    case 'left' : return 'leftwards'
-    case 'right' : return 'rightwards'
-    case 'down' : return 'downwards'
-    case 'up' : return 'upwards'
-    default: return 'oops' as never;
-  }
 }

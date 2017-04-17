@@ -1,3 +1,5 @@
+import { EventEmitter } from 'events';
+
 import {
   START_SELECTION,
   STOP_SELECTION,
@@ -8,15 +10,14 @@ import {
   POTENTIAL_LONG_PRESS,
   LOAD_CONTEXT_MENU,
   POTENTIAL_LONG_PRESS_CANCEL,
-  ABORT_LOAD_CONTEXT_MENU
+  ABORT_LOAD_CONTEXT_MENU,
+  HIDE_CONTEXT_MENU
 } from '../events';
 
-import {
-  HIDE_CONTEXT_MENU
-} from '../actions';
-
-export default class PointerSaga{
-  constructor(emitter){
+export default class PointerSaga {
+  canTap : boolean;
+  canShowContextMenu : boolean;
+  constructor(emitter : EventEmitter){
     this.canTap = true;
     this.canShowContextMenu = true;
 
@@ -43,8 +44,8 @@ export default class PointerSaga{
   }
 }
 
-function maybeEmit(emitter, condition, when, then){
-  emitter.on(when, data => {
+function maybeEmit(emitter : EventEmitter, condition : () => boolean, when : string, then : string){
+  emitter.on(when, (data : any) => {
     if(condition()){
       emitter.emit(then, data);
     }

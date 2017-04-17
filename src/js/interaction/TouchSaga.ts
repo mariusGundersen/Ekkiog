@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import EventSaga from 'event-saga';
 
 import {
@@ -14,6 +15,14 @@ import {
   POTENTIAL_LONG_PRESS_CANCEL
 } from '../events';
 
+import {
+  Pos,
+  PointerDownEvent,
+  PointerMoveEvent,
+  PointerUpEvent,
+  CancelPanZoomEvent
+} from './types';
+
 const TAP_TOO_SLOW_TIMEOUT = 'tapTooSlowTimeout';
 const LONG_PRESS_TIMEOUT = 'longPressTimeout';
 
@@ -21,10 +30,21 @@ const MAX_UNMOVED_DISTANCE = 5;
 const MAX_TAP_TIME = 100;
 const MIN_LONG_TOUCH_TIME = 1000;
 
-export default class TouchSaga extends EventSaga {
-  constructor(eventEmitter){
+interface TouchData extends Pos {
+  moved : boolean,
+  maybeTap : boolean,
+  longPress : boolean,
+  start : Pos
+}
+
+interface TouchEvent extends Pos {
+  id : number
+}
+
+export default class TouchSaga extends EventSaga<TouchData, number> {
+  constructor(eventEmitter : EventEmitter){
     super(eventEmitter, saga => {
-      saga.createOn(TOUCH_START, function(data){
+      saga.createOn<TouchEvent>(TOUCH_START, function(data){
         this.data = {
           moved: false,
           maybeTap: true,
@@ -37,25 +57,25 @@ export default class TouchSaga extends EventSaga {
           y: data.y
         };
 
-        this.emit(POINTER_DOWN, {
+        this.emit<PointerDownEvent>(POINTER_DOWN, {
           id: this.id,
           x: data.x,
           y: data.y
         });
 
         this.setTimeout(TAP_TOO_SLOW_TIMEOUT, MAX_TAP_TIME);
-        this.setTimeout(LONG_PRESS_TIMEOUT, {
+        this.setTimeout<Pos>(LONG_PRESS_TIMEOUT, {
           x: data.x,
           y: data.y
         }, MIN_LONG_TOUCH_TIME);
 
       });
 
-      saga.on(TOUCH_MOVE, function(data){
+      saga.on<TouchEvent>(TOUCH_MOVE, function(data){
         this.data.x = data.x;
         this.data.y = data.y;
 
-        this.emit(POINTER_MOVE, {
+        this.emit<PointerMoveEvent>(POINTER_MOVE, {
           id: this.id,
           x: data.x,
           y: data.y
@@ -89,7 +109,7 @@ export default class TouchSaga extends EventSaga {
         }
       });
 
-      saga.on(LONG_PRESS_TIMEOUT, function(data) {
+      saga.on<Pos>(LONG_PRESS_TIMEOUT, function(data) {
         this.data.longPress = true;
         this.emit(CANCEL_PAN_ZOOM, {
           id: this.id
@@ -102,7 +122,7 @@ export default class TouchSaga extends EventSaga {
         });
       });
 
-      saga.on(TOUCH_END, function(data){
+      saga.on<TouchEvent>(TOUCH_END, function(data){
         if(this.data.maybeTap && !this.data.moved){
           this.emit(POINTER_TAP, {
             x: data.x,
@@ -118,7 +138,7 @@ export default class TouchSaga extends EventSaga {
           });
         }
 
-        this.emit(POINTER_UP, {
+        this.emit<PointerUpEvent>(POINTER_UP, {
           id: this.id,
           x: data.x,
           y: data.y

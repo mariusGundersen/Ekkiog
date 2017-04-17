@@ -17,6 +17,7 @@ export const TAP : 'tap' = 'tap';
 export const SHOW_CONTEXT_MENU : 'showContextMenu' = 'showContextMenu';
 export const LOAD_CONTEXT_MENU : 'loadContextMenu' = 'loadContextMenu';
 export const ABORT_LOAD_CONTEXT_MENU : 'abortLoadContextMenu' = 'abortLoadContextMenu';
+export const HIDE_CONTEXT_MENU : 'hideContextMenu' = 'hideContextMenu';
 
 export const START_SELECTION : 'startSelection' = 'startSelection';
 export const STOP_SELECTION : 'stopSelection' = 'stopSelection';

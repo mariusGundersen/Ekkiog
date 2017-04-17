@@ -6,7 +6,7 @@ import NavBar from './NavBar';
 
 import style from './main.css';
 
-export default (props : any) => (
+export default () => (
   <div className={style.root}>
     <Menu />
     <WebGLCanvas />

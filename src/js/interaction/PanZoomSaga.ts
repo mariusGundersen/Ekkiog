@@ -1,3 +1,5 @@
+import { EventEmitter } from 'events';
+
 import EventSaga from 'event-saga';
 
 import {
@@ -7,12 +9,29 @@ import {
   CANCEL_PAN_ZOOM
 } from '../events';
 
+import {
+  Pos,
+  PointerDownEvent,
+  PointerMoveEvent,
+  PointerUpEvent,
+  CancelPanZoomEvent
+} from './types';
+
+interface Pointer {
+  x : number,
+  y : number,
+  ox : number,
+  oy : number
+}
+
 export default class PanZoomSaga{
-  constructor(eventEmitter){
-    const pointers = new Map();
+
+  pointers : Map<number, Pointer>;
+  constructor(eventEmitter : EventEmitter){
+    const pointers = new Map<number, Pointer>();
     this.pointers = pointers;
 
-    eventEmitter.on(POINTER_DOWN, function(data){
+    eventEmitter.on(POINTER_DOWN, function(data : PointerDownEvent){
       pointers.set(data.id, {
         x: data.x,
         y: data.y,
@@ -21,20 +40,21 @@ export default class PanZoomSaga{
       });
     });
 
-    eventEmitter.on(POINTER_MOVE, function(data){
+    eventEmitter.on(POINTER_MOVE, function(data : PointerMoveEvent){
       if(!pointers.has(data.id)) return;
 
       const pointer = pointers.get(data.id);
+      if(pointer === undefined) return;
       pointer.x = data.x;
       pointer.y = data.y;
     });
 
-    eventEmitter.on(CANCEL_PAN_ZOOM, function(data){
+    eventEmitter.on(CANCEL_PAN_ZOOM, function(data : CancelPanZoomEvent){
       if(!pointers.has(data.id)) return;
       pointers.delete(data.id);
     });
 
-    eventEmitter.on(POINTER_UP, function(data){
+    eventEmitter.on(POINTER_UP, function(data : PointerUpEvent){
       if(!pointers.has(data.id)) return;
 
       pointers.delete(data.id);
@@ -63,7 +83,7 @@ export default class PanZoomSaga{
   }
 }
 
-function getXYR(pointers){
+function getXYR(pointers : Pos[]){
   const avgX = pointers.reduce((sum, pair, i, c) => sum + pair.x/c.length, 0);
   const avgY = pointers.reduce((sum, pair, i, c) => sum + pair.y/c.length, 0);
 

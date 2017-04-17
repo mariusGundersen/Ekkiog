@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 
+import { State } from '../reduce';
+import { ContextMenuState } from '../reducers/contextMenu';
 import Loading from './radialMenu/Loading';
-import RadialMenu, { PieCenterProps ,PieRingProps } from './RadialMenu';
+import RadialMenu, { PieCenterProps, PieRingProps } from './RadialMenu';
 
 import IconWire from './icons/IconWire';
 import IconUnderpass from './icons/IconUnderpass';
@@ -15,76 +17,54 @@ import {
   removeMenuItem,
   toUnderpassMenuItem,
   toWireMenuItem,
-  moveMenuItem,
   MenuItem
 } from './radialMenu/menuItems';
 
-export interface Props {
-  loading : boolean;
-  x : number;
-  y : number;
+export type Props = {
+  contextMenu : ContextMenuState
   radius : number;
   width : number;
-  show : boolean;
-  tx : number;
-  ty : number;
-  tile : string;
-  dispatch : Dispatch<any>
+  dispatch : Dispatch<State>
 }
 
-interface State {
+export default class ContextMenu extends React.Component<Props, void>{
 
-}
-
-export default class ContextMenu extends React.Component<Props, State>{
-
-  shouldComponentUpdate(nextProps : Props, nextState : State){
-    if(nextProps.loading){
-      return nextProps.x !== this.props.x
-        || nextProps.y !== this.props.y
-        || nextProps.loading !== this.props.loading
+  shouldComponentUpdate(nextProps : Props){
+    if(nextProps.contextMenu.loading && this.props.contextMenu.loading){
+      return nextProps.contextMenu.x !== this.props.contextMenu.x
+        || nextProps.contextMenu.y !== this.props.contextMenu.y
+        || nextProps.contextMenu.loading !== this.props.contextMenu.loading
         || nextProps.radius !== this.props.radius
         || nextProps.width !== this.props.width;
     }
 
-    if(nextProps.show){
-      return nextProps.x !== this.props.x
-        || nextProps.y !== this.props.y
-        || nextProps.tx !== this.props.tx
-        || nextProps.ty !== this.props.ty
-        || nextProps.tile !== this.props.tile
-        || nextProps.show !== this.props.show
+    if(nextProps.contextMenu.show && this.props.contextMenu.show){
+      return nextProps.contextMenu.x !== this.props.contextMenu.x
+        || nextProps.contextMenu.y !== this.props.contextMenu.y
+        || nextProps.contextMenu.tx !== this.props.contextMenu.tx
+        || nextProps.contextMenu.ty !== this.props.contextMenu.ty
+        || nextProps.contextMenu.tile !== this.props.contextMenu.tile
+        || nextProps.contextMenu.show !== this.props.contextMenu.show
         || nextProps.radius !== this.props.radius
         || nextProps.width !== this.props.width;
     }
 
-    return nextProps.loading !== this.props.loading
-      || nextProps.show !== this.props.show;
+    return nextProps.contextMenu.loading !== this.props.contextMenu.loading
+      || nextProps.contextMenu.show !== this.props.contextMenu.show;
   }
 
   render(){
-    const {
-      x,
-      y,
-      tx,
-      ty,
-      tile,
-      loading,
-      show,
-      radius,
-      width,
-      dispatch
-    } = this.props;
-
-    if(loading){
+    if(this.props.contextMenu.loading){
+      const { x, y } = this.props.contextMenu;
       return (
         <g transform={`translate(${x} ${y})`}>
-          <Loading radius={radius} width={width+2} />
+          <Loading radius={this.props.radius} width={this.props.width+2} />
         </g>
       );
     }
 
-    if(show){
+    if(this.props.contextMenu.show){
+      const { x, y, tile, tx, ty } = this.props.contextMenu;
       return (
         <g transform={`translate(${x} ${y})`}>
           <RadialMenu
@@ -93,18 +73,18 @@ export default class ContextMenu extends React.Component<Props, State>{
           showMenu={true}
           center={undefined}
           menuTree={[
-            createRing(radius, width, [
-              ...tileMenuItems(tile, Math.floor(tx), Math.floor(ty), dispatch)
+            createRing(this.props.radius, this.props.width, [
+              ...tileMenuItems(tile, Math.floor(tx), Math.floor(ty), this.props.dispatch)
             ]),
             {
               ringKey: 2,
-              radius: radius,
-              width: width,
+              radius: this.props.radius,
+              width: this.props.width,
               fromTurnFraction: 1/8,
               toTurnFraction: 3/8,
               show: true,
               menuItems: [
-                acceptMenuItem(dispatch)
+                acceptMenuItem(this.props.dispatch)
               ]
             }
           ]} />
@@ -128,7 +108,7 @@ function createRing(radius : number, width : number, items : MenuItem[]) : PieRi
   };
 }
 
-function *tileMenuItems(tile : string, tx : number, ty : number, dispatch : Dispatch<any>){
+function *tileMenuItems(tile : string, tx : number, ty : number, dispatch : Dispatch<State>){
   if(tile == 'wire' || tile == 'empty'){
     yield toUnderpassMenuItem(dispatch, tx, ty);
   }

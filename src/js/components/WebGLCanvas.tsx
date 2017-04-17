@@ -5,9 +5,9 @@ import { Dispatch } from 'redux';
 import style from './main.css';
 
 import {
-  GL
+  initGl
 } from '../actions';
-
+import { State } from '../reduce';
 import {
   TOUCH_START,
   TOUCH_MOVE,
@@ -16,7 +16,7 @@ import {
 } from '../events';
 
 export interface Props{
-  dispatch : Dispatch<any>,
+  dispatch : Dispatch<State>,
   width : number,
   height : number
 }
@@ -26,7 +26,7 @@ const WebGLCanvas = connect(
     width: view.pixelWidth,
     height: view.pixelHeight
   })
-)(class WebGLCanvas extends React.Component<Props, any> {
+)(class WebGLCanvas extends React.Component<Props, void> {
   canvas : HTMLCanvasElement
   componentDidMount(){
     const gl = getContext(this.canvas);
@@ -36,13 +36,10 @@ const WebGLCanvas = connect(
     this.canvas.addEventListener('touchmove', dispatchTouchEvents(this.props.dispatch, TOUCH_MOVE), false);
     this.canvas.addEventListener('touchend', dispatchTouchEvents(this.props.dispatch, TOUCH_END), false);
 
-    this.props.dispatch({
-      type: GL,
-      gl
-    });
+    this.props.dispatch(initGl(gl));
   }
 
-  shouldComponentUpdate(nextProps : Props, nextState : Props){
+  shouldComponentUpdate(nextProps : Props){
     return nextProps.width != this.props.width
         || nextProps.height != this.props.height;
   }
@@ -62,10 +59,11 @@ export default WebGLCanvas;
 
 function getContext(canvas : HTMLCanvasElement) {
   return canvas.getContext("webgl", {})
-      || canvas.getContext("experimental-webgl", {});
+      || canvas.getContext("experimental-webgl", {})
+      || (() => {throw new Error("no webgle here")})();
 }
 
-function dispatchTouchEvents(dispatch : Dispatch<any>, type : TouchType){
+function dispatchTouchEvents(dispatch : Dispatch<State>, type : TouchType){
   return (event : TouchEvent) => {
     for(let i=0; i < event.changedTouches.length; i++){
       let touch = event.changedTouches[i];
