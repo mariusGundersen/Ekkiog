@@ -1,34 +1,28 @@
 import ndarray, { NdArray } from 'ndarray';
-import createBuffer, { GlBuffer} from 'gl-buffer';
-import createVAO, { GlVAO } from 'gl-vao';
 
+import { VertexBuffer, AtomicBind } from './types';
 import { Quad } from '../text/types';
 
-export default class QuadList {
-  gl : WebGLRenderingContext;
-  size : number;
-  vertices : Float32Array;
-  vertexBuffer : GlBuffer;
-  indecies : Uint16Array;
-  indexBuffer : GlBuffer;
-  vao : GlVAO;
-  map : NdArray;
-  count : number;
-  prevCount : number;
-  constructor(gl : WebGLRenderingContext, size : number){
+export default class QuadList implements VertexBuffer {
+  private readonly atomicBind : AtomicBind;
+  private readonly gl : WebGLRenderingContext;
+  private readonly size : number;
+  private readonly vertices : Float32Array;
+  private readonly vertexBuffer : WebGLBuffer;
+  private readonly indexBuffer : WebGLBuffer;
+  private readonly map : NdArray;
+  private count : number;
+  private prevCount : number;
+  constructor(atomicBind : AtomicBind, gl : WebGLRenderingContext, size : number){
+    this.atomicBind = atomicBind;
     this.gl = gl;
     this.size = size;
     this.vertices = new Float32Array(size*16);
-    this.vertexBuffer = createBuffer(gl, this.vertices);
-    this.indecies = new Uint16Array(createQuads(size));
-    this.indexBuffer = createBuffer(gl, this.indecies, gl.ELEMENT_ARRAY_BUFFER);
-    this.vao = createVAO(gl, [
-      {
-        buffer: this.vertexBuffer,
-        type: gl.FLOAT,
-        size: 4
-      }
-    ], this.indexBuffer, gl.UNSIGNED_SHORT);
+    this.vertexBuffer = gl.createBuffer() || (() => {throw new Error("Could not make buffer")})();
+    this.indexBuffer = gl.createBuffer() || (() => {throw new Error("Could not make buffer")})();
+    this.atomicBind(this);
+    gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(createQuads(size)), gl.STATIC_DRAW);
     this.map = ndarray(this.vertices, [size, 4, 2, 2]);
     this.count = 0;
     this.prevCount = 0;
@@ -63,20 +57,22 @@ export default class QuadList {
   }
 
   bind(){
-    this.vao.bind();
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+    this.gl.vertexAttribPointer(0, 4, this.gl.FLOAT, false, 0, 0);
   }
 
   update(){
     if(this.count !== this.prevCount){
-      this.vertexBuffer.bind();
+      this.atomicBind(this);
       this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
       this.prevCount = this.count;
     }
   }
 
   draw(){
-    this.bind();
-    this.vao.draw(this.gl.TRIANGLES, this.count*6);
+    this.atomicBind(this);
+    this.gl.drawElements(this.gl.TRIANGLES, this.count*6, this.gl.UNSIGNED_SHORT, 0);
   }
 }
 

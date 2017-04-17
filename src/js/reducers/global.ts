@@ -8,8 +8,15 @@ import Context from '../Context';
 import Renderer from '../engines/Renderer';
 import Perspective from '../Perspective';
 import { Storage } from '../storage/database';
+import { VertexBuffer, RenderContext, AtomicBind } from '../textures/types';
 
-export interface GlobalStateInitialized {
+interface GlobalSharedState {
+  readonly database : Storage,
+  readonly emitter : EventEmitter,
+  readonly perspective : Perspective
+}
+
+export interface GlobalStateInitialized extends GlobalSharedState {
   readonly initialized : true,
   readonly gl : WebGLRenderingContext
   readonly database : Storage,
@@ -20,11 +27,8 @@ export interface GlobalStateInitialized {
   readonly perspective : Perspective
 }
 
-export interface GlobalStateUninitialized {
-  readonly initialized : false,
-  readonly database : Storage,
-  readonly emitter : EventEmitter,
-  readonly perspective : Perspective
+export interface GlobalStateUninitialized extends GlobalSharedState {
+  readonly initialized : false
 }
 
 export type GlobalState = GlobalStateUninitialized | GlobalStateInitialized;
@@ -37,13 +41,15 @@ export default (database : Storage) => function global(state : GlobalState = {
 }, action : GlobalActions) : GlobalState {
   switch(action.type){
     case 'gl':
+      if(state.initialized) return state;
+      const atomicBind = makeAtomicBind();
       return {
         ...state,
         initialized: true,
         gl: action.gl,
         renderer: new Renderer(action.gl),
-        context: new Context(action.gl),
-        selectionContext: new Context(action.gl)
+        context: new Context(action.gl, atomicBind),
+        selectionContext: new Context(action.gl, atomicBind)
       };
     case 'set-forest':
       state.perspective.reset();
@@ -51,4 +57,14 @@ export default (database : Storage) => function global(state : GlobalState = {
     default:
       return state;
   }
+}
+
+function makeAtomicBind(){
+  let currentVBO : VertexBuffer | undefined = undefined;
+  return (vbo : VertexBuffer) => {
+    if(currentVBO === vbo) return;
+
+    currentVBO = vbo;
+    vbo.bind();
+  };
 }

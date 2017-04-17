@@ -4,7 +4,7 @@ import { mat3 } from 'gl-matrix';
 import textVS from './textVS.glsl';
 import textFS from './textFS.glsl';
 
-import Context from '../../Context';
+import { RenderContext } from '../../textures/types';
 
 export default class TextEngine {
   gl : WebGLRenderingContext;
@@ -14,9 +14,7 @@ export default class TextEngine {
     this.shader = createShader(gl, textVS, textFS);
   }
 
-  render(context : Context, matrix : mat3) {
-    if(!context.spriteSheetTexture.ready) return;
-
+  render(context : RenderContext, matrix : mat3) {
     this.shader.bind();
 
     this.shader.uniforms.inverseSpriteTextureSize = context.spriteSheetTexture.inverseSize;

@@ -1,14 +1,15 @@
 import {vec2} from 'gl-matrix';
 
-export default class Texture{
+import { TextureBuffer } from './types';
 
-  gl : WebGLRenderingContext;
-  texture : WebGLTexture;
+export default class Texture implements TextureBuffer {
+  readonly gl : WebGLRenderingContext;
+  readonly texture : WebGLTexture;
   width : number;
   height : number;
-  size : vec2;
-  halfSize : vec2;
-  inverseSize : vec2;
+  readonly size : vec2;
+  readonly halfSize : vec2;
+  readonly inverseSize : vec2;
   constructor(gl : WebGLRenderingContext, width=0, height=0){
     this.gl = gl;
     this.texture = gl.createTexture() || (() => {throw new Error("Could not make texture")})();
@@ -29,16 +30,12 @@ export default class Texture{
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
   }
 
-  activate(target : number){
-    this.gl.activeTexture(target + this.gl.TEXTURE0);
-  }
-
   bind(){
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
   }
 
   sampler2D(target : number){
-    this.activate(target);
+    this.gl.activeTexture(target + this.gl.TEXTURE0);
     this.bind();
     return target;
   }

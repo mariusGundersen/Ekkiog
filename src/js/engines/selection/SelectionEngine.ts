@@ -1,24 +1,20 @@
 import {vec2, mat3} from 'gl-matrix';
 import createShader, {GlShader} from 'gl-shader';
 
-import drawTriangle from 'a-big-triangle';
+import { RenderContext } from '../../textures/types';
 
-import moveVS from './moveVS.glsl';
-import moveFS from './moveFS.glsl';
+import selectionVS from './selectionVS.glsl';
+import selectionFS from './selectionFS.glsl';
 
-import Context from '../../Context';
-
-export default class MoveEngine {
+export default class SelectionEngine {
   gl : WebGLRenderingContext;
   shader : GlShader;
   constructor(gl : WebGLRenderingContext) {
     this.gl = gl;
-    this.shader = createShader(gl, moveVS, moveFS);
+    this.shader = createShader(gl, selectionVS, selectionFS);
   }
 
-  render(context : Context, matrix : mat3, [top, left, right, bottom] : number[], dx : number, dy : number) {
-    if(!context.spriteSheetTexture.ready) return;
-
+  render(context : RenderContext, matrix : mat3, [top, left, right, bottom] : number[], dx : number, dy : number) {
     this.shader.bind();
 
     this.shader.uniforms['inverseSpriteTextureSize'] = context.spriteSheetTexture.inverseSize;
@@ -38,6 +34,6 @@ export default class MoveEngine {
     ];
     this.shader.uniforms['translate'] = [dx, dy];
 
-    drawTriangle(this.gl)
+    context.triangle.draw();
   }
 }

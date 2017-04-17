@@ -1,13 +1,10 @@
 import {vec2, mat3} from 'gl-matrix';
 import createShader, {GlShader} from 'gl-shader';
 
-import drawTriangle from 'a-big-triangle';
-
 import viewVS from './viewVS.glsl';
 import viewFS from './viewFS.glsl';
 
-import Context from '../../Context';
-import DataTexture from '../../textures/DataTexture';
+import { RenderContext } from '../../textures/types';
 
 export default class ViewEngine {
   gl : WebGLRenderingContext;
@@ -17,9 +14,7 @@ export default class ViewEngine {
     this.shader = createShader(gl, viewVS, viewFS);
   }
 
-  render(context : Context, matrix : mat3) {
-    if(!context.spriteSheetTexture.ready) return;
-
+  render(context : RenderContext, matrix : mat3) {
     this.shader.bind();
     this.gl.clearColor(42/255, 45/255, 48/255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -34,6 +29,6 @@ export default class ViewEngine {
     this.shader.uniforms['chargeMap'] = context.chargeMapTexture.sampler2D(1);
     this.shader.uniforms['tileMap'] = context.tileMapTexture.sampler2D(2);
 
-    drawTriangle(this.gl)
+    context.triangle.draw();
   }
 }

@@ -1,9 +1,12 @@
 import { MutableContext, Item, Area } from 'ekkiog-editing';
 
+import { VertexBuffer, RenderContext, AtomicBind } from './textures/types';
+
 import DataTexture from './textures/DataTexture';
 import RenderTexture from './textures/RenderTexture';
 import ImageTexture from './textures/ImageTexture';
 
+import Triangle from './textures/Triangle';
 import QuadList from './textures/QuadList';
 import TextScene from './text/TextScene';
 
@@ -14,27 +17,30 @@ const MAP_SIZE = 128;
 const TILE_SIZE = 16;
 const SQRT_NET_COUNT = 256;
 
-export default class Context implements MutableContext{
-  gl : WebGLRenderingContext;
-  width : number;
-  height : number;
-  tileSize : number;
-  wordQuadList : QuadList;
-  textScene : TextScene;
-  spriteSheetTexture : ImageTexture;
-  mapTexture : DataTexture;
-  netMapTexture : DataTexture;
-  gatesTexture : DataTexture;
-  tileMapTexture : RenderTexture;
-  chargeMapTexture : RenderTexture;
-  netChargeTextures : [RenderTexture, RenderTexture];
-  constructor(gl : WebGLRenderingContext){
+export default class Context implements MutableContext, RenderContext {
+  readonly gl : WebGLRenderingContext;
+  readonly width : number;
+  readonly height : number;
+  readonly tileSize : number;
+  readonly triangle : Triangle;
+  readonly wordQuadList : QuadList;
+  readonly textScene : TextScene;
+  readonly spriteSheetTexture : ImageTexture;
+  readonly mapTexture : DataTexture;
+  readonly netMapTexture : DataTexture;
+  readonly gatesTexture : DataTexture;
+  readonly tileMapTexture : RenderTexture;
+  readonly chargeMapTexture : RenderTexture;
+  readonly netChargeTextures : [RenderTexture, RenderTexture];
+  private activeVBO : VertexBuffer
+  constructor(gl : WebGLRenderingContext, bindingTracker : AtomicBind){
     this.gl = gl;
     this.width = MAP_SIZE;
     this.height = MAP_SIZE;
     this.tileSize = TILE_SIZE;
 
-    this.wordQuadList = new QuadList(gl, 256);
+    this.triangle = new Triangle(bindingTracker, gl);
+    this.wordQuadList = new QuadList(bindingTracker, gl, 256);
     this.textScene = new TextScene(this.wordQuadList);
 
     this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));

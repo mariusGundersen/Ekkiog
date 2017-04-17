@@ -1,11 +1,11 @@
 import ndarray from 'ndarray';
 import Texture from './Texture';
 
-export default class RenderTexture extends Texture{
+import { FrameBuffer } from './types';
 
-  frameBuffer : WebGLFramebuffer;
-
-  renderBuffer : WebGLRenderbuffer;
+export default class RenderTexture extends Texture implements FrameBuffer{
+  private readonly frameBuffer : WebGLFramebuffer;
+  private readonly renderBuffer : WebGLRenderbuffer;
   constructor(gl : WebGLRenderingContext, width : number, height : number){
     super(gl, width, height);
 
@@ -28,18 +28,5 @@ export default class RenderTexture extends Texture{
 
   unbindFramebuffer(){
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-  }
-
-  export(){
-    const arrayBuffer = new Uint8Array(this.width*this.height*4);
-    this.bindFramebuffer();
-    this.gl.readPixels(0, 0, this.width, this.height, this.gl.RGBA, this.gl.UNSIGNED_BYTE, arrayBuffer);
-    this.unbindFramebuffer();
-    return arrayBuffer;
-  }
-
-  import(arrayBuffer : ArrayBufferView){
-    this.bind();
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, arrayBuffer);
   }
 }

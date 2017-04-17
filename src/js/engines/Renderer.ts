@@ -9,7 +9,7 @@ import MoveEngine from './move/MoveEngine';
 import TextEngine from './text/TextEngine';
 import DebugEngine from './debug/DebugEngine';
 
-import Context from '../Context';
+import { RenderContext } from '../textures/types';
 
 export default class Renderer {
   gl : WebGLRenderingContext;
@@ -37,19 +37,25 @@ export default class Renderer {
     this.debugEngine = new DebugEngine(gl);
   }
 
-  renderMap(context : Context){
+  renderMap(context : RenderContext){
+    if(!context.spriteSheetTexture.ready) return;
+
     this.tileMapEngine.render(
+      context.triangle,
       context.mapTexture,
       context.tileMapTexture);
   }
 
-  simulateTick(context : Context, tick=this.currentTick){
+  simulateTick(context : RenderContext, tick=this.currentTick){
+    if(!context.spriteSheetTexture.ready) return;
+
     this.currentTick = tick;
 
     const prevousCharges = context.netChargeTextures[(tick+1)%2];
     const nextCharges = context.netChargeTextures[tick%2];
 
     this.netChargeEngine.render(
+      context.triangle,
       prevousCharges,
       context.gatesTexture,
       nextCharges);
@@ -57,22 +63,27 @@ export default class Renderer {
     const currentCharges = nextCharges;
 
     this.chargeMapEngine.render(
+      context.triangle,
       context.netMapTexture,
       currentCharges,
       context.spriteSheetTexture,
       context.chargeMapTexture);
   }
 
-  renderView(context : Context, mapToViewportMatrix : mat3, viewportSize : vec2) {
+  renderView(context : RenderContext, mapToViewportMatrix : mat3, viewportSize : vec2) {
+    if(!context.spriteSheetTexture.ready) return;
+
     this.gl.viewport(0, 0, viewportSize[0], viewportSize[1]);
     this.viewEngine.render(context, mapToViewportMatrix);
     this.textEngine.render(context, mapToViewportMatrix);
     if('debug' in window){
-      this.debugEngine.render(context.chargeMapTexture, mapToViewportMatrix);
+      this.debugEngine.render(context.triangle, context.chargeMapTexture, mapToViewportMatrix);
     }
   }
 
-  renderMove(context : Context, mapToViewportMatrix : mat3, {top, left, right, bottom} : Box, dx : number, dy : number){
+  renderMove(context : RenderContext, mapToViewportMatrix : mat3, {top, left, right, bottom} : Box, dx : number, dy : number){
+    if(!context.spriteSheetTexture.ready) return;
+
     this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
   }
 }

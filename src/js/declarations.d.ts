@@ -31,31 +31,6 @@ declare module "gl-shader" {
   export default function(gl : WebGLRenderingContext, vertexShaderSource : string, fragmentShaderSource : string) : GlShader;
 }
 
-declare module "gl-buffer" {
-
-  export interface GlBuffer{
-    bind() : void
-  }
-
-  export default function createBuffer(gl : WebGLRenderingContext, source : Float32Array | Uint16Array, type? : number) : GlBuffer;
-}
-
-declare module "gl-vao" {
-
-  import { GlBuffer } from "gl-buffer";
-
-  export interface GlVAO {
-    bind() : void;
-    draw(type : number, count : number) : void;
-  }
-
-  export default function createVAO(gl : WebGLRenderingContext, definiton : any[], indexBuffer : GlBuffer, type : number) : GlVAO;
-}
-
-declare module "a-big-triangle"{
-  export default function(gl : WebGLRenderingContext) : void;
-}
-
 declare module "ndarray" {
   function ndarray(data: Data, shape?: number[], stride?: number[], offset?: number): NdArray;
 

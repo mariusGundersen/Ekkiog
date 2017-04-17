@@ -4,7 +4,7 @@ import Texture from './Texture';
 
 export default class ImageTexture extends Texture{
   image? : HTMLImageElement;
-  loading : Promise<ImageTexture>;
+  readonly loading : Promise<ImageTexture>;
   constructor(gl : WebGLRenderingContext, image : Promise<HTMLImageElement>){
     super(gl, 0, 0);
     this.image = undefined;

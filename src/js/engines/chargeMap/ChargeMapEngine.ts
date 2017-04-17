@@ -1,13 +1,9 @@
 import createShader, {GlShader} from 'gl-shader';
 
-import drawTriangle from 'a-big-triangle';
+import { VertexBuffer, TextureBuffer, FrameBuffer } from '../../textures/types';
 
 import chargeMapVS from './chargeMapVS.glsl';
 import chargeMapFS from './chargeMapFS.glsl';
-
-import ImageTexture from '../../textures/ImageTexture';
-import RenderTexture from '../../textures/RenderTexture';
-import DataTexture from '../../textures/DataTexture';
 
 export default class ChargeMapEngine{
   gl : WebGLRenderingContext;
@@ -17,9 +13,7 @@ export default class ChargeMapEngine{
     this.shader = createShader(gl, chargeMapVS, chargeMapFS);
   }
 
-  render(input : DataTexture, charges : RenderTexture, spriteSheet : ImageTexture, output : RenderTexture){
-    if(!spriteSheet.ready) return;
-
+  render(vertexBuffer : VertexBuffer, input : TextureBuffer, charges : TextureBuffer, spriteSheet : TextureBuffer, output : FrameBuffer){
     output.bindFramebuffer();
 
     this.shader.bind();
@@ -31,7 +25,7 @@ export default class ChargeMapEngine{
     this.shader.uniforms['netMap'] = input.sampler2D(1);
     this.shader.uniforms['netCharges'] = charges.sampler2D(2);
 
-    drawTriangle(this.gl)
+    vertexBuffer.draw();
 
     output.unbindFramebuffer();
   }

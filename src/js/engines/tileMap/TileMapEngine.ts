@@ -1,11 +1,9 @@
 import createShader, {GlShader} from 'gl-shader';
-import drawTriangle from 'a-big-triangle';
+
+import { VertexBuffer, TextureBuffer, FrameBuffer } from '../../textures/types';
 
 import tileMapVS from './tileMapVS.glsl';
 import tileMapFS from './tileMapFS.glsl';
-
-import RenderTexture from '../../textures/RenderTexture';
-import DataTexture from '../../textures/DataTexture';
 
 export default class TileMapEngine{
   gl : WebGLRenderingContext;
@@ -15,7 +13,7 @@ export default class TileMapEngine{
     this.shader = createShader(gl, tileMapVS, tileMapFS);
   }
 
-  render(input : DataTexture, output : RenderTexture){
+  render(vertexBuffer : VertexBuffer, input : TextureBuffer, output : FrameBuffer){
     output.bindFramebuffer();
 
     this.shader.bind();
@@ -24,7 +22,7 @@ export default class TileMapEngine{
     this.shader.uniforms['tilemap'] = input.sampler2D(0);
     this.shader.uniforms['inverseTileTextureSize'] = input.inverseSize;
 
-    drawTriangle(this.gl)
+    vertexBuffer.draw();
 
     output.unbindFramebuffer();
   }
