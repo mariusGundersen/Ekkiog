@@ -5,12 +5,14 @@ import {
   COMPONENT
 } from 'ekkiog-editing';
 
-import { spritesFlat, spritesThick, CharacterSprite } from './sprites';
+import { Quad, CharacterSprite, Sprite } from './types';
+
+import { spritesFlat, spritesThick } from './sprites';
 
 
 const TILE = 16;
 
-export default function textFromItem(item : Item, area : Area){
+export default function textFromItem(item : Item, area : Area) : Quad[] {
   switch(item.type){
     case COMPONENT:
       return [...textFromComponent(item, area)];
@@ -19,7 +21,7 @@ export default function textFromItem(item : Item, area : Area){
   }
 }
 
-export function* textFromComponent(component : Component, area : Area){
+export function* textFromComponent(component : Component, area : Area) : IterableIterator<Quad>{
   if(component.name){
     const characters = [...spritesFlat(component.name)];
     yield* textPos(area.left+1, area.top+1, area.width-2, area.height-2, characters);
@@ -40,7 +42,7 @@ export function* textFromComponent(component : Component, area : Area){
   }
 }
 
-export function* textPos(left : number, top : number, width : number, height : number, characters : CharacterSprite[]){
+export function* textPos(left : number, top : number, width : number, height : number, characters : CharacterSprite[]) : IterableIterator<Quad> {
   const x = left + width/2;
   const y = top + height/2;
   const w = width;
@@ -49,7 +51,7 @@ export function* textPos(left : number, top : number, width : number, height : n
   yield *centerText(x, y, scale, length, characters);
 }
 
-export function* centerText(cx : number, cy : number, scale : number, length : number, characters : CharacterSprite[]){
+export function* centerText(cx : number, cy : number, scale : number, length : number, characters : CharacterSprite[]) : IterableIterator<Quad> {
   let x = cx - length/2*scale;
   for(const c of characters){
     yield {

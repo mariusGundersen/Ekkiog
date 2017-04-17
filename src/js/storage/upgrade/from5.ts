@@ -1,0 +1,26 @@
+import xor from '../scripts/xor';
+import and from '../scripts/and';
+
+import {UpgradeDB} from 'idb';
+
+export default async function upgradeFrom5(db : UpgradeDB){
+  const components = db.transaction.objectStore('components');
+
+  await components
+    .put({
+      name: 'XOR',
+      ...xor()
+    });
+
+  await components
+    .put({
+      name: 'AND',
+      ...and()
+    });
+
+  await components
+    .put({
+      name: 'Welcome',
+      ...xor()
+    });
+}

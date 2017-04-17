@@ -6,14 +6,15 @@
     "strictNullChecks": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": false,
     "sourceMap": true,
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node"
   },
   "include": [
-    "./src/js/**/*.ts"
+    "./src/js/**/*.ts",
+    "./src/js/**/*.tsx"
   ],
   "exclude": [
     "node_modules"

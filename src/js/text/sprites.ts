@@ -1,10 +1,4 @@
-export interface CharacterSprite {
-  x : number,
-  y : number,
-  w : number,
-  h : number,
-  s : number
-}
+import { CharacterSprite } from './types';
 
 export function* spritesFlat(text : string){
   for(const char of text){

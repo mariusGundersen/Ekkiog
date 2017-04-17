@@ -1,0 +1,103 @@
+import { EventEmitter } from 'events';
+
+import EventSaga from 'event-saga';
+
+import {
+  POINTER_DOWN,
+  POINTER_MOVE,
+  POINTER_UP,
+  CANCEL_PAN_ZOOM
+} from '../events';
+
+import {
+  Pos,
+  PointerDownEvent,
+  PointerMoveEvent,
+  PointerUpEvent,
+  CancelPanZoomEvent
+} from './types';
+
+interface Pointer {
+  x : number,
+  y : number,
+  ox : number,
+  oy : number
+}
+
+export default class PanZoomSaga{
+
+  pointers : Map<number, Pointer>;
+  constructor(eventEmitter : EventEmitter){
+    const pointers = new Map<number, Pointer>();
+    this.pointers = pointers;
+
+    eventEmitter.on(POINTER_DOWN, function(data : PointerDownEvent){
+      pointers.set(data.id, {
+        x: data.x,
+        y: data.y,
+        ox: data.x,
+        oy: data.y
+      });
+    });
+
+    eventEmitter.on(POINTER_MOVE, function(data : PointerMoveEvent){
+      if(!pointers.has(data.id)) return;
+
+      const pointer = pointers.get(data.id);
+      if(pointer === undefined) return;
+      pointer.x = data.x;
+      pointer.y = data.y;
+    });
+
+    eventEmitter.on(CANCEL_PAN_ZOOM, function(data : CancelPanZoomEvent){
+      if(!pointers.has(data.id)) return;
+      pointers.delete(data.id);
+    });
+
+    eventEmitter.on(POINTER_UP, function(data : PointerUpEvent){
+      if(!pointers.has(data.id)) return;
+
+      pointers.delete(data.id);
+    });
+  }
+
+  process(){
+    const current = [...this.pointers.values()];
+
+    if(current.filter(p => p.ox != p.x || p.oy != p.y).length == 0) return null;
+
+    const previous = current.map(p => ({
+      x: p.ox,
+      y: p.oy
+    }));
+
+    current.forEach(pointer => {
+      pointer.ox = pointer.x;
+      pointer.oy = pointer.y;
+    });
+
+    return {
+      previous: getXYR(previous),
+      current: getXYR(current)
+    };
+  }
+}
+
+function getXYR(pointers : Pos[]){
+  const avgX = pointers.reduce((sum, pair, i, c) => sum + pair.x/c.length, 0);
+  const avgY = pointers.reduce((sum, pair, i, c) => sum + pair.y/c.length, 0);
+
+  const deltaX = pointers.map(point => (avgX - point.x)*(avgX - point.x));
+  const deltaY = pointers.map(point => (avgY - point.y)*(avgY - point.y));
+
+  let radius = 0;
+  for(let i=0; i<deltaX.length; i++){
+    radius += Math.sqrt(deltaX[i] + deltaY[i])/pointers.length;
+  }
+
+  return {
+    x: avgX,
+    y: avgY,
+    r: radius || 1
+  };
+}
