@@ -6,9 +6,9 @@ import {
 import { Dispatch, Store, Action } from 'redux';
 
 import { State } from '../reduce';
-import { } from '../actions';
 import { SelectionState, ComponentSelectedState, NothingSelectedState } from '../reducers/selection';
 import { GlobalState, GlobalStateInitialized } from '../reducers/global';
+import storage from '../storage';
 
 import mutateContext from './mutateContext';
 
@@ -42,6 +42,6 @@ function forestHandler(before : Forest, after : Forest, {context, renderer} : Gl
 
 function saveHandler(before : Forest, after : Forest, state : State, action : Action){
   if(before !== after && action.type !== 'set-forest'){
-    state.global.database.save(state.editor.currentComponentName, after);
+    storage.save(state.editor.currentComponentName, after);
   }
 }

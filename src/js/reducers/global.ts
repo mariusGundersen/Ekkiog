@@ -7,11 +7,9 @@ import {
 import Context from '../Context';
 import Renderer from '../engines/Renderer';
 import Perspective from '../Perspective';
-import { Storage } from '../storage/database';
 import { VertexBuffer, RenderContext, AtomicBind } from '../textures/types';
 
 interface GlobalSharedState {
-  readonly database : Storage,
   readonly emitter : EventEmitter,
   readonly perspective : Perspective
 }
@@ -19,7 +17,6 @@ interface GlobalSharedState {
 export interface GlobalStateInitialized extends GlobalSharedState {
   readonly initialized : true,
   readonly gl : WebGLRenderingContext
-  readonly database : Storage,
   readonly renderer : Renderer,
   readonly context : Context,
   readonly selectionContext : Context,
@@ -33,9 +30,8 @@ export interface GlobalStateUninitialized extends GlobalSharedState {
 
 export type GlobalState = GlobalStateUninitialized | GlobalStateInitialized;
 
-export default (database : Storage) => function global(state : GlobalState = {
+export default function global(state : GlobalState = {
   initialized: false,
-  database,
   emitter: new EventEmitter(),
   perspective: new Perspective()
 }, action : GlobalActions) : GlobalState {

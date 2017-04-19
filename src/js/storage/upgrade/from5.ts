@@ -3,22 +3,22 @@ import and from '../scripts/and';
 
 import {UpgradeDB} from 'idb';
 
-export default async function upgradeFrom5(db : UpgradeDB){
+export default function upgradeFrom5(db : UpgradeDB){
   const components = db.transaction.objectStore('components');
 
-  await components
+  components
     .put({
       name: 'XOR',
       ...xor()
     });
 
-  await components
+  components
     .put({
       name: 'AND',
       ...and()
     });
 
-  await components
+  components
     .put({
       name: 'Welcome',
       ...xor()

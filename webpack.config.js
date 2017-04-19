@@ -34,7 +34,7 @@ const postCssLoader = {
 };
 
 module.exports = {
-  entry: './src/js/main.tsx',
+  entry: './src/js/index.ts',
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',

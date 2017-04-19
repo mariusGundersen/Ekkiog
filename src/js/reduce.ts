@@ -8,8 +8,6 @@ import contextMenu, { ContextMenuState } from './reducers/contextMenu';
 import forest, { Forest } from './editing/reduce';
 import selection, { SelectionState } from './reducers/selection';
 
-import { Storage } from './storage/database';
-
 export interface State {
   view : ViewState,
   global : GlobalState,
@@ -20,9 +18,9 @@ export interface State {
   selection : SelectionState
 }
 
-export default (database : Storage) => combineReducers<State>({
+export default combineReducers<State>({
   view,
-  global: global(database),
+  global,
   editor,
   editorMenu,
   contextMenu,
