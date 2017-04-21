@@ -1,7 +1,7 @@
 import {vec2, mat3} from 'gl-matrix';
 import createShader, {GlShader} from 'gl-shader';
 
-import { RenderContext } from '../../textures/types';
+import { RenderContext } from '../textures/types';
 
 import moveVS from './moveVS.glsl';
 import moveFS from './moveFS.glsl';

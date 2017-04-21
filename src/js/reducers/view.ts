@@ -7,8 +7,6 @@ import {
 export interface ViewState {
   readonly pixelWidth : number,
   readonly pixelHeight : number,
-  readonly screenWidth : number,
-  readonly screenHeight : number,
   readonly centerTile : {
     readonly x : number,
     readonly y : number
@@ -18,8 +16,6 @@ export interface ViewState {
 export default function view(state : ViewState = {
   pixelWidth: 100,
   pixelHeight: 100,
-  screenWidth: 100,
-  screenHeight: 100,
   centerTile: {x: 64, y: 64}
 }, action : ViewActions) : ViewState {
   switch(action.type){
@@ -27,9 +23,7 @@ export default function view(state : ViewState = {
       return {
         ...state,
         pixelWidth: action.pixelWidth,
-        pixelHeight: action.pixelHeight,
-        screenWidth: action.screenWidth,
-        screenHeight: action.screenHeight
+        pixelHeight: action.pixelHeight
       };
     case 'panZoom':
       return {

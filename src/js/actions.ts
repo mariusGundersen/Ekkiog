@@ -15,16 +15,12 @@ export type Dispatch = Dispatch<State>;
 export type ResizeAction = {
   readonly type : 'resize',
   readonly pixelWidth : number,
-  readonly pixelHeight : number,
-  readonly screenWidth : number,
-  readonly screenHeight : number
+  readonly pixelHeight : number
 }
-export const resize = (pixelWidth : number, pixelHeight : number, screenWidth : number, screenHeight : number) : ResizeAction => ({
+export const resize = (pixelWidth : number, pixelHeight : number) : ResizeAction => ({
   type: 'resize',
   pixelWidth,
-  pixelHeight,
-  screenWidth,
-  screenHeight
+  pixelHeight
 });
 
 export type InitGlAction = {
@@ -276,7 +272,7 @@ export type EditorMenuActions =
   SetOkCancelMenuValidAction |
   ResetEditorMenuAction;
 
-export type EditingActions =
+export type ForestActions =
   SetForestAction |
   TapTileAction |
   RemoveTileAtAction |
@@ -301,7 +297,7 @@ export type Action =
   ContextMenuActions |
   EditorActions |
   EditorMenuActions |
-  EditingActions |
+  ForestActions |
   GlobalActions |
   ViewActions;
 

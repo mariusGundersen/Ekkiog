@@ -22,7 +22,7 @@ export interface Props{
 }
 
 const WebGLCanvas = connect(
-  ({view}) => ({
+  ({view} : State) => ({
     width: view.pixelWidth,
     height: view.pixelHeight
   })

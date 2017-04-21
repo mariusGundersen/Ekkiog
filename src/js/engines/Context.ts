@@ -10,8 +10,8 @@ import Triangle from './textures/Triangle';
 import QuadList from './textures/QuadList';
 import TextScene from './text/TextScene';
 
-import loadImage from './loadImage';
-import tiles from '../img/tiles.png';
+import loadImage from '../loadImage';
+import tiles from '../../img/tiles.png';
 
 const MAP_SIZE = 128;
 const TILE_SIZE = 16;

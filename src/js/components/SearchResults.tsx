@@ -7,10 +7,9 @@ import SearchResultView, { NoExactMatchView } from './SearchResultView';
 
 import style from './search.css';
 
-import { Storage, NamedForest } from '../storage/database';
+import storage, { Storage, NamedForest } from '../storage';
 
 export interface Props {
-  database : Storage,
   query : string,
   createComponent(name : string) : void;
   openComponent(name : NamedForest) : void;
@@ -29,11 +28,11 @@ export default reax<Props>()(({
 
   insertPackage
     .withLatestFrom(props)
-    .subscribe(([name, props] : [string, Props]) => props.database.loadPackage(name).then(props.insertPackage));
+    .subscribe(([name, props] : [string, Props]) => storage.loadPackage(name).then(props.insertPackage));
 
   openComponent
     .withLatestFrom(props)
-    .subscribe(([name, props] : [string, Props]) => props.database.load(name).then(props.openComponent))
+    .subscribe(([name, props] : [string, Props]) => storage.load(name).then(props.openComponent))
 
   const searchResults = searchDatabase(props);
 
@@ -58,9 +57,10 @@ export default reax<Props>()(({
 
 function searchDatabase(props : ObservableProps){
   return props
-    .switchMap(({database, query}) =>
+    .debounceTime(20)
+    .switchMap(({query}) =>
       query
-      ? database.getComponentNames()
+      ? storage.getComponentNames()
         .filter(name => name.toLowerCase().indexOf(query.toLowerCase()) >= 0)
         .scan((acc, val) => [...acc, val], [])
         .startWith([])

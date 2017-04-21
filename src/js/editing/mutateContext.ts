@@ -3,18 +3,15 @@ import {
   diffAndReconcile
 } from 'ekkiog-editing';
 
-import Renderer from '../engines/Renderer';
+import Engine, { MutableContext } from '../engines/Engine';
 
-import  Context from '../Context';
-
-export default function mutateContext(context : Context , renderer : Renderer, before : Forest, after : Forest){
-  if(before === after) return;
+export default function mutateContext(context : MutableContext, before : Forest, after : Forest){
+  if(before === after) return false;
 
   const changed = diffAndReconcile(before.enneaTree, after.enneaTree, context);
-  if(!changed) return;
+  if(!changed) return false;
 
   context.updateDataTextures();
 
-  renderer.simulateTick(context);
-  renderer.renderMap(context);
+  return true;
 }

@@ -3,10 +3,8 @@ export interface Options{
   readonly render : () => void;
   readonly tick : (tickCount : number) => void;
   readonly resize : (
-    width : number,
-    height : number,
-    screenWidth : number,
-    screenHeight : number) => void;
+    pixelWidth : number,
+    pixelHeight : number) => void;
 }
 
 export interface Config{
@@ -34,9 +32,9 @@ export default function startShell(options : Options) : Config{
   const onResizeRequest = () => {
     const screenWidth = window.document.body.clientWidth;
     const screenHeight = window.document.body.clientHeight;
-    const width = screenWidth*window.devicePixelRatio;
-    const height = screenHeight*window.devicePixelRatio;
-    options.resize(width, height, screenWidth, screenHeight);
+    const pixelWidth = screenWidth*window.devicePixelRatio;
+    const pixelHeight = screenHeight*window.devicePixelRatio;
+    options.resize(pixelWidth, pixelHeight);
   };
   window.addEventListener('resize', onResizeRequest)
   onResizeRequest();

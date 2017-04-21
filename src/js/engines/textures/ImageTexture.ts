@@ -27,6 +27,8 @@ export default class ImageTexture extends Texture{
   }
 
   update(){
+    if(this.image === undefined) return;
+
     this.bind();
 
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.image);

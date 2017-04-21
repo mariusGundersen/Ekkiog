@@ -1,7 +1,7 @@
 import {vec2, mat3} from 'gl-matrix';
 import createShader, { GlShader } from 'gl-shader';
 
-import { VertexBuffer, TextureBuffer } from '../../textures/types';
+import { VertexBuffer, TextureBuffer } from '../textures/types';
 
 import debugVS from './debugVS.glsl';
 import debugFS from './debugFS.glsl';

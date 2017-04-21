@@ -1,24 +1,21 @@
 import {vec2, mat3} from 'gl-matrix';
 import createShader, {GlShader} from 'gl-shader';
 
-import viewVS from './viewVS.glsl';
-import viewFS from './viewFS.glsl';
+import { RenderContext } from '../textures/types';
 
-import { RenderContext } from '../../textures/types';
+import selectionVS from './selectionVS.glsl';
+import selectionFS from './selectionFS.glsl';
 
-export default class ViewEngine {
+export default class SelectionEngine {
   gl : WebGLRenderingContext;
   shader : GlShader;
   constructor(gl : WebGLRenderingContext) {
     this.gl = gl;
-    this.shader = createShader(gl, viewVS, viewFS);
+    this.shader = createShader(gl, selectionVS, selectionFS);
   }
 
-  render(context : RenderContext, matrix : mat3) {
+  render(context : RenderContext, matrix : mat3, [top, left, right, bottom] : number[], dx : number, dy : number) {
     this.shader.bind();
-    this.gl.clearColor(42/255, 45/255, 48/255, 1);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-    this.gl.clearColor(0, 0, 0, 1);
 
     this.shader.uniforms['inverseSpriteTextureSize'] = context.spriteSheetTexture.inverseSize;
     this.shader.uniforms['mapTextureSize'] = context.tileMapTexture.size;
@@ -28,6 +25,14 @@ export default class ViewEngine {
     this.shader.uniforms['spriteSheet'] = context.spriteSheetTexture.sampler2D(0);
     this.shader.uniforms['chargeMap'] = context.chargeMapTexture.sampler2D(1);
     this.shader.uniforms['tileMap'] = context.tileMapTexture.sampler2D(2);
+
+    this.shader.uniforms['boundingBox'] = [
+      top-3,
+      left-2,
+      right-1,
+      bottom-2
+    ];
+    this.shader.uniforms['translate'] = [dx, dy];
 
     context.triangle.draw();
   }

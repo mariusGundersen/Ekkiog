@@ -23,11 +23,11 @@ export interface Props {
 }
 
 export default connect(
-  ({view, contextMenu, editor, editorMenu}) => ({
+  ({view, contextMenu, editor, editorMenu} : State) => ({
     pixelWidth: view.pixelWidth,
     pixelHeight: view.pixelHeight,
-    screenWidth: view.screenWidth,
-    screenHeight: view.screenHeight,
+    screenWidth: view.pixelWidth,
+    screenHeight: view.pixelHeight,
     contextMenu,
     editor,
     editorMenu

@@ -20,7 +20,7 @@ export default function createContextMiddleware(){
 
     if(after.global.initialized){
 
-      selectionHandler(before.selection, after.selection, after.global);
+      moveHandler(before.selection, after.selection, after.global);
       forestHandler(before.forest, after.forest, after.global);
       saveHandler(before.forest, after.forest, before, action);
     }
@@ -29,15 +29,22 @@ export default function createContextMiddleware(){
   }
 }
 
-function selectionHandler(before : SelectionState, after : SelectionState, {selectionContext, renderer} : GlobalStateInitialized){
+function moveHandler(before : SelectionState, after : SelectionState, {engine} : GlobalStateInitialized){
   if(!before.selection && !after.selection) return;
   const beforeForest = before.selection ? before.forest : createForest();
   const afterForest = after.selection ? after.forest : createForest();
-  mutateContext(selectionContext, renderer, beforeForest, afterForest);
+  const changed = mutateContext(engine.moveContext, beforeForest, afterForest);
+  if(!changed) return;
+
+  engine.updateMove();
 }
 
-function forestHandler(before : Forest, after : Forest, {context, renderer} : GlobalStateInitialized){
-  mutateContext(context, renderer, before, after);
+function forestHandler(before : Forest, after : Forest, {engine} : GlobalStateInitialized){
+  const changed = mutateContext(engine.context, before, after);
+  if(!changed) return;
+
+  engine.simulate();
+  engine.update();
 }
 
 function saveHandler(before : Forest, after : Forest, state : State, action : Action){

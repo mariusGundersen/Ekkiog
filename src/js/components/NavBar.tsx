@@ -19,12 +19,11 @@ import style from './navbar.css';
 
 import { insertComponentPackage, setForest } from '../actions';
 import { State } from '../reduce';
-import { Storage, NamedForest } from '../storage/database';
+import { NamedForest } from '../storage';
 
 export interface Props {
   dispatch : Dispatch<State>;
   currentComponentName : string;
-  database : Storage
 }
 
 const result = reax<Props>()({
@@ -74,7 +73,6 @@ const result = reax<Props>()({
     </div>
     {results.showSearch
     ? <SearchResults
-      database={props.database}
       query={results.query}
       insertPackage={actions.insertPackage}
       openComponent={actions.openComponent}
@@ -83,7 +81,6 @@ const result = reax<Props>()({
   </div>
 ));
 
-export default connect(state => ({
-  currentComponentName: state.editor.currentComponentName,
-  database: state.global.database
+export default connect((state : State) => ({
+  currentComponentName: state.editor.currentComponentName
 }))(result);

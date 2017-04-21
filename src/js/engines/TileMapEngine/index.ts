@@ -1,6 +1,6 @@
 import createShader, {GlShader} from 'gl-shader';
 
-import { VertexBuffer, TextureBuffer, FrameBuffer } from '../../textures/types';
+import { VertexBuffer, TextureBuffer, FrameBuffer } from '../textures/types';
 
 import tileMapVS from './tileMapVS.glsl';
 import tileMapFS from './tileMapFS.glsl';

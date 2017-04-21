@@ -24,14 +24,12 @@ const db = idb.open('ekkiog', 6, db => {
   }
 });
 
-export default new Storage(db);
-
 export interface NamedForest extends Forest {
   name : string
 };
 
 export class Storage{
-  db : Promise<DB>;
+  private readonly db : Promise<DB>;
   constructor(db : Promise<DB>){
     this.db = db;
   }
@@ -54,13 +52,19 @@ export class Storage{
       .objectStore('components')
       .get(name)
       .then(
-        x => x || createForest(),
-        x => createForest());
+        x => ({
+          name,
+          ...(x as Forest || createForest())
+        }),
+        x => ({
+          name,
+          ...createForest()
+        }));
   }
 
   async loadPackage(name : string) : Promise<CompiledComponent>{
-    return await this.load(name)
-      .then(component => packageComponent(component, component.name));
+    const namedForest = await this.load(name)
+    return packageComponent(namedForest, namedForest.name);
   }
 
   getComponentNames(){
@@ -85,3 +89,5 @@ export class Storage{
     });
   }
 }
+
+export default new Storage(db);

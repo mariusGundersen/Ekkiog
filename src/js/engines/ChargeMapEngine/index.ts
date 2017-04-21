@@ -1,6 +1,6 @@
 import createShader, {GlShader} from 'gl-shader';
 
-import { VertexBuffer, TextureBuffer, FrameBuffer } from '../../textures/types';
+import { VertexBuffer, TextureBuffer, FrameBuffer } from '../textures/types';
 
 import chargeMapVS from './chargeMapVS.glsl';
 import chargeMapFS from './chargeMapFS.glsl';

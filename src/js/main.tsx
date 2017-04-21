@@ -20,9 +20,7 @@ import { State } from './reduce';
 import App from './components/App';
 
 export default function main(store : Store<State>){
-  initialize(store, async ({gl, renderer, context, selectionContext, emitter, perspective} : GlobalStateInitialized) => {
-    perspective.setMapSize(context.width, context.height);
-
+  initialize(store, async ({engine, emitter, perspective} : GlobalStateInitialized) => {
     const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
 
     storage.load('Welcome').then(forest => store.dispatch(setForest(forest.name, forest)));
@@ -32,7 +30,7 @@ export default function main(store : Store<State>){
     const shellConfig = startShell({
       tickInterval: 500,
       tick(tickCount) {
-        renderer.simulateTick(context, tickCount);
+        engine.simulate(tickCount);
       },
 
       render() {
@@ -43,14 +41,12 @@ export default function main(store : Store<State>){
           store.dispatch(panZoom(perspective.tileToViewportMatrix, perspective.viewportToTileMatrix));
         }
 
-        renderer.renderView(
-          context,
+        engine.render(
           perspective.mapToViewportMatrix,
           perspective.viewportSize);
 
         if(state.selection.selection){
-          renderer.renderMove(
-            selectionContext,
+          engine.renderMove(
             perspective.mapToViewportMatrix,
             state.selection,
             state.selection.dx,
@@ -58,8 +54,8 @@ export default function main(store : Store<State>){
         }
       },
 
-      resize(pixelWidth, pixelHeight, screenWidth, screenHeight) {
-        store.dispatch(resize(pixelWidth, pixelHeight, screenWidth, screenHeight));
+      resize(pixelWidth, pixelHeight) {
+        store.dispatch(resize(pixelWidth, pixelHeight));
         const prevWidth = perspective.viewportWidth;
         perspective.setViewport(pixelWidth, pixelHeight);
         perspective.scaleBy(prevWidth/pixelWidth)

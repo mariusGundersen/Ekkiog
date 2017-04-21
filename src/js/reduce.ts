@@ -5,7 +5,7 @@ import global, { GlobalState } from './reducers/global';
 import editor, { EditorState } from './reducers/editor';
 import editorMenu, { EditorMenuState } from './reducers/editorMenu';
 import contextMenu, { ContextMenuState } from './reducers/contextMenu';
-import forest, { Forest } from './editing/reduce';
+import forest, { Forest } from './reducers/forest';
 import selection, { SelectionState } from './reducers/selection';
 
 export interface State {

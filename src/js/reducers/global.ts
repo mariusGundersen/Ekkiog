@@ -4,10 +4,8 @@ import {
   GlobalActions
 } from '../actions';
 
-import Context from '../Context';
-import Renderer from '../engines/Renderer';
+import Engine from '../engines/Engine';
 import Perspective from '../Perspective';
-import { VertexBuffer, RenderContext, AtomicBind } from '../textures/types';
 
 interface GlobalSharedState {
   readonly emitter : EventEmitter,
@@ -15,11 +13,8 @@ interface GlobalSharedState {
 }
 
 export interface GlobalStateInitialized extends GlobalSharedState {
-  readonly initialized : true,
-  readonly gl : WebGLRenderingContext
-  readonly renderer : Renderer,
-  readonly context : Context,
-  readonly selectionContext : Context,
+  readonly initialized : true
+  readonly engine : Engine
   readonly emitter : EventEmitter,
   readonly perspective : Perspective
 }
@@ -38,14 +33,10 @@ export default function global(state : GlobalState = {
   switch(action.type){
     case 'gl':
       if(state.initialized) return state;
-      const atomicBind = makeAtomicBind();
       return {
         ...state,
         initialized: true,
-        gl: action.gl,
-        renderer: new Renderer(action.gl),
-        context: new Context(action.gl, atomicBind),
-        selectionContext: new Context(action.gl, atomicBind)
+        engine: new Engine(action.gl)
       };
     case 'set-forest':
       state.perspective.reset();
@@ -53,14 +44,4 @@ export default function global(state : GlobalState = {
     default:
       return state;
   }
-}
-
-function makeAtomicBind(){
-  let currentVBO : VertexBuffer | undefined = undefined;
-  return (vbo : VertexBuffer) => {
-    if(currentVBO === vbo) return;
-
-    currentVBO = vbo;
-    vbo.bind();
-  };
 }

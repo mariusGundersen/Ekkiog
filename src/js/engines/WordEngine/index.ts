@@ -1,17 +1,17 @@
 import createShader, { GlShader } from 'gl-shader';
 import { mat3 } from 'gl-matrix';
 
-import textVS from './textVS.glsl';
-import textFS from './textFS.glsl';
+import wordVS from './wordVS.glsl';
+import wordFS from './wordFS.glsl';
 
-import { RenderContext } from '../../textures/types';
+import { RenderContext } from '../textures/types';
 
-export default class TextEngine {
+export default class WordEngine {
   gl : WebGLRenderingContext;
   shader : GlShader;
   constructor(gl : WebGLRenderingContext) {
     this.gl = gl;
-    this.shader = createShader(gl, textVS, textFS);
+    this.shader = createShader(gl, wordVS, wordFS);
   }
 
   render(context : RenderContext, matrix : mat3) {

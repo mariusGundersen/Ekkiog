@@ -1,26 +1,26 @@
 import { mat3, vec2 } from 'gl-matrix';
 import { Box } from 'ekkiog-editing';
 
-import ViewEngine from './view/ViewEngine';
-import TileMapEngine from './tileMap/TileMapEngine';
-import ChargeMapEngine from './chargeMap/ChargeMapEngine';
-import NetChargeEngine from './netCharges/NetChargeEngine';
-import MoveEngine from './move/MoveEngine';
-import TextEngine from './text/TextEngine';
-import DebugEngine from './debug/DebugEngine';
+import ViewEngine from './ViewEngine';
+import TileMapEngine from './TileMapEngine';
+import ChargeMapEngine from './ChargeMapEngine';
+import NetChargeEngine from './NetChargeEngine';
+import MoveEngine from './MoveEngine';
+import WordEngine from './WordEngine';
+import DebugEngine from './DebugEngine';
 
-import { RenderContext } from '../textures/types';
+import { RenderContext } from './textures/types';
 
 export default class Renderer {
-  gl : WebGLRenderingContext;
-  currentTick : number;
-  netChargeEngine : NetChargeEngine;
-  chargeMapEngine : ChargeMapEngine;
-  tileMapEngine : TileMapEngine;
-  viewEngine : ViewEngine;
-  moveEngine : MoveEngine;
-  textEngine : TextEngine;
-  debugEngine : DebugEngine;
+  private readonly gl : WebGLRenderingContext;
+  private currentTick : number;
+  private readonly netChargeEngine : NetChargeEngine;
+  private readonly chargeMapEngine : ChargeMapEngine;
+  private readonly tileMapEngine : TileMapEngine;
+  private readonly viewEngine : ViewEngine;
+  private readonly moveEngine : MoveEngine;
+  private readonly wordEngine : WordEngine;
+  private readonly debugEngine : DebugEngine;
   constructor(gl : WebGLRenderingContext) {
     this.gl = gl;
     this.currentTick = 0;
@@ -33,7 +33,7 @@ export default class Renderer {
     this.tileMapEngine = new TileMapEngine(gl);
     this.viewEngine = new ViewEngine(gl);
     this.moveEngine = new MoveEngine(gl);
-    this.textEngine = new TextEngine(gl);
+    this.wordEngine = new WordEngine(gl);
     this.debugEngine = new DebugEngine(gl);
   }
 
@@ -75,7 +75,7 @@ export default class Renderer {
 
     this.gl.viewport(0, 0, viewportSize[0], viewportSize[1]);
     this.viewEngine.render(context, mapToViewportMatrix);
-    this.textEngine.render(context, mapToViewportMatrix);
+    this.wordEngine.render(context, mapToViewportMatrix);
     if('debug' in window){
       this.debugEngine.render(context.triangle, context.chargeMapTexture, mapToViewportMatrix);
     }
