@@ -15,8 +15,8 @@ import {
 } from '../events';
 
 export default class PointerSaga {
-  canTap : boolean;
-  canShowContextMenu : boolean;
+  private canTap : boolean;
+  private canShowContextMenu : boolean;
   constructor(emitter : EventEmitter){
     this.canTap = true;
     this.canShowContextMenu = true;

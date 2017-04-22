@@ -21,7 +21,7 @@ import App from './components/App';
 
 export default function main(store : Store<State>){
   initialize(store, async ({engine, emitter, perspective} : GlobalStateInitialized) => {
-    const touchControls = new TouchControls(emitter, (x, y) => perspective.viewportToTile(x, y));
+    const touchControls = new TouchControls(emitter, perspective);
 
     storage.load('Welcome').then(forest => store.dispatch(setForest(forest.name, forest)));
 
@@ -35,15 +35,12 @@ export default function main(store : Store<State>){
 
       render() {
         const state = store.getState();
-        const result = touchControls.panZoomSaga.process();
-        if(result !== null){
-          perspective.panZoom(result.previous, result.current);
-          store.dispatch(panZoom(perspective.tileToViewportMatrix, perspective.viewportToTileMatrix));
+        const changed = touchControls.panZoomSaga.process();
+        if(changed){
+          store.dispatch(panZoom(perspective.tileToViewport.bind(perspective)));
         }
 
-        engine.render(
-          perspective.mapToViewportMatrix,
-          perspective.viewportSize);
+        engine.render(perspective.mapToViewportMatrix);
 
         if(state.selection.selection){
           engine.renderMove(
@@ -57,9 +54,17 @@ export default function main(store : Store<State>){
       resize(pixelWidth, pixelHeight) {
         store.dispatch(resize(pixelWidth, pixelHeight));
         const prevWidth = perspective.viewportWidth;
+        const mapPosA = perspective.viewportToMap(0, 0);
+        const mapPosB = perspective.viewportToMap(prevWidth, 0);
         perspective.setViewport(pixelWidth, pixelHeight);
-        perspective.scaleBy(prevWidth/pixelWidth)
-        store.dispatch(panZoom(perspective.tileToViewportMatrix, perspective.viewportToTileMatrix));
+        const squarePosA = perspective.viewportToSquare(0, 0);
+        const squarePosB = perspective.viewportToSquare(pixelWidth, 0);
+
+        perspective.transformMapToSquare(
+          [mapPosA, squarePosA],
+          [mapPosB, squarePosB]);
+
+        store.dispatch(panZoom(perspective.tileToViewport.bind(perspective)));
       }
     });
   });

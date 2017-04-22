@@ -21,7 +21,7 @@ import {
 } from './radialMenu/menuItems';
 
 export type Props = {
-  contextMenu : ContextMenuState
+  contextMenu : ContextMenuState;
   radius : number;
   width : number;
   dispatch : Dispatch<State>

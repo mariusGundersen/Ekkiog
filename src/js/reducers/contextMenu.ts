@@ -62,7 +62,7 @@ export default function contextMenu(state : ContextMenuState = {
     case 'panZoom':
       return state.show ? {
           ...state,
-          ...transform(action.tileToViewportMatrix, state.tx, state.ty)
+          ...toPos(action.tileToViewport(state.tx, state.ty))
         } : state;
     case 'hideContextMenu':
       return {
@@ -74,10 +74,9 @@ export default function contextMenu(state : ContextMenuState = {
   }
 }
 
-function transform(matrix : mat3, ...pos : number[]){
-  vec2.transformMat3(pos as any, pos, matrix);
+function toPos(pos : [number, number]){
   return {
-    x: pos[0]/window.devicePixelRatio,
-    y: pos[1]/window.devicePixelRatio
+    x: pos[0],
+    y: pos[1]
   };
 }

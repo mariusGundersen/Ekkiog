@@ -1,188 +1,329 @@
-import {vec2, mat3} from 'gl-matrix';
+import {vec2, vec3, mat3, mat2d} from 'gl-matrix';
+import { Box } from 'ekkiog-editing';
 
-export interface XYScale {
-  x : number,
-  y : number,
-  r : number
-};
+export type PosXY = [ number, number ];
+export type SquarePos = PosXY;
+export type MapPos = PosXY;
 
-export interface PosScale {
-  pos : [number, number],
-  r : number
-};
+/*
+                                            mapToTile
+                                 clipToMap       |
+                correctAspect        |           |
+    viewportToClip    |              |           |
+         |            |              |           |
+viewPort -> clipSpace -> aspectRatio -> mapSpace ->  tile
+  0,0    ->   -1,1    ->    -1,.8    ->   -1,1   ->   0,0
+400,300  ->    0,0    ->     0,0     ->    0,0   ->  64,64
+800,600  ->    1,-1   ->     1,-.8   ->    1,-1  -> 128,128
+
+viewportToClip:
+[ 1/w    0   -1 ]   [x]   [x]
+[   0  -1/h   1 ] X [y] = [y]
+[   0    0    1 ]   [1]   [1]
+
+correctAspect:
+[ 1   0   0 ]   [x]   [x]
+[ 0  h/w  0 ] X [y] = [y]
+[ 0   0   1 ]   [1]   [1]
+
+clipToMap:
+[ s  0  x ]   [x]   [x]
+[ 0  s  y ] X [y] = [y]
+[ 0  0  1 ]   [1]   [1]
+
+mapToTile:
+[ 64    0  64 ]   [x]   [x]
+[  0  -64  64 ] X [y] = [y]
+[  0    0   1 ]   [1]   [1]
+
+
+tilePos     =    mapToTile     * verticalFlip *  clipToMap  * verticalFlip * viewportToClip * viewportPos
+viewportPos = viewportFromClip * verticalFlip * clipFromMap * verticalFlip *   mapFromTile  *   tilePos
+*/
 
 export default class Perspective{
-  mapToViewportMatrix : mat3;
-  toClipSpaceMatrix : mat3;
-  viewportToMapCenterMatrix : mat3;
-  viewportToTileMatrix : mat3;
-  tileToViewportMatrix : mat3;
-  mapSize : vec2;
-  halfMapSize : vec2;
-  viewportSize : vec2;
-  viewportAspectRatio : vec2;
-  inverseViewportAspectRatio : vec2;
-  constructor(){
-    this.mapToViewportMatrix = mat3.create();
+  readonly mapToViewportMatrix : mat3;
+  readonly viewportToTileMatrix : mat3;
+  readonly tileToViewportMatrix : mat3;
+  private readonly viewportSize : vec2;
 
-    this.toClipSpaceMatrix = mat3.create();
-    this.viewportToMapCenterMatrix = mat3.create();
+  private readonly verticalFlipMatrix : mat2d;
+  private readonly mapToTileMatrix : mat2d;
+  private readonly mapFromTileMatrix : mat2d;
+  private readonly squareToMapMatrix : mat2d;
+  private readonly squareFromMapMatrix : mat2d;
+  private readonly clipToSquareMatrix : mat2d;
+  private readonly clipFromSquareMatrix : mat2d;
+  private readonly viewportToClipMatrix : mat2d;
+  private readonly viewportFromClipMatrix : mat2d;
+  constructor(){
+    this.verticalFlipMatrix = mat2d.create();
+    this.mapToTileMatrix = mat2d.create();
+    this.mapFromTileMatrix = mat2d.create();
+    this.squareToMapMatrix = mat2d.create();
+    this.squareFromMapMatrix = mat2d.create();
+    this.clipToSquareMatrix = mat2d.create();
+    this.clipFromSquareMatrix = mat2d.create();
+    this.viewportToClipMatrix = mat2d.create();
+    this.viewportFromClipMatrix = mat2d.create();
+
+    this.mapToViewportMatrix = mat3.create();
     this.viewportToTileMatrix = mat3.create();
     this.tileToViewportMatrix = mat3.create();
 
-    this.mapSize = vec2.fromValues(128, 128);
-    this.halfMapSize = vec2.fromValues(64, 64);
-
     this.viewportSize = vec2.fromValues(1, 1);
-    this.viewportAspectRatio = vec2.fromValues(1, 1);
-    this.inverseViewportAspectRatio = vec2.fromValues(1, 1);
 
-    scaleSelf(this.mapToViewportMatrix, this.viewportAspectRatio);
+    mat2d.fromScaling(this.verticalFlipMatrix, [1, -1]);
+    mat2d.fromScaling(this.squareToMapMatrix, [1, 1]);
+    mat2d.invert(this.squareFromMapMatrix, this.squareToMapMatrix);
 
-    this.recalculateViewportToMapCenterMatrix();
-  }
-
-  get scale(){
-    return this.mapToViewportMatrix[0];
-  }
-
-  set scale(scale){
-    this.scaleBy(scale/this.mapToViewportMatrix[0]);
+    this.setMapSize(128);
   }
 
   get viewportWidth(){
     return this.viewportSize[0];
   }
 
-  reset(){
-    this.mapToViewportMatrix[6] = 0;
-    this.mapToViewportMatrix[7] = 0;
-    this.scale = 16*128/this.viewportSize[0];
-    this.recalculateViewportToMapCenterMatrix();
+  get viewportHeight(){
+    return this.viewportSize[1];
   }
 
-  scaleBy(r : number){
-    this.panZoomInMapSpace({
-      pos: [0,0],
-      r: 1
-    },{
-      pos: [0,0],
-      r: r
-    });
-  }
-
-  panZoom(previous : XYScale, next : XYScale){
-    const previousCoord = transformPos(this.viewportToMapCenterMatrix, previous.x, previous.y);
-    const nextCoord = transformPos(this.viewportToMapCenterMatrix, next.x, next.y);
-
-    this.panZoomInMapSpace({
-      pos: previousCoord,
-      r: previous.r
-    },{
-      pos: nextCoord,
-      r: next.r
-    });
-  }
-
-  panZoomInMapSpace(previous : PosScale, next : PosScale){
-    translateSelf(this.mapToViewportMatrix, next.pos);
-    scaleSelf(this.mapToViewportMatrix, this.viewportAspectRatio);
-    scaleSelfByInverseScalar(this.mapToViewportMatrix, previous.r);
-    scaleSelfByScalar(this.mapToViewportMatrix, next.r);
-    scaleSelf(this.mapToViewportMatrix, this.inverseViewportAspectRatio);
-    translateSelfNegative(this.mapToViewportMatrix, previous.pos);
-
-    this.recalculateViewportToMapCenterMatrix();
+  /** Resets to fit the XOR gate */
+  reset({top, left, bottom, right} : Box){
+    const topLeft = [top, left] as PosXY;
+    const bottomRight = [bottom, right] as PosXY;
+    vec2.transformMat2d(topLeft as any, topLeft, this.mapFromTileMatrix);
+    vec2.transformMat2d(topLeft as any, topLeft, this.verticalFlipMatrix);
+    vec2.transformMat2d(bottomRight as any, bottomRight, this.mapFromTileMatrix);
+    vec2.transformMat2d(bottomRight as any, bottomRight, this.verticalFlipMatrix);
+    this.transformMapToSquare(
+      [topLeft, [-1,1]],
+      [bottomRight, [ 1,-1]]
+    );
   }
 
   setViewport(width : number, height : number){
+    /*
+      viewportToClip:
+      [ 2/w    0  -1 ]   [x]   [x]
+      [  0    2/h -1 ] X [y] = [y]
+      [  0     0   1 ]   [1]   [1]
+    */
+
+    mat2d.set(this.viewportToClipMatrix, 2/width, 0, 0, 2/height, -1, -1);
+    mat2d.invert(this.viewportFromClipMatrix, this.viewportToClipMatrix);
+
+    /*
+      correctAspect:
+      [ 1   0   0 ]   [x]   [x]
+      [ 0  h/w  0 ] X [y] = [y]
+      [ 0   0   1 ]   [1]   [1]
+    */
+
+    mat2d.set(this.clipToSquareMatrix, 1, 0, 0, height/width, 0, 0);
+    mat2d.invert(this.clipFromSquareMatrix, this.clipToSquareMatrix);
+
     vec2.set(this.viewportSize, width, height);
 
-    mat3.fromTranslation(this.toClipSpaceMatrix, [-1, -1]);
-    scaleSelf(this.toClipSpaceMatrix, [2/width, 2/height]);
-
-    vec2.set(this.inverseViewportAspectRatio, 1, width/height);
-    scaleSelf(this.mapToViewportMatrix, this.viewportAspectRatio);
-    scaleSelf(this.mapToViewportMatrix, this.inverseViewportAspectRatio);
-    vec2.set(this.viewportAspectRatio, 1, height/width);
-
-    this.recalculateViewportToMapCenterMatrix();
+    this.recalculate();
   }
 
-  setMapSize(width : number, height : number){
-    vec2.set(this.mapSize, width, height);
-    vec2.set(this.halfMapSize, width/2, height/2);
+  setMapSize(size : number){
+    /*
+    mapToTile:
+    [ 64   0  64 ]   [x]   [x]
+    [  0  64  64 ] X [y] = [y]
+    [  0   0   1 ]   [1]   [1]
+    */
+    mat2d.set(this.mapToTileMatrix, size/2, 0, 0, size/2, size/2, size/2);
+    mat2d.invert(this.mapFromTileMatrix, this.mapToTileMatrix);
 
-    this.recalculateViewportToTileMatrix();
+    this.recalculate();
   }
 
-  tileToViewport(...pos : Array<number>){
-    return vec2.transformMat3(pos as any, pos, this.tileToViewportMatrix);
+  transformMapToSquare(...pos : [MapPos, SquarePos][]){
+    if(pos.length === 1){
+      /*
+
+      mapPos = squareToMap * squarePos
+      [ s 0 x ]   [s_x]   [m_x]
+      [ 0 s y ] x [s_y] = [m_y]
+      [ 0 0 1 ]   [ 1 ]   [ 1 ]
+
+      x = m_x - s*s_x
+      y = m_y - s*s_y
+
+      */
+      const s = this.squareToMapMatrix[0] //reuse existing scale
+      const x = pos[0][0][0] - s*pos[0][1][0];
+      const y = pos[0][0][1] - s*pos[0][1][1];
+      mat2d.set(this.squareToMapMatrix, s, 0, 0, s, x, y);
+      mat2d.invert(this.squareFromMapMatrix, this.squareToMapMatrix);
+
+      this.recalculate();
+      return;
+    }
+
+    /*
+    Calculate squareToMap by solving the equation
+    mapPos = squareToMap * squarePos
+    [ s 0 x ]   [s_x_a  s_x_b  s_x_c]   [m_x_a  m_x_b  m_x_c]
+    [ 0 s y ] x [s_y_a  s_y_b  s_y_c] = [m_y_a  m_y_b  m_y_c]
+    [ 0 0 1 ]   [    1      1      1]   [    1      1      1]
+
+    s*s_x_a + x = m_x_a
+    s*s_x_b + x = m_x_b
+    s*s_x_c + x = m_x_c
+    s*s_y_a + y = m_y_a
+    s*s_y_b + y = m_y_b
+    s*s_y_c + y = m_y_c
+
+    [ s_x_a 1 0 ] [ s ]   [ m_x_a ]
+    [ s_x_b 1 0 ] [ x ] = [ m_x_b ]
+    [ s_x_c 1 0 ] [ y ]   [ m_x_c ]
+    [ s_y_a 0 1 ]         [ m_y_a ]
+    [ s_y_b 0 1 ]         [ m_y_b ]
+    [ s_y_c 0 1 ]         [ m_y_c ]
+
+    (At*A)i*At*b
+    Ai*Ati*At*b
+    Ai*b
+
+    [L*3][3] = [L]
+    [3*L][L*3][3] = [3*L][L]
+    [3*3][3] = [3]
+
+    */
+
+    const len = pos.length;
+    let m00=0, m01=0, m02=0, m11=0,m12=0,m22=0;
+    let v0=0, v1=0, v2=0;
+    for(let i=0; i<len; i++){
+      m00 += pos[i][1][0]*pos[i][1][0] + pos[i][1][1]*pos[i][1][1];
+      m01 += pos[i][1][0];
+      m02 += pos[i][1][1];
+      v0 += pos[i][0][0]*pos[i][1][0] + pos[i][0][1]*pos[i][1][1];
+      v1 += pos[i][0][0];
+      v2 += pos[i][0][1];
+    }
+    const mat = mat3.fromValues(
+      m00, m01, m02,
+      m01, len,   0,
+      m02,   0, len);
+    const vec = vec3.fromValues(v0, v1, v2);
+    mat3.invert(mat, mat);
+    vec3.transformMat3(vec, vec, mat);
+
+    mat2d.set(this.squareToMapMatrix, vec[0], 0, 0, vec[0], vec[1], vec[2]);
+    mat2d.invert(this.squareFromMapMatrix, this.squareToMapMatrix);
+
+    this.recalculate();
   }
 
-  viewportToTile(...pos : number[]){
-    return vec2.transformMat3(pos as any, pos, this.viewportToTileMatrix) as any as [number, number];
+  /**
+   * viewportPos = viewportFromClip * verticalFlip * clipFromSquare * squareFromMap * mapPos
+   */
+  mapToViewport(...pos : number[]) : PosXY{
+    let vec = pos as any as vec2;
+    vec2.transformMat2d(vec, vec, this.squareFromMapMatrix);
+    vec2.transformMat2d(vec, vec, this.clipFromSquareMatrix);
+    vec2.transformMat2d(vec, vec, this.verticalFlipMatrix);
+    vec2.transformMat2d(vec, vec, this.viewportFromClipMatrix);
+    return vec as any as PosXY;
   }
 
-  viewportToTileFloored(...pos : number[]){
+  /**
+   * mapPos = squareToMap * clipToSquare * viewportToClip * verticalFlip * viewportPos
+   */
+  viewportToMap(...pos : number[]) : MapPos {
+    let vec = pos as any as vec2;
+    vec2.transformMat2d(vec, vec, this.viewportToClipMatrix);
+    vec2.transformMat2d(vec, vec, this.verticalFlipMatrix);
+    vec2.transformMat2d(vec, vec, this.clipToSquareMatrix);
+    vec2.transformMat2d(vec, vec, this.squareToMapMatrix);
+    return vec as any as PosXY;
+  }
+
+  /**
+   * squarePos = clipToSquare * viewportToClip * verticalFlip * viewportPos
+   */
+  viewportToSquare(...pos : number[]) : SquarePos {
+    let vec = pos as any as vec2;
+    vec2.transformMat2d(vec, vec, this.viewportToClipMatrix);
+    vec2.transformMat2d(vec, vec, this.verticalFlipMatrix);
+    vec2.transformMat2d(vec, vec, this.clipToSquareMatrix);
+    return vec as any as PosXY;
+  }
+
+  /**
+   * viewportPos = viewportFromClip * verticalFlip * clipFromSquare * squareFromMap * verticalFlip * mapFromTile * tilePos
+   */
+  tileToViewport(...pos : number[]) : PosXY{
+    let vec = pos as any as vec2;
+    vec2.transformMat2d(vec, vec, this.mapFromTileMatrix);
+    vec2.transformMat2d(vec, vec, this.verticalFlipMatrix);
+    vec2.transformMat2d(vec, vec, this.squareFromMapMatrix);
+    vec2.transformMat2d(vec, vec, this.clipFromSquareMatrix);
+    vec2.transformMat2d(vec, vec, this.verticalFlipMatrix);
+    vec2.transformMat2d(vec, vec, this.viewportFromClipMatrix);
+    return vec as any as PosXY;
+  }
+
+  /**
+   * tilePos = mapToTile * verticalFlip * squareToMap * clipToSquare * verticalFlip * viewportToClip * viewportPos
+   */
+  viewportToTile(...pos : number[]) : PosXY{
+    let vec = pos as any as vec2;
+    vec2.transformMat2d(vec, vec, this.viewportToClipMatrix);
+    vec2.transformMat2d(vec, vec, this.verticalFlipMatrix);
+    vec2.transformMat2d(vec, vec, this.clipToSquareMatrix);
+    vec2.transformMat2d(vec, vec, this.squareToMapMatrix);
+    vec2.transformMat2d(vec, vec, this.verticalFlipMatrix);
+    vec2.transformMat2d(vec, vec, this.mapToTileMatrix);
+    return vec as any as PosXY;
+  }
+
+  viewportToTileFloored(...pos : number[]) : PosXY{
     pos = this.viewportToTile(...pos);
-    return [Math.floor(pos[0]), Math.floor(pos[1])];
+    return [pos[0]|0, pos[1]|0];
   }
 
-  recalculateViewportToMapCenterMatrix(){
-    const aspect = this.viewportAspectRatio[1];
-    const scale = minmax(0.1, this.mapToViewportMatrix[0], 100);
-    this.mapToViewportMatrix[0] = scale;
-    this.mapToViewportMatrix[4] = scale/aspect;
-    this.mapToViewportMatrix[6] = minmax(-1, this.mapToViewportMatrix[6]/scale, 1)*scale;
-    this.mapToViewportMatrix[7] = minmax(-1, this.mapToViewportMatrix[7]/scale*aspect, 1)*scale/aspect;
+  /**
+   * clipPos = clipFromSquare * squareFromMap * verticalFlip * mapPos
+   */
+  private recalculate(){
+    mat3.fromMat2d(this.mapToViewportMatrix, this.verticalFlipMatrix);
+    mul2d(this.mapToViewportMatrix, this.squareFromMapMatrix, this.mapToViewportMatrix);
+    mul2d(this.mapToViewportMatrix, this.clipFromSquareMatrix, this.mapToViewportMatrix);
 
-    mat3.invert(this.viewportToMapCenterMatrix, this.mapToViewportMatrix);
-    mat3.multiply(this.viewportToMapCenterMatrix, this.viewportToMapCenterMatrix, this.toClipSpaceMatrix);
-
-    this.recalculateViewportToTileMatrix();
-  }
-
-  recalculateViewportToTileMatrix(){
-    mat3.copy(this.viewportToTileMatrix, this.viewportToMapCenterMatrix);
-    this.viewportToTileMatrix[6] += 1;
-    this.viewportToTileMatrix[7] += 1;
-    scaleSelf(this.viewportToTileMatrix, this.halfMapSize);
-    this.viewportToTileMatrix[6] *= this.halfMapSize[0];
-    this.viewportToTileMatrix[7] *= this.halfMapSize[1];
-
-    this.recalculateTileToViewportMatrix();
-  }
-
-  recalculateTileToViewportMatrix(){
     mat3.invert(this.tileToViewportMatrix, this.viewportToTileMatrix);
   }
 }
 
-function transformPos(matrix : mat3, ...pos : number[]) : [number, number] {
-  return vec2.transformMat3(pos as any, pos, matrix) as any;
-}
+function mul2d(out : mat3, a : mat2d, b : mat3) {
 
-function translateSelf(matrix : mat3, pos : [number, number]){
-  return mat3.translate(matrix, matrix, pos as any);
-}
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3], a4 = a[4], a5 = a[5],
 
-function translateSelfNegative(matrix : mat3, [x, y] : [number, number]){
-  return mat3.translate(matrix, matrix, [-x, -y]);
-}
+        b0 = b[0], b1 = b[1], b2 = b[3], b3 = b[4], b4 = b[6], b5 = b[7];
 
-function scaleSelf(matrix : mat3, scale : number[] | vec2){
-  return mat3.scale(matrix, matrix, scale);
-}
+    out[0] = a0 * b0 + a2 * b1;
 
-function scaleSelfByScalar(matrix : mat3, r : number){
-  return mat3.scale(matrix, matrix, [r, r]);
-}
+    out[1] = a1 * b0 + a3 * b1;
 
-function scaleSelfByInverseScalar(matrix : mat3, r : number){
-  return mat3.scale(matrix, matrix, [1/r, 1/r]);
-}
+    out[2] = b[2];
 
-function minmax(min : number, v : number, max : number){
-  return v < min ? min : v > max ? max : v;
-}
+    out[3] = a0 * b2 + a2 * b3;
+
+    out[4] = a1 * b2 + a3 * b3;
+
+    out[5] = b[5];
+
+    out[6] = a0 * b4 + a2 * b5 + a4;
+
+    out[7] = a1 * b4 + a3 * b5 + a5;
+
+    out[8] = b[8];
+
+    return out;
+
+};

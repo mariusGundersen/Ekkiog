@@ -7,16 +7,11 @@ import {
 export interface ViewState {
   readonly pixelWidth : number,
   readonly pixelHeight : number,
-  readonly centerTile : {
-    readonly x : number,
-    readonly y : number
-  }
 }
 
 export default function view(state : ViewState = {
   pixelWidth: 100,
-  pixelHeight: 100,
-  centerTile: {x: 64, y: 64}
+  pixelHeight: 100
 }, action : ViewActions) : ViewState {
   switch(action.type){
     case 'resize':
@@ -25,20 +20,7 @@ export default function view(state : ViewState = {
         pixelWidth: action.pixelWidth,
         pixelHeight: action.pixelHeight
       };
-    case 'panZoom':
-      return {
-        ...state,
-        centerTile: transform(action.viewportToTileMatrix, state.pixelWidth/2, state.pixelHeight/2)
-      };
     default:
       return state;
   }
-}
-
-function transform(matrix : mat3, ...pos : number[]){
-  vec2.transformMat3(pos as any, pos, matrix);
-  return {
-    x: pos[0],
-    y: pos[1]
-  };
 }

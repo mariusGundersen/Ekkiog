@@ -1,4 +1,4 @@
-import { mat3, vec2 } from 'gl-matrix';
+import { mat3 } from 'gl-matrix';
 import { Box } from 'ekkiog-editing';
 
 import ViewEngine from './ViewEngine';
@@ -21,6 +21,8 @@ export default class Renderer {
   private readonly moveEngine : MoveEngine;
   private readonly wordEngine : WordEngine;
   private readonly debugEngine : DebugEngine;
+  private width : number;
+  private height : number;
   constructor(gl : WebGLRenderingContext) {
     this.gl = gl;
     this.currentTick = 0;
@@ -35,6 +37,11 @@ export default class Renderer {
     this.moveEngine = new MoveEngine(gl);
     this.wordEngine = new WordEngine(gl);
     this.debugEngine = new DebugEngine(gl);
+  }
+
+  setViewport(width : number, height : number){
+    this.width = width;
+    this.height = height;
   }
 
   renderMap(context : RenderContext){
@@ -70,10 +77,10 @@ export default class Renderer {
       context.chargeMapTexture);
   }
 
-  renderView(context : RenderContext, mapToViewportMatrix : mat3, viewportSize : vec2) {
+  renderView(context : RenderContext, mapToViewportMatrix : mat3) {
     if(!context.spriteSheetTexture.ready) return;
 
-    this.gl.viewport(0, 0, viewportSize[0], viewportSize[1]);
+    this.gl.viewport(0, 0, this.width, this.height);
     this.viewEngine.render(context, mapToViewportMatrix);
     this.wordEngine.render(context, mapToViewportMatrix);
     if('debug' in window){

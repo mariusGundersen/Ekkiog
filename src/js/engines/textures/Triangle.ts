@@ -9,7 +9,7 @@ export default class Triangle implements VertexBuffer {
     this.gl = gl;
     this.buffer = gl.createBuffer() || (() => {throw new Error("Could not make buffer")})();
     this.atomicBind(this);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 4, 4, -1]), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 3, 3, -1]), gl.STATIC_DRAW);
   }
 
   bind(){

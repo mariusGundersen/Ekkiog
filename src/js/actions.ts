@@ -45,13 +45,11 @@ export const setForest = (name : string, forest : Forest) : SetForestAction => (
 
 export type PanZoomAction = {
   readonly type : 'panZoom',
-  readonly tileToViewportMatrix : mat3,
-  readonly viewportToTileMatrix : mat3
+  readonly tileToViewport : (...pos : number[]) => [number, number]
 }
-export const panZoom = (tileToViewportMatrix : mat3, viewportToTileMatrix : mat3) : PanZoomAction => ({
+export const panZoom = (tileToViewport : (...pos : number[]) => [number, number]) : PanZoomAction => ({
   type: 'panZoom',
-  tileToViewportMatrix,
-  viewportToTileMatrix
+  tileToViewport
 });
 
 export type LoadContextMenuAction = {
@@ -282,6 +280,7 @@ export type ForestActions =
 
 export type GlobalActions =
   InitGlAction |
+  ResizeAction |
   SetForestAction;
 
 export type SelectionActions =
@@ -290,8 +289,7 @@ export type SelectionActions =
   StopSelectionAction;
 
 export type ViewActions =
-  ResizeAction |
-  PanZoomAction;
+  ResizeAction;
 
 export type Action =
   ContextMenuActions |
@@ -329,9 +327,10 @@ export const startSelection = (top : number, left : number, right : number, bott
 
 export const insertComponentPackage = (componentPackage : CompiledComponent) => (dispatch : Dispatch<State>, getState : () => State) => {
   const state = getState();
+  const tile = state.global.perspective.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
   const centerTile = {
-    x: state.view.centerTile.x|0,
-    y: state.view.centerTile.y|0
+    x: tile[0],
+    y: tile[1]
   };
   const top = centerTile.y - (componentPackage.height>>1);
   const left = centerTile.x - (componentPackage.width>>1);

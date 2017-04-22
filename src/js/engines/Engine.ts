@@ -1,4 +1,4 @@
-import { mat3, vec2 } from 'gl-matrix';
+import { mat3 } from 'gl-matrix';
 import { MutableContext, Item, Area, Box } from 'ekkiog-editing';
 
 import Context from './Context';
@@ -23,6 +23,10 @@ export default class Engine {
     this.renderer = new Renderer(gl);
   }
 
+  setViewport(width : number, height : number){
+    this.renderer.setViewport(width, height);
+  }
+
   update(){
     this.renderer.renderMap(this.context);
   }
@@ -35,8 +39,8 @@ export default class Engine {
     this.renderer.simulateTick(this.context, tickCount);
   }
 
-  render(mapToViewportMatrix : mat3, viewportSize : vec2) {
-    this.renderer.renderView(this.context, mapToViewportMatrix, viewportSize);
+  render(mapToViewportMatrix : mat3) {
+    this.renderer.renderView(this.context, mapToViewportMatrix);
   }
 
   renderMove(mapToViewportMatrix : mat3, box : Box, dx : number, dy : number){
