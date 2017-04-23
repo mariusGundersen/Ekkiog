@@ -25,12 +25,6 @@ export default class PointerSaga {
     maybeEmit(emitter, () => this.canShowContextMenu, LONG_PRESS, SHOW_CONTEXT_MENU);
     maybeEmit(emitter, () => this.canShowContextMenu, POTENTIAL_LONG_PRESS, LOAD_CONTEXT_MENU);
     maybeEmit(emitter, () => this.canShowContextMenu, POTENTIAL_LONG_PRESS_CANCEL, ABORT_LOAD_CONTEXT_MENU);
-
-    emitter.on(START_SELECTION, () => this.disableAll());
-    emitter.on(STOP_SELECTION, () => this.enableAll());
-
-    emitter.on(SHOW_CONTEXT_MENU, () => this.disableAll());
-    emitter.on(HIDE_CONTEXT_MENU, () => this.enableAll());
   }
 
   disableAll(){

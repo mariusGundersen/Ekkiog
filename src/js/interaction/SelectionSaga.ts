@@ -36,7 +36,7 @@ interface StateSelection {
 }
 
 export default class SelectionSaga extends EventSaga<any, any> {
-  state : State;
+  private state : State;
   constructor(eventEmitter : EventEmitter, viewportToTile : (x : number, y : number) => [number, number]){
     super(eventEmitter, saga => {
       saga.createOn<PointerDownEvent>(POINTER_DOWN, (data, actor) => {
@@ -114,5 +114,23 @@ export default class SelectionSaga extends EventSaga<any, any> {
         selection: false
       };
     });
+  }
+
+  startSelection(data : StartSelectionEvent){
+    this.state = {
+      selection: true,
+      top: data.top,
+      left: data.left,
+      right: data.right,
+      bottom: data.bottom,
+      dx: 0,
+      dy: 0
+    };
+  }
+
+  stopSelection(){
+    this.state = {
+      selection: false
+    };
   }
 }

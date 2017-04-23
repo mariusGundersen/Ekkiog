@@ -15,8 +15,6 @@ export interface Props {
   dispatch : Dispatch<State>,
   pixelWidth : number,
   pixelHeight : number,
-  screenWidth : number,
-  screenHeight : number,
   contextMenu : ContextMenuState,
   editor : EditorState,
   editorMenu : EditorMenuState
@@ -24,10 +22,8 @@ export interface Props {
 
 export default connect(
   ({view, contextMenu, editor, editorMenu} : State) => ({
-    pixelWidth: view.pixelWidth,
-    pixelHeight: view.pixelHeight,
-    screenWidth: view.pixelWidth,
-    screenHeight: view.pixelHeight,
+    pixelWidth: view.pixelWidth/devicePixelRatio,
+    pixelHeight: view.pixelHeight/devicePixelRatio,
     contextMenu,
     editor,
     editorMenu
@@ -35,17 +31,17 @@ export default connect(
 )(({dispatch, ...props} : Props) => {
   const radius = 40;
   const gap = 10;
-  const cx = props.screenWidth;
-  const cy = props.screenHeight;
+  const cx = props.pixelWidth;
+  const cy = props.pixelHeight;
 
   return (
     <svg
       className={style.svg}
-      width={props.screenWidth}
-      height={props.screenHeight}
-      viewBox={`0 0 ${props.screenWidth} ${props.screenHeight}`}>
+      width={props.pixelWidth}
+      height={props.pixelHeight}
+      viewBox={`0 0 ${props.pixelWidth} ${props.pixelHeight}`}>
       <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} editor={props.editor} editorMenu={props.editorMenu} dispatch={dispatch} />
-      <ContextMenu radius={radius+gap} width={radius+gap} dispatch={dispatch} contextMenu = {props.contextMenu} />
+      <ContextMenu radius={radius+gap} width={radius+gap} dispatch={dispatch} contextMenu={props.contextMenu} />
     </svg>
   )
 });

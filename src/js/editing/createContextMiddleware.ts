@@ -1,16 +1,10 @@
-import {
-  Forest,
-  createForest
-} from 'ekkiog-editing';
+import { Forest } from 'ekkiog-editing';
+import { Dispatch, Store } from 'redux';
 
-import { Dispatch, Store, Action } from 'redux';
-
+import { Action } from '../actions';
 import { State } from '../reduce';
-import { SelectionState, ComponentSelectedState, NothingSelectedState } from '../reducers/selection';
-import { GlobalState, GlobalStateInitialized } from '../reducers/global';
+import { EditorState } from '../reducers/editor';
 import storage from '../storage';
-
-import mutateContext from './mutateContext';
 
 export default function createContextMiddleware(){
   return (store : Store<State>) => (next : Dispatch<State>) => (action : any) => {
@@ -18,37 +12,14 @@ export default function createContextMiddleware(){
     const result = next(action);
     const after = store.getState();
 
-    if(after.global.initialized){
-
-      moveHandler(before.selection, after.selection, after.global);
-      forestHandler(before.forest, after.forest, after.global);
-      saveHandler(before.forest, after.forest, before, action);
-    }
+    saveHandler(before.forest, after.forest, before.editor, action);
 
     return result;
   }
 }
 
-function moveHandler(before : SelectionState, after : SelectionState, {engine} : GlobalStateInitialized){
-  if(!before.selection && !after.selection) return;
-  const beforeForest = before.selection ? before.forest : createForest();
-  const afterForest = after.selection ? after.forest : createForest();
-  const changed = mutateContext(engine.moveContext, beforeForest, afterForest);
-  if(!changed) return;
-
-  engine.updateMove();
-}
-
-function forestHandler(before : Forest, after : Forest, {engine} : GlobalStateInitialized){
-  const changed = mutateContext(engine.context, before, after);
-  if(!changed) return;
-
-  engine.simulate();
-  engine.update();
-}
-
-function saveHandler(before : Forest, after : Forest, state : State, action : Action){
+export function saveHandler(before : Forest, after : Forest, editor : EditorState, action : Action){
   if(before !== after && action.type !== 'set-forest'){
-    storage.save(state.editor.currentComponentName, after);
+    storage.save(editor.currentComponentName, after);
   }
 }

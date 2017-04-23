@@ -23,15 +23,6 @@ export const resize = (pixelWidth : number, pixelHeight : number) : ResizeAction
   pixelHeight
 });
 
-export type InitGlAction = {
-  readonly type : 'gl',
-  readonly gl : WebGLRenderingContext
-}
-export const initGl = (gl : WebGLRenderingContext) : InitGlAction => ({
-  type: 'gl',
-  gl
-});
-
 export type SetForestAction = {
   readonly type : 'set-forest',
   readonly name : string,
@@ -45,11 +36,13 @@ export const setForest = (name : string, forest : Forest) : SetForestAction => (
 
 export type PanZoomAction = {
   readonly type : 'panZoom',
-  readonly tileToViewport : (...pos : number[]) => [number, number]
+  readonly tileToViewport : (...pos : number[]) => [number, number],
+  readonly viewportToTileFloored : (...pos : number[]) => [number, number]
 }
-export const panZoom = (tileToViewport : (...pos : number[]) => [number, number]) : PanZoomAction => ({
+export const panZoom = (tileToViewport : (...pos : number[]) => [number, number], viewportToTileFloored : (...pos : number[]) => [number, number]) : PanZoomAction => ({
   type: 'panZoom',
-  tileToViewport
+  tileToViewport,
+  viewportToTileFloored
 });
 
 export type LoadContextMenuAction = {
@@ -84,15 +77,10 @@ export const showContextMenu = (tile : string, tx : number, ty : number) :ShowCo
 });
 
 export type HideContextMenuAction = {
-  readonly type : 'hideContextMenu',
-  readonly meta : Meta
+  readonly type : 'hideContextMenu'
 }
 export const hideContextMenu = () : HideContextMenuAction => ({
-  type: 'hideContextMenu',
-  meta: {
-    emit: true,
-    dispatch: true
-  }
+  type: 'hideContextMenu'
 });
 
 export type SetSelectedToolAction = {
@@ -203,13 +191,10 @@ export type InsertComponentAction = {
     readonly y : number
   }
 }
-export const insertComponent = (component : CompiledComponent, position : {x : number, y : number}, selection : {dx : number, dy : number}) : InsertComponentAction => ({
+export const insertComponent = (component : CompiledComponent, position : {x : number, y : number}) : InsertComponentAction => ({
   type: 'insert-component',
   component,
-  position: {
-    x: (position.x|0) + selection.dx,
-    y: (position.y|0) + selection.dy
-  }
+  position
 });
 
 export type SelectComponentAction = {
@@ -238,15 +223,10 @@ export const moveSelection = (dx : number, dy : number) : MoveSelectionAction =>
 });
 
 export type StopSelectionAction = {
-  readonly type : 'stopSelection',
-  readonly meta : Meta
+  readonly type : 'stopSelection'
 }
 export const stopSelection = () : StopSelectionAction => ({
-  type: 'stopSelection',
-  meta: {
-    emit: true,
-    dispatch: true
-  }
+  type: 'stopSelection'
 });
 
 
@@ -279,9 +259,7 @@ export type ForestActions =
   InsertComponentAction;
 
 export type GlobalActions =
-  InitGlAction |
-  ResizeAction |
-  SetForestAction;
+  PanZoomAction;
 
 export type SelectionActions =
   SelectComponentAction |
@@ -307,8 +285,7 @@ export type Action =
 
 
 export type StartSelectionAction = {
-  readonly type : 'startSelection',
-  readonly meta : Meta,
+  readonly type : 'startSelection'
   readonly top : number,
   readonly left : number,
   readonly right : number,
@@ -316,9 +293,6 @@ export type StartSelectionAction = {
 }
 export const startSelection = (top : number, left : number, right : number, bottom : number) : StartSelectionAction => ({
   type: 'startSelection',
-  meta: {
-    emit: true
-  },
   top,
   left,
   right,
@@ -327,16 +301,6 @@ export const startSelection = (top : number, left : number, right : number, bott
 
 export const insertComponentPackage = (componentPackage : CompiledComponent) => (dispatch : Dispatch<State>, getState : () => State) => {
   const state = getState();
-  const tile = state.global.perspective.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
-  const centerTile = {
-    x: tile[0],
-    y: tile[1]
-  };
-  const top = centerTile.y - (componentPackage.height>>1);
-  const left = centerTile.x - (componentPackage.width>>1);
-  const right = centerTile.x - (componentPackage.width>>1) + componentPackage.width;
-  const bottom = centerTile.y - (componentPackage.height>>1) + componentPackage.height;
-
   if(state.selection.selection){
     dispatch(stopSelection());
     dispatch(resetEditorMenu());
@@ -346,7 +310,10 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
     () => {
       const selection = getState().selection;
       if(selection.selection == false) return;
-      dispatch(insertComponent(componentPackage, centerTile, selection));
+      dispatch(insertComponent(componentPackage, {
+        x: selection.x + selection.dx,
+        y: selection.y + selection.dy
+      }));
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
     },
@@ -355,12 +322,22 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
       dispatch(resetEditorMenu());
     }
   ));
+
+  const tile = state.global.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
+  const centerTile = {
+    x: tile[0],
+    y: tile[1]
+  };
+  const top = centerTile.y - (componentPackage.height>>1);
+  const left = centerTile.x - (componentPackage.width>>1);
+  const right = centerTile.x - (componentPackage.width>>1) + componentPackage.width;
+  const bottom = centerTile.y - (componentPackage.height>>1) + componentPackage.height;
+
   const isValid = isEmpty(state.forest.enneaTree, top, left, right, bottom);
   dispatch(setOkCancelMenuValid(isValid));
   dispatch(startSelection(top, left, right, bottom));
   dispatch(selectComponent(componentPackage, centerTile));
 }
-
 
 export const hideContextMenuAfter = (action : Action) => (dispatch : Dispatch<State>) => {
   dispatch(action);

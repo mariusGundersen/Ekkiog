@@ -12,7 +12,9 @@ export interface ComponentSelectedState {
   readonly right : number,
   readonly bottom : number,
   readonly dx : number,
-  readonly dy : number
+  readonly dy : number,
+  readonly x : number,
+  readonly y : number
 }
 
 export interface NothingSelectedState {
@@ -34,6 +36,8 @@ export default function reduce(state : NothingSelectedState = {
         bottom: (action.position.y|0) - (action.component.height>>1) + action.component.height,
         dx: 0,
         dy: 0,
+        x: action.position.x|0,
+        y: action.position.y|0,
         selection: true
       };
     case 'moveSelection':

@@ -8,10 +8,10 @@ import '../css/main.css';
 import '../manifest.json';
 
 import offline from './offline';
-
-import { createEmitterMiddleware } from './emitterRedux';
+import storage from './storage';
 import createContextMiddleware from './editing/createContextMiddleware';
 import reduce, { State } from './reduce';
+import { setForest } from './actions';
 
 import main from './main';
 
@@ -21,9 +21,10 @@ const store = createStore<State>(
   reduce,
   applyMiddleware(
     thunk,
-    createEmitterMiddleware(),
     createContextMiddleware()
   )
 );
+
+storage.load('Welcome').then(forest => store.dispatch(setForest(forest.name, forest)));
 
 main(store);
