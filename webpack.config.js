@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const DashboardPlugin = require('webpack-dashboard/plugin');
 const OfflinePlugin = require('offline-plugin');
 const autoprefixer = require('autoprefixer');
+const nesting = require('postcss-nesting');
 
 const debug = process.env.NODE_ENV !== 'production';
 
@@ -27,7 +28,8 @@ const postCssLoader = {
   options: {
     plugins: function () {
       return [
-        autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] })
+        autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] }),
+        nesting()
       ];
     }
   }
@@ -98,7 +100,7 @@ module.exports = {
         }
       },
       {
-        test: /\.css$/,
+        test: /\.s?css$/,
         use: [
           'style-loader',
           cssLoader,

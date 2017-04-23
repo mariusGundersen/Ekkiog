@@ -10,7 +10,8 @@ import style from './main.css';
 import {
   resize,
   panZoom,
-  setForest
+  setForest,
+  simulationTick
 } from '../actions';
 import { State } from '../reduce';
 import { SelectionState } from '../reducers/selection';
@@ -42,13 +43,14 @@ export interface Props{
 }
 
 const WebGLCanvas = connect(
-  ({view, forest, selection, contextMenu, editor} : State) => ({
+  ({view, forest, selection, contextMenu, editor, simulation} : State) => ({
     forest,
     selection,
     width: view.pixelWidth,
     height: view.pixelHeight,
     contextMenu,
-    name: editor.currentComponentName
+    name: editor.currentComponentName,
+    tickInterval: simulation.tickInterval
   })
 )(class WebGLCanvas extends React.Component<Props, void> {
   private canvas : HTMLCanvasElement;
@@ -89,7 +91,10 @@ const WebGLCanvas = connect(
             this.props.selection.dy);
         }
       },
-      tick: tickCount => this.engine.simulate(tickCount),
+      tick: tickCount => {
+        this.engine.simulate(tickCount);
+        this.props.dispatch(simulationTick(tickCount));
+      },
       resize: (pixelWidth, pixelHeight) => {
         this.props.dispatch(resize(pixelWidth, pixelHeight));
         const prevWidth = this.perspective.viewportWidth;

@@ -17,6 +17,13 @@ declare module "*.css" {
   export default style;
 }
 
+declare module "*.scss" {
+  const style : {
+    [key : string] : string
+  }
+  export default style;
+}
+
 declare module "react-icons/lib/md" {
   export * from "react-icons/md";
 }

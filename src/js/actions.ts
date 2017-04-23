@@ -229,6 +229,15 @@ export const stopSelection = () : StopSelectionAction => ({
   type: 'stopSelection'
 });
 
+export type SimulationTickAction = {
+  readonly type : 'simulationTick',
+  readonly tickCount : number
+}
+export const simulationTick = (tickCount: number) : SimulationTickAction => ({
+  type: 'simulationTick',
+  tickCount
+});
+
 
 export type ContextMenuActions =
   LoadContextMenuAction |
@@ -258,24 +267,25 @@ export type ForestActions =
   ToWireAction |
   InsertComponentAction;
 
-export type GlobalActions =
-  PanZoomAction;
-
 export type SelectionActions =
   SelectComponentAction |
   MoveSelectionAction |
   StopSelectionAction;
 
 export type ViewActions =
+  PanZoomAction |
   ResizeAction;
+
+export type SimulationActions =
+  SimulationTickAction;
 
 export type Action =
   ContextMenuActions |
   EditorActions |
   EditorMenuActions |
   ForestActions |
-  GlobalActions |
-  ViewActions;
+  ViewActions |
+  SimulationActions;
 
 
 
@@ -283,21 +293,6 @@ export type Action =
 
 
 
-
-export type StartSelectionAction = {
-  readonly type : 'startSelection'
-  readonly top : number,
-  readonly left : number,
-  readonly right : number,
-  readonly bottom : number
-}
-export const startSelection = (top : number, left : number, right : number, bottom : number) : StartSelectionAction => ({
-  type: 'startSelection',
-  top,
-  left,
-  right,
-  bottom
-});
 
 export const insertComponentPackage = (componentPackage : CompiledComponent) => (dispatch : Dispatch<State>, getState : () => State) => {
   const state = getState();
@@ -323,7 +318,7 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
     }
   ));
 
-  const tile = state.global.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
+  const tile = state.view.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
   const centerTile = {
     x: tile[0],
     y: tile[1]
@@ -335,7 +330,6 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
 
   const isValid = isEmpty(state.forest.enneaTree, top, left, right, bottom);
   dispatch(setOkCancelMenuValid(isValid));
-  dispatch(startSelection(top, left, right, bottom));
   dispatch(selectComponent(componentPackage, centerTile));
 }
 
