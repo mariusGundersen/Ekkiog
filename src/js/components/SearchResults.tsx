@@ -34,7 +34,7 @@ export default reax<Props>()(({
     .withLatestFrom(props)
     .subscribe(([name, props] : [string, Props]) => storage.load(name).then(props.openComponent))
 
-  const searchResults = searchDatabase(props);
+  const searchResults = searchDatabase(props.map(p => p.query));
 
   const noExactMatch = searchResults
     .withLatestFrom(props)
@@ -55,10 +55,11 @@ export default reax<Props>()(({
   </div>
 ));
 
-function searchDatabase(props : ObservableProps){
-  return props
+function searchDatabase(query : Rx.Observable<string>){
+  return query
     .debounceTime(20)
-    .switchMap(({query}) =>
+    .distinctUntilChanged()
+    .switchMap((query) =>
       query
       ? storage.getComponentNames()
         .filter(name => name.toLowerCase().indexOf(query.toLowerCase()) >= 0)

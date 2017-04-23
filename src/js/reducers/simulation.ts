@@ -14,11 +14,16 @@ export default function view(state : SimulationState = {
   tickInterval: 500
 }, action : SimulationActions) : SimulationState {
   switch(action.type){
+    case 'setTickInterval':
+      return {
+        ...state,
+        tickInterval: action.tickInterval
+      };
     case 'simulationTick':
       return {
         ...state,
         tickCount: action.tickCount
-      }
+      };
     default:
       return state;
   }

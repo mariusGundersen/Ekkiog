@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Tool } from 'ekkiog-editing';
 
-import RadialMenu from './RadialMenu';
+import RadialMenu from './radialMenu';
 
 import IconWire from './icons/IconWire';
 import IconUnderpass from './icons/IconUnderpass';

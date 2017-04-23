@@ -15,12 +15,16 @@ const babelLoader = {
   }
 };
 
-const cssLoader = {
+const cssModuleLoader = {
   loader:'css-loader',
   options: {
     modules: true,
     camelCase: true
   }
+};
+
+const cssLoader = {
+  loader:'css-loader'
 };
 
 const postCssLoader = {
@@ -103,9 +107,18 @@ module.exports = {
         test: /\.s?css$/,
         use: [
           'style-loader',
-          cssLoader,
+          cssModuleLoader,
           postCssLoader
-        ]
+        ],
+        exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          cssLoader
+        ],
+        include: /node_modules/
       },
       {
         test: /manifest\.json$/,

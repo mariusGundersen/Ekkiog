@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import PieRing, { Props as PieRingProps } from './radialMenu/PieRing';
-import PieCenter, { Props as PieCenterProps } from './radialMenu/PieCenter';
+import PieRing, { Props as PieRingProps } from './PieRing';
+import PieCenter, { Props as PieCenterProps } from './PieCenter';
 
 export interface Props {
   cx : number;

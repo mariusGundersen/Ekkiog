@@ -10,7 +10,7 @@
 }
 
 .input{
-  background: #2a2d30;
+  background: #31363c;
   border: 2px solid #446364;
   color: white;
   flex: 0 0 auto;
@@ -19,15 +19,12 @@
   padding: 0.5em;
 }
 
-.searchButton{
-}
-
 .results{
   margin: 0.25em 0 0 0;
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  background: #2a2d30;
+  background: #31363c;
   border: 2px solid #446364;
   color: white;
 }
@@ -62,7 +59,7 @@
 .searchResult{
   display: flex;
   flex-direction: row;
-  background: #2a2d30;
+  background: #31363c;
   border: 2px solid #446364;
   border-top: none;
   color: white;

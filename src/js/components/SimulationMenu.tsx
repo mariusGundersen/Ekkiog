@@ -1,19 +1,35 @@
 import * as React from 'react';
+import { MdPlayArrow, MdPause, MdSkipNext } from 'react-icons/lib/md';
+import * as Slider from 'rc-slider';
 
-export default (props : { className : string, tick : number, tickInterval : number }) => (
-  <button className={props.className}><MdApps tick={props.tick} paused={!Number.isFinite(props.tickInterval)} /></button>
-);
+import pure from './pure';
 
-const size = 8;
-const MdApps = (props : {tick : number, paused : boolean}) => (
-    <svg fill="currentColor" height="1em" width="1em" style={{verticalAlign: 'middle'}} preserveAspectRatio="xMidYMid meet" viewBox="0 0 40 40">
-        <rect x=" 5" y=" 5" width={size} height={size} style={{opacity: props.paused ? 1.00 : Math.max(0.05, 1-(props.tick + 0)%8 / 4) }} />
-        <rect x=" 5" y="16" width={size} height={size} style={{opacity: props.paused ? 1.00 : Math.max(0.05, 1-(props.tick + 1)%8 / 4) }} />
-        <rect x=" 5" y="27" width={size} height={size} style={{opacity: props.paused ? 1.00 : Math.max(0.05, 1-(props.tick + 2)%8 / 4) }} />
-        <rect x="16" y="27" width={size} height={size} style={{opacity: props.paused ? 0.05 : Math.max(0.05, 1-(props.tick + 3)%8 / 4) }} />
-        <rect x="27" y="27" width={size} height={size} style={{opacity: props.paused ? 1.00 : Math.max(0.05, 1-(props.tick + 4)%8 / 4) }} />
-        <rect x="27" y="16" width={size} height={size} style={{opacity: props.paused ? 1.00 : Math.max(0.05, 1-(props.tick + 5)%8 / 4) }} />
-        <rect x="27" y=" 5" width={size} height={size} style={{opacity: props.paused ? 1.00 : Math.max(0.05, 1-(props.tick + 6)%8 / 4) }} />
-        <rect x="16" y=" 5" width={size} height={size} style={{opacity: props.paused ? 0.05 : Math.max(0.05, 1-(props.tick + 7)%8 / 4) }} />
-    </svg>
-)
+import 'rc-slider/assets/index.css';
+import style from './simulationMenu.scss';
+
+export interface Props {
+  readonly tickInterval : number;
+  readonly setTickInterval : (tickInterval : number) => void;
+}
+
+export default pure(
+  (prev, next) => prev.tickInterval != next.tickInterval,
+  (props : Props) => (
+  <div
+    className={style.simulationMenu}>
+      {Number.isFinite(props.tickInterval)
+      ? <Slider
+        className={style.slider}
+        min={4}
+        max={11}
+        step={1}
+        value={Math.floor(Math.log(props.tickInterval)/Math.LN2)}
+        onChange={x => props.setTickInterval(2**x)} />
+      : <div className={style.slider} />}
+      <button onClick={() => props.setTickInterval(Number.isFinite(props.tickInterval) ? Infinity : 512)}>
+        {Number.isFinite(props.tickInterval)
+        ? <MdPause />
+        : <MdPlayArrow />}
+      </button>
+  </div>
+));

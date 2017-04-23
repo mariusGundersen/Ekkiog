@@ -10,7 +10,7 @@
 
   & .bar {
     display: flex;
-    background: #2a2d30;
+    background: #31363c;
     border-bottom: 2px solid #446364;
     color: white;
     font-size: 16px;
@@ -18,7 +18,7 @@
     flex: 1 0 auto;
 
     & button.navbar-button {
-      background: #2a2d30;
+      background: #31363c;
       border: none;
       outline: none;
 
@@ -27,15 +27,10 @@
       font-size: 32px;
       line-height: 0;
       font-family: Arial, Helvetica, sans-serif;
-    }
 
-    & input {
-      border: none;
-      transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
-      background: transparent;
-      color: #aaa;
-      font-size: 16px;
-      outline: none
+      &[data-active=true] {
+        background: #446364;
+      }
     }
 
     & .search-bar {
@@ -66,11 +61,18 @@
 
       & .search-box {
         width: 0;
+        background: #446364;
         transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
         display: flex;
 
         & input{
           flex: 1 0 auto;
+          border: none;
+          transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
+          background: transparent;
+          color: white;
+          font-size: 16px;
+          outline: none
         }
       }
 

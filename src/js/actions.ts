@@ -229,6 +229,15 @@ export const stopSelection = () : StopSelectionAction => ({
   type: 'stopSelection'
 });
 
+export type SetTickIntervalAction = {
+  readonly type : 'setTickInterval',
+  readonly tickInterval : number
+}
+export const setTickInterval = (tickInterval: number) : SetTickIntervalAction => ({
+  type: 'setTickInterval',
+  tickInterval
+});
+
 export type SimulationTickAction = {
   readonly type : 'simulationTick',
   readonly tickCount : number
@@ -277,6 +286,7 @@ export type ViewActions =
   ResizeAction;
 
 export type SimulationActions =
+  SetTickIntervalAction |
   SimulationTickAction;
 
 export type Action =

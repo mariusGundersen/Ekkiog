@@ -5,19 +5,15 @@ import { Dispatch } from 'redux';
 import * as Rx from 'rxjs/Rx.js';
 import { CompiledComponent, createForest } from 'ekkiog-editing';
 
-import {
-  MdMenu,
-  MdSearch,
-  MdEdit
-} from 'react-icons/lib/md';
-
-import StatusBar from './StatusBar';
+import MainMenuButton from './MainMenuButton';
 import SearchResults from './SearchResults';
+import SimulationMenuButton from './SimulationMenuButton';
 import SimulationMenu from './SimulationMenu';
+import SearchBar from './SearchBar';
 
 import style from './navbar.scss';
 
-import { insertComponentPackage, setForest } from '../actions';
+import { insertComponentPackage, setForest, setTickInterval } from '../actions';
 import { State } from '../reduce';
 import { NamedForest } from '../storage';
 
@@ -30,39 +26,65 @@ export interface Props {
 
 const result = reax<Props>()({
   toggleSearch: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
+  toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => { console.log('toggleSimulationMenu', event); return true },
   query: (event : React.SyntheticEvent<HTMLInputElement>) => event.currentTarget.value,
   insertPackage: (result : CompiledComponent) => result,
   openComponent: (result : NamedForest) => result,
   createComponent: (result : string) => result
 }, ({
   toggleSearch,
+  toggleSimulationMenu,
   query,
   insertPackage,
   openComponent,
   createComponent
-}, props, initialProps) => ({
-  query: query
-    .merge(toggleSearch.map(_ => ''))
-    .startWith(''),
-  showSearch: toggleSearch
+}, props, initialProps) => {
+  insertPackage.forEach(r => initialProps.dispatch(insertComponentPackage(r)));
+  openComponent.forEach(r => initialProps.dispatch(setForest(r.name, r)));
+  createComponent.forEach(r => initialProps.dispatch(setForest(r, createForest())))
+
+  const showSearch = toggleSearch
     .merge(
-      insertPackage.do(r => initialProps.dispatch(insertComponentPackage(r))),
-      openComponent.do(r => initialProps.dispatch(setForest(r.name, r))),
-      createComponent.do(r => initialProps.dispatch(setForest(r, createForest())))
+      insertPackage.map(x => true),
+      openComponent.map(x => true),
+      createComponent.map(x => true)
     )
-    .map(x => true)
     .scan((state, _) => !state, false)
-    .startWith(false)
-}) , ({
+    .startWith(false);
+
+  const showSimulationMenu = toggleSimulationMenu
+    .scan(state => !state, false)
+    .startWith(false);
+
+  const state = Rx.Observable.merge(
+    showSearch.map(x => x ? 'search' : ''),
+    showSimulationMenu.map(x => x ? 'simulation' : '')
+  ).scan((_, event) => event, '');
+
+  return {
+    query: state.map(x => x == 'search')
+      .switchMap(ifElse(query.startWith(''), '')),
+    showSearch: state.map(x => x == 'search'),
+    showSimulationMenu: state.map(x => x == 'simulation')
+  };
+} , ({
   actions,
   results,
   props
 }) => (
   <div className={style.navbar}>
     <div className={style.bar}>
-      <button className={style.navbarButton}><MdMenu /></button>
-      <SearchBar currentComponentName={props.currentComponentName} showSearch={results.showSearch} toggleSearch={actions.toggleSearch} query={actions.query} />
-      <SimulationMenu className={style.navbarButton} tick={props.tickCount} tickInterval={props.tickInterval} />
+      <MainMenuButton />
+      <SearchBar
+        currentComponentName={props.currentComponentName}
+        showSearch={results.showSearch}
+        toggleSearch={actions.toggleSearch}
+        query={actions.query} />
+      <SimulationMenuButton
+        tick={props.tickCount}
+        tickInterval={props.tickInterval}
+        onClick={actions.toggleSimulationMenu}
+        isActive={results.showSimulationMenu} />
     </div>
     {results.showSearch
     ? <SearchResults
@@ -70,6 +92,10 @@ const result = reax<Props>()({
       insertPackage={actions.insertPackage}
       openComponent={actions.openComponent}
       createComponent={actions.createComponent} />
+    : results.showSimulationMenu
+    ? <SimulationMenu
+      tickInterval={props.tickInterval}
+      setTickInterval={x => props.dispatch(setTickInterval(x))}/>
     : null}
   </div>
 ));
@@ -80,25 +106,6 @@ export default connect((state : State) => ({
   tickInterval: state.simulation.tickInterval
 }))(result);
 
-
-function SearchBar(props : {
-  currentComponentName : string,
-  showSearch : boolean,
-  toggleSearch : (event : React.SyntheticEvent<HTMLButtonElement>) => void,
-  query : (event : React.SyntheticEvent<HTMLInputElement>) => void}) {
-  return (
-    <div className={style.searchBar} data-state={props.showSearch ? 'search' : 'name'}>
-      <div className={style.nameBox}>
-        <span>{props.currentComponentName}</span>
-      </div>
-      <button className={style.navbarButton} onClick={props.toggleSearch}><MdSearch /></button>
-      <div className={style.searchBox}>
-        {props.showSearch
-        ? <input
-            autoFocus
-            onChange={props.query} />
-        : null}
-      </div>
-    </div>
-  );
+export function ifElse<T>(observable : Rx.Observable<T>, fallback : T){
+  return (condition : boolean) => condition ? observable : Rx.Observable.of(fallback);
 }

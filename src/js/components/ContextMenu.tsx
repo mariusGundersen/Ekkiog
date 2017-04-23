@@ -4,7 +4,7 @@ import { connect, Dispatch } from 'react-redux';
 import { State } from '../reduce';
 import { ContextMenuState } from '../reducers/contextMenu';
 import Loading from './radialMenu/Loading';
-import RadialMenu, { PieCenterProps, PieRingProps } from './RadialMenu';
+import RadialMenu, { PieCenterProps, PieRingProps } from './radialMenu';
 
 import IconWire from './icons/IconWire';
 import IconUnderpass from './icons/IconUnderpass';

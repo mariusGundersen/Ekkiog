@@ -1,0 +1,23 @@
+.simulation-menu {
+  display: flex;
+  align-items: center;
+  color: white;
+  background: #446364;
+
+  & .slider {
+    flex: 1 0 auto;
+    margin: 0 15px;
+    width: 0;
+  }
+
+  & button {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 0;
+    font-size: 32px;
+    line-height: 0;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
