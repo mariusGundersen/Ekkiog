@@ -17,6 +17,7 @@ export default class MoveEngine {
   render(context : RenderContext, matrix : mat3, [top, left, right, bottom] : number[], dx : number, dy : number) {
     this.shader.bind();
 
+    this.shader.uniforms['spriteTextureSize'] = context.spriteSheetTexture.size;
     this.shader.uniforms['inverseSpriteTextureSize'] = context.spriteSheetTexture.inverseSize;
     this.shader.uniforms['mapTextureSize'] = context.tileMapTexture.size;
     this.shader.uniforms['tileSize'] = context.tileSize;
