@@ -90,8 +90,8 @@ export default class Perspective{
 
   /** Resets to fit the XOR gate */
   reset({top, left, bottom, right} : Box){
-    const topLeft = [top, left] as PosXY;
-    const bottomRight = [bottom, right] as PosXY;
+    const topLeft = [left, top] as PosXY;
+    const bottomRight = [right, bottom] as PosXY;
     vec2.transformMat2d(topLeft as any, topLeft, this.mapFromTileMatrix);
     vec2.transformMat2d(topLeft as any, topLeft, this.verticalFlipMatrix);
     vec2.transformMat2d(bottomRight as any, bottomRight, this.mapFromTileMatrix);
