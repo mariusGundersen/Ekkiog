@@ -142,6 +142,7 @@ export default class Perspective{
   }
 
   transformMapToSquare(...pos : [MapPos, SquarePos][]){
+    if(pos.length === 0) return;
     if(pos.length === 1){
       /*
 

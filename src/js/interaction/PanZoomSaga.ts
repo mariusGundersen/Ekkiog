@@ -62,10 +62,11 @@ export default class PanZoomSaga {
   }
 
   process(){
-    const current = [...this.pointers.values()];
-
     if(this.changed === false) return false;
     this.changed = false;
+    const current = [...this.pointers.values()];
+
+    if(current.length === 0) return false;
 
     const squarePos = current.map(p => [p.mapPos, this.perspective.viewportToSquare(p.x, p.y)] as [MapPos, SquarePos]);
 
