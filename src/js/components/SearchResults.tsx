@@ -1,6 +1,16 @@
 import * as React from 'react';
 import reax from 'reaxjs';
-import * as Rx from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/merge';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/scan';
+import 'rxjs/add/operator/startWith';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/withLatestFrom';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/observable/of';
 import { CompiledComponent } from 'ekkiog-editing';
 
 import SearchResultView, { NoExactMatchView } from './SearchResultView';
@@ -16,7 +26,7 @@ export interface Props {
   insertPackage(name : CompiledComponent) : void;
 }
 
-type ObservableProps = Rx.Observable<Props>;
+type ObservableProps = Observable<Props>;
 
 export default reax<Props>()(({
   insertPackage: (result : string) => result,
@@ -55,7 +65,7 @@ export default reax<Props>()(({
   </div>
 ));
 
-function searchDatabase(query : Rx.Observable<string>){
+function searchDatabase(query : Observable<string>){
   return query
     .debounceTime(20)
     .distinctUntilChanged()
@@ -65,7 +75,7 @@ function searchDatabase(query : Rx.Observable<string>){
         .filter(name => name.toLowerCase().indexOf(query.toLowerCase()) >= 0)
         .scan((acc, val) => [...acc, val], [])
         .startWith([])
-      : Rx.Observable.of([]))
+      : Observable.of([]))
     .startWith([])
     .distinctUntilChanged();
 }

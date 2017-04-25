@@ -1,5 +1,6 @@
 import idb, {DB} from 'idb';
-import * as Rx from 'rxjs/Rx.js';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import {
   packageComponent,
@@ -67,26 +68,26 @@ export class Storage{
     return packageComponent(namedForest, namedForest.name);
   }
 
-  getComponentNames(){
-    return new Rx.Observable<string>(s => {
-      this.db.then(db => {
-        const tx = db.transaction('components');
-        tx.objectStore('components').iterateCursor(cursor => {
-          if (!cursor) return;
-          s.next(cursor.key as string);
-          cursor.continue();
-        });
-        const abort = s.add(() => tx.abort());
-        tx.complete
-          .then(() => {
-            s.remove(abort);
-            s.complete();
-          }, e => {
-            s.remove(abort);
-            s.error(e);
-          });
+  getComponentNames() : Observable<string> {
+    const s = new Subject<string>();
+    this.db.then(db => {
+      const tx = db.transaction('components');
+      tx.objectStore('components').iterateCursor(cursor => {
+        if (!cursor) return;
+        s.next(cursor.key as string);
+        cursor.continue();
       });
+      const abort = s.subscribe(() => {}, () => tx.abort());
+      tx.complete
+        .then(() => {
+          abort.unsubscribe();
+          s.complete();
+        }, e => {
+          abort.unsubscribe();
+          s.error(e);
+        });
     });
+    return s;
   }
 }
 

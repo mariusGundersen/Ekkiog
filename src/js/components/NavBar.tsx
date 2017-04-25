@@ -2,7 +2,14 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import reax from 'reaxjs';
 import { Dispatch } from 'redux';
-import * as Rx from 'rxjs/Rx.js';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/merge';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/scan';
+import 'rxjs/add/operator/startWith';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/merge';
 import { CompiledComponent, createForest } from 'ekkiog-editing';
 
 import MainMenuButton from './MainMenuButton';
@@ -26,7 +33,7 @@ export interface Props {
 
 const result = reax<Props>()({
   toggleSearch: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
-  toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => { console.log('toggleSimulationMenu', event); return true },
+  toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   query: (event : React.SyntheticEvent<HTMLInputElement>) => event.currentTarget.value,
   insertPackage: (result : CompiledComponent) => result,
   openComponent: (result : NamedForest) => result,
@@ -56,7 +63,7 @@ const result = reax<Props>()({
     .scan(state => !state, false)
     .startWith(false);
 
-  const state = Rx.Observable.merge(
+  const state = Observable.merge(
     showSearch.map(x => x ? 'search' : ''),
     showSimulationMenu.map(x => x ? 'simulation' : '')
   ).scan((_, event) => event, '');
@@ -106,6 +113,6 @@ export default connect((state : State) => ({
   tickInterval: state.simulation.tickInterval
 }))(result);
 
-export function ifElse<T>(observable : Rx.Observable<T>, fallback : T){
-  return (condition : boolean) => condition ? observable : Rx.Observable.of(fallback);
+export function ifElse<T>(observable : Observable<T>, fallback : T){
+  return (condition : boolean) => condition ? observable : Observable.of(fallback);
 }

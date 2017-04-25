@@ -5,6 +5,7 @@ const DashboardPlugin = require('webpack-dashboard/plugin');
 const OfflinePlugin = require('offline-plugin');
 const autoprefixer = require('autoprefixer');
 const nesting = require('postcss-nesting');
+const BabiliPlugin = require("babili-webpack-plugin");
 
 const debug = process.env.NODE_ENV !== 'production';
 
@@ -66,7 +67,11 @@ module.exports = {
         events: true
       }
     }),
-    ...(debug ? [new DashboardPlugin()] : [])
+    ...(debug ? [
+      new DashboardPlugin()
+    ] : [
+      new BabiliPlugin()
+    ])
   ],
   resolve: {
     modules: [

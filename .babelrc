@@ -1,6 +1,14 @@
 {
   "presets": [
-    ["es2015", {"spec": true, "modules": false}],
+    ["env", {
+      "spec": true,
+      "modules": false,
+      "targets" : {
+        "ios": 10,
+        "chrome": 58,
+        "firefox": 53
+      }
+    }],
     "es2016",
     "es2017",
     "react"
