@@ -1,9 +1,7 @@
 import * as React from 'react';
 
-import {
-  MdEdit,
-  MdAddCircle
-} from 'react-icons/lib/md';
+import MdEdit from 'react-icons/md/edit';
+import MdAddCircle from 'react-icons/md/add-circle';
 
 import style from './search.css';
 

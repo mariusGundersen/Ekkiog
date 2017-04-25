@@ -93,6 +93,10 @@ module.exports = {
         exclude: /node_modules/
       },
       {
+        test: /react-icons/,
+        loader: babelLoader
+      },
+      {
         test: /\.glsl$/,
         loader: 'webpack-glsl-loader'
       },

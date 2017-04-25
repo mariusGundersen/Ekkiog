@@ -24,10 +24,6 @@ declare module "*.scss" {
   export default style;
 }
 
-declare module "react-icons/lib/md" {
-  export * from "react-icons/md";
-}
-
 declare module "gl-shader" {
   export interface GlShader {
     bind() : void,

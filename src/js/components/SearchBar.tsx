@@ -3,7 +3,7 @@ import * as React from 'react';
 import pure from './pure';
 
 import style from './navbar.scss';
-import { MdSearch } from 'react-icons/lib/md';
+import MdSearch from 'react-icons/md/search';
 
 export type EventCallback<T> = (event : T) => void;
 

@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { MdPlayArrow, MdPause, MdSkipNext } from 'react-icons/lib/md';
+import MdPlayArrow from 'react-icons/md/play-arrow';
+import MdPause from 'react-icons/md/pause';
+import MdSkipNext from 'react-icons/md/skip-next';
 import * as Slider from 'rc-slider';
 
 import pure from './pure';
