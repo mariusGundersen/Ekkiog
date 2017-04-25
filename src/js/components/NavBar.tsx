@@ -31,7 +31,7 @@ export interface Props {
   readonly tickInterval : number;
 }
 
-const result = reax<Props>()({
+const result = reax({
   toggleSearch: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   query: (event : React.SyntheticEvent<HTMLInputElement>) => event.currentTarget.value,
@@ -45,7 +45,7 @@ const result = reax<Props>()({
   insertPackage,
   openComponent,
   createComponent
-}, props, initialProps) => {
+}, props, initialProps : Props) => {
   insertPackage.forEach(r => initialProps.dispatch(insertComponentPackage(r)));
   openComponent.forEach(r => initialProps.dispatch(setForest(r.name, r)));
   createComponent.forEach(r => initialProps.dispatch(setForest(r, createForest())))
@@ -75,8 +75,8 @@ const result = reax<Props>()({
     showSimulationMenu: state.map(x => x == 'simulation')
   };
 } , ({
-  actions,
-  results,
+  events,
+  values,
   props
 }) => (
   <div className={style.navbar}>
@@ -84,22 +84,22 @@ const result = reax<Props>()({
       <MainMenuButton />
       <SearchBar
         currentComponentName={props.currentComponentName}
-        showSearch={results.showSearch}
-        toggleSearch={actions.toggleSearch}
-        query={actions.query} />
+        showSearch={values.showSearch}
+        toggleSearch={events.toggleSearch}
+        query={events.query} />
       <SimulationMenuButton
         tick={props.tickCount}
         tickInterval={props.tickInterval}
-        onClick={actions.toggleSimulationMenu}
-        isActive={results.showSimulationMenu} />
+        onClick={events.toggleSimulationMenu}
+        isActive={values.showSimulationMenu} />
     </div>
-    {results.showSearch
+    {values.showSearch
     ? <SearchResults
-      query={results.query}
-      insertPackage={actions.insertPackage}
-      openComponent={actions.openComponent}
-      createComponent={actions.createComponent} />
-    : results.showSimulationMenu
+      query={values.query}
+      insertPackage={events.insertPackage}
+      openComponent={events.openComponent}
+      createComponent={events.createComponent} />
+    : values.showSimulationMenu
     ? <SimulationMenu
       tickInterval={props.tickInterval}
       setTickInterval={x => props.dispatch(setTickInterval(x))}/>

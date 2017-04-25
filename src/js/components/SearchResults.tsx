@@ -54,13 +54,13 @@ export default reax<Props>()(({
     searchResults,
     noExactMatch
   };
-}, ({actions, results: {searchResults, noExactMatch}, props}) => (
+}, ({events, values: {searchResults, noExactMatch}, props}) => (
   <div className={style.searchResultsContainer}>
     <div className={style.searchResults}>
       {noExactMatch
       ? <NoExactMatchView key="no-exact-match" query={props.query} createComponent={props.createComponent} />
       : null}
-      {searchResults.map(r => <SearchResultView key={r} insertPackage={actions.insertPackage} openComponent={actions.openComponent} result={r} />)}
+      {searchResults.map(r => <SearchResultView key={r} insertPackage={events.insertPackage} openComponent={events.openComponent} result={r} />)}
     </div>
   </div>
 ));
