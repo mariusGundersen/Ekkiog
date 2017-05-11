@@ -69,10 +69,10 @@ const result = reax({
   ).scan((_, event) => event, '');
 
   return {
-    query: state.map(x => x == 'search')
-      .switchMap(ifElse(query.startWith(''), '')),
     showSearch: state.map(x => x == 'search'),
-    showSimulationMenu: state.map(x => x == 'simulation')
+    showSimulationMenu: state.map(x => x == 'simulation'),
+    query: state.map(x => x == 'search')
+      .switchMap(ifElse(query.startWith(''), ''))
   };
 } , ({
   events,

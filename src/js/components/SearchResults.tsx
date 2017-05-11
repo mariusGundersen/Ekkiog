@@ -11,6 +11,7 @@ import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/withLatestFrom';
 import { CompiledComponent } from 'ekkiog-editing';
 
@@ -58,9 +59,7 @@ export default reax<Props>()(({
 }, ({events, values: {searchResults, noExactMatch}, props}) => (
   <div className={style.searchResultsContainer}>
     <div className={style.searchResults}>
-      {noExactMatch
-      ? <NoExactMatchView key="no-exact-match" query={props.query} createComponent={props.createComponent} />
-      : null}
+      {noExactMatch && <NoExactMatchView key="no-exact-match" query={props.query} createComponent={props.createComponent} />}
       {searchResults.map(r => <SearchResultView key={r} insertPackage={events.insertPackage} openComponent={events.openComponent} result={r} />)}
     </div>
   </div>
@@ -77,7 +76,9 @@ function searchDatabase(query : Observable<string>){
         .scan((acc, val) => [...acc, val], [])
         .map(list => [...list].sort((a, b) => (a.indexOf(query) - b.indexOf(query)) || (a > b ? 1 : a < b ? -1 : 0)))
         .startWith([])
-      : Observable.of([]))
+      : storage.getRecent()
+        .take(5)
+        .scan((acc, val) => [...acc, val], []))
     .startWith([])
     .distinctUntilChanged()
     .share();
