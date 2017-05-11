@@ -3,7 +3,7 @@ import * as React from 'react';
 import MdEdit from 'react-icons/md/edit';
 import MdAddCircle from 'react-icons/md/add-circle';
 
-import style from './search.css';
+import style from './search.scss';
 
 export interface SearchResultViewProps {
   insertPackage(result : string) : void;

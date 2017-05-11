@@ -1,21 +1,22 @@
 import * as React from 'react';
 import reax from 'reaxjs';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/merge';
-import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/merge';
 import 'rxjs/add/operator/scan';
+import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/withLatestFrom';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/observable/of';
 import { CompiledComponent } from 'ekkiog-editing';
 
 import SearchResultView, { NoExactMatchView } from './SearchResultView';
 
-import style from './search.css';
+import style from './search.scss';
 
 import storage, { Storage, NamedForest } from '../storage';
 
@@ -74,8 +75,10 @@ function searchDatabase(query : Observable<string>){
       ? storage.getComponentNames()
         .filter(name => name.toLowerCase().indexOf(query.toLowerCase()) >= 0)
         .scan((acc, val) => [...acc, val], [])
+        .map(list => [...list].sort((a, b) => (a.indexOf(query) - b.indexOf(query)) || (a > b ? 1 : a < b ? -1 : 0)))
         .startWith([])
       : Observable.of([]))
     .startWith([])
-    .distinctUntilChanged();
+    .distinctUntilChanged()
+    .share();
 }

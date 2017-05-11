@@ -11,3 +11,15 @@ body{
   touch-action: none;
   overflow: hidden; /* prevent scrollbars */
 }
+
+button,
+textarea,
+input[type="text"],
+input[type="button"],
+input[type="submit"] {
+  -webkit-appearance: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+}

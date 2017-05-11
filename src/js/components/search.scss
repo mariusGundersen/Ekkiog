@@ -1,0 +1,44 @@
+.searchResultsContainer{
+  flex: 0 1 auto;
+  overflow: auto;
+  -webkit-overflow-scrolling: auto;
+
+  & .searchResults{
+    display: flex;
+    flex-direction: column;
+
+    & .searchResult{
+      display: flex;
+      flex-direction: row;
+      background: #31363c;
+      border: 2px solid #446364;
+      border-top: none;
+      color: white;
+
+      & .noExactMatch,
+      & .insertPackage,
+      & .openComponent{
+        outline: none;
+        background: none;
+        border: none;
+        text-align: left;
+        color: white;
+        font-size: 16px;
+        font-family: Courier Bold, Courier, monospace;
+        padding: 8px;
+      }
+
+      & .noExactMatch,
+      & .insertPackage{
+        flex: 1 0 auto;
+      }
+
+      & .openComponent{
+        flex: 0 0 auto;
+        display: flex;
+        font-size: 24px;
+        padding: 4px;
+      }
+    }
+  }
+}
