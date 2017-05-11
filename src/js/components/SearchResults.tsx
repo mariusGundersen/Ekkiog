@@ -73,7 +73,7 @@ function searchDatabase(query : Observable<string>){
     .switchMap((query) =>
       query
       ? storage.getComponentNames()
-        .filter(name => name.toLowerCase().indexOf(query.toLowerCase()) >= 0)
+        .filter(name => name.toUpperCase().indexOf(query) >= 0)
         .scan((acc, val) => [...acc, val], [])
         .map(list => [...list].sort((a, b) => (a.indexOf(query) - b.indexOf(query)) || (a > b ? 1 : a < b ? -1 : 0)))
         .startWith([])

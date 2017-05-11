@@ -34,7 +34,7 @@ export interface Props {
 const result = reax({
   toggleSearch: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
-  query: (event : React.SyntheticEvent<HTMLInputElement>) => event.currentTarget.value,
+  query: (value : string) => value,
   insertPackage: (result : CompiledComponent) => result,
   openComponent: (result : NamedForest) => result,
   createComponent: (result : string) => result

@@ -15,7 +15,7 @@ export default pure(
     currentComponentName : string,
     showSearch : boolean,
     toggleSearch : EventCallback<React.SyntheticEvent<HTMLButtonElement>>,
-    query : EventCallback<React.SyntheticEvent<HTMLInputElement>>
+    query : EventCallback<string>
   }) => (
   <div className={style.searchBar} data-state={props.showSearch ? 'search' : 'name'}>
     <div className={style.nameBox}>
@@ -31,8 +31,18 @@ export default pure(
       {props.showSearch
       ? <input
           autoFocus
-          onChange={props.query} />
+          onChange={limitInput(props.query)} />
       : null}
     </div>
   </div>
 ));
+
+function limitInput(handle : (value : string) => void){
+  return (event : React.SyntheticEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value
+      .toUpperCase()
+      .replace(/[^A-Z0-9-]/g, '-');
+    event.currentTarget.value = value;
+    handle(value);
+  };
+}
