@@ -20,7 +20,8 @@ const cssModuleLoader = {
   loader:'css-loader',
   options: {
     modules: true,
-    camelCase: true
+    camelCase: true,
+    localIdentName: '_[local]-[hash:base64:16]'
   }
 };
 
@@ -46,6 +47,10 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: 'bundle.js'
+  },
+  devServer: {
+    host: '0.0.0.0',
+    disableHostCheck: true
   },
   plugins: [
     new HtmlWebpackPlugin({
