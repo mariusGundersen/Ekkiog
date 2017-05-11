@@ -22,7 +22,7 @@ export default pure(
       {Number.isFinite(props.tickInterval)
       ? <Slider
         className={style.slider}
-        min={4}
+        min={1}
         max={11}
         step={1}
         value={Math.floor(Math.log(props.tickInterval)/Math.LN2)}

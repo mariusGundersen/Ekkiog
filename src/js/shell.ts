@@ -21,12 +21,23 @@ export default function startShell(options : Options) : Config{
   window.requestAnimationFrame(onFrameRequest);
 
   /* TICK */
-  let tickCount = 0;
+  const tick = {
+    count: 0,
+    timeout: 0,
+    interval: options.tickInterval
+  };
   const onTickRequest = () => {
-    setTimeout(onTickRequest, options.tickInterval);
-    options.tick(tickCount++);
+    time(tick, onTickRequest);
+
+    if(tick.interval < 16){
+      for(let d=16; d>tick.interval; d-=tick.interval){
+        options.tick(tick.count++);
+      }
+    }else{
+      options.tick(tick.count++);
+    }
   }
-  setTimeout(onTickRequest, options.tickInterval);
+  time(tick, onTickRequest);
 
   /* RESIZE */
   const onResizeRequest = () => {
@@ -41,7 +52,15 @@ export default function startShell(options : Options) : Config{
 
   return {
     setTickInterval(tickInterval : number){
-      options.tickInterval = tickInterval;
+      tick.interval = tickInterval;
+      clearTimeout(tick.timeout);
+      time(tick, onTickRequest);
     }
   };
 };
+
+function time(options : {interval : number, timeout : number}, callback : () => void){
+  if(Number.isFinite(options.interval)){
+    options.timeout = setTimeout(callback, Math.max(16, options.interval)) as any;
+  }
+}
