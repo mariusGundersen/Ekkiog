@@ -6080,8 +6080,8 @@ vm-browserify@0.0.4:
     indexof "0.0.1"
 
 w3c-manifest-loader@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/w3c-manifest-loader/-/w3c-manifest-loader-1.1.0.tgz#81fe401071684f40bb566072fb47d933650475ce"
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/w3c-manifest-loader/-/w3c-manifest-loader-1.1.1.tgz#04f420ca26ccc8bbb4c6db910f18f8832f2b223e"
   dependencies:
     babel-polyfill "^6.9.1"
     fs-promise "^0.5.0"
