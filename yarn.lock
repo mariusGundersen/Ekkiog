@@ -1456,10 +1456,6 @@ btoa@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/btoa/-/btoa-1.1.2.tgz#3e40b81663f81d2dd6596a4cb714a8dc16cfabe0"
 
-buddy-tree@^2.0.3:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/buddy-tree/-/buddy-tree-2.0.4.tgz#1e516c187a32aafe26ab3dde525824dd86c2db89"
-
 buddy-tree@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/buddy-tree/-/buddy-tree-2.1.0.tgz#6f2988bc293c8d631e3901e289d53a12c94efedd"
@@ -1561,8 +1557,8 @@ caniuse-api@^1.5.2:
     lodash.uniq "^4.5.0"
 
 caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
-  version "1.0.30000667"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000667.tgz#fb6060dbf349c101df26f421442419802fc6dab1"
+  version "1.0.30000669"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000669.tgz#dbe8f25700ecda631dfb05cb71027762bd4b03e5"
 
 caniuse-lite@^1.0.30000665:
   version "1.0.30000669"
@@ -2121,13 +2117,13 @@ debug@2.3.3:
   dependencies:
     ms "0.7.2"
 
-debug@2.6.1, debug@^2.1.1:
+debug@2.6.1, debug@^2.1.1, debug@^2.2.0:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.1.tgz#79855090ba2c4e3115cc7d8769491d58f0491351"
   dependencies:
     ms "0.7.2"
 
-debug@2.6.4, debug@^2.2.0:
+debug@2.6.4:
   version "2.6.4"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.4.tgz#7586a9b3c39741c0282ae33445c4e8ac74734fe0"
   dependencies:
@@ -2275,11 +2271,11 @@ ejs@^2.3.4:
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.6.tgz#479636bfa3fe3b1debd52087f0acb204b4f19c88"
 
 ekkiog-editing@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-3.0.2.tgz#f22cda6c4960b852119f9c82455bfc8c341eba56"
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-3.0.5.tgz#058215642e6f5eeec1aabc91e4b013a56e26e0ef"
   dependencies:
-    buddy-tree "^2.0.3"
-    ennea-tree "^2.0.4"
+    buddy-tree "^2.1.0"
+    ennea-tree "^2.0.5"
 
 electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.9:
   version "1.3.10"
@@ -2366,7 +2362,7 @@ enhanced-resolve@^3.0.0, enhanced-resolve@^3.1.0:
     object-assign "^4.0.1"
     tapable "^0.2.5"
 
-ennea-tree@^2.0.4:
+ennea-tree@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/ennea-tree/-/ennea-tree-2.0.5.tgz#c52002754ca9bb8b608d8199abb8984adc0bf65b"
 
@@ -3123,9 +3119,9 @@ icss-replace-symbols@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/icss-replace-symbols/-/icss-replace-symbols-1.0.2.tgz#cb0b6054eb3af6edc9ab1d62d01933e2d4c8bfa5"
 
-idb@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/idb/-/idb-2.0.2.tgz#531da3b5fdaa3b8435b52d1a85da81d45dab394b"
+idb@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/idb/-/idb-2.0.1.tgz#93359f84b932cff87d847530844f58444f49afa2"
 
 ieee754@^1.1.4:
   version "1.1.8"
@@ -3468,19 +3464,19 @@ js-tokens@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.1.tgz#08e9f132484a2c45a30907e9dc4d5567b7f114d7"
 
-js-yaml@^3.4.3, js-yaml@~3.7.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.7.0.tgz#5c967ddd837a9bfdca5f2de84253abe8a1c03b80"
-  dependencies:
-    argparse "^1.0.7"
-    esprima "^2.6.0"
-
-js-yaml@^3.8.2:
+js-yaml@^3.4.3, js-yaml@^3.8.2:
   version "3.8.4"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.8.4.tgz#520b4564f86573ba96662af85a8cafa7b4b5a6f6"
   dependencies:
     argparse "^1.0.7"
     esprima "^3.1.1"
+
+js-yaml@~3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.7.0.tgz#5c967ddd837a9bfdca5f2de84253abe8a1c03b80"
+  dependencies:
+    argparse "^1.0.7"
+    esprima "^2.6.0"
 
 jsbn@~0.1.0:
   version "0.1.1"
@@ -5914,8 +5910,8 @@ ua-parser-js@^0.7.9:
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.12.tgz#04c81a99bdd5dc52263ea29d24c6bf8d4818a4bb"
 
 uglify-js@^2.8.5, uglify-js@~2.8.22:
-  version "2.8.23"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.23.tgz#8230dd9783371232d62a7821e2cf9a817270a8a0"
+  version "2.8.24"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.24.tgz#48eb5175cf32e22ec11a47e638d7c8b4e0faf2dd"
   dependencies:
     source-map "~0.5.1"
     yargs "~3.10.0"
