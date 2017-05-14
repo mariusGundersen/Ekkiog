@@ -126,7 +126,7 @@ function cursorToObservable<T>(
       s.next(getValue(cursor));
       cursor.continue();
     });
-    s.subscribe(() => {}, () => {}, () => console.log('closed'));
+    s.subscribe(() => {}, () => {}, () => tx.complete ? null : tx.abort());
     tx.complete
       .then(() => {
         s.complete();
