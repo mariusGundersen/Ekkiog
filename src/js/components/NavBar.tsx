@@ -29,6 +29,7 @@ export interface Props {
   readonly currentComponentName : string;
   readonly tickCount : number;
   readonly tickInterval : number;
+  readonly gateCount : number;
 }
 
 const result = reax({
@@ -84,6 +85,7 @@ const result = reax({
       <MainMenuButton />
       <SearchBar
         currentComponentName={props.currentComponentName}
+        gateCount={props.gateCount}
         showSearch={values.showSearch}
         toggleSearch={events.toggleSearch}
         query={events.query} />
@@ -110,7 +112,8 @@ const result = reax({
 export default connect((state : State) => ({
   currentComponentName: state.editor.currentComponentName,
   tickCount: state.simulation.tickCount,
-  tickInterval: state.simulation.tickInterval
+  tickInterval: state.simulation.tickInterval,
+  gateCount: state.forest.buddyTree.usedSize||0
 }))(result);
 
 export function ifElse<T>(observable : Observable<T>, fallback : T){

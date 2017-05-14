@@ -10,16 +10,18 @@ export type EventCallback<T> = (event : T) => void;
 export default pure(
   (prev, next) =>
     prev.currentComponentName != next.currentComponentName
-    || prev.showSearch != next.showSearch,
+    || prev.showSearch != next.showSearch
+    || prev.gateCount != next.gateCount,
   (props : {
     currentComponentName : string,
+    gateCount : number,
     showSearch : boolean,
     toggleSearch : EventCallback<React.SyntheticEvent<HTMLButtonElement>>,
     query : EventCallback<string>
   }) => (
   <div className={style.searchBar} data-state={props.showSearch ? 'search' : 'name'}>
     <div className={style.nameBox}>
-      <span>{props.currentComponentName}</span>
+      <span>{props.currentComponentName} ({props.gateCount})</span>
     </div>
     <button
       className={style.navbarButton}
