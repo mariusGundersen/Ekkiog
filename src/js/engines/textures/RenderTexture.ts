@@ -9,7 +9,7 @@ export default class RenderTexture extends Texture implements FrameBuffer{
   constructor(gl : WebGLRenderingContext, width : number, height : number){
     super(gl, width, height);
 
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, undefined);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
 
     this.frameBuffer = gl.createFramebuffer() || (() => {throw new Error("Could not make framebuffer")})();
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
