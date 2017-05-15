@@ -75,7 +75,7 @@ const WebGLCanvas = connect(
 
     this.shellConfig = startShell({
       tickInterval : this.props.tickInterval,
-      render: () => {
+      render: (delta : number) => {
         const changed = this.touchControls.panZoomSaga.process();
         if(changed){
           this.props.dispatch(panZoom(this.perspective.tileToViewport.bind(this.perspective), this.perspective.viewportToTileFloored.bind(this.perspective)));
