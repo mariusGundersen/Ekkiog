@@ -186,11 +186,3 @@ function cursorToObservable<T>(
     };
   });
 }
-
-
-declare module "idb" {
-  export interface Index {
-    iterateCursor(range: IDBKeyRange | IDBValidKey, callback: (c: Cursor) => void): void;
-    iterateCursor(range: IDBKeyRange | IDBValidKey, direction: 'next' | 'nextunique' | 'prev' | 'prevunique', callback: (c: Cursor) => void): void;
-  }
-}

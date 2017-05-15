@@ -65,7 +65,7 @@
     "express": "^4.14.0",
     "gl-matrix": "^2.3.2",
     "gl-shader": "^4.2.0",
-    "idb": "2.0.1",
+    "idb": "~2.0.3",
     "morgan": "^1.7.0",
     "ndarray": "^1.0.18",
     "rc-slider": "7.0.0",

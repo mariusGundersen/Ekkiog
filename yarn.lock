@@ -3119,9 +3119,9 @@ icss-replace-symbols@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/icss-replace-symbols/-/icss-replace-symbols-1.0.2.tgz#cb0b6054eb3af6edc9ab1d62d01933e2d4c8bfa5"
 
-idb@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/idb/-/idb-2.0.1.tgz#93359f84b932cff87d847530844f58444f49afa2"
+idb@~2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/idb/-/idb-2.0.3.tgz#705ce38f57525c7b3e9949d6b2aad7d8ddc08dce"
 
 ieee754@^1.1.4:
   version "1.1.8"
