@@ -118,23 +118,27 @@ function cursorToObservable<T>(
   getCursor : (tx : Transaction, callback : (cursor : Cursor) => void) => void,
   getValue : (cursor : Cursor) => T) {
 
-  const s = new Subject<T>();
-  db.then(db => {
-    const tx = getTransaction(db);
-    getCursor(tx, cursor => {
-      if (!cursor) return;
-      s.next(getValue(cursor));
-      cursor.continue();
-    });
-    s.subscribe(() => {}, () => {}, () => tx.complete ? null : tx.abort());
-    tx.complete
-      .then(() => {
-        s.complete();
-      }, e => {
-        s.error(e);
+  return new Observable<T>(s => {
+    let running = false;
+    db.then(db => {
+      running = true;
+      const tx = getTransaction(db);
+      getCursor(tx, cursor => {
+        if (!cursor) return;
+        s.next(getValue(cursor));
+        if(running) cursor.continue();
       });
+      tx.complete
+        .then(() => {
+          s.complete();
+        }, e => {
+          s.error(e);
+        });
+    });
+    return () => {
+      running = false;
+    };
   });
-  return s;
 }
 
 
