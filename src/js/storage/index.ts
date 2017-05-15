@@ -11,9 +11,9 @@ import {
 
 import upgradeFrom0 from './upgrade/from0';
 import upgradeFrom5 from './upgrade/from5';
-import upgradeFrom6 from './upgrade/from6';
+import upgradeFrom7 from './upgrade/from7';
 
-const db = idb.open('ekkiog', 7, db => {
+const db = idb.open('ekkiog', 10, db => {
   switch(db.oldVersion){
     case 0:
       upgradeFrom0(db);
@@ -24,13 +24,24 @@ const db = idb.open('ekkiog', 7, db => {
     case 5:
       upgradeFrom5(db);
     case 6:
-      upgradeFrom6(db);
+    case 7:
+    case 8:
+      upgradeFrom7(db);
+    case 9:
+      return;
   }
 });
 
 export interface NamedForest extends Forest {
   name : string
 };
+
+export interface ComponentMetadata {
+  readonly name : string
+  readonly usedAt : Date
+  readonly useCount : number
+  readonly favorite : boolean
+}
 
 export class Storage{
   private readonly db : Promise<DB>;
@@ -53,21 +64,16 @@ export class Storage{
     const db = await this.db;
     const transaction = db.transaction([
       'components',
-      'recent',
-      'popular'
+      'componentMetadata',
     ], 'readwrite');
-    await transaction
-      .objectStore('recent')
+    const metadataStore = transaction.objectStore('componentMetadata');
+    const metadata = await metadataStore.get(name);
+    await metadataStore
       .put({
         name,
-        usedAt: new Date()
-      });
-    const popular = transaction.objectStore('popular');
-    const useCount = await popular.get(name);
-    await popular
-      .put({
-        name,
-        useCount: useCount ? useCount.useCount : 0
+        useCount: metadata ? (metadata.useCount||0)+1 : 1,
+        usedAt: new Date(),
+        favorite: (metadata && metadata.favorite === 'true') ? 'true' : 'false'
       });
     return await transaction
       .objectStore('components')
@@ -91,9 +97,9 @@ export class Storage{
   getRecent() : Observable<string> {
     return cursorToObservable<string>(
       this.db,
-      db => db.transaction('recent'),
+      db => db.transaction('componentMetadata'),
       (tx, callback) => {
-        const store = tx.objectStore('recent');
+        const store = tx.objectStore('componentMetadata');
         const index = store.index('usedAt');
         const range = IDBKeyRange.upperBound(new Date(2100, 1));
         index.iterateCursor(range, 'prev', callback);
@@ -101,12 +107,52 @@ export class Storage{
       cursor => cursor.value.name as string);
   }
 
-  getComponentNames() : Observable<string> {
+  getPopular() : Observable<string> {
     return cursorToObservable<string>(
       this.db,
-      db => db.transaction('components'),
-      (tx, callback) => tx.objectStore('components').iterateCursor(callback),
-      cursor => cursor.key as string);
+      db => db.transaction('componentMetadata'),
+      (tx, callback) => {
+        const store = tx.objectStore('componentMetadata');
+        const index = store.index('useCount');
+        const range = IDBKeyRange.upperBound(Number.MAX_SAFE_INTEGER);
+        index.iterateCursor(range, 'prev', callback);
+      },
+      cursor => cursor.value.name as string);
+  }
+
+  getFavorite() : Observable<string> {
+    return cursorToObservable<string>(
+      this.db,
+      db => db.transaction('componentMetadata'),
+      (tx, callback) => {
+        const store = tx.objectStore('componentMetadata');
+        const index = store.index('favorite');
+        const range = IDBKeyRange.only('true');
+        index.iterateCursor(range, 'prev', callback);
+      },
+      cursor => cursor.value.name as string);
+  }
+
+  async toggleFavorite(name : string) {
+    const db = await this.db;
+    const tx = db.transaction('componentMetadata', 'readwrite');
+    const store = tx.objectStore('componentMetadata');
+    const metadata = await store.get(name);
+    await store.put({
+      ...metadata,
+      favorite: (metadata && metadata.favorite === 'true') ? 'false' : 'true'
+    });
+  }
+
+  getComponentNames() : Observable<ComponentMetadata> {
+    return cursorToObservable<ComponentMetadata>(
+      this.db,
+      db => db.transaction('componentMetadata'),
+      (tx, callback) => tx.objectStore('componentMetadata').iterateCursor(callback),
+      cursor => ({
+        ...cursor.value,
+        favorite: cursor.value.favorite === 'true'
+      }));
   }
 }
 

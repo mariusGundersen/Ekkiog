@@ -17,7 +17,8 @@
 
       & .noExactMatch,
       & .insertPackage,
-      & .openComponent{
+      & .openComponent,
+      & .toggleFavorite {
         outline: none;
         background: none;
         border: none;
@@ -33,7 +34,8 @@
         flex: 1 0 auto;
       }
 
-      & .openComponent{
+      & .openComponent,
+      & .toggleFavorite {
         flex: 0 0 auto;
         display: flex;
         font-size: 24px;
