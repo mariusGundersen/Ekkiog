@@ -32,6 +32,8 @@ export default pure(
     <div className={style.searchBox}>
       {props.showSearch
       ? <input
+          type="text"
+          size={2}
           autoFocus
           onChange={limitInput(props.query)} />
       : null}
