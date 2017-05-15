@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-
+import { get } from 'ennea-tree';
 import { getTypeAt, isEmpty } from 'ekkiog-editing';
 
 import {Dispatch, Store} from 'react-redux';
@@ -11,22 +11,27 @@ import {
   abortLoadContextMenu,
   showContextMenu,
   setOkCancelMenuValid,
-  moveSelection
+  moveSelection,
+  setForest
 } from './actions';
 import { State } from './reduce';
 import {
   TAP,
+  DOUBLE_TAP,
   SHOW_CONTEXT_MENU,
   LOAD_CONTEXT_MENU,
   ABORT_LOAD_CONTEXT_MENU,
   MOVE_SELECTION
 } from './events';
 
+import storage from './storage';
+
 type ViewportToTile = (x : number, y : number) => [number, number];
 
 export default function fromEmitter(emitter : EventEmitter, viewportToTile : ViewportToTile, dispatch : Dispatch<State>){
   dispatchOn(emitter, dispatch, {
     [TAP]: handleTap(viewportToTile),
+    [DOUBLE_TAP]: handleDoubleTap(viewportToTile),
     [SHOW_CONTEXT_MENU]: handleShowContextMenu(viewportToTile),
     [LOAD_CONTEXT_MENU]: handleLoadContextMenu,
     [ABORT_LOAD_CONTEXT_MENU]: handleAbortContextMenu,
@@ -52,6 +57,19 @@ export function handleTap(viewportToTile : ViewportToTile){
       window.requestAnimationFrame(() => {
         dispatch(tapTile(Math.floor(tx), Math.floor(ty), selectedTool, toolDirection));
       });
+  };
+}
+
+export function handleDoubleTap(viewportToTile : ViewportToTile){
+  return ({x, y} : {x : number, y : number}) =>
+    (dispatch : Dispatch<State>, getState : () => State) => {
+      const [tx, ty] = viewportToTile(x, y);
+      const forest = getState().forest;
+      const areaData = get(forest.enneaTree, ty|0, tx|0);
+      if(areaData && areaData.data.type === 'component' && areaData.data.name){
+        const name = areaData.data.name;
+        storage.load(name).then(component => dispatch(setForest(name, component)));
+      }
   };
 }
 

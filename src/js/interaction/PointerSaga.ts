@@ -4,7 +4,9 @@ import {
   START_SELECTION,
   STOP_SELECTION,
   POINTER_TAP,
+  POINTER_DOUBLE_TAP,
   TAP,
+  DOUBLE_TAP,
   LONG_PRESS,
   SHOW_CONTEXT_MENU,
   POTENTIAL_LONG_PRESS,
@@ -15,26 +17,23 @@ import {
 } from '../events';
 
 export default class PointerSaga {
-  private canTap : boolean;
-  private canShowContextMenu : boolean;
+  private canInteract : boolean;
   constructor(emitter : EventEmitter){
-    this.canTap = true;
-    this.canShowContextMenu = true;
+    this.canInteract = true;
 
-    maybeEmit(emitter, () => this.canTap, POINTER_TAP, TAP);
-    maybeEmit(emitter, () => this.canShowContextMenu, LONG_PRESS, SHOW_CONTEXT_MENU);
-    maybeEmit(emitter, () => this.canShowContextMenu, POTENTIAL_LONG_PRESS, LOAD_CONTEXT_MENU);
-    maybeEmit(emitter, () => this.canShowContextMenu, POTENTIAL_LONG_PRESS_CANCEL, ABORT_LOAD_CONTEXT_MENU);
+    maybeEmit(emitter, () => this.canInteract, POINTER_TAP, TAP);
+    maybeEmit(emitter, () => this.canInteract, POINTER_DOUBLE_TAP, DOUBLE_TAP);
+    maybeEmit(emitter, () => this.canInteract, LONG_PRESS, SHOW_CONTEXT_MENU);
+    maybeEmit(emitter, () => this.canInteract, POTENTIAL_LONG_PRESS, LOAD_CONTEXT_MENU);
+    maybeEmit(emitter, () => this.canInteract, POTENTIAL_LONG_PRESS_CANCEL, ABORT_LOAD_CONTEXT_MENU);
   }
 
-  disableAll(){
-    this.canTap = false;
-    this.canShowContextMenu = false;
+  disable(){
+    this.canInteract = false;
   }
 
-  enableAll(){
-    this.canTap = true;
-    this.canShowContextMenu = true;
+  enable(){
+    this.canInteract = true;
   }
 }
 

@@ -119,16 +119,16 @@ const WebGLCanvas = connect(
     moveHandler(this.props.selection, nextProps.selection, this.engine);
     if(nextProps.selection.selection && !this.props.selection.selection){
       this.touchControls.selectionSaga.startSelection(nextProps.selection);
-      this.touchControls.pointerSaga.disableAll();
+      this.touchControls.pointerSaga.disable();
     }else if(this.props.selection.selection && !nextProps.selection.selection){
       this.touchControls.selectionSaga.stopSelection();
-      this.touchControls.pointerSaga.enableAll();
+      this.touchControls.pointerSaga.enable();
     }
 
     if(nextProps.contextMenu.show && !this.props.contextMenu.show){
-      this.touchControls.pointerSaga.disableAll();
+      this.touchControls.pointerSaga.disable();
     }else if(this.props.contextMenu.show && !nextProps.contextMenu.show){
-      this.touchControls.pointerSaga.enableAll();
+      this.touchControls.pointerSaga.enable();
     }
 
     if(nextProps.name !== this.props.name){
