@@ -11,7 +11,7 @@ uniform float tileSize;
 
 void main(void) {
   vec2 tileCoord = floor(texCoord*spriteTextureSize)*inverseSpriteTextureSize;
-  if(tileCoord.x > 1.0 || tileCoord.y > 1.0){
+  if(tileCoord.x >= 1.0 || tileCoord.y >= 1.0){
     discard;
   }
 
@@ -20,7 +20,9 @@ void main(void) {
   vec2 spriteCoord = mod(pixelCoord, tileSize);
   vec4 color = texture2D(spriteSheet, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);
 
-  if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
+  if(color.a == 0.0){
+    gl_FragColor = vec4(42.0/255.0, 45.0/255.0, 48.0/255.0, 1.0);
+  }else if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, tileCoord);
     gl_FragColor = charge;
   }else{

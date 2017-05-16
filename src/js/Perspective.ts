@@ -88,7 +88,7 @@ export default class Perspective{
     return this.viewportSize[1];
   }
 
-  /** Resets to fit the XOR gate */
+  /** Resets to fit tiles in viewport */
   reset({top, left, bottom, right} : Box){
     const topLeft = [left, top] as PosXY;
     const bottomRight = [right, bottom] as PosXY;
@@ -146,19 +146,25 @@ export default class Perspective{
     if(pos.length === 1){
       /*
 
-      mapPos = squareToMap * squarePos
+      squareToMap * squarePos = mapPos
       [ s 0 x ]   [s_x]   [m_x]
       [ 0 s y ] x [s_y] = [m_y]
       [ 0 0 1 ]   [ 1 ]   [ 1 ]
 
+      m_x = s*s_x + x
+      m_y = s*s_y + y
+
       x = m_x - s*s_x
       y = m_y - s*s_y
+
+      1 > x > -1
+      1 > y > -1
 
       */
       const s = this.squareToMapMatrix[0] //reuse existing scale
       const x = pos[0][0][0] - s*pos[0][1][0];
       const y = pos[0][0][1] - s*pos[0][1][1];
-      mat2d.set(this.squareToMapMatrix, s, 0, 0, s, x, y);
+      mat2d.set(this.squareToMapMatrix, s, 0, 0, s, minmax(-1, x, 1), minmax(-1, y, 1));
       mat2d.invert(this.squareFromMapMatrix, this.squareToMapMatrix);
 
       this.recalculate();
@@ -214,8 +220,8 @@ export default class Perspective{
     const vec = vec3.fromValues(v0, v1, v2);
     mat3.invert(mat, mat);
     vec3.transformMat3(vec, vec, mat);
-
-    mat2d.set(this.squareToMapMatrix, vec[0], 0, 0, vec[0], vec[1], vec[2]);
+    const s = minmax(0.001, vec[0], 2);
+    mat2d.set(this.squareToMapMatrix, s, 0, 0, s, minmax(-1, vec[1], 1), minmax(-1, vec[2], 1));
     mat2d.invert(this.squareFromMapMatrix, this.squareToMapMatrix);
 
     this.recalculate();
@@ -326,5 +332,10 @@ function mul2d(out : mat3, a : mat2d, b : mat3) {
     out[8] = b8;
 
     return out;
+}
 
-};
+function minmax(a : number, b : number, c : number){
+  return b < a ? a
+       : b > c ? c
+       : b;
+}

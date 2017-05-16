@@ -1,6 +1,6 @@
 export interface Options{
   tickInterval : number;
-  readonly render : () => void;
+  readonly render : (delta : number, now : number) => void;
   readonly tick : (tickCount : number) => void;
   readonly resize : (
     pixelWidth : number,
@@ -14,9 +14,11 @@ export interface Config{
 export default function startShell(options : Options) : Config{
 
   /* RENDER */
-  const onFrameRequest = () => {
+  let earlier = window.performance.now();
+  const onFrameRequest = (now : number) => {
     window.requestAnimationFrame(onFrameRequest);
-    options.render();
+    options.render(now - earlier, now);
+    earlier = now;
   }
   window.requestAnimationFrame(onFrameRequest);
 
@@ -52,6 +54,7 @@ export default function startShell(options : Options) : Config{
 
   return {
     setTickInterval(tickInterval : number){
+      if(tick.interval === tickInterval) return;
       tick.interval = tickInterval;
       clearTimeout(tick.timeout);
       time(tick, onTickRequest);

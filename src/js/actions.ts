@@ -34,6 +34,22 @@ export const setForest = (name : string, forest : Forest) : SetForestAction => (
   forest
 });
 
+export type PushEditorAction = {
+  readonly type : 'push-editor',
+  readonly name : string
+}
+export const pushEditor = (name : string) : PushEditorAction => ({
+  type: 'push-editor',
+  name
+});
+
+export type PopEditorAction = {
+  readonly type : 'pop-editor'
+}
+export const popEditor = () : PopEditorAction => ({
+  type: 'pop-editor'
+});
+
 export type PanZoomAction = {
   readonly type : 'panZoom',
   readonly tileToViewport : (...pos : number[]) => [number, number],
@@ -258,7 +274,9 @@ export type ContextMenuActions =
 export type EditorActions =
   SetSelectedToolAction |
   SetToolDirectionAction |
-  SetForestAction;
+  SetForestAction |
+  PushEditorAction |
+  PopEditorAction;
 
 export type EditorMenuActions =
   ShowContextMenuAction |

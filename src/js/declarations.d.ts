@@ -107,3 +107,7 @@ declare module "offline-plugin/runtime" {
 
   export default new Offline;
 }
+
+interface Window {
+  __REDUX_DEVTOOLS_EXTENSION_COMPOSE__<R>(a: R) : R
+}
