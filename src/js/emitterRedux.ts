@@ -12,7 +12,9 @@ import {
   showContextMenu,
   setOkCancelMenuValid,
   moveSelection,
-  setForest
+  setForest,
+  pushEditor,
+  popEditor
 } from './actions';
 import { State } from './reduce';
 import {
@@ -33,7 +35,7 @@ export default function fromEmitter(emitter : EventEmitter, viewportToTile : Vie
     [TAP]: handleTap(viewportToTile),
     [DOUBLE_TAP]: handleDoubleTap(viewportToTile),
     [SHOW_CONTEXT_MENU]: handleShowContextMenu(viewportToTile),
-    [LOAD_CONTEXT_MENU]: handleLoadContextMenu,
+    [LOAD_CONTEXT_MENU]: handleLoadContextMenu(viewportToTile),
     [ABORT_LOAD_CONTEXT_MENU]: handleAbortContextMenu,
     [MOVE_SELECTION]: handleMoveSelection
   });
@@ -52,8 +54,10 @@ export function handleTap(viewportToTile : ViewportToTile){
   return ({x, y} : {x : number, y : number}) =>
     (dispatch : Dispatch<State>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y);
-      const {selectedTool, toolDirection} = getState().editor;
 
+      if(tx < 0 || ty < 0 || tx > 128 || ty > 128) return;
+
+      const {selectedTool, toolDirection} = getState().editor;
       window.requestAnimationFrame(() => {
         dispatch(tapTile(Math.floor(tx), Math.floor(ty), selectedTool, toolDirection));
       });
@@ -64,11 +68,22 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
   return ({x, y} : {x : number, y : number}) =>
     (dispatch : Dispatch<State>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y);
-      const forest = getState().forest;
-      const areaData = get(forest.enneaTree, ty|0, tx|0);
-      if(areaData && areaData.data.type === 'component' && areaData.data.name){
-        const name = areaData.data.name;
-        storage.load(name).then(component => dispatch(setForest(name, component)));
+      if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
+        const topOfStack = getState().editor.stack;
+        if(topOfStack){
+          const name = topOfStack.value;
+          dispatch(popEditor());
+          storage.load(name).then(component => dispatch(setForest(name, component)));
+        }
+      }else{
+        const state = getState();
+        const forest = state.forest;
+        const areaData = get(forest.enneaTree, ty|0, tx|0);
+        if(areaData && areaData.data.type === 'component' && areaData.data.name){
+          const name = areaData.data.name;
+          dispatch(pushEditor(state.editor.currentComponentName));
+          storage.load(name).then(component => dispatch(setForest(name, component)));
+        }
       }
   };
 }
@@ -77,19 +92,28 @@ export function handleShowContextMenu(viewportToTile : ViewportToTile){
   return ({x, y} : {x : number, y : number}) =>
     (dispatch : Dispatch<State>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y);
-      const enneaTree = getState().forest.enneaTree;
-      const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
-      dispatch(showContextMenu(
-        tile,
-        tx,
-        ty));
+      if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
+        dispatch(abortLoadContextMenu());
+      }else{
+        const enneaTree = getState().forest.enneaTree;
+        const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
+        dispatch(showContextMenu(
+          tile,
+          tx,
+          ty));
+      }
     };
 }
 
-export function handleLoadContextMenu({x, y} : {x : number, y : number}){
-  return loadContextMenu(
-    x,
-    y);
+export function handleLoadContextMenu(viewportToTile : ViewportToTile){
+  return ({x, y} : {x : number, y : number}) => {
+    const [tx, ty] = viewportToTile(x, y);
+    if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
+      return abortLoadContextMenu();
+    }else{
+      return loadContextMenu(x, y);
+    }
+  };
 }
 
 export function handleAbortContextMenu({x, y} : {x : number, y : number}){

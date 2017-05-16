@@ -12,8 +12,8 @@ import {
 
 const DOUBLE_TAP_TOO_SLOW_TIMEOUT = 'tapTooSlowTimeout';
 
-const MAX_UNMOVED_DISTANCE = 10;
-const MAX_HOLD_TIME = 250;
+const MAX_UNMOVED_DISTANCE = 50;
+const MAX_HOLD_TIME = 500;
 
 interface DoubleTapData extends Pos {
   doubleTap : boolean
