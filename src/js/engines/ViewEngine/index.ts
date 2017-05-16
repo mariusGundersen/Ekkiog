@@ -16,9 +16,8 @@ export default class ViewEngine {
 
   render(context : RenderContext, matrix : mat3) {
     this.shader.bind();
-    this.gl.clearColor(42/255, 45/255, 48/255, 1);
+    this.gl.clearColor(0.1, 0.1, 0.1, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-    this.gl.clearColor(0, 0, 0, 1);
 
     this.shader.uniforms['spriteTextureSize'] = context.spriteSheetTexture.size;
     this.shader.uniforms['inverseSpriteTextureSize'] = context.spriteSheetTexture.inverseSize;
