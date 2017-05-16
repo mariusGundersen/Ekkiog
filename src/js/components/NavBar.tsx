@@ -113,7 +113,7 @@ export default connect((state : State) => ({
   currentComponentName: state.editor.currentComponentName,
   tickCount: state.simulation.tickCount,
   tickInterval: state.simulation.tickInterval,
-  gateCount: state.forest.buddyTree.usedSize||0
+  gateCount: (state.forest.buddyTree.usedSize||2) - 2
 }))(result);
 
 export function ifElse<T>(observable : Observable<T>, fallback : T){
