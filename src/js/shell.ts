@@ -54,6 +54,7 @@ export default function startShell(options : Options) : Config{
 
   return {
     setTickInterval(tickInterval : number){
+      if(tick.interval === tickInterval) return;
       tick.interval = tickInterval;
       clearTimeout(tick.timeout);
       time(tick, onTickRequest);

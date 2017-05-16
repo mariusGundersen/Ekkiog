@@ -115,24 +115,31 @@ const WebGLCanvas = connect(
 
   componentWillReceiveProps(nextProps : Props){
     this.shellConfig.setTickInterval(nextProps.tickInterval);
+
     forestHandler(this.props.forest, nextProps.forest, this.engine);
     moveHandler(this.props.selection, nextProps.selection, this.engine);
-    if(nextProps.selection.selection && !this.props.selection.selection){
-      this.touchControls.selectionSaga.startSelection(nextProps.selection);
-      this.touchControls.pointerSaga.disable();
-    }else if(this.props.selection.selection && !nextProps.selection.selection){
-      this.touchControls.selectionSaga.stopSelection();
-      this.touchControls.pointerSaga.enable();
+
+    if(nextProps.selection.selection !== this.props.selection.selection){
+      if(nextProps.selection.selection){
+        this.touchControls.selectionSaga.startSelection(nextProps.selection);
+        this.touchControls.pointerSaga.disable();
+      }else{
+        this.touchControls.selectionSaga.stopSelection();
+        this.touchControls.pointerSaga.enable();
+      }
     }
 
-    if(nextProps.contextMenu.show && !this.props.contextMenu.show){
-      this.touchControls.pointerSaga.disable();
-    }else if(this.props.contextMenu.show && !nextProps.contextMenu.show){
-      this.touchControls.pointerSaga.enable();
+    if(nextProps.contextMenu.show !== this.props.contextMenu.show){
+      if(nextProps.contextMenu.show){
+        this.touchControls.pointerSaga.disable();
+      }else{
+        this.touchControls.pointerSaga.enable();
+      }
     }
 
     if(nextProps.name !== this.props.name){
-      this.perspective.reset(calculateBoundingBox(nextProps.forest.enneaTree));}
+      this.perspective.reset(calculateBoundingBox(nextProps.forest.enneaTree));
+    }
   }
 
   shouldComponentUpdate(nextProps : Props){
@@ -177,6 +184,7 @@ function emit(emiter : EventEmitter, type : TouchType){
     event.preventDefault();
   }
 }
+
 function calculateBoundingBox(tree : TreeNode) : Box {
   const box = {
     top: tree.size,
@@ -185,11 +193,11 @@ function calculateBoundingBox(tree : TreeNode) : Box {
     bottom: 0
   };
 
-  for(const node of getIterator(tree, {top: 0, left: 0, width: tree.size, height: tree.size})){
-    box.top = Math.min(box.top, node.top-2);
-    box.left = Math.min(box.left, node.left-2);
-    box.right = Math.max(box.right, node.left+node.width+2);
-    box.bottom = Math.max(box.bottom, node.top+node.height+2);
+  for(const item of getIterator(tree, {top: 0, left: 0, width: tree.size, height: tree.size})){
+    box.top = Math.min(box.top, item.top-5);
+    box.left = Math.min(box.left, item.left-5);
+    box.right = Math.max(box.right, item.left+item.width+5);
+    box.bottom = Math.max(box.bottom, item.top+item.height+5);
   }
 
   if(box.top > box.bottom){
