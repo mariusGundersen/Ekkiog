@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware, Store } from 'redux';
+import { createStore, applyMiddleware, compose, Store } from 'redux';
 import thunk from 'redux-thunk';
 
 import '../css/main.css';
@@ -18,9 +18,11 @@ offline();
 
 const store = createStore<State>(
   reduce,
-  applyMiddleware(
-    thunk,
-    createContextMiddleware()
+  (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
+    applyMiddleware(
+      thunk,
+      createContextMiddleware()
+    )
   )
 );
 
