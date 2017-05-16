@@ -51,13 +51,29 @@ export class Storage{
 
   async save(name : string, forest : Forest){
     const db = await this.db;
-    return await db
-      .transaction('components', 'readwrite')
+    const transaction = db.transaction([
+      'components',
+      'componentMetadata'
+    ], 'readwrite');
+
+    await transaction
       .objectStore('components')
       .put({
         name,
         ...forest
       });
+
+    const metadataStore = transaction.objectStore('componentMetadata');
+    const metadata = await metadataStore.get(name);
+    if(metadata == undefined){
+      await metadataStore
+        .put({
+          name,
+          useCount: 1,
+          usedAt: new Date(),
+          favorite: 'false'
+        });
+    }
   }
 
   async load(name : string) : Promise<NamedForest>{
