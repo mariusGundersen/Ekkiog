@@ -1,4 +1,4 @@
-import { MutableContext, Item, Area } from 'ekkiog-editing';
+import { MutableContext as IMutableContext, Item, Area } from 'ekkiog-editing';
 
 import { VertexBuffer, RenderContext, AtomicBind } from './textures/types';
 
@@ -17,10 +17,10 @@ const MAP_SIZE = 128;
 const TILE_SIZE = 16;
 const SQRT_NET_COUNT = 256;
 
-export default class Context implements MutableContext, RenderContext {
-  readonly gl : WebGLRenderingContext;
-  readonly width : number;
-  readonly height : number;
+export default class Context implements RenderContext {
+  private readonly gl : WebGLRenderingContext;
+  private readonly width : number;
+  private readonly height : number;
   readonly tileSize : number;
   readonly triangle : Triangle;
   readonly wordQuadList : QuadList;
@@ -32,7 +32,6 @@ export default class Context implements MutableContext, RenderContext {
   readonly tileMapTexture : RenderTexture;
   readonly chargeMapTexture : RenderTexture;
   readonly netChargeTextures : [RenderTexture, RenderTexture];
-  private activeVBO : VertexBuffer
   constructor(gl : WebGLRenderingContext, bindingTracker : AtomicBind){
     this.gl = gl;
     this.width = MAP_SIZE;
@@ -57,34 +56,76 @@ export default class Context implements MutableContext, RenderContext {
     ];
   }
 
-  setMap(x : number, y : number, tile : number){
-    this.mapTexture.set(x, y, tile);
+  mutateContext(mutator : (mutableContext : MutableContext) => void){
+    const mutableContext = new MutableContext(this);
+    mutator(mutableContext);
+    mutableContext.update();
+    return mutableContext.changed;
+  }
+}
+
+class MutableContext implements IMutableContext {
+  private readonly context : Context;
+  private textChanged : boolean;
+  private mapChanged : boolean;
+  private netChanged : boolean;
+  private gateChanged : boolean;
+  constructor(context : Context) {
+    this.context = context;
+    this.textChanged = false;
+    this.mapChanged = false;
+    this.netChanged = false;
+    this.gateChanged = false;
+  }
+
+  get changed(){
+    return this.textChanged
+        || this.mapChanged
+        || this.netChanged
+        || this.gateChanged;
+  }
+  setMap(x : number, y : number, tile : number) {
+    this.context.mapTexture.set(x, y, tile);
+    this.mapChanged = true;
   }
 
   setNet(x : number, y : number, net : number){
-    this.netMapTexture.set(x, y, net);
+    this.context.netMapTexture.set(x, y, net);
+    this.netChanged = true;
   }
 
   setGate(v : number, a : number, b : number){
-    this.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
+    this.context.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
+    this.gateChanged = true;
   }
 
   insertText(item : Item, area : Area){
-    this.textScene.insertItem(item, area);
+    this.context.textScene.insertItem(item, area);
+    this.textChanged = true;
   }
 
   removeText(item : Item){
-    this.textScene.removeItem(item);
+    this.context.textScene.removeItem(item);
+    this.textChanged = true;
   }
 
   updateText(before : Item, after : Item){
-    this.textScene.updateItem(before, after);
+    this.context.textScene.updateItem(before, after);
+    this.textChanged = true;
   }
 
-  updateDataTextures(){
-    this.mapTexture.update();
-    this.netMapTexture.update();
-    this.gatesTexture.update();
-    this.wordQuadList.update();
+  update(){
+    if(this.mapChanged){
+      this.context.mapTexture.update();
+    }
+    if(this.netChanged){
+      this.context.netMapTexture.update();
+    }
+    if(this.gateChanged){
+      this.context.gatesTexture.update();
+    }
+    if(this.textChanged){
+      this.context.wordQuadList.update();
+    }
   }
 }

@@ -5,8 +5,8 @@ import Context from './Context';
 import Renderer from './Renderer';
 import { VertexBuffer } from './textures/types';
 
-export interface MutableContext extends MutableContext {
-  updateDataTextures() : void;
+export interface ContextMutator {
+  mutateContext(mutator : (context : MutableContext) => void) : boolean;
 }
 
 
