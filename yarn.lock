@@ -2270,9 +2270,9 @@ ejs@^2.3.4:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.6.tgz#479636bfa3fe3b1debd52087f0acb204b4f19c88"
 
-ekkiog-editing@^3.0.6:
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-3.0.6.tgz#b7e153a92783cc25c979f64ecadc2d8f1ef5273b"
+ekkiog-editing@^3.0.7:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-3.0.7.tgz#5193938d511cff658a03eb3342858a607bcc17e9"
   dependencies:
     buddy-tree "^2.1.1"
     ennea-tree "^2.0.5"
