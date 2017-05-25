@@ -22,4 +22,5 @@ input[type="submit"] {
   margin: 0;
   padding: 0;
   border-width: 0;
+  touch-action: manipulation;
 }

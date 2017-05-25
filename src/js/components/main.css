@@ -12,6 +12,7 @@
 
 .clickable{
   pointer-events: painted;
+  touch-action: manipulation;
 }
 
 .transTrans{
