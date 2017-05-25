@@ -3,6 +3,7 @@ import { connect, Dispatch } from 'react-redux';
 
 import { State } from '../reduce';
 import { ContextMenuState } from '../reducers/contextMenu';
+import { ViewState } from '../reducers/view';
 import Loading from './radialMenu/Loading';
 import RadialMenu, { PieCenterProps, PieRingProps } from './radialMenu';
 
@@ -21,10 +22,11 @@ import {
 } from './radialMenu/menuItems';
 
 export type Props = {
-  contextMenu : ContextMenuState;
-  radius : number;
-  width : number;
-  dispatch : Dispatch<State>
+  readonly contextMenu : ContextMenuState;
+  readonly view : ViewState;
+  readonly radius : number;
+  readonly width : number;
+  readonly dispatch : Dispatch<State>
 }
 
 export default class ContextMenu extends React.Component<Props, void>{
@@ -39,12 +41,11 @@ export default class ContextMenu extends React.Component<Props, void>{
     }
 
     if(nextProps.contextMenu.show && this.props.contextMenu.show){
-      return nextProps.contextMenu.x !== this.props.contextMenu.x
-        || nextProps.contextMenu.y !== this.props.contextMenu.y
-        || nextProps.contextMenu.tx !== this.props.contextMenu.tx
+      return nextProps.contextMenu.tx !== this.props.contextMenu.tx
         || nextProps.contextMenu.ty !== this.props.contextMenu.ty
         || nextProps.contextMenu.tile !== this.props.contextMenu.tile
         || nextProps.contextMenu.show !== this.props.contextMenu.show
+        || nextProps.view.tileToViewport !== this.props.view.tileToViewport
         || nextProps.radius !== this.props.radius
         || nextProps.width !== this.props.width;
     }
@@ -64,7 +65,8 @@ export default class ContextMenu extends React.Component<Props, void>{
     }
 
     if(this.props.contextMenu.show){
-      const { x, y, tile, tx, ty } = this.props.contextMenu;
+      const { tile, tx, ty } = this.props.contextMenu;
+      const [x, y] = this.props.view.tileToViewport(tx, ty);
       return (
         <g transform={`translate(${x/window.devicePixelRatio} ${y/window.devicePixelRatio})`}>
           <RadialMenu

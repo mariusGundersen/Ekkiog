@@ -7,11 +7,13 @@ import {
 export interface ViewState {
   readonly pixelWidth : number,
   readonly pixelHeight : number,
-  readonly viewportToTileFloored : (...pos : number[]) => [number, number]
+  viewportToTileFloored(...pos : number[]) : [number, number],
+  tileToViewport(...pos : number[]) : [number, number]
 }
 
 export default function view(state : ViewState = {
   viewportToTileFloored: () => [0,0],
+  tileToViewport: () => [0, 0],
   pixelWidth: 100,
   pixelHeight: 100
 }, action : ViewActions) : ViewState {
@@ -19,7 +21,8 @@ export default function view(state : ViewState = {
     case 'panZoom':
       return {
         ...state,
-        viewportToTileFloored: action.viewportToTileFloored
+        viewportToTileFloored: action.viewportToTileFloored,
+        tileToViewport: action.tileToViewport
       }
     case 'resize':
       return {

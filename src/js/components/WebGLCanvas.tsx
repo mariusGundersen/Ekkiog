@@ -32,14 +32,14 @@ import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reducers/contextMenu';
 
 export interface Props{
-  dispatch : Dispatch<State>,
-  tickInterval : number,
-  width : number,
-  height : number,
-  forest : Forest,
-  selection : SelectionState,
-  contextMenu : ContextMenuState,
-  name : string
+  readonly dispatch : Dispatch<State>,
+  readonly tickInterval : number,
+  readonly width : number,
+  readonly height : number,
+  readonly forest : Forest,
+  readonly selection : SelectionState,
+  readonly contextMenu : ContextMenuState,
+  readonly name : string
 }
 
 const WebGLCanvas = connect(
@@ -78,7 +78,10 @@ const WebGLCanvas = connect(
       render: (delta : number) => {
         const changed = this.touchControls.panZoomSaga.process();
         if(changed){
-          this.props.dispatch(panZoom(this.perspective.tileToViewport.bind(this.perspective), this.perspective.viewportToTileFloored.bind(this.perspective)));
+          this.props.dispatch(panZoom(
+            this.perspective.tileToViewport.bind(this.perspective),
+            this.perspective.viewportToTileFloored.bind(this.perspective),
+            this.perspective.transformation));
         }
 
         this.engine.render(this.perspective.mapToViewportMatrix);
@@ -97,7 +100,7 @@ const WebGLCanvas = connect(
       },
       resize: (pixelWidth, pixelHeight) => {
         this.props.dispatch(resize(pixelWidth, pixelHeight));
-        const prevWidth = this.perspective.viewportWidth;
+        const prevWidth = this.props.height;
         const mapPosA = this.perspective.viewportToMap(0, 0);
         const mapPosB = this.perspective.viewportToMap(prevWidth, 0);
         this.perspective.setViewport(pixelWidth, pixelHeight);
@@ -108,7 +111,10 @@ const WebGLCanvas = connect(
           [mapPosA, squarePosA],
           [mapPosB, squarePosB]);
 
-        this.props.dispatch(panZoom(this.perspective.tileToViewport.bind(this.perspective), this.perspective.viewportToTileFloored.bind(this.perspective)));
+        this.props.dispatch(panZoom(
+          this.perspective.tileToViewport.bind(this.perspective),
+          this.perspective.viewportToTileFloored.bind(this.perspective),
+          this.perspective.transformation));
       }
     });
   }

@@ -20,8 +20,6 @@ export interface ContextMenuShowState {
   readonly loading : false,
   readonly show : true,
   readonly tile : string,
-  readonly x : number,
-  readonly y : number,
   readonly tx : number,
   readonly ty : number
 }
@@ -31,10 +29,6 @@ export type ContextMenuState = ContextMenuHideState | ContextMenuLoadingState | 
 export default function contextMenu(state : ContextMenuState = {
   loading: false,
   show: false,
-  x: 0,
-  y: 0,
-  tx: 0,
-  ty: 0
 }, action : ContextMenuActions) : ContextMenuState {
   switch(action.type){
     case 'loadContextMenu':
@@ -59,11 +53,6 @@ export default function contextMenu(state : ContextMenuState = {
         loading: false,
         show: false
       } : state;
-    case 'panZoom':
-      return state.show ? {
-          ...state,
-          ...toPos(action.tileToViewport(state.tx, state.ty))
-        } : state;
     case 'hideContextMenu':
       return {
         loading: false,
@@ -72,11 +61,4 @@ export default function contextMenu(state : ContextMenuState = {
     default:
       return state;
   }
-}
-
-function toPos(pos : [number, number]){
-  return {
-    x: pos[0],
-    y: pos[1]
-  };
 }

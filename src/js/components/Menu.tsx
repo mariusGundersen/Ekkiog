@@ -8,22 +8,25 @@ import { State } from '../reduce';
 import { ContextMenuState } from '../reducers/contextMenu';
 import { EditorState } from '../reducers/editor';
 import { EditorMenuState } from '../reducers/editorMenu';
+import { ViewState } from '../reducers/view';
 import EditorMenu from './EditorMenu';
 import ContextMenu from './ContextMenu';
 
 export interface Props {
-  dispatch : Dispatch<State>,
-  pixelWidth : number,
-  pixelHeight : number,
-  contextMenu : ContextMenuState,
-  editor : EditorState,
-  editorMenu : EditorMenuState
+  readonly dispatch : Dispatch<State>,
+  readonly pixelWidth : number,
+  readonly pixelHeight : number,
+  readonly contextMenu : ContextMenuState,
+  readonly view : ViewState,
+  readonly editor : EditorState,
+  readonly editorMenu : EditorMenuState
 }
 
 export default connect(
   ({view, contextMenu, editor, editorMenu} : State) => ({
     pixelWidth: view.pixelWidth/devicePixelRatio,
     pixelHeight: view.pixelHeight/devicePixelRatio,
+    view,
     contextMenu,
     editor,
     editorMenu
@@ -41,7 +44,7 @@ export default connect(
       height={props.pixelHeight}
       viewBox={`0 0 ${props.pixelWidth} ${props.pixelHeight}`}>
       <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} editor={props.editor} editorMenu={props.editorMenu} dispatch={dispatch} />
-      <ContextMenu radius={radius+gap} width={radius+gap} dispatch={dispatch} contextMenu={props.contextMenu} />
+      <ContextMenu radius={radius+gap} width={radius+gap} dispatch={dispatch} contextMenu={props.contextMenu} view={props.view} />
     </svg>
   )
 });

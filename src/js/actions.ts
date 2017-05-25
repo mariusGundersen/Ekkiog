@@ -53,12 +53,18 @@ export const popEditor = () : PopEditorAction => ({
 export type PanZoomAction = {
   readonly type : 'panZoom',
   readonly tileToViewport : (...pos : number[]) => [number, number],
-  readonly viewportToTileFloored : (...pos : number[]) => [number, number]
+  readonly viewportToTileFloored : (...pos : number[]) => [number, number],
+  readonly transform : {x : number, y : number, s : number}
 }
-export const panZoom = (tileToViewport : (...pos : number[]) => [number, number], viewportToTileFloored : (...pos : number[]) => [number, number]) : PanZoomAction => ({
+export const panZoom = (
+  tileToViewport : (...pos : number[]) => [number, number],
+  viewportToTileFloored : (...pos : number[]) => [number, number],
+  transform : {x : number, y : number, s : number}
+) : PanZoomAction => ({
   type: 'panZoom',
   tileToViewport,
-  viewportToTileFloored
+  viewportToTileFloored,
+  transform
 });
 
 export type LoadContextMenuAction = {
@@ -268,8 +274,7 @@ export type ContextMenuActions =
   LoadContextMenuAction |
   AbortLoadContextMenuAction |
   ShowContextMenuAction |
-  HideContextMenuAction |
-  PanZoomAction;
+  HideContextMenuAction;
 
 export type EditorActions =
   SetSelectedToolAction |
