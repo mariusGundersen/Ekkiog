@@ -4,6 +4,10 @@ import style from './navbar.scss';
 
 import MdMenu from 'react-icons/md/menu';
 
-export default (props : {}) => (
-  <button className={style.navbarButton}><MdMenu /></button>
+export default (props : {onClick : (event : React.SyntheticEvent<HTMLButtonElement>) => void}) => (
+  <button
+    className={style.navbarButton}
+    onClick={props.onClick}>
+    <MdMenu />
+  </button>
 );

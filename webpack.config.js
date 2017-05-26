@@ -60,7 +60,8 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       '__DEV__': debug,
-      'process.env.NODE_ENV': debug ? '"development"' : '"production"'
+      'process.env.NODE_ENV': debug ? '"development"' : '"production"',
+      '__BuildDate__': JSON.stringify(new Date().toISOString())
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: !debug,

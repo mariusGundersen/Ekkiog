@@ -16,6 +16,7 @@ import MainMenuButton from './MainMenuButton';
 import SearchResults from './SearchResults';
 import SimulationMenuButton from './SimulationMenuButton';
 import SimulationMenu from './SimulationMenu';
+import MainMenu from './MainMenu';
 import SearchBar from './SearchBar';
 
 import style from './navbar.scss';
@@ -35,6 +36,7 @@ export interface Props {
 const result = reax({
   toggleSearch: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
+  toggleMainMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   query: (value : string) => value,
   insertPackage: (result : CompiledComponent) => result,
   openComponent: (result : NamedForest) => result,
@@ -42,6 +44,7 @@ const result = reax({
 }, ({
   toggleSearch,
   toggleSimulationMenu,
+  toggleMainMenu,
   query,
   insertPackage,
   openComponent,
@@ -57,21 +60,29 @@ const result = reax({
       openComponent.map(x => true),
       createComponent.map(x => true)
     )
-    .scan((state, _) => !state, false)
+    .scan(state => !state, false)
     .startWith(false);
 
   const showSimulationMenu = toggleSimulationMenu
     .scan(state => !state, false)
     .startWith(false);
 
+  const showMainMenu = toggleMainMenu
+    .scan(state => !state, false)
+    .startWith(false);
+
   const state = Observable.merge(
     showSearch.map(x => x ? 'search' : ''),
-    showSimulationMenu.map(x => x ? 'simulation' : '')
-  ).scan((_, event) => event, '');
+    showSimulationMenu.map(x => x ? 'simulation' : ''),
+    showMainMenu.map(x => x ? 'main' : '')
+  ).scan((_, event) => event, '')
+  .share();
 
   return {
+    state,
     showSearch: state.map(x => x == 'search'),
     showSimulationMenu: state.map(x => x == 'simulation'),
+    showMainMenu: state.map(x => x == 'main'),
     query: state.map(x => x == 'search')
       .switchMap(ifElse(query.startWith(''), ''))
   };
@@ -82,7 +93,8 @@ const result = reax({
 }) => (
   <div className={style.navbar}>
     <div className={style.bar}>
-      <MainMenuButton />
+      <MainMenuButton
+        onClick={events.toggleMainMenu}/>
       <SearchBar
         currentComponentName={props.currentComponentName}
         gateCount={props.gateCount}
@@ -95,19 +107,27 @@ const result = reax({
         onClick={events.toggleSimulationMenu}
         isActive={values.showSimulationMenu} />
     </div>
-    {values.showSearch
-    ? <SearchResults
-      query={values.query}
-      insertPackage={events.insertPackage}
-      openComponent={events.openComponent}
-      createComponent={events.createComponent} />
-    : values.showSimulationMenu
-    ? <SimulationMenu
-      tickInterval={props.tickInterval}
-      setTickInterval={x => props.dispatch(setTickInterval(x))}/>
-    : null}
+    { values.state == 'search' ?
+      <SearchResults
+        query={values.query}
+        insertPackage={events.insertPackage}
+        openComponent={events.openComponent}
+        createComponent={events.createComponent} />
+    : values.state == 'simulation' ?
+      <SimulationMenu
+        tickInterval={props.tickInterval}
+        setTickInterval={x => props.dispatch(setTickInterval(x))}/>
+    : values.state == 'main' ?
+      <MainMenu />
+    : null }
   </div>
 ));
+
+function menus<V, E, P>(state : 'search' | 'simulation' | 'main' | '', values : V, events : E, props : P){
+  switch(state){
+
+  }
+}
 
 export default connect((state : State) => ({
   currentComponentName: state.editor.currentComponentName,
