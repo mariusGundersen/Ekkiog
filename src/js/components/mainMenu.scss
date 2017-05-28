@@ -1,0 +1,11 @@
+.main-menu{
+  display: flex;
+  align-items: center;
+  color: white;
+  background: #446364;
+  max-width: 50%;
+
+  & .version {
+    font-size: 10px;
+  }
+}

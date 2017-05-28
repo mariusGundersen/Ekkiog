@@ -8,6 +8,8 @@
 .root{
   flex: 1 0 100%;
   display: flex;
+  font-size: 16px;
+  font-family: Courier Bold, Courier, monospace;
 }
 
 .clickable{
