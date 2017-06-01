@@ -76,6 +76,37 @@ export class Storage{
     }
   }
 
+  async export(){
+    const db = await this.db;
+    const transaction = db.transaction([
+      'components',
+      'componentMetadata',
+    ], 'readonly');
+
+    const components = exportToArray(transaction.objectStore("components"));
+    const componentMetadata = exportToArray(transaction.objectStore("componentMetadata"));
+
+    return {
+      components: await components,
+      componentMetadata: await componentMetadata
+    };
+  }
+
+  async import(json : {components : any[], componentMetadata : any[]}){
+    const db = await this.db;
+    const transaction = db.transaction([
+      'components',
+      'componentMetadata',
+    ], 'readwrite');
+
+    const componentStore = transaction.objectStore('components');
+    await componentStore.clear();
+    await Promise.all(json.components.map(component => componentStore.put(component)));
+    const componentMetadataStore = transaction.objectStore('componentMetadata');
+    await componentMetadataStore.clear();
+    await Promise.all(json.componentMetadata.map(componentMetadata => componentMetadataStore.put(componentMetadata)));
+  }
+
   async load(name : string) : Promise<NamedForest>{
     const db = await this.db;
     const transaction = db.transaction([
@@ -172,7 +203,10 @@ export class Storage{
   }
 }
 
-export default new Storage(db);
+const singleton = new Storage(db);
+export default singleton;
+
+window.debugStorage = singleton;
 
 function cursorToObservable<T>(
   db : Promise<DB>,
@@ -200,5 +234,16 @@ function cursorToObservable<T>(
     return () => {
       running = false;
     };
+  });
+}
+
+function exportToArray(objectStore : ObjectStore){
+  return new Promise(res => {
+    const content : any[] = [];
+    objectStore.iterateCursor(cursor => {
+      if (!cursor) return res(content);
+      content.push(cursor.value);
+      cursor.continue();
+    });
   });
 }
