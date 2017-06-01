@@ -12,7 +12,6 @@ export default class QuadList implements VertexBuffer {
   private readonly indexBuffer : WebGLBuffer;
   private readonly map : NdArray;
   private count : number;
-  private prevCount : number;
   constructor(atomicBind : AtomicBind, gl : WebGLRenderingContext, size : number){
     this.atomicBind = atomicBind;
     this.gl = gl;
@@ -25,7 +24,6 @@ export default class QuadList implements VertexBuffer {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(createQuads(size)), gl.STATIC_DRAW);
     this.map = ndarray(this.vertices, [size, 4, 2, 2]);
     this.count = 0;
-    this.prevCount = 0;
   }
 
   set(index : number, quad : Quad){
@@ -63,11 +61,8 @@ export default class QuadList implements VertexBuffer {
   }
 
   update(){
-    if(this.count !== this.prevCount){
-      this.atomicBind(this);
-      this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
-      this.prevCount = this.count;
-    }
+    this.atomicBind(this);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
   }
 
   draw(){
