@@ -5,14 +5,9 @@ import Context from './Context';
 import Renderer from './Renderer';
 import { VertexBuffer } from './textures/types';
 
-export interface ContextMutator {
-  mutateContext(mutator : (context : MutableContext) => void) : boolean;
-}
-
-
 export default class Engine {
-  readonly context : Context;
-  readonly moveContext : Context;
+  private readonly context : Context;
+  private readonly moveContext : Context;
   private readonly renderer : Renderer;
   constructor(
     private readonly gl : WebGLRenderingContext
@@ -27,13 +22,21 @@ export default class Engine {
     this.renderer.setViewport(width, height);
   }
 
-  update(){
-    this.renderer.renderMap(this.context);
+  mutateContext(mutator : (context : MutableContext) => void){
+    const changed = this.context.mutateContext(mutator);
+    if(changed){
+      this.simulate();
+      this.renderer.renderMap(this.context);
+    }
   }
 
-  updateMove(){
-    this.renderer.renderMap(this.moveContext);
+  mutateMoveContext(mutator : (context : MutableContext) => void){
+    const changed = this.moveContext.mutateContext(mutator);
+    if(changed){
+      this.renderer.renderMap(this.moveContext);
+    }
   }
+
 
   simulate(tickCount? : number){
     this.renderer.simulateTick(this.context, tickCount);
