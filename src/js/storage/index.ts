@@ -9,7 +9,7 @@ import {
   CompiledComponent
 } from 'ekkiog-editing';
 
-import { commit } from './repo';
+import { commit, checkout } from './repo';
 
 import upgradeFrom0 from './upgrade/from0';
 import upgradeFrom5 from './upgrade/from5';
@@ -52,7 +52,8 @@ export class Storage{
   }
 
   async save(name : string, forest : Forest){
-    await commit({name: 'marius', email: 'gundersen@gmail.com'}, forest, 'test commit, please ignore');
+    await commit(name, {name: 'marius', email: 'gundersen@gmail.com'}, forest, 'test commit, please ignore');
+    await checkout(name);
     const db = await this.db;
     const transaction = db.transaction([
       'components',

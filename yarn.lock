@@ -2282,12 +2282,12 @@ ejs@^2.3.4:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.6.tgz#479636bfa3fe3b1debd52087f0acb204b4f19c88"
 
-ekkiog-editing@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-4.0.0.tgz#d1af1ed9535bbfaed4f8faa487834fb715479ccf"
+ekkiog-editing@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/ekkiog-editing/-/ekkiog-editing-4.1.1.tgz#7777712eb07f32d9980a07fe33a446d6f786a828"
   dependencies:
     buddy-tree "^2.1.1"
-    ennea-tree "^2.0.5"
+    ennea-tree "^2.1.0"
 
 electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.9:
   version "1.3.10"
@@ -2374,9 +2374,9 @@ enhanced-resolve@^3.0.0, enhanced-resolve@^3.1.0:
     object-assign "^4.0.1"
     tapable "^0.2.5"
 
-ennea-tree@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/ennea-tree/-/ennea-tree-2.0.5.tgz#c52002754ca9bb8b608d8199abb8984adc0bf65b"
+ennea-tree@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/ennea-tree/-/ennea-tree-2.1.0.tgz#df36d06e190e2ea7ab8734c828837e5481657dfd"
 
 entities@~1.1.1:
   version "1.1.1"

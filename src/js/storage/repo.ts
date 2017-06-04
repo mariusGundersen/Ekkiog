@@ -1,18 +1,18 @@
-import { Item, TreeNode, Forest, Box } from 'ekkiog-editing';
+import { Item, TreeNode, Forest, Box, BuddyNode } from 'ekkiog-editing';
 import { BoxedData } from 'ennea-tree';
 
 import modes from 'js-git/lib/modes';
-import memDb, { MemDb } from 'js-git/mixins/mem-db';
+import memDb, { MemDb, TYPE } from 'js-git/mixins/mem-db';
 //import createTree from 'js-git/mixins/create-tree';
 //import packOps from 'js-git/mixins/pack-ops';
-//import walkers from 'js-git/mixins/walkers';
+import walkers, { Walkers } from 'js-git/mixins/walkers';
 //import readCombiners from 'js-git/mixins/read-combiner';
 import formats from 'js-git/mixins/formats';
 
 type TreeLeaf = BoxedData<Item>;
 
 // Create a repo by creating a plain object.
-const repo = {} as MemDb;
+const repo = {} as MemDb & Walkers;
 
 // This provides an in-memory storage backend that provides the following APIs:
 // - saveAs(type, value) => hash
@@ -34,7 +34,7 @@ memDb(repo);
 // This adds in walker algorithms for quickly walking history or a tree.
 // - logWalk(ref|hash) => stream<commit>
 // - treeWalk(hash) => stream<object>
-//walkers(repo);
+walkers(repo);
 
 // This combines parallel requests for the same resource for effeciency under load.
 //readCombiners(repo);
@@ -55,97 +55,144 @@ type Author = {
 const BLOB : 'blob' = 'blob';
 const TREE : 'tree' = 'tree';
 
-const hashCache = new WeakMap<TreeNode | TreeLeaf[] | TreeLeaf | Item, HashMode>();
+const hashCache = new WeakMap<BuddyNode | TreeNode | TreeLeaf[] | TreeLeaf | Item, HashMode>();
 
-export async function commit(author : Author, forest : Forest, message : string){
-  const tree = await saveEnnea(forest.enneaTree);
+function loadAs<T>(type : TYPE, hash : string){
+  return promisify(repo.loadAs<T>(type, hash));
+}
+
+export async function checkout(branch : string){
+  const hash = await promisify(repo.readRef(branch));
+  const commit = await loadAs<{ tree : string }>('commit', hash);
+
+  const tree = await loadAs<any>('tree', commit.tree);
+  const forest = await buildTree(await loadAs<any>('tree', tree.ennea.hash));
+
+  console.log(forest);
+}
+
+async function buildTree(body : any, size = 128) : Promise<TreeNode | undefined> {
+  if(!body) return undefined;
+
+  return {
+    size,
+    topLeft: body.topLeft ? await buildTree(await loadAs<any>('tree', body.topLeft.hash), size/2) : undefined,
+    topRight: body.topRight ? await buildTree(await loadAs<any>('tree', body.topRight.hash), size/2) : undefined,
+    bottomLeft: body.bottomLeft ? await buildTree(await loadAs<any>('tree', body.bottomLeft.hash), size/2) : undefined,
+    bottomRight: body.bottomRight ? await buildTree(await loadAs<any>('tree', body.bottomRight.hash), size/2) : undefined,
+    top: body.top && body.top ? await buildList(await loadAs<any>('tree', body.top.hash)) : [],
+    left: body.left && body.left ? await buildList(await loadAs<any>('tree', body.left.hash)) : [],
+    right: body.right && body.right ? await buildList(await loadAs<any>('tree', body.right.hash)) : [],
+    bottom: body.bottom && body.bottom ? await buildList(await loadAs<any>('tree', body.bottom.hash)) : [],
+    center: body.center ? JSON.parse(await loadAs<string>('text', body.center.hash)) : undefined,
+    data: body.data ? JSON.parse(await loadAs<string>('text', body.data.hash)) : undefined
+  };
+}
+
+async function buildList(items : {[key : string] : {hash : string}}) : Promise<TreeLeaf[]> {
+  const result = [] as TreeLeaf[];
+  for(const item of Object.keys(items)){
+    result[parseInt(item)] = JSON.parse(await loadAs<string>('text', items[item].hash));
+  }
+  return result;
+}
+
+export async function commit(branch : string, author : Author, forest : Forest, message : string){
+  const tree = await saveForest(forest);
   const result = await promisify(repo.saveAs("commit", {
     author,
     message,
     tree: tree.hash
   }));
+  await promisify(repo.updateRef(branch, result));
   return result;
 }
 
-let indent = '';
+async function saveForest({enneaTree, buddyTree} : Forest){
+  const dir = {};
 
-async function saveEnnea(tree : TreeNode){
+  add(dir, 'ennea', enneaTree ? hashCache.get(enneaTree) || await saveEnnea(enneaTree) : undefined);
+  add(dir, 'buddy', buddyTree ? hashCache.get(buddyTree) || await saveBuddy(buddyTree) : undefined);
+
+  const hash = await promisify(repo.saveAs(TREE, dir));
+  return {hash, mode : TREE};
+}
+
+async function saveEnnea(tree : TreeNode,){
   const cached = hashCache.get(tree);
   if(cached) return cached;
 
-  console.log('-> saveEnnea');
-  const result = await saveTree(tree, 'root');
-  console.log('<- saveEnnea', result.hash);
-  return result;
+  return await saveTree(tree);
 }
 
-async function saveTree(node : TreeNode, name : string){
-  indent = indent+' ';
-  console.log(indent, '-> saveTree', name);
-
+async function saveTree(node : TreeNode){
   const dir = {};
-  add(dir, 'topLeft', node.topLeft ? hashCache.get(node.topLeft) || await saveTree(node.topLeft, 'topLeft') : undefined);
-  add(dir, 'topRight', node.topRight ? hashCache.get(node.topRight) || await saveTree(node.topRight, 'topRight') : undefined);
-  add(dir, 'bottomLeft', node.bottomLeft ? hashCache.get(node.bottomLeft) || await saveTree(node.bottomLeft, 'bottomLeft') : undefined);
-  add(dir, 'bottomRight', node.bottomRight ? hashCache.get(node.bottomRight) || await saveTree(node.bottomRight, 'bottomRight') : undefined);
-  add(dir, 'top', node.top.length ? hashCache.get(node.top) || await saveList(node.top, 'top') : undefined);
-  add(dir, 'left', node.left.length ? hashCache.get(node.left) || await saveList(node.left, 'left') : undefined);
-  add(dir, 'right', node.right.length ? hashCache.get(node.right) || await saveList(node.right, 'right') : undefined);
-  add(dir, 'bottom', node.bottom.length ? hashCache.get(node.bottom) || await saveList(node.bottom, 'bottom') : undefined);
-  add(dir, 'center', node.center ? hashCache.get(node.center) || await saveNode(node.center, 'center') : undefined);
-  add(dir, 'data', node.data ? hashCache.get(node.data) || await saveData(node.data, 'data') : undefined);
 
-  const hash = await promisify<string>(repo.saveAs(TREE, dir));
+  add(dir, 'topLeft', node.topLeft ? hashCache.get(node.topLeft) || await saveTree(node.topLeft) : undefined);
+  add(dir, 'topRight', node.topRight ? hashCache.get(node.topRight) || await saveTree(node.topRight) : undefined);
+  add(dir, 'bottomLeft', node.bottomLeft ? hashCache.get(node.bottomLeft) || await saveTree(node.bottomLeft) : undefined);
+  add(dir, 'bottomRight', node.bottomRight ? hashCache.get(node.bottomRight) || await saveTree(node.bottomRight) : undefined);
+  add(dir, 'top', node.top.length ? hashCache.get(node.top) || await saveList(node.top) : undefined);
+  add(dir, 'left', node.left.length ? hashCache.get(node.left) || await saveList(node.left) : undefined);
+  add(dir, 'right', node.right.length ? hashCache.get(node.right) || await saveList(node.right) : undefined);
+  add(dir, 'bottom', node.bottom.length ? hashCache.get(node.bottom) || await saveList(node.bottom) : undefined);
+  add(dir, 'center', node.center ? hashCache.get(node.center) || await saveNode(node.center) : undefined);
+  add(dir, 'data', node.data ? hashCache.get(node.data) || await saveData(node.data) : undefined);
+
+  const hash = await promisify(repo.saveAs(TREE, dir));
   const result = {hash, mode : TREE};
   hashCache.set(node, result);
-  console.log(indent, '<- saveTree', hash);
-  indent = indent.substr(1);
   return result;
 }
 
-async function saveList(list : TreeLeaf[], name : string){
-  indent = indent+' ';
-  console.log(indent, '-> saveList', name);
+async function saveBuddy(node : BuddyNode){
+  const dir = {};
+
+  add(dir, 'left', node.left ? hashCache.get(node.left) || await saveBuddy(node.left) : undefined);
+  add(dir, 'right', node.right ? hashCache.get(node.right) || await saveBuddy(node.right) : undefined);
+  add(dir, 'node', await saveBuddyLeaf(node));
+
+  const hash = await promisify(repo.saveAs(TREE, dir));
+  const result = {hash, mode : TREE};
+  hashCache.set(node, result);
+  return result;
+}
+
+async function saveList(list : TreeLeaf[]){
   const dir = {};
 
   let i=0;
   for(const item of list){
-    add(dir, ""+i, hashCache.get(item) || await saveNode(item, ""+i));
+    add(dir, ""+i, hashCache.get(item) || await saveNode(item));
     i++;
   }
 
-  const hash = await promisify<string>(repo.saveAs(TREE, dir));
+  const hash = await promisify(repo.saveAs(TREE, dir));
   const result = {hash, mode : TREE};
   hashCache.set(list, result);
-  console.log(indent, '<- saveList', hash);
-  indent = indent.substr(1);
   return result;
 }
 
-async function saveNode(node : TreeLeaf, name : string){
-  indent = indent+' ';
-  console.log(indent, '-> saveNode', name);
+async function saveNode(node : TreeLeaf){
   const json = JSON.stringify(node);
-  console.log(indent, json);
-  const hash = await promisify<string>(repo.saveAs(BLOB, json));
+  const hash = await promisify(repo.saveAs(BLOB, json));
   const result = {hash, mode : BLOB};
   hashCache.set(node, result);
-  console.log(indent, '<- saveNode', hash);
-  indent = indent.substr(1);
   return result;
 }
 
-async function saveData(data : Item, name : string){
-  indent = indent+' ';
-  console.log(indent, '-> saveData');
+async function saveData(data : Item){
   const json = JSON.stringify(data);
-  console.log(indent, json);
-  const hash = await promisify<string>(repo.saveAs(BLOB, json));
+  const hash = await promisify(repo.saveAs(BLOB, json));
   const result = {hash, mode : BLOB};
   hashCache.set(data, result);
-  console.log(indent, '<- saveData', hash);
-  indent = indent.substr(1);
   return result;
+}
+
+async function saveBuddyLeaf({address, level, size, used, usedSize} : BuddyNode){
+  const json = JSON.stringify({address, level, size, used, usedSize});
+  const hash = await promisify<string>(repo.saveAs(BLOB, json));
+  return {hash, mode : BLOB};
 }
 
 function add(obj : { [key : string] : HashMode}, name : string, hashMode : HashMode | undefined){
