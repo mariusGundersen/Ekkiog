@@ -1,7 +1,7 @@
 import { mat3 } from 'gl-matrix';
-import { MutableContext, Item, Area, Box } from 'ekkiog-editing';
+import { Item, Area, Box } from 'ekkiog-editing';
 
-import Context from './Context';
+import Context, { MutableContext } from './Context';
 import Renderer from './Renderer';
 import { VertexBuffer } from './textures/types';
 
@@ -36,7 +36,6 @@ export default class Engine {
       this.renderer.renderMap(this.moveContext);
     }
   }
-
 
   simulate(tickCount? : number){
     this.renderer.simulateTick(this.context, tickCount);

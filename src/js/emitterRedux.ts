@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { get } from 'ennea-tree';
-import { getTypeAt, isEmpty } from 'ekkiog-editing';
+import { getTypeAt, isEmpty, BUTTON } from 'ekkiog-editing';
 
 import {Dispatch, Store} from 'react-redux';
 
@@ -27,12 +27,17 @@ import {
 } from './events';
 
 import storage from './storage';
+import Engine from './engines/Engine';
 
 type ViewportToTile = (x : number, y : number) => [number, number];
 
-export default function fromEmitter(emitter : EventEmitter, viewportToTile : ViewportToTile, dispatch : Dispatch<State>){
+export default function fromEmitter(
+  emitter : EventEmitter,
+  viewportToTile : ViewportToTile,
+  dispatch : Dispatch<State>,
+  engine : Engine){
   dispatchOn(emitter, dispatch, {
-    [TAP]: handleTap(viewportToTile),
+    [TAP]: handleTap(viewportToTile, engine),
     [DOUBLE_TAP]: handleDoubleTap(viewportToTile),
     [SHOW_CONTEXT_MENU]: handleShowContextMenu(viewportToTile),
     [LOAD_CONTEXT_MENU]: handleLoadContextMenu(viewportToTile),
@@ -50,16 +55,22 @@ export function dispatchOn(emitter : EventEmitter, dispatch : Dispatch<State>, e
   }
 }
 
-export function handleTap(viewportToTile : ViewportToTile){
+export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
   return ({x, y} : {x : number, y : number}) =>
     (dispatch : Dispatch<State>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y);
 
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128) return;
 
-      const {selectedTool, toolDirection} = getState().editor;
+      const {forest, editor : {selectedTool, toolDirection}} = getState();
       window.requestAnimationFrame(() => {
-        dispatch(tapTile(Math.floor(tx), Math.floor(ty), selectedTool, toolDirection));
+        const area = get(forest.enneaTree, ty, tx);
+        if(area && area.data && area.data.type === BUTTON){
+          const net = area.data.net;
+          engine.mutateContext(mutator => mutator.toggleGate(net));
+        }else{
+          dispatch(tapTile(Math.floor(tx), Math.floor(ty), selectedTool, toolDirection));
+        }
       });
   };
 }

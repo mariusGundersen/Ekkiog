@@ -20,8 +20,7 @@ import {
   drawComponent,
   drawLight,
 
-  clear,
-  toggleButton,
+  clear
 } from 'ekkiog-editing';
 
 import {
@@ -51,9 +50,7 @@ export default function editing(forest=createForest(), action : ForestActions) :
 
 function tap(forest : Forest, tool : Tool, direction : Direction, x : number, y : number) : Forest{
   const type = getTypeAt(forest.enneaTree, x, y);
-  if(type === BUTTON){
-    return toggleButton(forest, x, y);
-  }else if(tool === WIRE){
+  if(tool === WIRE){
     if(type === WIRE || type === UNDERPASS){
       return clear(forest, x, y);
     }else{

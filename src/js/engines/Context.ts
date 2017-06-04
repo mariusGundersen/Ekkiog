@@ -64,7 +64,7 @@ export default class Context implements RenderContext {
   }
 }
 
-class MutableContext implements IMutableContext {
+export class MutableContext implements IMutableContext {
   private readonly context : Context;
   private textChanged : boolean;
   private mapChanged : boolean;
@@ -96,6 +96,13 @@ class MutableContext implements IMutableContext {
 
   setGate(v : number, a : number, b : number){
     this.context.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
+    this.gateChanged = true;
+  }
+
+  toggleGate(v : number){
+    const s = this.context.gatesTexture.get((v>>0)&0xff, (v>>8)&0xff);
+    const a = s === 0 ? (1<<16) | 1 : 0;
+    this.context.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, a);
     this.gateChanged = true;
   }
 

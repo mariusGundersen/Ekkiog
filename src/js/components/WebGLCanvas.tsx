@@ -71,7 +71,7 @@ const WebGLCanvas = connect(
     this.canvas.addEventListener('touchmove', emit(emitter, TOUCH_MOVE), false);
     this.canvas.addEventListener('touchend', emit(emitter, TOUCH_END), false);
 
-    fromEmitter(emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch);
+    fromEmitter(emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch, this.engine);
 
     this.shellConfig = startShell({
       tickInterval : this.props.tickInterval,
