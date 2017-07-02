@@ -51,7 +51,7 @@
     "ts-loader": "^2.0.0",
     "typescript": "^2.3.2",
     "w3c-manifest-loader": "^1.1.0",
-    "webpack": "^3.0.9",
+    "webpack": "^3.0.0",
     "webpack-dashboard": "^0.4.0",
     "webpack-dev-server": "^2.4.4",
     "webpack-glsl-loader": "^1.0.1"
