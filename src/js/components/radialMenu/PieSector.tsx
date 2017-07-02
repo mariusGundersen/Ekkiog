@@ -43,13 +43,12 @@ export default ({
       </g>);
   }
 
-  const path = [
-    `M${innerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${innerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}`,
-    `A${innerRadius},${innerRadius} 0 0,1 ${innerRadius*Math.cos(radiansEnd)+gap*Math.sin(radiansEnd)},${innerRadius*Math.sin(radiansEnd)-gap*Math.cos(radiansEnd)}`,
-    `L${outerRadius*Math.cos(radiansEnd)+gap*Math.sin(radiansEnd)},${outerRadius*Math.sin(radiansEnd)-gap*Math.cos(radiansEnd)}`,
-    `A${outerRadius},${outerRadius} 0 0,0 ${outerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${outerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}`,
-    'z'
-  ].join(' ');
+  const path = `
+    M${innerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${innerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}
+    A${innerRadius},${innerRadius} 0 0,1 ${innerRadius*Math.cos(radiansEnd)+gap*Math.sin(radiansEnd)},${innerRadius*Math.sin(radiansEnd)-gap*Math.cos(radiansEnd)}
+    L${outerRadius*Math.cos(radiansEnd)+gap*Math.sin(radiansEnd)},${outerRadius*Math.sin(radiansEnd)-gap*Math.cos(radiansEnd)}
+    A${outerRadius},${outerRadius} 0 0,0 ${outerRadius*Math.cos(radiansStart)-gap*Math.sin(radiansStart)},${outerRadius*Math.sin(radiansStart)+gap*Math.cos(radiansStart)}
+    z`;
 
   return (
     <g
