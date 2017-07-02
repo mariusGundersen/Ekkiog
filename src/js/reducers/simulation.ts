@@ -11,7 +11,7 @@ export interface SimulationState {
 
 export default function view(state : SimulationState = {
   tickCount: 0,
-  tickInterval: 500
+  tickInterval: 2**8
 }, action : Action) : SimulationState {
   switch(action.type){
     case 'setTickInterval':
