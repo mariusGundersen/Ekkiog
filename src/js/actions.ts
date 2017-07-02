@@ -318,6 +318,7 @@ export type Action =
   EditorMenuActions |
   ForestActions |
   ViewActions |
+  SelectionActions |
   SimulationActions;
 
 

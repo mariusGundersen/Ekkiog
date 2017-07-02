@@ -1,7 +1,7 @@
 import { vec2, mat3 } from 'gl-matrix';
 
 import {
-  ContextMenuActions
+  Action
 } from '../actions';
 
 export interface ContextMenuHideState {
@@ -29,7 +29,7 @@ export type ContextMenuState = ContextMenuHideState | ContextMenuLoadingState | 
 export default function contextMenu(state : ContextMenuState = {
   loading: false,
   show: false,
-}, action : ContextMenuActions) : ContextMenuState {
+}, action : Action) : ContextMenuState {
   switch(action.type){
     case 'loadContextMenu':
       return state.show == false ? {

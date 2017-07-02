@@ -29,7 +29,7 @@ export type Props = {
   readonly dispatch : Dispatch<State>
 }
 
-export default class ContextMenu extends React.Component<Props, void>{
+export default class ContextMenu extends React.Component<Props, any>{
 
   shouldComponentUpdate(nextProps : Props){
     if(nextProps.contextMenu.loading && this.props.contextMenu.loading){

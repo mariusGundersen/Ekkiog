@@ -1,7 +1,8 @@
 import { vec2, mat3 } from 'gl-matrix';
 
 import {
-  ViewActions
+  ViewActions,
+  Action
 } from '../actions';
 
 export interface ViewState {
@@ -16,7 +17,7 @@ export default function view(state : ViewState = {
   tileToViewport: () => [0, 0],
   pixelWidth: 100,
   pixelHeight: 100
-}, action : ViewActions) : ViewState {
+}, action : Action) : ViewState {
   switch(action.type){
     case 'panZoom':
       return {

@@ -24,12 +24,12 @@ import {
 } from 'ekkiog-editing';
 
 import {
-  ForestActions
+  Action
 } from '../actions';
 
 export { Forest };
 
-export default function editing(forest=createForest(), action : ForestActions) : Forest{
+export default function editing(forest=createForest(), action : Action) : Forest{
   switch(action.type){
     case 'set-forest':
       return action.forest || forest;

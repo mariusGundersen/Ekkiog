@@ -1,5 +1,5 @@
 import {
-  EditorMenuActions
+  Action
 } from '../actions';
 
 export interface ContextMenuState {
@@ -26,7 +26,7 @@ export type EditorMenuState = ToolsMenuState | OkCancelMenuState | ContextMenuSt
 export default function editorMenu(state : EditorMenuState = {
   open: false,
   menuType: 'tools'
-}, action : EditorMenuActions) : EditorMenuState {
+}, action : Action) : EditorMenuState {
   switch(action.type){
     case 'toggleEditorMenu':
       return state.menuType == 'tools'

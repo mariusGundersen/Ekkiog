@@ -1,16 +1,16 @@
 import { Forest } from 'ekkiog-editing';
-import { Dispatch, Store } from 'redux';
+import { Dispatch, Store, Middleware, MiddlewareAPI } from 'redux';
 
 import { Action } from '../actions';
 import { State } from '../reduce';
 import { EditorState } from '../reducers/editor';
 import storage from '../storage';
 
-export default function createContextMiddleware(){
-  return (store : Store<State>) => (next : Dispatch<State>) => (action : any) => {
-    const before = store.getState();
+export default function createContextMiddleware() : Middleware {
+  return <S>(store : MiddlewareAPI<S>) => (next : Dispatch<S>) => (action : any) => {
+    const before = store.getState() as any as State;
     const result = next(action);
-    const after = store.getState();
+    const after = store.getState() as any as State;
 
     saveHandler(before.forest, after.forest, before.editor, action);
 

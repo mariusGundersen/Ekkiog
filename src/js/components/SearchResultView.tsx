@@ -9,6 +9,11 @@ import MdFavoriteBorder from 'react-icons/md/favorite-border';
 
 import style from './search.scss';
 
+export const RECENT : 'recent' = 'recent';
+export const POPUPLAR : 'popular' = 'popular';
+export const FAVORITE : 'favorite' = 'favorite';
+export const NORMAL : 'normal' = 'normal';
+
 export interface SearchResult {
   readonly name : string;
   readonly type : 'recent' | 'popular' | 'favorite' | 'normal'

@@ -84,7 +84,7 @@ export default class Renderer {
     this.viewEngine.render(context, mapToViewportMatrix);
     this.wordEngine.render(context, mapToViewportMatrix);
     if('debug' in window){
-      this.debugEngine.render(context.triangle, context.chargeMapTexture, mapToViewportMatrix);
+      this.debugEngine.render(context.triangle, context.netChargeTextures[this.currentTick%2], mapToViewportMatrix);
     }
   }
 

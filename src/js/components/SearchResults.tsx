@@ -19,7 +19,7 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/withLatestFrom';
 import { CompiledComponent } from 'ekkiog-editing';
 
-import SearchResultView, { NoExactMatchView, SearchResult } from './SearchResultView';
+import SearchResultView, { NoExactMatchView, SearchResult, RECENT, POPUPLAR, FAVORITE, NORMAL } from './SearchResultView';
 
 import style from './search.scss';
 
@@ -96,7 +96,7 @@ function searchDatabase(query : string){
 function find(query : string) : Observable<SearchResult[]>{
   return storage.getComponentNames()
     .filter(data => data.name.toUpperCase().indexOf(query) >= 0)
-    .map(data => ({name : data.name, type: data.favorite ? 'favorite' : 'normal'}))
+    .map(data => ({name : data.name, type: data.favorite ? FAVORITE : NORMAL}))
     .scan((acc, val) => [...acc, val], [])
     .map(list => [...list].sort((a, b) => (a.name.indexOf(query) - b.name.indexOf(query)) || (a > b ? 1 : a < b ? -1 : 0)))
     .startWith([]);
@@ -113,18 +113,18 @@ function showEmpty(){
 
 function getRecent() : Observable<SearchResult>{
   return storage.getRecent()
-    .map(name => ({name, type: 'recent'}))
+    .map(name => ({name, type: RECENT}))
     .take(5);
 }
 
 function getFavorite() : Observable<SearchResult>{
   return storage.getFavorite()
-    .map(name => ({name, type: 'favorite'}))
+    .map(name => ({name, type: FAVORITE}))
     .take(5);
 }
 
 function getPopular() : Observable<SearchResult>{
   return storage.getPopular()
-    .map(name => ({name, type: 'popular'}))
+    .map(name => ({name, type: POPUPLAR}))
     .take(5);
 }

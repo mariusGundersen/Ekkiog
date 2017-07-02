@@ -52,13 +52,14 @@ const WebGLCanvas = connect(
     name: editor.currentComponentName,
     tickInterval: simulation.tickInterval
   })
-)(class WebGLCanvas extends React.Component<Props, void> {
-  private canvas : HTMLCanvasElement;
+)(class WebGLCanvas extends React.Component<Props, any> {
+  private canvas : HTMLCanvasElement | null;
   private engine : Engine;
   private perspective : Perspective;
   private touchControls : TouchControls;
   private shellConfig : Config
   componentDidMount(){
+    if(!this.canvas) return
     const gl = getContext(this.canvas);
     const emitter = new EventEmitter();
     this.engine = new Engine(gl);

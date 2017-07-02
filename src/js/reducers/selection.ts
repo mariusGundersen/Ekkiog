@@ -1,7 +1,7 @@
 import { drawComponent, createForest, Forest } from 'ekkiog-editing';
 
 import {
-  SelectionActions
+  Action
 } from '../actions';
 
 export interface ComponentSelectedState {
@@ -25,7 +25,7 @@ export type SelectionState = ComponentSelectedState | NothingSelectedState;
 
 export default function reduce(state : NothingSelectedState = {
   selection: false
-}, action : SelectionActions) : SelectionState {
+}, action : Action) : SelectionState {
   switch(action.type){
     case 'selectComponent':
       return {

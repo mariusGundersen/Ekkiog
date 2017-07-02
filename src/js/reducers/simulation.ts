@@ -1,7 +1,7 @@
 import { vec2, mat3 } from 'gl-matrix';
 
 import {
-  SimulationActions
+  Action
 } from '../actions';
 
 export interface SimulationState {
@@ -12,7 +12,7 @@ export interface SimulationState {
 export default function view(state : SimulationState = {
   tickCount: 0,
   tickInterval: 500
-}, action : SimulationActions) : SimulationState {
+}, action : Action) : SimulationState {
   switch(action.type){
     case 'setTickInterval':
       return {

@@ -1,7 +1,7 @@
 import { Tool, Direction } from 'ekkiog-editing';
 
 import {
-  EditorActions
+  Action
 } from '../actions';
 
 export interface EditorState {
@@ -21,7 +21,7 @@ export default function editor(state : EditorState = {
   selectedTool: 'wire',
   currentComponentName: 'empty',
   stack: undefined
-}, action : EditorActions) : EditorState{
+}, action : Action) : EditorState{
   switch(action.type){
     case 'setSelectedTool':
       return {

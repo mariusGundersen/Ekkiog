@@ -5,9 +5,9 @@ export interface Props {
   width : number;
 }
 
-export default class Loading extends React.Component<Props, void> {
-  circumference : number;
-  circle? : SVGCircleElement;
+export default class Loading extends React.Component<Props, any> {
+  private circumference : number;
+  private circle : SVGCircleElement | null;
   constructor(props : Props){
     super(props);
     this.circumference = Math.PI*2*(props.radius+props.width/2);

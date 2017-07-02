@@ -39,7 +39,7 @@ export interface Props {
   dispatch : Dispatch<State>
 }
 
-export default class EditorMenu extends React.Component<Props, void> {
+export default class EditorMenu extends React.Component<Props, any> {
   shouldComponentUpdate(nextProps : Props){
     return nextProps.cx !== this.props.cx
       || nextProps.cy !== this.props.cy
