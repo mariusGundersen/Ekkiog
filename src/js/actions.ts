@@ -41,12 +41,16 @@ export const setForest = (name : string, forest : Forest, boundingBox : Box) : S
 export type PushEditorAction = {
   readonly type : 'push-editor',
   readonly name : string,
-  readonly boundingBox : Box
+  readonly boundingBox : Box,
+  readonly centerX : number,
+  readonly centerY : number
 }
-export const pushEditor = (name : string, boundingBox : Box) : PushEditorAction => ({
+export const pushEditor = (name : string, boundingBox : Box, centerX : number, centerY : number) : PushEditorAction => ({
   type: 'push-editor',
   name,
-  boundingBox
+  boundingBox,
+  centerX,
+  centerY
 });
 
 export type PopEditorAction = {

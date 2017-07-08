@@ -19,7 +19,9 @@ export interface Link<T> {
 
 export interface HistoryEntry {
   readonly name : string,
-  readonly boundingBox : Box
+  readonly boundingBox : Box,
+  readonly centerX : number,
+  readonly centerY : number
 }
 
 export default function editor(state : EditorState = {
@@ -44,13 +46,20 @@ export default function editor(state : EditorState = {
       return {
         ...state,
         boundingBox: action.boundingBox,
-        currentComponentName: action.name,
-        //history: undefined
+        currentComponentName: action.name
       };
     case 'push-editor':
       return {
         ...state,
-        history: {value: {name: action.name, boundingBox: action.boundingBox}, next: state.history}
+        history: {
+          next: state.history,
+          value: {
+            name: action.name,
+            boundingBox: action.boundingBox,
+            centerX: action.centerX,
+            centerY: action.centerY
+          }
+        }
       };
     case 'pop-editor':
       return {

@@ -13,6 +13,7 @@ import {
 } from '../actions';
 import { State } from '../reduce';
 import { SelectionState } from '../reducers/selection';
+import { HistoryEntry } from '../reducers/editor';
 import {
   TOUCH_START,
   TOUCH_MOVE,
@@ -28,6 +29,7 @@ import moveHandler from '../editing/moveHandler';
 import forestHandler from '../editing/forestHandler';
 import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reducers/contextMenu';
+import ease, { Step, easeOut } from '../utils/ease';
 
 export interface Props{
   readonly dispatch : Dispatch<State>,
@@ -39,6 +41,7 @@ export interface Props{
   readonly contextMenu : ContextMenuState,
   readonly name : string,
   readonly boundingBox : Box
+  readonly previous : HistoryEntry
 }
 
 const WebGLCanvas = connect(
@@ -50,6 +53,7 @@ const WebGLCanvas = connect(
     contextMenu,
     name: editor.currentComponentName,
     boundingBox: editor.boundingBox,
+    previous: editor.history ? editor.history.value : undefined,
     tickInterval: simulation.tickInterval
   })
 )(class WebGLCanvas extends React.Component<Props, any> {
@@ -58,6 +62,7 @@ const WebGLCanvas = connect(
   private perspective : Perspective;
   private touchControls : TouchControls;
   private shellConfig : Config
+  private ease? : Step
   componentDidMount(){
     if(!this.canvas) return
     const gl = getContext(this.canvas);
@@ -77,6 +82,14 @@ const WebGLCanvas = connect(
     this.shellConfig = startShell({
       tickInterval : this.props.tickInterval,
       render: (delta : number) => {
+        if(this.ease){
+          const box = this.ease(delta);
+          if(box){
+            this.perspective.reset(arrayToBox(box));
+          }else{
+            this.ease = undefined;
+          }
+        }
         const changed = this.touchControls.panZoomSaga.process();
         if(changed){
           this.props.dispatch(panZoom(
@@ -145,7 +158,17 @@ const WebGLCanvas = connect(
     }
 
     if(nextProps.boundingBox !== this.props.boundingBox){
-      this.perspective.reset(nextProps.boundingBox);
+      if(this.props.previous && this.props.previous.name === nextProps.name){
+        const from = scaleBox(nextProps.boundingBox, 0.5, this.props.previous.centerX, this.props.previous.centerY);
+        this.perspective.reset(from);
+        this.ease = ease(boxToArray(from), boxToArray(nextProps.boundingBox), easeOut, 200);
+      }else if(nextProps.previous === undefined){
+        this.perspective.reset(nextProps.boundingBox);
+      }else if(nextProps.previous.name === this.props.name){
+        const from = scaleBox(nextProps.boundingBox, 1.5);
+        this.perspective.reset(from);
+        this.ease = ease(boxToArray(from), boxToArray(nextProps.boundingBox), easeOut, 200);
+      }
     }
   }
 
@@ -190,4 +213,25 @@ function emit(emiter : EventEmitter, type : TouchType){
 
     event.preventDefault();
   }
+}
+
+function boxToArray({top, left, right, bottom} : Box){
+  return [top, left, right, bottom];
+}
+
+function arrayToBox([top, left, right, bottom] : number[]){
+  return {top, left, right, bottom};
+}
+
+function scaleBox({top, left, right, bottom} : Box, scale : number, x = (left+right)/2, y = ((top+bottom)/2)){
+  const w = right - left;
+  const h = bottom - top;
+  const scaleX = scale;
+  const scaleY = h/w*scale;
+  return {
+    top: y - h/2*scaleY,
+    left: x - w/2*scaleX,
+    right: x + w/2*scaleX,
+    bottom: y + h/2*scaleY
+  };
 }
