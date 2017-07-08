@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Tool } from 'ekkiog-editing';
+import { Tool, Direction } from 'ekkiog-editing';
 
 import RadialMenu from './radialMenu';
 
@@ -151,13 +151,13 @@ function createOkCancelMenuTree(editorMenu : OkCancelMenuState, dispatch : Dispa
 function createCenter(radius : number, editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<State>){
   switch(editorMenu.menuType){
     case 'tools':
-      return createToolsCenter(radius, editor.selectedTool, editorMenu.open, dispatch);
+      return createToolsCenter(radius, editor.selectedTool, editor.toolDirection, editorMenu.open, dispatch);
     default:
       return undefined;
   }
 }
 
-function createToolsCenter(radius : number, selectedTool : Tool, open : boolean, dispatch : Dispatch<State>){
+function createToolsCenter(radius : number, selectedTool : Tool, direction : Direction, open : boolean, dispatch : Dispatch<State>){
   return {
     radius: radius,
     cx: open ? radius : -radius*1.5,
@@ -165,9 +165,19 @@ function createToolsCenter(radius : number, selectedTool : Tool, open : boolean,
     onClick: () => dispatch(toggleEditorMenu()),
     icon:
       selectedTool == 'wire' ? <IconWire /> :
-      selectedTool == 'button' ? <IconButton /> :
+      selectedTool == 'button' ? <IconButton rotate={degree(direction)} /> :
       selectedTool == 'gate' ? <IconGate /> :
       selectedTool == 'underpass' ? <IconUnderpass /> :
-      selectedTool == 'light' ? <IconLight /> : <g />
+      selectedTool == 'light' ? <IconLight rotate={degree(direction)} /> : <g />
   };
+}
+
+function degree(direction : Direction){
+  switch(direction){
+    case 'downwards': return 90;
+    case 'leftwards': return 180;
+    case 'upwards': return 270;
+    case 'rightwards': return 0;
+    default: return 0;
+  }
 }
