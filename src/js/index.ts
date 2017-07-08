@@ -10,7 +10,7 @@ import offline from './offline';
 import storage from './storage';
 import createContextMiddleware from './editing/createContextMiddleware';
 import reduce, { State } from './reduce';
-import { setForest } from './actions';
+import { loadForest } from './actions';
 
 import main from './main';
 
@@ -26,6 +26,6 @@ const store = createStore<State>(
   )
 );
 
-storage.load('Welcome').then(forest => store.dispatch(setForest(forest.name, forest)));
+store.dispatch(loadForest('Welcome'));
 
 main(store);

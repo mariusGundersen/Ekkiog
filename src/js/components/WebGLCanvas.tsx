@@ -1,20 +1,19 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Forest, TreeNode, Box } from 'ekkiog-editing';
+import { Forest, Box } from 'ekkiog-editing';
 import { EventEmitter } from 'events';
-import { getIterator } from 'ennea-tree';
 
 import style from './main.css';
 
 import {
   resize,
   panZoom,
-  setForest,
   simulationTick
 } from '../actions';
 import { State } from '../reduce';
 import { SelectionState } from '../reducers/selection';
+import { HistoryEntry } from '../reducers/editor';
 import {
   TOUCH_START,
   TOUCH_MOVE,
@@ -30,6 +29,7 @@ import moveHandler from '../editing/moveHandler';
 import forestHandler from '../editing/forestHandler';
 import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reducers/contextMenu';
+import ease, { Step, easeOut } from '../utils/ease';
 
 export interface Props{
   readonly dispatch : Dispatch<State>,
@@ -39,7 +39,9 @@ export interface Props{
   readonly forest : Forest,
   readonly selection : SelectionState,
   readonly contextMenu : ContextMenuState,
-  readonly name : string
+  readonly name : string,
+  readonly boundingBox : Box
+  readonly previous : HistoryEntry
 }
 
 const WebGLCanvas = connect(
@@ -50,6 +52,8 @@ const WebGLCanvas = connect(
     height: view.pixelHeight,
     contextMenu,
     name: editor.currentComponentName,
+    boundingBox: editor.boundingBox,
+    previous: editor.history ? editor.history.value : undefined,
     tickInterval: simulation.tickInterval
   })
 )(class WebGLCanvas extends React.Component<Props, any> {
@@ -58,6 +62,7 @@ const WebGLCanvas = connect(
   private perspective : Perspective;
   private touchControls : TouchControls;
   private shellConfig : Config
+  private ease? : Step
   componentDidMount(){
     if(!this.canvas) return
     const gl = getContext(this.canvas);
@@ -77,6 +82,14 @@ const WebGLCanvas = connect(
     this.shellConfig = startShell({
       tickInterval : this.props.tickInterval,
       render: (delta : number) => {
+        if(this.ease){
+          const box = this.ease(delta);
+          if(box){
+            this.perspective.reset(arrayToBox(box));
+          }else{
+            this.ease = undefined;
+          }
+        }
         const changed = this.touchControls.panZoomSaga.process();
         if(changed){
           this.props.dispatch(panZoom(
@@ -144,8 +157,18 @@ const WebGLCanvas = connect(
       }
     }
 
-    if(nextProps.name !== this.props.name){
-      this.perspective.reset(calculateBoundingBox(nextProps.forest.enneaTree));
+    if(nextProps.boundingBox !== this.props.boundingBox){
+      if(this.props.previous && this.props.previous.name === nextProps.name){
+        const from = scaleBox(nextProps.boundingBox, 0.5, this.props.previous.centerX, this.props.previous.centerY);
+        this.perspective.reset(from);
+        this.ease = ease(boxToArray(from), boxToArray(nextProps.boundingBox), easeOut, 200);
+      }else if(nextProps.previous === undefined){
+        this.perspective.reset(nextProps.boundingBox);
+      }else if(nextProps.previous.name === this.props.name){
+        const from = scaleBox(nextProps.boundingBox, 1.5);
+        this.perspective.reset(from);
+        this.ease = ease(boxToArray(from), boxToArray(nextProps.boundingBox), easeOut, 200);
+      }
     }
   }
 
@@ -192,29 +215,23 @@ function emit(emiter : EventEmitter, type : TouchType){
   }
 }
 
-function calculateBoundingBox(tree : TreeNode) : Box {
-  const box = {
-    top: tree.size,
-    left: tree.size,
-    right: 0,
-    bottom: 0
+function boxToArray({top, left, right, bottom} : Box){
+  return [top, left, right, bottom];
+}
+
+function arrayToBox([top, left, right, bottom] : number[]){
+  return {top, left, right, bottom};
+}
+
+function scaleBox({top, left, right, bottom} : Box, scale : number, x = (left+right)/2, y = ((top+bottom)/2)){
+  const w = right - left;
+  const h = bottom - top;
+  const scaleX = scale;
+  const scaleY = h/w*scale;
+  return {
+    top: y - h/2*scaleY,
+    left: x - w/2*scaleX,
+    right: x + w/2*scaleX,
+    bottom: y + h/2*scaleY
   };
-
-  for(const item of getIterator(tree, {top: 0, left: 0, width: tree.size, height: tree.size})){
-    box.top = Math.min(box.top, item.top-5);
-    box.left = Math.min(box.left, item.left-5);
-    box.right = Math.max(box.right, item.left+item.width+5);
-    box.bottom = Math.max(box.bottom, item.top+item.height+5);
-  }
-
-  if(box.top > box.bottom){
-    return {
-      top: 56,
-      left: 56,
-      right: 72,
-      bottom: 72
-    }
-  }
-
-  return box;
 }
