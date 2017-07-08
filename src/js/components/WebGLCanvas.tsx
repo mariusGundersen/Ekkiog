@@ -1,16 +1,14 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Forest, TreeNode, Box } from 'ekkiog-editing';
+import { Forest, Box } from 'ekkiog-editing';
 import { EventEmitter } from 'events';
-import { getIterator } from 'ennea-tree';
 
 import style from './main.css';
 
 import {
   resize,
   panZoom,
-  setForest,
   simulationTick
 } from '../actions';
 import { State } from '../reduce';
@@ -39,7 +37,8 @@ export interface Props{
   readonly forest : Forest,
   readonly selection : SelectionState,
   readonly contextMenu : ContextMenuState,
-  readonly name : string
+  readonly name : string,
+  readonly boundingBox : Box
 }
 
 const WebGLCanvas = connect(
@@ -50,6 +49,7 @@ const WebGLCanvas = connect(
     height: view.pixelHeight,
     contextMenu,
     name: editor.currentComponentName,
+    boundingBox: editor.boundingBox,
     tickInterval: simulation.tickInterval
   })
 )(class WebGLCanvas extends React.Component<Props, any> {
@@ -144,8 +144,8 @@ const WebGLCanvas = connect(
       }
     }
 
-    if(nextProps.name !== this.props.name){
-      this.perspective.reset(calculateBoundingBox(nextProps.forest.enneaTree));
+    if(nextProps.boundingBox !== this.props.boundingBox){
+      this.perspective.reset(nextProps.boundingBox);
     }
   }
 
@@ -190,31 +190,4 @@ function emit(emiter : EventEmitter, type : TouchType){
 
     event.preventDefault();
   }
-}
-
-function calculateBoundingBox(tree : TreeNode) : Box {
-  const box = {
-    top: tree.size,
-    left: tree.size,
-    right: 0,
-    bottom: 0
-  };
-
-  for(const item of getIterator(tree, {top: 0, left: 0, width: tree.size, height: tree.size})){
-    box.top = Math.min(box.top, item.top-5);
-    box.left = Math.min(box.left, item.left-5);
-    box.right = Math.max(box.right, item.left+item.width+5);
-    box.bottom = Math.max(box.bottom, item.top+item.height+5);
-  }
-
-  if(box.top > box.bottom){
-    return {
-      top: 56,
-      left: 56,
-      right: 72,
-      bottom: 72
-    }
-  }
-
-  return box;
 }

@@ -28,7 +28,7 @@ import storage, { Storage, NamedForest } from '../storage';
 export interface Props {
   query : string,
   createComponent(name : string) : void;
-  openComponent(name : NamedForest) : void;
+  openComponent(name : string) : void;
   insertPackage(name : CompiledComponent) : void;
 }
 
@@ -50,7 +50,7 @@ export default reax<Props>()(({
 
   openComponent
     .withLatestFrom(props)
-    .subscribe(([name, props] : [string, Props]) => storage.load(name).then(props.openComponent));
+    .subscribe(([name, props] : [string, Props]) => props.openComponent(name));
 
   const updateList = toggleFavorite
     .switchMap(name => Observable.fromPromise(storage.toggleFavorite(name)))

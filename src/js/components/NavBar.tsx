@@ -21,7 +21,7 @@ import SearchBar from './SearchBar';
 
 import style from './navbar.scss';
 
-import { insertComponentPackage, setForest, setTickInterval } from '../actions';
+import { insertComponentPackage, loadForest, setTickInterval } from '../actions';
 import { State } from '../reduce';
 import { NamedForest } from '../storage';
 
@@ -39,7 +39,7 @@ const result = reax({
   toggleMainMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   query: (value : string) => value,
   insertPackage: (result : CompiledComponent) => result,
-  openComponent: (result : NamedForest) => result,
+  openComponent: (result : string) => result,
   createComponent: (result : string) => result
 }, ({
   toggleSearch,
@@ -51,8 +51,8 @@ const result = reax({
   createComponent
 }, props, initialProps : Props) => {
   insertPackage.forEach(r => initialProps.dispatch(insertComponentPackage(r)));
-  openComponent.forEach(r => initialProps.dispatch(setForest(r.name, r)));
-  createComponent.forEach(r => initialProps.dispatch(setForest(r, createForest())))
+  openComponent.forEach(r => initialProps.dispatch(loadForest(r)));
+  createComponent.forEach(r => initialProps.dispatch(loadForest(r)))
 
   const showSearch = toggleSearch
     .merge(

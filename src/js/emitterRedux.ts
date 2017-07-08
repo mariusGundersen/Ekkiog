@@ -13,6 +13,7 @@ import {
   setOkCancelMenuValid,
   moveSelection,
   setForest,
+  loadForest,
   pushEditor,
   popEditor
 } from './actions';
@@ -80,11 +81,12 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
     (dispatch : Dispatch<State>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y);
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
-        const topOfStack = getState().editor.stack;
+        const topOfStack = getState().editor.history;
         if(topOfStack){
-          const name = topOfStack.value;
+          const entry = topOfStack.value;
+          const name = entry.name;
           dispatch(popEditor());
-          storage.load(name).then(component => dispatch(setForest(name, component)));
+          storage.load(name).then(component => dispatch(setForest(name, component, entry.boundingBox)));
         }
       }else{
         const state = getState();
@@ -92,8 +94,10 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
         const areaData = get(forest.enneaTree, ty|0, tx|0);
         if(areaData && areaData.data.type === 'component' && areaData.data.name){
           const name = areaData.data.name;
-          dispatch(pushEditor(state.editor.currentComponentName));
-          storage.load(name).then(component => dispatch(setForest(name, component)));
+          const posA = viewportToTile(0, 0);
+          const posB = viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
+          dispatch(pushEditor(state.editor.currentComponentName, {top: posA[1], left: posA[0], right: posB[0], bottom: posB[1]}));
+          dispatch(loadForest(name, false));
         }
       }
   };

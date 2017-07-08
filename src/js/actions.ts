@@ -1,8 +1,10 @@
-import { isEmpty, Forest, Item, CompiledComponent, Direction, Tool } from 'ekkiog-editing';
+import { isEmpty, Forest, Item, CompiledComponent, Direction, Tool, Box } from 'ekkiog-editing';
 import { vec2, mat3 } from 'gl-matrix';
 import { Dispatch } from 'redux';
 
 import { State } from './reduce';
+import storage from './storage';
+import getComponentBoundingBox from './utils/getComponentBoundingBox';
 
 export interface Meta {
   emit? : boolean,
@@ -26,21 +28,25 @@ export const resize = (pixelWidth : number, pixelHeight : number) : ResizeAction
 export type SetForestAction = {
   readonly type : 'set-forest',
   readonly name : string,
-  readonly forest : Forest
+  readonly forest : Forest,
+  readonly boundingBox : Box
 }
-export const setForest = (name : string, forest : Forest) : SetForestAction => ({
+export const setForest = (name : string, forest : Forest, boundingBox : Box) : SetForestAction => ({
   type: 'set-forest',
   name,
-  forest
+  forest,
+  boundingBox
 });
 
 export type PushEditorAction = {
   readonly type : 'push-editor',
-  readonly name : string
+  readonly name : string,
+  readonly boundingBox : Box
 }
-export const pushEditor = (name : string) : PushEditorAction => ({
+export const pushEditor = (name : string, boundingBox : Box) : PushEditorAction => ({
   type: 'push-editor',
-  name
+  name,
+  boundingBox
 });
 
 export type PopEditorAction = {
@@ -48,6 +54,13 @@ export type PopEditorAction = {
 }
 export const popEditor = () : PopEditorAction => ({
   type: 'pop-editor'
+});
+
+export type ClearHistoryAction = {
+  readonly type : 'clear-history'
+}
+export const clearHistory = () : ClearHistoryAction => ({
+  type: 'clear-history'
 });
 
 export type PanZoomAction = {
@@ -281,7 +294,8 @@ export type EditorActions =
   SetToolDirectionAction |
   SetForestAction |
   PushEditorAction |
-  PopEditorAction;
+  PopEditorAction |
+  ClearHistoryAction;
 
 export type EditorMenuActions =
   ShowContextMenuAction |
@@ -371,3 +385,13 @@ export const hideContextMenuAfter = (action : Action) => (dispatch : Dispatch<St
   dispatch(action);
   dispatch(hideContextMenu());
 };
+
+export const loadForest = (name : string, keepHistory = true) => async (dispatch : Dispatch<State>) => {
+  const component = await storage.load(name);
+  const boundingBox = getComponentBoundingBox(component.enneaTree);
+  if(keepHistory){
+    dispatch(clearHistory());
+  }
+  dispatch(setForest(name, component, boundingBox));
+};
+
