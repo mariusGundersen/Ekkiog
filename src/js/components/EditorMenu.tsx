@@ -13,6 +13,7 @@ import IconLight from './icons/IconLight';
 import IconReturn from './icons/IconReturn';
 import IconAccept from './icons/IconAccept';
 import IconRemove from './icons/IconRemove';
+import IconCancel from './icons/IconCancel';
 
 import {
   wireMenuItem,
@@ -142,7 +143,7 @@ function createOkCancelMenuTree(editorMenu : OkCancelMenuState, dispatch : Dispa
     {
       menuItems: [
         menuItem('ok', <IconAccept />, editorMenu.okAction, false, editorMenu.isValid),
-        menuItem('cancel', <IconRemove />, editorMenu.cancelAction)
+        menuItem('cancel', <IconCancel />, editorMenu.cancelAction)
       ]
     }
   ];
