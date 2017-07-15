@@ -139,11 +139,16 @@ const WebGLCanvas = connect(
     forestHandler(this.props.forest, nextProps.forest, this.engine);
     moveHandler(this.props.selection, nextProps.selection, this.engine);
 
-    if(nextProps.selection.selection !== this.props.selection.selection){
-      if(nextProps.selection.selection){
+    if(nextProps.selection.selection){
+      if(!this.props.selection.selection
+      || nextProps.selection.forest !== this.props.selection.forest){
         this.touchControls.selectionSaga.startSelection(nextProps.selection);
         this.touchControls.pointerSaga.disable();
-      }else{
+      }
+    }
+
+    if(!nextProps.selection.selection){
+      if(this.props.selection.selection){
         this.touchControls.selectionSaga.stopSelection();
         this.touchControls.pointerSaga.enable();
       }

@@ -48,7 +48,7 @@ export default function editorMenu(state : EditorMenuState = {
       return {
         menuType: 'okCancel',
         open: true,
-        isValid: true,
+        isValid: action.isValid,
         okAction: action.okAction,
         cancelAction: action.cancelAction,
         previousMenu: state

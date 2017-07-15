@@ -1,8 +1,27 @@
 import { EventEmitter } from 'events';
-import { get, getIterator } from 'ennea-tree';
-import { getTypeAt, isEmpty, Forest, BUTTON, COMPONENT, clear, packageComponent, drawComponent, CompiledComponent } from 'ekkiog-editing';
+import {
+  get,
+  getIterator,
+  AreaData
+} from 'ennea-tree';
 
-import {Dispatch, Store} from 'react-redux';
+import {
+  getTypeAt,
+  isEmpty,
+  Forest,
+  BUTTON,
+  COMPONENT,
+  Component,
+  clear,
+  packageComponent,
+  drawComponent,
+  CompiledComponent
+} from 'ekkiog-editing';
+
+import {
+  Dispatch,
+  Store
+} from 'react-redux';
 
 import {
   Action,
@@ -15,7 +34,8 @@ import {
   setForest,
   loadForest,
   pushEditor,
-  popEditor
+  popEditor,
+  insertComponentPackages
 } from './actions';
 import { State } from './reduce';
 import {
@@ -86,10 +106,15 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
         if(topOfStack){
           const editedComponentName = editor.currentComponentName;
           const {name, boundingBox} = topOfStack.value;
-          let parentComponent : Forest = await storage.load(name);
+          let parentForest : Forest = await storage.load(name);
           dispatch(popEditor());
-          parentComponent = replaceComponents(parentComponent, packageComponent(forest, editedComponentName));
-          dispatch(setForest(name, parentComponent, boundingBox));
+          dispatch(setForest(name, parentForest, boundingBox));
+          const component = packageComponent(forest, editedComponentName);
+          const {forest : newForest, didntFit} = replaceComponents(parentForest, component);
+          dispatch(setForest(name, newForest, boundingBox));
+          if(didntFit.length > 0){
+            dispatch(insertComponentPackages(component, getIterableIterator(didntFit)));
+          }
         }
       }else{
         const state = getState();
@@ -156,18 +181,41 @@ export function handleMoveSelection({dx, dy} : {dx : number, dy : number}){
   };
 }
 
-function replaceComponents(parentComponent : Forest, newComponent : CompiledComponent){
-  for(const item of getIterator(parentComponent.enneaTree, box([0,0], [parentComponent.enneaTree.size, parentComponent.enneaTree.size]))){
-    if(item.data.type === COMPONENT){
-      const x = item.left + (item.width>>1);
-      const y = item.top + (item.height>>1);
-      parentComponent = clear(parentComponent, x, y);
-      parentComponent = drawComponent(parentComponent, x, y, newComponent);
+function replaceComponents(forest : Forest, newComponent : CompiledComponent){
+  const didntFit = [] as {x : number, y : number}[];
+  for(const item of getComponents(forest, newComponent.name)){
+    const x = item.left + (item.width>>1);
+    const y = item.top + (item.height>>1);
+    const clearedForest = clear(forest, x, y);
+    const newForest = drawComponent(clearedForest, x, y, newComponent);
+    if(newForest === clearedForest){
+      didntFit.push({x, y});
+    }else{
+      forest = newForest;
     }
   }
-  return parentComponent;
+  return {forest, didntFit};
+}
+
+function *getComponents(forest : Forest, name : string) : IterableIterator<AreaData<Component>>{
+  const size = forest.enneaTree.size;
+  for(const item of getIterator(forest.enneaTree, box([0,0], [size, size]))){
+    if(item.data.type === COMPONENT
+    && item.data.name === name){
+      yield {
+        ...item,
+        data: item.data
+      };
+    }
+  }
 }
 
 function box([left, top] : number[], [right, bottom] : number[]){
   return {top, left, right, bottom};
+}
+
+function *getIterableIterator<T>(list : T[]) : IterableIterator<T>{
+  for(const item of list){
+    yield item;
+  };
 }

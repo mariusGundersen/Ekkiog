@@ -150,12 +150,14 @@ export const toggleEditorMenu = () : ToggleEditorMenuAction => ({
 export type ShowOkCancelMenuAction = {
   readonly type : 'showOkCancelMenu',
   okAction() : void,
-  cancelAction() : void
+  cancelAction() : void,
+  isValid : boolean
 }
-export const showOkCancelMenu = (okAction : () => void, cancelAction : () => void) : ShowOkCancelMenuAction => ({
+export const showOkCancelMenu = (okAction : () => void, cancelAction : () => void, isValid = true) : ShowOkCancelMenuAction => ({
   type: 'showOkCancelMenu',
   okAction,
-  cancelAction
+  cancelAction,
+  isValid
 });
 
 export type SetOkCancelMenuValidAction = {
@@ -353,6 +355,17 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
     dispatch(resetEditorMenu());
   }
 
+    const tile = state.view.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
+  const centerTile = {
+    x: tile[0],
+    y: tile[1]
+  };
+  const top = centerTile.y - (componentPackage.height>>1);
+  const left = centerTile.x - (componentPackage.width>>1);
+  const right = centerTile.x - (componentPackage.width>>1) + componentPackage.width;
+  const bottom = centerTile.y - (componentPackage.height>>1) + componentPackage.height;
+
+  const isValid = isEmpty(state.forest.enneaTree, top, left, right, bottom);
   dispatch(showOkCancelMenu(
     () => {
       const selection = getState().selection;
@@ -367,22 +380,47 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
     () => {
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
-    }
+    },
+    isValid
   ));
-
-  const tile = state.view.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
-  const centerTile = {
-    x: tile[0],
-    y: tile[1]
-  };
-  const top = centerTile.y - (componentPackage.height>>1);
-  const left = centerTile.x - (componentPackage.width>>1);
-  const right = centerTile.x - (componentPackage.width>>1) + componentPackage.width;
-  const bottom = centerTile.y - (componentPackage.height>>1) + componentPackage.height;
-
-  const isValid = isEmpty(state.forest.enneaTree, top, left, right, bottom);
-  dispatch(setOkCancelMenuValid(isValid));
   dispatch(selectComponent(componentPackage, centerTile));
+}
+
+export const insertComponentPackages = (componentPackage : CompiledComponent, positions : IterableIterator<{x : number, y : number}>) => (dispatch : Dispatch<State>, getState : () => State) => {
+  const state = getState();
+  if(state.selection.selection){
+    dispatch(stopSelection());
+    dispatch(resetEditorMenu());
+  }
+
+  const insertIntoNextPosition = (position : IteratorResult<{x : number, y : number}>) => {
+    if(position.done) return;
+
+    dispatch(showOkCancelMenu(
+      () => {
+        const selection = getState().selection;
+        if(selection.selection == false) return;
+        dispatch(insertComponent(componentPackage, {
+          x: selection.x + selection.dx,
+          y: selection.y + selection.dy
+        }));
+        dispatch(stopSelection());
+        dispatch(resetEditorMenu());
+        insertIntoNextPosition(positions.next());
+      },
+      () => {
+        dispatch(stopSelection());
+        dispatch(resetEditorMenu());
+        insertIntoNextPosition(positions.next());
+      },
+      false
+    ));
+
+    dispatch(removeTileAt(position.value.x, position.value.y))
+    dispatch(selectComponent(componentPackage, position.value));
+  };
+
+  insertIntoNextPosition(positions.next());
 }
 
 export const hideContextMenuAfter = (action : Action) => (dispatch : Dispatch<State>) => {
