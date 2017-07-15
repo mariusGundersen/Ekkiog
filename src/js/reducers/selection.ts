@@ -27,17 +27,17 @@ export default function reduce(state : NothingSelectedState = {
   selection: false
 }, action : Action) : SelectionState {
   switch(action.type){
-    case 'selectComponent':
+    case 'selectItem':
       return {
-        forest: drawComponent(createForest(), action.position.x|0, action.position.y|0, action.component),
-        top: (action.position.y|0) - (action.component.height>>1),
-        left: (action.position.x|0) - (action.component.width>>1),
-        right: (action.position.x|0) - (action.component.width>>1) + action.component.width,
-        bottom: (action.position.y|0) - (action.component.height>>1) + action.component.height,
+        forest: action.forest,
+        top: (action.area.top|0),
+        left: (action.area.left|0),
+        right: (action.area.left|0) + (action.area.width|0),
+        bottom: (action.area.top|0) + (action.area.height|0),
         dx: 0,
         dy: 0,
-        x: action.position.x|0,
-        y: action.position.y|0,
+        x: action.area.left|0,
+        y: action.area.top|0,
         selection: true
       };
     case 'moveSelection':

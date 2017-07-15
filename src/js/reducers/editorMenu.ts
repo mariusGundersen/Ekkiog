@@ -39,7 +39,6 @@ export default function editorMenu(state : EditorMenuState = {
         menuType: null,
         previousMenu: state
       };
-    case 'hideContextMenu':
     case 'resetEditorMenu':
       return state.menuType != 'tools'
         ? state.previousMenu || state

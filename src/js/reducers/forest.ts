@@ -2,12 +2,14 @@ import {
   Forest,
   Direction,
   Tool,
+  Item,
 
   WIRE,
   GATE,
   UNDERPASS,
   BUTTON,
   LIGHT,
+  COMPONENT,
 
   createForest,
 
@@ -42,7 +44,9 @@ export default function editing(forest=createForest(), action : Action) : Forest
     case 'convert-underpass-to-wire':
       return underpassToWire(forest, action.x, action.y);
     case 'insert-component':
-      return drawComponent(forest, action.position.x, action.position.y, action.component);
+      return drawComponent(forest, action.position.x+(action.component.width>>1), action.position.y+(action.component.height>>1), action.component);
+    case 'insert-item':
+      return copyTo(forest, action.item, action.position.x, action.position.y);
     default:
       return forest;
   }
@@ -70,6 +74,25 @@ function tap(forest : Forest, tool : Tool, direction : Direction, x : number, y 
     return drawLight(forest, x, y, direction);
   }else{
     return forest;
+  }
+}
+
+export function copyTo(forest : Forest, item : Item, x : number, y : number){
+  switch(item.type){
+    case WIRE:
+      return drawWire(forest, x, y);
+    case UNDERPASS:
+      return drawUnderpass(forest, x, y);
+    case GATE:
+      return drawGate(forest, x+3, y+1);
+    case BUTTON:
+      return drawButton(forest, x+1, y+1, item.direction);
+    case LIGHT:
+      return drawLight(forest, x+1, y+1, item.direction);
+    case COMPONENT:
+      return item.source ? drawComponent(forest, x+(item.source.width>>1), y+(item.source.height>>1), item.source) : forest;
+    default:
+      return forest;
   }
 }
 

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
+import { Tool } from 'ekkiog-editing';
 
 import { State } from '../reduce';
 import { ContextMenuState } from '../reducers/contextMenu';
@@ -18,6 +19,7 @@ import {
   removeMenuItem,
   toUnderpassMenuItem,
   toWireMenuItem,
+  moveMenuItem,
   MenuItem
 } from './radialMenu/menuItems';
 
@@ -110,16 +112,16 @@ function createRing(radius : number, width : number, items : MenuItem[]) : PieRi
   };
 }
 
-function *tileMenuItems(tile : string, tx : number, ty : number, dispatch : Dispatch<State>){
+function *tileMenuItems(tile : Tool | 'empty', tx : number, ty : number, dispatch : Dispatch<State>){
   if(tile == 'wire' || tile == 'empty'){
     yield toUnderpassMenuItem(dispatch, tx, ty);
   }
   if(tile == 'underpass' || tile == 'empty'){
     yield toWireMenuItem(dispatch, tx, ty);
   }
-  //if(tile == 'gate'){
-  //  yield moveMenuItem(dispatch, tx, ty);
-  //}
+  if(tile == 'gate' || tile == 'component' || tile == 'light' || tile == 'button'){
+    yield moveMenuItem(dispatch, tx, ty);
+  }
   if(tile != 'empty'){
     yield removeMenuItem(dispatch, tx, ty);
   }

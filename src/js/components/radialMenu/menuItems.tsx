@@ -9,7 +9,8 @@ import {
   hideContextMenuAfter,
   removeTileAt,
   toUnderpass,
-  toWire
+  toWire,
+  moveItemAt
 } from '../../actions';
 import { State } from '../../reduce';
 
@@ -20,6 +21,7 @@ import IconUnderpass from '../icons/IconUnderpass';
 import IconLight from '../icons/IconLight';
 import IconRemove from '../icons/IconRemove';
 import IconAccept from '../icons/IconAccept';
+import IconMove from '../icons/IconMove';
 
 export function wireMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
   return toolMenuItem('wire', <IconWire />, selectedTool, dispatch);
@@ -42,18 +44,22 @@ export function lightMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
 }
 
 export function removeMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(removeTileAt(tx, ty))));
+  return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(removeTileAt(tx, ty)))));
 }
 
 export function toUnderpassMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(hideContextMenuAfter(toUnderpass(tx, ty))));
+  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(toUnderpass(tx, ty)))));
 }
 export function toWireMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('toWire', <IconWire />, () => dispatch(hideContextMenuAfter(toWire(tx, ty))));
+  return menuItem('toWire', <IconWire />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(toWire(tx, ty)))));
 }
 
 export function acceptMenuItem(dispatch : Dispatch<State>){
   return menuItem('accept', <IconAccept />, () => dispatch(hideContextMenu()));
+}
+
+export function moveMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
+  return menuItem('move', <IconMove />, () => dispatch(hideContextMenuAfter(moveItemAt(tx, ty))));
 }
 
 export function toolMenuItem(tool : Tool, icon : JSX.Element, selectedTool : Tool, dispatch : Dispatch<State>){

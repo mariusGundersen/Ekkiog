@@ -1,8 +1,11 @@
-import { isEmpty, Forest, Item, CompiledComponent, Direction, Tool, Box } from 'ekkiog-editing';
+import { isEmpty, drawComponent, createForest, Forest, Item, CompiledComponent, Direction, Tool, Box, COMPONENT, Area } from 'ekkiog-editing';
+import { get as getTileAt } from 'ennea-tree';
 import { vec2, mat3 } from 'gl-matrix';
 import { Dispatch } from 'redux';
+import { ThunkAction } from 'redux-thunk';
 
 import { State } from './reduce';
+import { copyTo } from './reducers/forest';
 import storage from './storage';
 import getComponentBoundingBox from './utils/getComponentBoundingBox';
 
@@ -104,11 +107,11 @@ export const abortLoadContextMenu = () : AbortLoadContextMenuAction => ({
 
 export type ShowContextMenuAction = {
   readonly type : 'showContextMenu',
-  readonly tile : string,
+  readonly tile : Tool | 'empty',
   readonly tx : number,
   readonly ty : number
 }
-export const showContextMenu = (tile : string, tx : number, ty : number) :ShowContextMenuAction => ({
+export const showContextMenu = (tile : Tool | 'empty', tx : number, ty : number) :ShowContextMenuAction => ({
   type: 'showContextMenu',
   tile,
   tx,
@@ -238,18 +241,41 @@ export const insertComponent = (component : CompiledComponent, position : {x : n
   position
 });
 
-export type SelectComponentAction = {
-  readonly type : 'selectComponent',
-  readonly component : CompiledComponent,
+export type InsertItemAction = {
+  readonly type : 'insert-item',
+  readonly item : Item,
   readonly position : {
     readonly x : number,
     readonly y : number
   }
 }
-export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) : SelectComponentAction => ({
-  type: 'selectComponent',
-  component,
+export const insertItem = (item : Item, position : {x : number, y : number}) : InsertItemAction => ({
+  type: 'insert-item',
+  item,
   position
+});
+
+export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) =>  (dispatch : Dispatch<State>) => {
+  dispatch(selectItem(
+    drawComponent(createForest(), position.x|0, position.y|0, component),
+    {
+      top : (position.y|0) - (component.height>>1),
+      left: (position.x|0) - (component.width>>1),
+      width: component.width|0,
+      height: component.height|0
+    }
+  ));
+};
+
+export type SelectItemAction = {
+  readonly type : 'selectItem',
+  readonly forest : Forest,
+  readonly area : Area
+}
+export const selectItem = (forest : Forest, area : Area) : SelectItemAction => ({
+  type: 'selectItem',
+  forest,
+  area
 });
 
 export type MoveSelectionAction = {
@@ -317,10 +343,11 @@ export type ForestActions =
   RemoveTileAtAction |
   ToUnderpassAction |
   ToWireAction |
-  InsertComponentAction;
+  InsertComponentAction |
+  InsertItemAction;
 
 export type SelectionActions =
-  SelectComponentAction |
+  SelectItemAction |
   MoveSelectionAction |
   StopSelectionAction;
 
@@ -355,7 +382,7 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
     dispatch(resetEditorMenu());
   }
 
-    const tile = state.view.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
+  const tile = state.view.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
   const centerTile = {
     x: tile[0],
     y: tile[1]
@@ -423,7 +450,8 @@ export const insertComponentPackages = (componentPackage : CompiledComponent, po
   insertIntoNextPosition(positions.next());
 }
 
-export const hideContextMenuAfter = (action : Action) => (dispatch : Dispatch<State>) => {
+export const hideContextMenuAfter = (action : ThunkAction<any, State, any>) => (dispatch : Dispatch<State>) => {
+  dispatch(resetEditorMenu());
   dispatch(action);
   dispatch(hideContextMenu());
 };
@@ -437,3 +465,27 @@ export const loadForest = (name : string, keepHistory = true) => async (dispatch
   dispatch(setForest(name, component, boundingBox));
 };
 
+export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
+  const state = getState();
+  const item = getTileAt(state.forest.enneaTree, ty, tx);
+  dispatch(removeTileAt(tx, ty));
+  dispatch(selectItem(copyTo(createForest(), item.data, item.left, item.top), item));
+  dispatch(showOkCancelMenu(
+    () => {
+      const selection = getState().selection;
+      if(selection.selection == false) return;
+      dispatch(insertItem(item.data, {
+        x: selection.x + selection.dx,
+        y: selection.y + selection.dy
+      }));
+      dispatch(stopSelection());
+      dispatch(resetEditorMenu());
+    },
+    () => {
+      dispatch(setForest(state.editor.currentComponentName, state.forest, state.editor.boundingBox));
+      dispatch(stopSelection());
+      dispatch(resetEditorMenu());
+    },
+    true
+  ));
+};
