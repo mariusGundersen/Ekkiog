@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
-import { get } from 'ennea-tree';
-import { getTypeAt, isEmpty, BUTTON } from 'ekkiog-editing';
+import { get, getIterator } from 'ennea-tree';
+import { getTypeAt, isEmpty, Forest, BUTTON, COMPONENT, clear, packageComponent, drawComponent, CompiledComponent } from 'ekkiog-editing';
 
 import {Dispatch, Store} from 'react-redux';
 
@@ -81,13 +81,15 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
     async (dispatch : Dispatch<State>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y);
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
-        const topOfStack = getState().editor.history;
+        const {editor, forest} = getState();
+        const topOfStack = editor.history;
         if(topOfStack){
-          const entry = topOfStack.value;
-          const name = entry.name;
-          const component = await storage.load(name);
+          const editedComponentName = editor.currentComponentName;
+          const {name, boundingBox} = topOfStack.value;
+          let parentComponent : Forest = await storage.load(name);
           dispatch(popEditor());
-          dispatch(setForest(name, component, entry.boundingBox));
+          parentComponent = replaceComponents(parentComponent, packageComponent(forest, editedComponentName));
+          dispatch(setForest(name, parentComponent, boundingBox));
         }
       }else{
         const state = getState();
@@ -99,7 +101,7 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
           const centerY = areaData.top + areaData.height/2;
           const posA = viewportToTile(0, 0);
           const posB = viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
-          dispatch(pushEditor(state.editor.currentComponentName, {top: posA[1], left: posA[0], right: posB[0], bottom: posB[1]}, centerX, centerY));
+          dispatch(pushEditor(state.editor.currentComponentName, box(posA, posB), centerX, centerY));
           dispatch(loadForest(name, false));
         }
       }
@@ -152,4 +154,20 @@ export function handleMoveSelection({dx, dy} : {dx : number, dy : number}){
       selection.bottom + selection.dy);
     dispatch(setOkCancelMenuValid(isValid));
   };
+}
+
+function replaceComponents(parentComponent : Forest, newComponent : CompiledComponent){
+  for(const item of getIterator(parentComponent.enneaTree, box([0,0], [parentComponent.enneaTree.size, parentComponent.enneaTree.size]))){
+    if(item.data.type === COMPONENT){
+      const x = item.left + (item.width>>1);
+      const y = item.top + (item.height>>1);
+      parentComponent = clear(parentComponent, x, y);
+      parentComponent = drawComponent(parentComponent, x, y, newComponent);
+    }
+  }
+  return parentComponent;
+}
+
+function box([left, top] : number[], [right, bottom] : number[]){
+  return {top, left, right, bottom};
 }

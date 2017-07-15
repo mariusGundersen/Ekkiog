@@ -46,11 +46,11 @@ export default reax<Props>()(({
 
   insertPackage
     .withLatestFrom(props)
-    .subscribe(([name, props] : [string, Props]) => storage.loadPackage(name).then(props.insertPackage));
+    .subscribe(([name, props]) => storage.loadPackage(name).then(props.insertPackage));
 
   openComponent
     .withLatestFrom(props)
-    .subscribe(([name, props] : [string, Props]) => props.openComponent(name));
+    .subscribe(([name, props]) => props.openComponent(name));
 
   const updateList = toggleFavorite
     .switchMap(name => Observable.fromPromise(storage.toggleFavorite(name)))
