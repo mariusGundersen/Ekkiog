@@ -143,19 +143,18 @@ const WebGLCanvas = connect(
       if(!this.props.selection.selection
       || nextProps.selection.forest !== this.props.selection.forest){
         this.touchControls.selectionSaga.startSelection(nextProps.selection);
-        this.touchControls.pointerSaga.disable();
       }
     }
 
     if(!nextProps.selection.selection){
       if(this.props.selection.selection){
         this.touchControls.selectionSaga.stopSelection();
-        this.touchControls.pointerSaga.enable();
       }
     }
 
-    if(nextProps.contextMenu.show !== this.props.contextMenu.show){
-      if(nextProps.contextMenu.show){
+    if(nextProps.contextMenu.show !== this.props.contextMenu.show
+    || nextProps.selection.selection !== this.props.selection.selection){
+      if(nextProps.contextMenu.show || nextProps.selection.selection){
         this.touchControls.pointerSaga.disable();
       }else{
         this.touchControls.pointerSaga.enable();
