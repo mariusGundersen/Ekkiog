@@ -5,7 +5,7 @@ import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
 import { State } from './reduce';
-import { copyTo } from './reducers/forest';
+import { copyTo, tap } from './reducers/forest';
 import storage from './storage';
 import getComponentBoundingBox from './utils/getComponentBoundingBox';
 
@@ -501,7 +501,34 @@ export const save = () => async (dispatch : Dispatch<State>, getState : () => St
 };
 
 export const saveAfter = (action : Action) => async (dispatch : Dispatch<State>, getState : () => State) => {
+  const {forest: oldForest} = getState();
   dispatch(action);
   const {forest, editor : {currentComponentName}} = getState();
-  await storage.save(currentComponentName, forest);
+  if(oldForest !== forest){
+    await storage.save(currentComponentName, forest);
+  }
+};
+
+export const insertMovableItem = (tool : Tool, direction : Direction, tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
+  const forest = tap(createForest(), tool, direction, tx, ty);
+  const item = getTileAt(forest.enneaTree, ty, tx);
+  dispatch(selectItem(forest, item));
+  dispatch(showOkCancelMenu(
+    () => {
+      const selection = getState().selection;
+      if(selection.selection == false) return;
+      dispatch(insertItem(item.data, {
+        x: selection.x + selection.dx,
+        y: selection.y + selection.dy
+      }));
+      dispatch(save());
+      dispatch(stopSelection());
+      dispatch(resetEditorMenu());
+    },
+    () => {
+      dispatch(stopSelection());
+      dispatch(resetEditorMenu());
+    },
+    false
+  ));
 };

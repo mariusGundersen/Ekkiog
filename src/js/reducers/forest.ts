@@ -52,15 +52,16 @@ export default function editing(forest=createForest(), action : Action) : Forest
   }
 }
 
-function tap(forest : Forest, tool : Tool, direction : Direction, x : number, y : number) : Forest{
-  const type = getTypeAt(forest.enneaTree, x, y);
+export function tap(forest : Forest, tool : Tool, direction : Direction, x : number, y : number) : Forest {
   if(tool === WIRE){
+  const type = getTypeAt(forest.enneaTree, x, y);
     if(type === WIRE || type === UNDERPASS){
       return clear(forest, x, y);
     }else{
       return drawWire(forest, x, y);
     }
   }else if(tool === UNDERPASS){
+    const type = getTypeAt(forest.enneaTree, x, y);
     if(type === UNDERPASS || type === WIRE){
       return clear(forest, x, y);
     }else{

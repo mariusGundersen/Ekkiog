@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import {
-  get,
+  get as getTileAt,
   getIterator,
   AreaData
 } from 'ennea-tree';
@@ -10,6 +10,8 @@ import {
   isEmpty,
   Forest,
   BUTTON,
+  GATE,
+  LIGHT,
   COMPONENT,
   Component,
   clear,
@@ -36,6 +38,7 @@ import {
   pushEditor,
   popEditor,
   insertComponentPackages,
+  insertMovableItem,
   saveAfter,
   save
 } from './actions';
@@ -81,18 +84,30 @@ export function dispatchOn(emitter : EventEmitter, dispatch : Dispatch<State>, e
 export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
   return ({x, y} : {x : number, y : number}) =>
     (dispatch : Dispatch<State>, getState : () => State) => {
-      const [tx, ty] = viewportToTile(x, y);
+      const [tx, ty] = viewportToTile(x, y).map(Math.floor);
 
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128) return;
 
       const {forest, editor : {selectedTool, toolDirection}} = getState();
       window.requestAnimationFrame(() => {
-        const area = get(forest.enneaTree, ty, tx);
+        const area = getTileAt(forest.enneaTree, ty, tx);
         if(area && area.data && area.data.type === BUTTON){
           const net = area.data.net;
           engine.mutateContext(mutator => mutator.toggleGate(net));
         }else{
-          dispatch(saveAfter(tapTile(Math.floor(tx), Math.floor(ty), selectedTool, toolDirection)));
+          dispatch(tapTile(tx, ty, selectedTool, toolDirection));
+          if(selectedTool == BUTTON
+          || selectedTool == GATE
+          || selectedTool == LIGHT){
+            const {forest: mutatedForest} = getState();
+            if(forest === mutatedForest){
+              dispatch(insertMovableItem(selectedTool, toolDirection, tx, ty));
+            }else{
+              dispatch(save());
+            }
+          }else{
+            dispatch(save());
+          }
         }
       });
   };
@@ -123,7 +138,7 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
       }else{
         const state = getState();
         const forest = state.forest;
-        const areaData = get(forest.enneaTree, ty|0, tx|0);
+        const areaData = getTileAt(forest.enneaTree, ty|0, tx|0);
         if(areaData && areaData.data.type === 'component' && areaData.data.name){
           const name = areaData.data.name;
           const centerX = areaData.left + areaData.width/2;
