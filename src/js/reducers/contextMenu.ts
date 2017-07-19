@@ -1,6 +1,6 @@
 import { vec2, mat3 } from 'gl-matrix';
 
-import { Tool } from 'ekkiog-editing';
+import { TileType } from 'ekkiog-editing';
 
 import {
   Action
@@ -21,7 +21,7 @@ export interface ContextMenuLoadingState {
 export interface ContextMenuShowState {
   readonly loading : false,
   readonly show : true,
-  readonly tile : Tool | 'empty',
+  readonly tile : TileType,
   readonly tx : number,
   readonly ty : number
 }

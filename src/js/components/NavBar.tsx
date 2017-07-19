@@ -10,7 +10,7 @@ import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/merge';
-import { CompiledComponent, createForest } from 'ekkiog-editing';
+import { CompiledComponent } from 'ekkiog-editing';
 
 import MainMenuButton from './MainMenuButton';
 import SearchResults from './SearchResults';

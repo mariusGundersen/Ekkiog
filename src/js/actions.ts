@@ -500,7 +500,7 @@ export const saveAfter = (action : Action) => async (dispatch : Dispatch<State>,
 
 export const insertMovableItem = (tool : Tool, direction : Direction, tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
   const {forest : {buddyTree}} = getState();
-  const forest = tap({...createForest(), buddyTree}, tool, direction, tx, ty);
+  const forest = tap(createForest(buddyTree), tool, direction, tx, ty);
   const item = getTileAt(forest.enneaTree, ty, tx);
   dispatch(selectItem(forest, item));
   dispatch(showOkCancelMenu(
@@ -527,7 +527,7 @@ export const insertMovableItem = (tool : Tool, direction : Direction, tx : numbe
 export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) => (dispatch : Dispatch<State>, getState : () => State) => {
   const {forest: {buddyTree}} = getState();
   dispatch(selectItem(
-    drawComponent({...createForest(), buddyTree}, position.x|0, position.y|0, component),
+    drawComponent(createForest(buddyTree), position.x|0, position.y|0, component),
     {
       top : (position.y|0) - (component.height>>1),
       left: (position.x|0) - (component.width>>1),

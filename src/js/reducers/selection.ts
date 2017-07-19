@@ -1,4 +1,4 @@
-import { drawComponent, createForest, Forest } from 'ekkiog-editing';
+import { Forest } from 'ekkiog-editing';
 
 import {
   Action
