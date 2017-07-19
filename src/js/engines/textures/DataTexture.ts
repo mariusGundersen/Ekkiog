@@ -5,11 +5,11 @@ export default class DataTexture extends Texture{
   private readonly data : Uint8Array;
   private readonly data32 : Uint32Array;
   private readonly map : NdArray;
-  constructor(gl : WebGLRenderingContext, width : number, height : number){
-    super(gl, width, height);
-    this.data = new Uint8Array(width*height*4);
+  constructor(gl : WebGLRenderingContext, size : number){
+    super(gl, size);
+    this.data = new Uint8Array(size*size*4);
     this.data32 = new Uint32Array(this.data.buffer);
-    this.map = ndarray(this.data32, [height, width]);
+    this.map = ndarray(this.data32, [size, size]);
 
     this.update();
   }

@@ -18,7 +18,7 @@ export default class WordEngine {
     this.shader.bind();
 
     this.shader.uniforms.inverseSpriteTextureSize = context.spriteSheetTexture.inverseSize;
-    this.shader.uniforms.inverseMapTextureSize = context.tileMapTexture.inverseSize;
+    this.shader.uniforms.inverseMapTextureSize = context.mapTexture.inverseSize;
     this.shader.uniforms.tileSize = context.tileSize;
     this.shader.uniforms.matrix = matrix;
 

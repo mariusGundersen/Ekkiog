@@ -6,7 +6,7 @@ export default class ImageTexture extends Texture{
   image? : HTMLImageElement;
   readonly loading : Promise<ImageTexture>;
   constructor(gl : WebGLRenderingContext, image : Promise<HTMLImageElement>){
-    super(gl, 0, 0);
+    super(gl, 0);
     this.image = undefined;
     this.loading = image.then(image => {
       this.width = image.width;

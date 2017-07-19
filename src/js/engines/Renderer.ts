@@ -93,4 +93,15 @@ export default class Renderer {
 
     this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
   }
+
+  renderChargeMap(context : RenderContext, chargeContext : RenderContext){
+    const currentCharges = chargeContext.netChargeTextures[this.currentTick%2];
+
+    this.chargeMapEngine.render(
+      context.triangle,
+      context.netMapTexture,
+      currentCharges,
+      context.spriteSheetTexture,
+      context.chargeMapTexture);
+  }
 }

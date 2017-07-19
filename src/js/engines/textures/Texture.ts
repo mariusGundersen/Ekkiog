@@ -10,7 +10,7 @@ export default class Texture implements TextureBuffer {
   readonly size : vec2;
   readonly halfSize : vec2;
   readonly inverseSize : vec2;
-  constructor(gl : WebGLRenderingContext, width=0, height=0){
+  constructor(gl : WebGLRenderingContext, width=0, height=width){
     this.gl = gl;
     this.texture = gl.createTexture() || (() => {throw new Error("Could not make texture")})();
 
