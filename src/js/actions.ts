@@ -401,6 +401,7 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
         x: selection.x + selection.dx,
         y: selection.y + selection.dy
       }));
+      dispatch(save());
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
     },
@@ -421,7 +422,10 @@ export const insertComponentPackages = (componentPackage : CompiledComponent, po
   }
 
   const insertIntoNextPosition = (position : IteratorResult<{x : number, y : number}>) => {
-    if(position.done) return;
+    if(position.done) {
+      dispatch(save());
+      return;
+    }
 
     dispatch(showOkCancelMenu(
       () => {
@@ -478,6 +482,7 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
         x: selection.x + selection.dx,
         y: selection.y + selection.dy
       }));
+      dispatch(save());
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
     },
@@ -488,4 +493,15 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
     },
     true
   ));
+};
+
+export const save = () => async (dispatch : Dispatch<State>, getState : () => State) => {
+  const {forest, editor : {currentComponentName}} = getState();
+  await storage.save(currentComponentName, forest);
+};
+
+export const saveAfter = (action : Action) => async (dispatch : Dispatch<State>, getState : () => State) => {
+  dispatch(action);
+  const {forest, editor : {currentComponentName}} = getState();
+  await storage.save(currentComponentName, forest);
 };

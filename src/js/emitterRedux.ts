@@ -35,7 +35,9 @@ import {
   loadForest,
   pushEditor,
   popEditor,
-  insertComponentPackages
+  insertComponentPackages,
+  saveAfter,
+  save
 } from './actions';
 import { State } from './reduce';
 import {
@@ -90,7 +92,7 @@ export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
           const net = area.data.net;
           engine.mutateContext(mutator => mutator.toggleGate(net));
         }else{
-          dispatch(tapTile(Math.floor(tx), Math.floor(ty), selectedTool, toolDirection));
+          dispatch(saveAfter(tapTile(Math.floor(tx), Math.floor(ty), selectedTool, toolDirection)));
         }
       });
   };
@@ -114,6 +116,8 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
           dispatch(setForest(name, newForest, boundingBox));
           if(didntFit.length > 0){
             dispatch(insertComponentPackages(component, getIterableIterator(didntFit)));
+          }else{
+            dispatch(save());
           }
         }
       }else{

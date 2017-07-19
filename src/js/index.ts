@@ -8,7 +8,6 @@ import '../manifest.json';
 
 import offline from './offline';
 import storage from './storage';
-import createContextMiddleware from './editing/createContextMiddleware';
 import reduce, { State } from './reduce';
 import { loadForest } from './actions';
 
@@ -20,8 +19,7 @@ const store = createStore<State>(
   reduce,
   (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
     applyMiddleware(
-      thunk,
-      createContextMiddleware()
+      thunk
     )
   )
 );

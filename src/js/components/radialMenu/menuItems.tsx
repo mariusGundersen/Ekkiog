@@ -10,7 +10,8 @@ import {
   removeTileAt,
   toUnderpass,
   toWire,
-  moveItemAt
+  moveItemAt,
+  saveAfter
 } from '../../actions';
 import { State } from '../../reduce';
 
@@ -44,14 +45,14 @@ export function lightMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
 }
 
 export function removeMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(removeTileAt(tx, ty)))));
+  return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(saveAfter(removeTileAt(tx, ty))))));
 }
 
 export function toUnderpassMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(toUnderpass(tx, ty)))));
+  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(saveAfter(toUnderpass(tx, ty))))));
 }
 export function toWireMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('toWire', <IconWire />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(toWire(tx, ty)))));
+  return menuItem('toWire', <IconWire />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(saveAfter(toWire(tx, ty))))));
 }
 
 export function acceptMenuItem(dispatch : Dispatch<State>){
