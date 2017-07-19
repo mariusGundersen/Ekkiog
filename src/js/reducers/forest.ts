@@ -46,7 +46,7 @@ export default function editing(forest=createForest(), action : Action) : Forest
     case 'insert-component':
       return drawComponent(forest, action.position.x+(action.component.width>>1), action.position.y+(action.component.height>>1), action.component);
     case 'insert-item':
-      return copyTo(forest, action.item, action.position.x, action.position.y);
+      return insertItem(forest, action.item, action.position.x, action.position.y);
     default:
       return forest;
   }
@@ -78,7 +78,7 @@ export function tap(forest : Forest, tool : Tool, direction : Direction, x : num
   }
 }
 
-export function copyTo(forest : Forest, item : Item, x : number, y : number){
+export function insertItem(forest : Forest, item : Item, x : number, y : number){
   switch(item.type){
     case WIRE:
       return drawWire(forest, x, y);

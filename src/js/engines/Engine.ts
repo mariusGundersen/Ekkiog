@@ -33,6 +33,7 @@ export default class Engine {
   mutateMoveContext(mutator : (context : MutableContext) => void){
     const changed = this.moveContext.mutateContext(mutator);
     if(changed){
+      this.renderer.simulateTick(this.moveContext, 0);
       this.renderer.renderMap(this.moveContext);
     }
   }

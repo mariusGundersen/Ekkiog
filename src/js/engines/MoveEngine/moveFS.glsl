@@ -52,8 +52,9 @@ void main(void) {
       gl_FragColor = vec4(0.0);
     }
   }else if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
-    gl_FragColor = vec4(102.0/255.0, 102.0/255.0, 102.0/255.0, 0.8);
+    vec4 charge = texture2D(chargeMap, movedCoord);
+    gl_FragColor = vec4(charge.rgb, 0.8);
   }else{
-    gl_FragColor = color * vec4(1.0, 1.0, 1.0, 0.8);
+    gl_FragColor = vec4(color.rgb, 0.8);
   }
 }

@@ -5,7 +5,8 @@ import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
 import { State } from './reduce';
-import { copyTo, tap } from './reducers/forest';
+import { tap } from './reducers/forest';
+import copyTo from './editing/copyTo';
 import storage from './storage';
 import getComponentBoundingBox from './utils/getComponentBoundingBox';
 
@@ -255,18 +256,6 @@ export const insertItem = (item : Item, position : {x : number, y : number}) : I
   position
 });
 
-export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) =>  (dispatch : Dispatch<State>) => {
-  dispatch(selectItem(
-    drawComponent(createForest(), position.x|0, position.y|0, component),
-    {
-      top : (position.y|0) - (component.height>>1),
-      left: (position.x|0) - (component.width>>1),
-      width: component.width|0,
-      height: component.height|0
-    }
-  ));
-};
-
 export type SelectItemAction = {
   readonly type : 'selectItem',
   readonly forest : Forest,
@@ -473,7 +462,7 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
   const state = getState();
   const item = getTileAt(state.forest.enneaTree, ty, tx);
   dispatch(removeTileAt(tx, ty));
-  dispatch(selectItem(copyTo(createForest(), item.data, item.left, item.top), item));
+  dispatch(selectItem(copyTo(createForest(), item.data, item), item));
   dispatch(showOkCancelMenu(
     () => {
       const selection = getState().selection;
@@ -510,7 +499,8 @@ export const saveAfter = (action : Action) => async (dispatch : Dispatch<State>,
 };
 
 export const insertMovableItem = (tool : Tool, direction : Direction, tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const forest = tap(createForest(), tool, direction, tx, ty);
+  const {forest : {buddyTree}} = getState();
+  const forest = tap({...createForest(), buddyTree}, tool, direction, tx, ty);
   const item = getTileAt(forest.enneaTree, ty, tx);
   dispatch(selectItem(forest, item));
   dispatch(showOkCancelMenu(
@@ -532,3 +522,15 @@ export const insertMovableItem = (tool : Tool, direction : Direction, tx : numbe
     false
   ));
 };
+
+
+export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) =>
+  selectItem(
+    drawComponent(createForest(), position.x|0, position.y|0, component),
+    {
+      top : (position.y|0) - (component.height>>1),
+      left: (position.x|0) - (component.width>>1),
+      width: component.width|0,
+      height: component.height|0
+    }
+  );
