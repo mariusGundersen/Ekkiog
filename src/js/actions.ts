@@ -524,13 +524,15 @@ export const insertMovableItem = (tool : Tool, direction : Direction, tx : numbe
 };
 
 
-export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) =>
-  selectItem(
-    drawComponent(createForest(), position.x|0, position.y|0, component),
+export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) => (dispatch : Dispatch<State>, getState : () => State) => {
+  const {forest: {buddyTree}} = getState();
+  dispatch(selectItem(
+    drawComponent({...createForest(), buddyTree}, position.x|0, position.y|0, component),
     {
       top : (position.y|0) - (component.height>>1),
       left: (position.x|0) - (component.width>>1),
       width: component.width|0,
       height: component.height|0
     }
-  );
+  ));
+}
