@@ -4,6 +4,10 @@
   color: white;
   background: #446364;
 
+  & .flex-fill {
+    flex: 1 0 auto;
+  }
+
   & button {
     background: transparent;
     border: none;
