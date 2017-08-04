@@ -12,12 +12,14 @@ export interface ViewState {
   tileToViewport(...pos : number[]) : [number, number]
 }
 
-export default function view(state : ViewState = {
+const initialState : ViewState = {
   viewportToTileFloored: () => [0,0],
   tileToViewport: () => [0, 0],
   pixelWidth: 100,
   pixelHeight: 100
-}, action : Action) : ViewState {
+};
+
+export default function view(state = initialState, action : Action) : ViewState {
   switch(action.type){
     case 'panZoom':
       return {

@@ -4,7 +4,7 @@ import view, { ViewState } from './reducers/view';
 import editor, { EditorState } from './reducers/editor';
 import editorMenu, { EditorMenuState } from './reducers/editorMenu';
 import contextMenu, { ContextMenuState } from './reducers/contextMenu';
-import forest, { Forest } from './reducers/forest';
+import context, { ContextState } from './reducers/context';
 import selection, { SelectionState } from './reducers/selection';
 import simulation, { SimulationState } from './reducers/simulation';
 
@@ -13,7 +13,7 @@ export interface State {
   editor : EditorState,
   editorMenu : EditorMenuState,
   contextMenu : ContextMenuState,
-  forest : Forest,
+  context : ContextState,
   selection : SelectionState,
   simulation : SimulationState
 }
@@ -23,7 +23,7 @@ export default combineReducers<State>({
   editor,
   editorMenu,
   contextMenu,
-  forest,
+  context,
   selection,
   simulation
 });

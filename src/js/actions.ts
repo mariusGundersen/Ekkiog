@@ -31,44 +31,46 @@ export const resize = (pixelWidth : number, pixelHeight : number) : ResizeAction
 
 export type SetForestAction = {
   readonly type : 'set-forest',
-  readonly name : string,
-  readonly forest : Forest,
-  readonly boundingBox : Box
+  readonly forest : Forest
 }
-export const setForest = (name : string, forest : Forest, boundingBox : Box) : SetForestAction => ({
+export const setForest = (forest : Forest) : SetForestAction => ({
   type: 'set-forest',
-  name,
-  forest,
-  boundingBox
+  forest
 });
 
-export type PushEditorAction = {
-  readonly type : 'push-editor',
+export type NewContextAction = {
+  readonly type : 'new-context',
   readonly name : string,
+  readonly forest : Forest
+}
+export const newContext = (name : string, forest : Forest) : NewContextAction => ({
+  type: 'new-context',
+  name,
+  forest
+});
+
+export type PushContextAction = {
+  readonly type : 'push-context',
+  readonly name : string,
+  readonly forest : Forest,
   readonly boundingBox : Box,
   readonly centerX : number,
   readonly centerY : number
 }
-export const pushEditor = (name : string, boundingBox : Box, centerX : number, centerY : number) : PushEditorAction => ({
-  type: 'push-editor',
+export const pushContext = (name : string, forest : Forest, boundingBox : Box, centerX : number, centerY : number) : PushContextAction => ({
+  type: 'push-context',
   name,
+  forest,
   boundingBox,
   centerX,
   centerY
 });
 
-export type PopEditorAction = {
-  readonly type : 'pop-editor'
+export type PopContextAction = {
+  readonly type : 'pop-context'
 }
-export const popEditor = () : PopEditorAction => ({
-  type: 'pop-editor'
-});
-
-export type ClearHistoryAction = {
-  readonly type : 'clear-history'
-}
-export const clearHistory = () : ClearHistoryAction => ({
-  type: 'clear-history'
+export const popContext = () : PopContextAction => ({
+  type: 'pop-context'
 });
 
 export type PanZoomAction = {
@@ -312,11 +314,12 @@ export type ContextMenuActions =
 
 export type EditorActions =
   SetSelectedToolAction |
-  SetToolDirectionAction |
-  SetForestAction |
-  PushEditorAction |
-  PopEditorAction |
-  ClearHistoryAction;
+  SetToolDirectionAction;
+
+export type ContextActions =
+  NewContextAction |
+  PushContextAction |
+  PopContextAction;
 
 export type EditorMenuActions =
   ShowContextMenuAction |
@@ -349,6 +352,7 @@ export type SimulationActions =
   SimulationTickAction;
 
 export type Action =
+  ContextActions |
   ContextMenuActions |
   EditorActions |
   EditorMenuActions |
@@ -381,7 +385,7 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
   const right = centerTile.x - (componentPackage.width>>1) + componentPackage.width;
   const bottom = centerTile.y - (componentPackage.height>>1) + componentPackage.height;
 
-  const isValid = isEmpty(state.forest.enneaTree, top, left, right, bottom);
+  const isValid = isEmpty(state.context.forest.enneaTree, top, left, right, bottom);
   dispatch(showOkCancelMenu(
     () => {
       const selection = getState().selection;
@@ -449,18 +453,14 @@ export const hideContextMenuAfter = (action : ThunkAction<any, State, any>) => (
   dispatch(hideContextMenu());
 };
 
-export const loadForest = (name : string, keepHistory = true) => async (dispatch : Dispatch<State>) => {
+export const loadForest = (name : string) => async (dispatch : Dispatch<State>) => {
   const component = await storage.load(name);
-  const boundingBox = getComponentBoundingBox(component.enneaTree);
-  if(keepHistory){
-    dispatch(clearHistory());
-  }
-  dispatch(setForest(name, component, boundingBox));
+  dispatch(newContext(name, component));
 };
 
 export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
   const state = getState();
-  const item = getTileAt(state.forest.enneaTree, ty, tx);
+  const item = getTileAt(state.context.forest.enneaTree, ty, tx);
   dispatch(removeTileAt(tx, ty));
   dispatch(selectItem(copyTo(createForest(), item.data, item), item));
   dispatch(showOkCancelMenu(
@@ -476,7 +476,7 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
       dispatch(resetEditorMenu());
     },
     () => {
-      dispatch(setForest(state.editor.currentComponentName, state.forest, state.editor.boundingBox));
+      dispatch(setForest(state.context.forest));
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
     },
@@ -485,21 +485,21 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
 };
 
 export const save = () => async (dispatch : Dispatch<State>, getState : () => State) => {
-  const {forest, editor : {currentComponentName}} = getState();
-  await storage.save(currentComponentName, forest);
+  const {forest, name} = getState().context;
+  await storage.save(name, forest);
 };
 
 export const saveAfter = (action : Action) => async (dispatch : Dispatch<State>, getState : () => State) => {
-  const {forest: oldForest} = getState();
+  const oldForest = getState().context.forest;
   dispatch(action);
-  const {forest, editor : {currentComponentName}} = getState();
+  const {forest, name} = getState().context;
   if(oldForest !== forest){
-    await storage.save(currentComponentName, forest);
+    await storage.save(name, forest);
   }
 };
 
 export const insertMovableItem = (tool : Tool, direction : Direction, tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const {forest : {buddyTree}} = getState();
+  const buddyTree = getState().context.forest.buddyTree;
   const forest = tap(createForest(buddyTree), tool, direction, tx, ty);
   const item = getTileAt(forest.enneaTree, ty, tx);
   dispatch(selectItem(forest, item));
@@ -525,7 +525,7 @@ export const insertMovableItem = (tool : Tool, direction : Direction, tx : numbe
 
 
 export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const {forest: {buddyTree}} = getState();
+  const buddyTree = getState().context.forest.buddyTree;
   dispatch(selectItem(
     drawComponent(createForest(buddyTree), position.x|0, position.y|0, component),
     {

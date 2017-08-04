@@ -23,9 +23,11 @@ export interface NothingSelectedState {
 
 export type SelectionState = ComponentSelectedState | NothingSelectedState;
 
-export default function reduce(state : NothingSelectedState = {
+const initialState : NothingSelectedState = {
   selection: false
-}, action : Action) : SelectionState {
+};
+
+export default function reduce(state = initialState, action : Action) : SelectionState {
   switch(action.type){
     case 'selectItem':
       return {

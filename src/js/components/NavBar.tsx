@@ -130,10 +130,10 @@ function menus<V, E, P>(state : 'search' | 'simulation' | 'main' | '', values : 
 }
 
 export default connect((state : State) => ({
-  currentComponentName: state.editor.currentComponentName,
+  currentComponentName: state.context.name,
   tickCount: state.simulation.tickCount,
   tickInterval: state.simulation.tickInterval,
-  gateCount: (state.forest.buddyTree.usedSize||2) - 2
+  gateCount: (state.context.forest.buddyTree.usedSize||2) - 2
 }))(result);
 
 export function ifElse<T>(observable : Observable<T>, fallback : T){

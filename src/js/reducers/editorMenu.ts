@@ -23,10 +23,12 @@ export interface OkCancelMenuState {
 
 export type EditorMenuState = ToolsMenuState | OkCancelMenuState | ContextMenuState;
 
-export default function editorMenu(state : EditorMenuState = {
+const initialState : EditorMenuState = {
   open: false,
   menuType: 'tools'
-}, action : Action) : EditorMenuState {
+};
+
+export default function editorMenu(state = initialState, action : Action) : EditorMenuState {
   switch(action.type){
     case 'toggleEditorMenu':
       return state.menuType == 'tools'

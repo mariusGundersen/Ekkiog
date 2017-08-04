@@ -28,10 +28,12 @@ export interface ContextMenuShowState {
 
 export type ContextMenuState = ContextMenuHideState | ContextMenuLoadingState | ContextMenuShowState;
 
-export default function contextMenu(state : ContextMenuState = {
+const initialState : ContextMenuState = {
   loading: false,
   show: false,
-}, action : Action) : ContextMenuState {
+};
+
+export default function contextMenu(state = initialState, action : Action) : ContextMenuState {
   switch(action.type){
     case 'loadContextMenu':
       return state.show == false ? {

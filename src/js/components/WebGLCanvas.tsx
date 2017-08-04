@@ -13,7 +13,7 @@ import {
 } from '../actions';
 import { State } from '../reduce';
 import { SelectionState } from '../reducers/selection';
-import { HistoryEntry } from '../reducers/editor';
+import { PushedContextState } from '../reducers/context';
 import {
   TOUCH_START,
   TOUCH_MOVE,
@@ -41,19 +41,19 @@ export interface Props{
   readonly contextMenu : ContextMenuState,
   readonly name : string,
   readonly boundingBox : Box
-  readonly previous : HistoryEntry
+  readonly previous : PushedContextState
 }
 
 const WebGLCanvas = connect(
-  ({view, forest, selection, contextMenu, editor, simulation} : State) => ({
-    forest,
+  ({view, context, selection, contextMenu, simulation} : State) => ({
+    forest: context.forest,
     selection,
     width: view.pixelWidth,
     height: view.pixelHeight,
     contextMenu,
-    name: editor.currentComponentName,
-    boundingBox: editor.boundingBox,
-    previous: editor.history ? editor.history.value : undefined,
+    name: context.name,
+    boundingBox: context.boundingBox,
+    previous: context.previous,
     tickInterval: simulation.tickInterval
   })
 )(class WebGLCanvas extends React.Component<Props, any> {

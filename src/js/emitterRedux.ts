@@ -34,9 +34,8 @@ import {
   setOkCancelMenuValid,
   moveSelection,
   setForest,
-  loadForest,
-  pushEditor,
-  popEditor,
+  pushContext,
+  popContext,
   insertComponentPackages,
   insertMovableItem,
   saveAfter,
@@ -88,7 +87,7 @@ export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
 
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128) return;
 
-      const {forest, editor : {selectedTool, toolDirection}} = getState();
+      const {context: {forest}, editor : {selectedTool, toolDirection}} = getState();
       window.requestAnimationFrame(() => {
         const area = getTileAt(forest.enneaTree, ty, tx);
         if(area && area.data && area.data.type === BUTTON){
@@ -99,7 +98,7 @@ export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
           if(selectedTool == BUTTON
           || selectedTool == GATE
           || selectedTool == LIGHT){
-            const {forest: mutatedForest} = getState();
+            const mutatedForest = getState().context.forest;
             if(forest === mutatedForest){
               dispatch(insertMovableItem(selectedTool, toolDirection, tx, ty));
             }else{
@@ -118,17 +117,13 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
     async (dispatch : Dispatch<State>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y);
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
-        const {editor, forest} = getState();
-        const topOfStack = editor.history;
-        if(topOfStack){
-          const editedComponentName = editor.currentComponentName;
-          const {name, boundingBox} = topOfStack.value;
-          let parentForest : Forest = await storage.load(name);
-          dispatch(popEditor());
-          dispatch(setForest(name, parentForest, boundingBox));
-          const component = packageComponent(forest, editedComponentName);
-          const {forest : newForest, didntFit} = replaceComponents(parentForest, component);
-          dispatch(setForest(name, newForest, boundingBox));
+        const context = getState().context;
+        const previousContext = context.previous;
+        if(previousContext){
+          const component = packageComponent(context.forest, context.name);
+          dispatch(popContext());
+          const {forest, didntFit} = replaceComponents(previousContext.forest, component);
+          dispatch(setForest(forest));
           if(didntFit.length > 0){
             dispatch(insertComponentPackages(component, getIterableIterator(didntFit)));
           }else{
@@ -137,16 +132,15 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
         }
       }else{
         const state = getState();
-        const forest = state.forest;
-        const areaData = getTileAt(forest.enneaTree, ty|0, tx|0);
+        const areaData = getTileAt(state.context.forest.enneaTree, ty|0, tx|0);
         if(areaData && areaData.data.type === 'component' && areaData.data.name){
           const name = areaData.data.name;
           const centerX = areaData.left + areaData.width/2;
           const centerY = areaData.top + areaData.height/2;
           const posA = viewportToTile(0, 0);
           const posB = viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
-          dispatch(pushEditor(state.editor.currentComponentName, box(posA, posB), centerX, centerY));
-          dispatch(loadForest(name, false));
+          const forest = await storage.load(name);
+          dispatch(pushContext(name, forest, box(posA, posB), centerX, centerY));
         }
       }
   };
@@ -159,7 +153,7 @@ export function handleShowContextMenu(viewportToTile : ViewportToTile){
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
         dispatch(abortLoadContextMenu());
       }else{
-        const enneaTree = getState().forest.enneaTree;
+        const enneaTree = getState().context.forest.enneaTree;
         const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
         dispatch(showContextMenu(
           tile,
@@ -191,7 +185,7 @@ export function handleMoveSelection({dx, dy} : {dx : number, dy : number}){
     const selection = state.selection;
     if(!selection.selection) return;
     const isValid = isEmpty(
-      state.forest.enneaTree,
+      state.context.forest.enneaTree,
       selection.top + selection.dy,
       selection.left + selection.dx,
       selection.right + selection.dx,

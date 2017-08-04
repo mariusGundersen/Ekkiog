@@ -9,10 +9,12 @@ export interface SimulationState {
   readonly tickInterval : number
 }
 
-export default function view(state : SimulationState = {
+const initialState : SimulationState = {
   tickCount: 0,
   tickInterval: 2**8
-}, action : Action) : SimulationState {
+};
+
+export default function view(state = initialState, action : Action) : SimulationState {
   switch(action.type){
     case 'setTickInterval':
       return {
