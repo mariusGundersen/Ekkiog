@@ -57,7 +57,12 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
-    "@types/js-git": "^0.5.28",
+    "@es-git/cache-objects-mixin": "0.0.2",
+    "@es-git/core": "0.0.1",
+    "@es-git/idb-repo": "0.0.1",
+    "@es-git/load-as-mixin": "0.0.4",
+    "@es-git/object-mixin": "0.0.5",
+    "@es-git/save-as-mixin": "0.0.5",
     "babel-runtime": "^6.11.6",
     "base64-arraybuffer": "^0.1.5",
     "buddy-tree": "^2.1.1",
@@ -68,7 +73,6 @@
     "gl-matrix": "^2.3.2",
     "gl-shader": "^4.2.0",
     "idb": "~2.0.3",
-    "js-git": "^0.7.8",
     "morgan": "^1.7.0",
     "ndarray": "^1.0.18",
     "react": "^15.3.0",

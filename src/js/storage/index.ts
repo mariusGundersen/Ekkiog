@@ -9,7 +9,7 @@ import {
   CompiledComponent
 } from 'ekkiog-editing';
 
-import { commit, checkout } from './repo';
+import createRepo, { IRepo } from './repo';
 
 import upgradeFrom0 from './upgrade/from0';
 import upgradeFrom5 from './upgrade/from5';
