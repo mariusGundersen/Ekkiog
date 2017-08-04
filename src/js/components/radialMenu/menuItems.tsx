@@ -45,14 +45,14 @@ export function lightMenuItem(selectedTool : Tool, dispatch : Dispatch<State>){
 }
 
 export function removeMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(saveAfter(removeTileAt(tx, ty))))));
+  return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(saveAfter(removeTileAt(tx, ty), 'Removed item'))));
 }
 
 export function toUnderpassMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(saveAfter(toUnderpass(tx, ty))))));
+  return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(hideContextMenuAfter(saveAfter(toUnderpass(tx, ty), 'Converted wire to underpass'))));
 }
 export function toWireMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('toWire', <IconWire />, () => dispatch(hideContextMenuAfter(dispatch => dispatch(saveAfter(toWire(tx, ty))))));
+  return menuItem('toWire', <IconWire />, () => dispatch(hideContextMenuAfter(saveAfter(toWire(tx, ty), 'Converted underpass to wire'))));
 }
 
 export function acceptMenuItem(dispatch : Dispatch<State>){

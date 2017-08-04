@@ -394,7 +394,7 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) => 
         x: selection.x + selection.dx,
         y: selection.y + selection.dy
       }));
-      dispatch(save());
+      dispatch(save(`Inserted ${componentPackage.name}`));
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
     },
@@ -416,7 +416,7 @@ export const insertComponentPackages = (componentPackage : CompiledComponent, po
 
   const insertIntoNextPosition = (position : IteratorResult<{x : number, y : number}>) => {
     if(position.done) {
-      dispatch(save());
+      dispatch(save(`Updated ${componentPackage.name}`));
       return;
     }
 
@@ -471,7 +471,7 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
         x: selection.x + selection.dx,
         y: selection.y + selection.dy
       }));
-      dispatch(save());
+      dispatch(save(`Moved ${item.data.type}`));
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
     },
@@ -484,17 +484,17 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
   ));
 };
 
-export const save = () => async (dispatch : Dispatch<State>, getState : () => State) => {
+export const save = (message : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
   const {forest, name} = getState().context;
   await storage.save(name, forest);
 };
 
-export const saveAfter = (action : Action) => async (dispatch : Dispatch<State>, getState : () => State) => {
+export const saveAfter = (action : Action, mesage : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
   const oldForest = getState().context.forest;
   dispatch(action);
-  const {forest, name} = getState().context;
-  if(oldForest !== forest){
-    await storage.save(name, forest);
+  const newForest = getState().context.forest;
+  if(oldForest !== newForest){
+    await dispatch(save(mesage));
   }
 };
 
@@ -511,7 +511,7 @@ export const insertMovableItem = (tool : Tool, direction : Direction, tx : numbe
         x: selection.x + selection.dx,
         y: selection.y + selection.dy
       }));
-      dispatch(save());
+      dispatch(save(`Inserted ${tool}`));
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
     },

@@ -38,7 +38,6 @@ import {
   popContext,
   insertComponentPackages,
   insertMovableItem,
-  saveAfter,
   save
 } from './actions';
 import { State } from './reduce';
@@ -102,10 +101,10 @@ export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
             if(forest === mutatedForest){
               dispatch(insertMovableItem(selectedTool, toolDirection, tx, ty));
             }else{
-              dispatch(save());
+              dispatch(save(`Inserted ${selectedTool}`));
             }
           }else{
-            dispatch(save());
+            dispatch(save(`Inserted ${selectedTool}`));
           }
         }
       });
@@ -123,11 +122,13 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
           const component = packageComponent(context.forest, context.name);
           dispatch(popContext());
           const {forest, didntFit} = replaceComponents(previousContext.forest, component);
-          dispatch(setForest(forest));
+          if(previousContext.forest !== forest){
+            dispatch(setForest(forest));
+          }
           if(didntFit.length > 0){
             dispatch(insertComponentPackages(component, getIterableIterator(didntFit)));
-          }else{
-            dispatch(save());
+          }else if(previousContext.forest !== forest){
+            dispatch(save(`Updated ${component.name}`));
           }
         }
       }else{
