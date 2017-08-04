@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "customize": "vscode.npm.run tsc",
+      "taskName": "npm: run tsc -w",
+      "problemMatcher": ["$tsc-watch"]
+    }
+  ]
+}
