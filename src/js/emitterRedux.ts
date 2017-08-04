@@ -26,7 +26,6 @@ import {
 } from 'react-redux';
 
 import {
-  Action,
   tapTile,
   loadContextMenu,
   abortLoadContextMenu,
