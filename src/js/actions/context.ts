@@ -35,7 +35,23 @@ export const popContext = () : PopContextAction => ({
   type: 'pop-context'
 });
 
+export type UndoAction = {
+  readonly type : 'undo-context'
+}
+export const undo = () : UndoAction => ({
+  type: 'undo-context'
+});
+
+export type RedoAction = {
+  readonly type : 'redo-context'
+}
+export const redo = () : RedoAction => ({
+  type: 'redo-context'
+});
+
 export type ContextActions =
   NewContextAction |
   PushContextAction |
-  PopContextAction;
+  PopContextAction |
+  UndoAction |
+  RedoAction;

@@ -11,11 +11,19 @@ export interface ContextState {
   readonly previous? : PushedContextState
   readonly forest : Forest
   readonly boundingBox : Box
+  readonly done? : Link<Forest>
+  readonly undone? : Link<Forest>
 }
 
 export interface PushedContextState extends ContextState {
   readonly centerX : number
   readonly centerY : number
+}
+
+export interface Link<T> {
+  readonly next? : Link<T>
+  readonly value : T
+  readonly count : number
 }
 
 const initialState : ContextState = {
@@ -46,6 +54,28 @@ export default function context(state = initialState, action: Action) : ContextS
       };
     case 'pop-context':
       return state.previous || initialState;
+    case 'undo-context':
+      return !state.done ? state : {
+        ...state,
+        forest: state.done.value,
+        done: state.done.next,
+        undone: {
+          value: state.forest,
+          next: state.undone,
+          count: state.undone ? state.undone.count+1 : 1
+        }
+      };
+    case 'redo-context':
+      return !state.undone ? state : {
+        ...state,
+        forest: state.undone.value,
+        undone: state.undone.next,
+        done: {
+          value: state.forest,
+          next: state.done,
+          count: state.done ? state.done.count+1 : 1
+        }
+      };
     default:
       return combine(state, action, state.forest, forest);
   }
@@ -58,5 +88,19 @@ function combine(
   reducer : (forest : Forest, action : Action) => Forest)
    : ContextState {
   const next = reducer(current, action);
-  return next === current ? state : {...state, forest: next};
+
+  if(next === current) {
+    return state;
+  }
+
+  return {
+    ...state,
+    forest: next,
+    undone: undefined,
+    done: {
+      next: state.done,
+      value: current,
+      count: state.done ? state.done.count+1 : 1
+    }
+  };
 }

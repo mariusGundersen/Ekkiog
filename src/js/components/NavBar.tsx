@@ -21,7 +21,7 @@ import SearchBar from './SearchBar';
 
 import style from './navbar.scss';
 
-import { insertComponentPackage, loadForest, setTickInterval } from '../actions';
+import { insertComponentPackage, loadForest, setTickInterval, undo, redo } from '../actions';
 import { State } from '../reduce';
 import { NamedForest } from '../storage';
 
@@ -31,6 +31,8 @@ export interface Props {
   readonly tickCount : number;
   readonly tickInterval : number;
   readonly gateCount : number;
+  readonly undoCount : number;
+  readonly redoCount : number;
 }
 
 const result = reax({
@@ -116,7 +118,11 @@ const result = reax({
     : values.state == 'simulation' ?
       <SimulationMenu
         tickInterval={props.tickInterval}
-        setTickInterval={x => props.dispatch(setTickInterval(x))}/>
+        undoCount={props.undoCount}
+        redoCount={props.redoCount}
+        setTickInterval={x => props.dispatch(setTickInterval(x))}
+        undo={() => props.dispatch(undo())}
+        redo={() => props.dispatch(redo())}/>
     : values.state == 'main' ?
       <MainMenu />
     : null }
@@ -133,7 +139,9 @@ export default connect((state : State) => ({
   currentComponentName: state.context.name,
   tickCount: state.simulation.tickCount,
   tickInterval: state.simulation.tickInterval,
-  gateCount: (state.context.forest.buddyTree.usedSize||2) - 2
+  gateCount: (state.context.forest.buddyTree.usedSize||2) - 2,
+  undoCount: state.context.done && state.context.done.count || 0,
+  redoCount: state.context.undone && state.context.undone.count || 0
 }))(result);
 
 export function ifElse<T>(observable : Observable<T>, fallback : T){

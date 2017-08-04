@@ -2,25 +2,34 @@ import * as React from 'react';
 import MdPlayArrow from 'react-icons/md/play-arrow';
 import MdPause from 'react-icons/md/pause';
 import MdSkipNext from 'react-icons/md/skip-next';
-import { MdLooksOne } from 'react-icons/md';
 import MdSlow from 'react-icons/md/skip-next';
 import MdMedium from 'react-icons/md/play-arrow';
 import MdFast from 'react-icons/md/fast-forward';
+import MdUndo from 'react-icons/md/undo';
+import MdRedo from 'react-icons/md/redo';
 
 import pure from './pure';
 
 import style from './simulationMenu.scss';
 
 export interface Props {
-  readonly tickInterval : number;
-  readonly setTickInterval : (tickInterval : number) => void;
+  readonly tickInterval : number
+  readonly undoCount : number
+  readonly redoCount : number
+  setTickInterval(tickInterval : number) : void
+  undo() : void
+  redo() : void
 }
 
 export default pure(
-  (prev, next) => prev.tickInterval != next.tickInterval,
+  (prev, next) => prev.tickInterval != next.tickInterval
+               || prev.undoCount != next.undoCount
+               || prev.redoCount != next.redoCount,
   (props : Props) => (
   <div
     className={style.simulationMenu}>
+      <button className={props.undoCount > 0 ? style.selected : ''} onClick={props.undo}><MdUndo /></button>
+      <button className={props.redoCount > 0 ? style.selected : ''} onClick={props.redo}><MdRedo /></button>
       <div className={style.flexFill} />
       <button className={props.tickInterval == Infinity ? style.selected : ''} onClick={() => props.setTickInterval(Infinity)}><MdPause /></button>
       <button className={props.tickInterval == 2**11 ? style.selected : ''} onClick={() => props.setTickInterval(2**11)}><MdSlow /></button>
