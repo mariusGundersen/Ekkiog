@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
+import { connect, DispatchProp } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Forest, Box } from 'ekkiog-editing';
 import { EventEmitter } from 'events';
@@ -13,7 +13,7 @@ import {
 } from '../actions';
 import { State } from '../reduce';
 import { SelectionState } from '../reducers/selection';
-import { PushedContextState } from '../reducers/context';
+import { ContextState, PushedContextState } from '../reducers/context';
 import {
   TOUCH_START,
   TOUCH_MOVE,
@@ -32,31 +32,26 @@ import { ContextMenuState } from '../reducers/contextMenu';
 import ease, { Step, easeOut } from '../utils/ease';
 
 export interface Props{
-  readonly dispatch : Dispatch<State>,
   readonly tickInterval : number,
   readonly width : number,
   readonly height : number,
-  readonly forest : Forest,
   readonly selection : SelectionState,
   readonly contextMenu : ContextMenuState,
-  readonly name : string,
-  readonly boundingBox : Box
-  readonly previous : PushedContextState
+  readonly currentContext : ContextState,
+  readonly previousContext? : PushedContextState
 }
 
 const WebGLCanvas = connect(
-  ({view, context, selection, contextMenu, simulation} : State) => ({
-    forest: context.forest,
+  ({view, context, selection, contextMenu, simulation} : State) : Props => ({
     selection,
     width: view.pixelWidth,
     height: view.pixelHeight,
     contextMenu,
-    name: context.name,
-    boundingBox: context.boundingBox,
-    previous: context.previous,
+    currentContext: context,
+    previousContext: context.previous,
     tickInterval: simulation.tickInterval
   })
-)(class WebGLCanvas extends React.Component<Props, any> {
+)(class WebGLCanvas extends React.Component<Props & DispatchProp<State>, any> {
   private canvas : HTMLCanvasElement | null;
   private engine : Engine;
   private perspective : Perspective;
@@ -134,9 +129,13 @@ const WebGLCanvas = connect(
   }
 
   componentWillReceiveProps(nextProps : Props){
+    const previousContext = this.props.previousContext;
+    const currentContext = this.props.currentContext;
+    const nextContext = nextProps.currentContext;
+
     this.shellConfig.setTickInterval(nextProps.tickInterval);
 
-    forestHandler(this.props.forest, nextProps.forest, this.engine);
+    forestHandler(currentContext.forest, nextContext.forest, this.engine);
     moveHandler(this.props.selection, nextProps.selection, this.engine);
 
     if(nextProps.selection.selection){
@@ -161,17 +160,17 @@ const WebGLCanvas = connect(
       }
     }
 
-    if(nextProps.boundingBox !== this.props.boundingBox){
-      if(this.props.previous && this.props.previous.name === nextProps.name){
-        const from = scaleBox(nextProps.boundingBox, 0.5, this.props.previous.centerX, this.props.previous.centerY);
+    if(nextContext.boundingBox !== currentContext.boundingBox){
+      if(previousContext && previousContext.name === nextContext.name){
+        const from = scaleBox(nextContext.boundingBox, 0.5, previousContext.centerX, previousContext.centerY);
         this.perspective.reset(from);
-        this.ease = ease(boxToArray(from), boxToArray(nextProps.boundingBox), easeOut, 200);
-      }else if(nextProps.previous === undefined){
-        this.perspective.reset(nextProps.boundingBox);
-      }else if(nextProps.previous.name === this.props.name){
-        const from = scaleBox(nextProps.boundingBox, 1.5);
+        this.ease = ease(boxToArray(from), boxToArray(nextContext.boundingBox), easeOut, 200);
+      }else if(nextProps.previousContext === undefined){
+        this.perspective.reset(nextContext.boundingBox);
+      }else if(nextProps.previousContext.name === currentContext.name){
+        const from = scaleBox(nextContext.boundingBox, 1.5);
         this.perspective.reset(from);
-        this.ease = ease(boxToArray(from), boxToArray(nextProps.boundingBox), easeOut, 200);
+        this.ease = ease(boxToArray(from), boxToArray(nextContext.boundingBox), easeOut, 200);
       }
     }
   }
