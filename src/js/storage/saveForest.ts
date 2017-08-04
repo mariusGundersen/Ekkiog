@@ -7,6 +7,7 @@ import { ISaveAsRepo } from '@es-git/save-as-mixin';
 
 export interface ISaveForestRepo {
   commit(branch : string, author : Person, forest : Forest, message : string) : Promise<string>
+  create(branch : string, author : Person, forest : Forest, message : string) : Promise<string>
 }
 
 type EnneaLeaf = BoxedData<Item>;
@@ -22,6 +23,14 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
     async commit(branch : string, person : {name : string, email : string}, forest : Forest, message : string){
       const parentHash = await super.getRef(branch);
       if(!parentHash) throw new Error('could not load parent hash');
+      return this.saveAndCommit(branch, person, forest, message, [parentHash]);
+    }
+
+    async create(branch : string, person : {name : string, email : string}, forest : Forest, message : string){
+      return this.saveAndCommit(branch, person, forest, message, []);
+    }
+
+    async saveAndCommit(branch : string, person : {name : string, email : string}, forest : Forest, message : string, parents : Hash[]){
       const tree = await this.saveForest(forest);
 
       const author : Person = {
@@ -35,7 +44,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
         committer: author,
         message,
         tree: tree.hash,
-        parents: [parentHash]
+        parents
       });
       await super.setRef(branch, hash);
       return hash;

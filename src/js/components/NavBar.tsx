@@ -23,7 +23,6 @@ import style from './navbar.scss';
 
 import { insertComponentPackage, loadForest, setTickInterval, undo, redo } from '../actions';
 import { State } from '../reduce';
-import { NamedForest } from '../storage';
 
 export interface Props {
   readonly dispatch : Dispatch<State>;

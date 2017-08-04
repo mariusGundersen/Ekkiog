@@ -23,7 +23,7 @@ import SearchResultView, { NoExactMatchView, SearchResult, RECENT, POPUPLAR, FAV
 
 import style from './search.scss';
 
-import storage, { Storage, NamedForest } from '../storage';
+import storage from '../storage';
 
 export interface Props {
   query : string,

@@ -161,7 +161,7 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
 
 export const save = (message : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
   const {forest, name} = getState().context;
-  await storage.save(name, forest);
+  await storage.save(name, forest, message);
 };
 
 export const saveAfter = (action : Action, mesage : string) => async (dispatch : Dispatch<State>, getState : () => State) => {

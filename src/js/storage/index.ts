@@ -34,10 +34,6 @@ const db = idb.open('ekkiog', 10, db => {
   }
 });
 
-export interface NamedForest extends Forest {
-  name : string
-};
-
 export interface ComponentMetadata {
   readonly name : string
   readonly usedAt : Date
@@ -47,13 +43,15 @@ export interface ComponentMetadata {
 
 export class Storage{
   private readonly db : Promise<DB>;
+  private readonly repo : Promise<IRepo>;
   constructor(db : Promise<DB>){
     this.db = db;
+    this.repo = createRepo();
   }
 
-  async save(name : string, forest : Forest){
-    await commit(name, {name: 'marius', email: 'gundersen@gmail.com'}, forest, 'test commit, please ignore');
-    await checkout(name);
+  async save(name : string, forest : Forest, message : string){
+    const repo = await this.repo;
+    await repo.save(name, forest, message);
     const db = await this.db;
     const transaction = db.transaction([
       'components',
@@ -111,7 +109,7 @@ export class Storage{
     await Promise.all(json.componentMetadata.map(componentMetadata => componentMetadataStore.put(componentMetadata)));
   }
 
-  async load(name : string) : Promise<NamedForest>{
+  async load(name : string) : Promise<Forest>{
     const db = await this.db;
     const transaction = db.transaction([
       'components',
@@ -126,23 +124,13 @@ export class Storage{
         usedAt: new Date(),
         favorite: (metadata && metadata.favorite === 'true') ? 'true' : 'false'
       });
-    return await transaction
-      .objectStore('components')
-      .get(name)
-      .then(
-        x => ({
-          name,
-          ...(x as Forest || createForest())
-        }),
-        x => ({
-          name,
-          ...createForest()
-        }));
+    const repo = await this.repo;
+    return await repo.load(name);
   }
 
   async loadPackage(name : string) : Promise<CompiledComponent>{
     const namedForest = await this.load(name)
-    return packageComponent(namedForest, namedForest.name);
+    return packageComponent(namedForest, name);
   }
 
   getRecent() : Observable<string> {
