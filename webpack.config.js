@@ -42,11 +42,14 @@ const postCssLoader = {
 };
 
 module.exports = {
-  entry: './src/js/index.ts',
+  entry: {
+    bundle: './src/js/index.ts',
+    git: './src/js/git.ts'
+  },
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: '[name].js'
   },
   devServer: {
     host: '0.0.0.0',
