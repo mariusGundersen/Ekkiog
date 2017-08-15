@@ -8,7 +8,9 @@ const morgan = require('koa-morgan');
 const route = require('koa-route');
 const mount = require('koa-mount');
 const Grant = require('grant-koa');
-const request = require('request-promise');
+const webpack = require('koa-webpack');
+const request = require('request');
+const requestAsync = require('request-promise');
 const purest = require('purest')({request, promise: Promise});
 const providers = require('@purest/providers');
 const config = require('./config/secrets.json');
@@ -27,6 +29,7 @@ const githubApi = purest({
   }
 }});
 
+app.use(webpack());
 app.use(favicon('./dist/favicon.ico'));
 app.use(morgan('short'));
 app.use(static('./dist'));
@@ -59,7 +62,7 @@ app.use(route.get('/github/callback', async (ctx, next) => {
 
 app.use(route.get('/git/:server/:user/:repo/info/refs', async (ctx, ...[server, user, repo]) => {
   const service = ctx.query['service'];
-  ctx.body = await request(`https://${server}/${user}/${repo}/info/refs?service=${service}`, {
+  ctx.body = await requestAsync(`https://${server}/${user}/${repo}/info/refs?service=${service}`, {
     ...authorization(server, user, ctx.session)
   });
 }));
@@ -68,19 +71,33 @@ app.use(route.post('/git/:server/:user/:repo/:service', async (ctx, ...[server, 
   if(service === 'git-receive-pack'){
     if(ctx.session.server !== server
     || ctx.session.user !== user){
-      return ctx.redirect(`/connect/${server}`);
+      ctx.status = 403;
+      return;
     }
   }
 
-  request(`https://${server}/${user}/${repo}/${service}`, {
-    method: 'PSOT',
+  ctx.body = request(`https://${server}/${user}/${repo}/${service}`, {
+    method: 'POST',
     body: ctx.req,
     headers: {
       'Content-Type': `application/x-${service}-request`,
-      'Accept': `application/x-${service}-result`
+      'Accept': `application/x-${service}-result`,
+      'User-Agent': 'Ekkiog'
     },
     ...authorization(server, user, ctx.session)
   })
+}));
+
+app.use(route.get('/debug', ctx => {
+  ctx.body = ctx.session;
+}));
+
+app.use(route.get('/git', ctx => {
+  ctx.body = `<!doctype html>
+  <html>
+    <script src="/git.js"></script>
+    <h2>git test</h2>
+  </html>`
 }));
 
 app.listen(PORT);
