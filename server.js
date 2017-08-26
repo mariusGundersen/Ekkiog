@@ -1,5 +1,5 @@
 const PORT = process.env.PORT || 8080;
-
+require('babel-polyfill');
 const Koa = require('koa');
 const favicon = require('koa-favicon');
 const session = require('koa-session');
@@ -10,7 +10,8 @@ const mount = require('koa-mount');
 const Grant = require('grant-koa');
 const webpack = require('koa-webpack');
 const request = require('request');
-const requestAsync = require('request-promise');
+const proxy = require('@es-git/node-git-proxy').default;
+
 const purest = require('purest')({request, promise: Promise});
 const providers = require('@purest/providers');
 const config = require('./config/secrets.json');
@@ -50,42 +51,22 @@ app.use(route.get('/github/callback', async (ctx, next) => {
     return ctx.redirect('/connect/github');
   }
 
-  ctx.session = {
+  const session = {
     provider: "github",
     server: "github.com",
     user: user.login,
     access_token: ctx.session.grant.response.access_token
   };
 
-  return ctx.redirect('/');
-}));
+  ctx.session = null;
 
-app.use(route.get('/git/:server/:user/:repo/info/refs', async (ctx, ...[server, user, repo]) => {
-  const service = ctx.query['service'];
-  ctx.body = await requestAsync(`https://${server}/${user}/${repo}/info/refs?service=${service}`, {
-    ...authorization(server, user, ctx.session)
-  });
-}));
-
-app.use(route.post('/git/:server/:user/:repo/:service', async (ctx, ...[server, user, repo, service]) => {
-  if(service === 'git-receive-pack'){
-    if(ctx.session.server !== server
-    || ctx.session.user !== user){
-      ctx.status = 403;
-      return;
-    }
-  }
-
-  ctx.body = request(`https://${server}/${user}/${repo}/${service}`, {
-    method: 'POST',
-    body: ctx.req,
-    headers: {
-      'Content-Type': `application/x-${service}-request`,
-      'Accept': `application/x-${service}-result`,
-      'User-Agent': 'Ekkiog'
-    },
-    ...authorization(server, user, ctx.session)
-  })
+  ctx.body = `<!doctype html>
+  <html>
+    <script>
+      localStorage.setItem('session', '${JSON.stringify(session)}');
+      document.location = '/git';
+    </script>
+  </html>`
 }));
 
 app.use(route.get('/debug', ctx => {
@@ -97,23 +78,15 @@ app.use(route.get('/git', ctx => {
   <html>
     <script src="/git.js"></script>
     <h2>git test</h2>
+    <a href="/connect/github">Github</a>
   </html>`
 }));
+
+app.use(mount('/git', ctx => proxy(ctx.req, ctx.res)));
 
 app.listen(PORT);
 
 console.log(`server started on localhost:${PORT}`);
-
-function authorization(server, user, session){
-  if(session.server !== server) return {};
-  if(session.user !== user) return {};
-  return {
-    auth: {
-      user,
-      password: session.access_token
-    }
-  };
-}
 
 function sessionConfig(){
   return {
