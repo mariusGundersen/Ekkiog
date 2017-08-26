@@ -7,7 +7,6 @@ import '../css/main.css';
 import '../manifest.json';
 
 import offline from './offline';
-import storage from './storage';
 import reduce, { State } from './reduce';
 import { loadForest } from './actions';
 

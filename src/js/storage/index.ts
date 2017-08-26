@@ -9,12 +9,19 @@ import {
   CompiledComponent
 } from 'ekkiog-editing';
 
-import { IRepo, Repo } from './repo';
+import Repo, { IRepo } from './repo';
 
 import upgradeFrom10 from './upgrade/from10';
 import upgradeFrom7 from './upgrade/from7';
 
-const db = idb.open('ekkiog', 11, db => {
+export interface ComponentMetadata {
+  readonly name : string
+  readonly usedAt : Date
+  readonly useCount : number
+  readonly favorite : boolean
+}
+
+const _db = idb.open('ekkiog', 11, db => {
   switch(db.oldVersion){
     case 0:
     case 1:
@@ -32,131 +39,113 @@ const db = idb.open('ekkiog', 11, db => {
   }
 });
 
-export interface ComponentMetadata {
-  readonly name : string
-  readonly usedAt : Date
-  readonly useCount : number
-  readonly favorite : boolean
-}
+const _repo = _db.then(db => new Repo({}, db));
+export const user : OauthData | null = JSON.parse(localStorage.getItem('ekkiog-user') || 'null') as OauthData | null;
 
-export class Storage{
-  private readonly db : Promise<DB>;
-  private readonly repo : Promise<IRepo>;
-  constructor(db : Promise<DB>){
-    this.db = db;
-    this.repo = db.then(db => new Repo({}, db));
-  }
+export async function save(name : string, forest : Forest, message : string){
+  const repo = await _repo;
+  await repo.save(name, forest, message, user);
+  const db = await _db;
+  const transaction = db.transaction([
+    'componentMetadata'
+  ], 'readwrite');
 
-  async save(name : string, forest : Forest, message : string){
-    const repo = await this.repo;
-    await repo.save(name, forest, message);
-    const db = await this.db;
-    const transaction = db.transaction([
-      'componentMetadata'
-    ], 'readwrite');
-
-    const metadataStore = transaction.objectStore('componentMetadata');
-    const metadata = await metadataStore.get(name);
-    if(metadata == undefined){
-      await metadataStore
-        .put({
-          name,
-          useCount: 1,
-          usedAt: new Date(),
-          favorite: 'false'
-        });
-    }
-  }
-
-  async load(name : string) : Promise<Forest>{
-    const db = await this.db;
-    const transaction = db.transaction([
-      'componentMetadata',
-    ], 'readwrite');
-    const metadataStore = transaction.objectStore('componentMetadata');
-    const metadata = await metadataStore.get(name);
+  const metadataStore = transaction.objectStore('componentMetadata');
+  const metadata = await metadataStore.get(name);
+  if(metadata == undefined){
     await metadataStore
       .put({
         name,
-        useCount: metadata ? (metadata.useCount||0)+1 : 1,
+        useCount: 1,
         usedAt: new Date(),
-        favorite: (metadata && metadata.favorite === 'true') ? 'true' : 'false'
+        favorite: 'false'
       });
-    const repo = await this.repo;
-    return await repo.load(name);
-  }
-
-  async loadPackage(name : string) : Promise<CompiledComponent>{
-    const forest = await this.load(name)
-    return packageComponent(forest, name);
-  }
-
-  getRecent() : Observable<string> {
-    return cursorToObservable<string>(
-      this.db,
-      db => db.transaction('componentMetadata'),
-      (tx, callback) => {
-        const store = tx.objectStore('componentMetadata');
-        const index = store.index('usedAt');
-        const range = IDBKeyRange.upperBound(new Date(2100, 1));
-        index.iterateCursor(range, 'prev', callback);
-      },
-      cursor => cursor.value.name as string);
-  }
-
-  getPopular() : Observable<string> {
-    return cursorToObservable<string>(
-      this.db,
-      db => db.transaction('componentMetadata'),
-      (tx, callback) => {
-        const store = tx.objectStore('componentMetadata');
-        const index = store.index('useCount');
-        const range = IDBKeyRange.upperBound(Number.MAX_SAFE_INTEGER);
-        index.iterateCursor(range, 'prev', callback);
-      },
-      cursor => cursor.value.name as string);
-  }
-
-  getFavorite() : Observable<string> {
-    return cursorToObservable<string>(
-      this.db,
-      db => db.transaction('componentMetadata'),
-      (tx, callback) => {
-        const store = tx.objectStore('componentMetadata');
-        const index = store.index('favorite');
-        const range = IDBKeyRange.only('true');
-        index.iterateCursor(range, 'prev', callback);
-      },
-      cursor => cursor.value.name as string);
-  }
-
-  async toggleFavorite(name : string) {
-    const db = await this.db;
-    const tx = db.transaction('componentMetadata', 'readwrite');
-    const store = tx.objectStore('componentMetadata');
-    const metadata = await store.get(name);
-    await store.put({
-      ...metadata,
-      favorite: (metadata && metadata.favorite === 'true') ? 'false' : 'true'
-    });
-  }
-
-  getComponentNames() : Observable<ComponentMetadata> {
-    return cursorToObservable<ComponentMetadata>(
-      this.db,
-      db => db.transaction('componentMetadata'),
-      (tx, callback) => tx.objectStore('componentMetadata').iterateCursor(callback),
-      cursor => ({
-        ...cursor.value,
-        favorite: cursor.value.favorite === 'true'
-      }));
   }
 }
 
-const singleton = new Storage(db);
-export default singleton;
+export async function load(name : string) : Promise<Forest>{
+  const db = await _db;
+  const transaction = db.transaction([
+    'componentMetadata',
+  ], 'readwrite');
+  const metadataStore = transaction.objectStore('componentMetadata');
+  const metadata = await metadataStore.get(name);
+  await metadataStore
+    .put({
+      name,
+      useCount: metadata ? (metadata.useCount||0)+1 : 1,
+      usedAt: new Date(),
+      favorite: (metadata && metadata.favorite === 'true') ? 'true' : 'false'
+    });
+  const repo = await _repo;
+  return await repo.load(name);
+}
 
-window.debugStorage = singleton;
+export async function loadPackage(name : string) : Promise<CompiledComponent>{
+  const forest = await load(name)
+  return packageComponent(forest, name);
+}
+
+export function getRecent() : Observable<string> {
+  return cursorToObservable<string>(
+    _db,
+    db => db.transaction('componentMetadata'),
+    (tx, callback) => {
+      const store = tx.objectStore('componentMetadata');
+      const index = store.index('usedAt');
+      const range = IDBKeyRange.upperBound(new Date(2100, 1));
+      index.iterateCursor(range, 'prev', callback);
+    },
+    cursor => cursor.value.name as string);
+}
+
+export function getPopular() : Observable<string> {
+  return cursorToObservable<string>(
+    _db,
+    db => db.transaction('componentMetadata'),
+    (tx, callback) => {
+      const store = tx.objectStore('componentMetadata');
+      const index = store.index('useCount');
+      const range = IDBKeyRange.upperBound(Number.MAX_SAFE_INTEGER);
+      index.iterateCursor(range, 'prev', callback);
+    },
+    cursor => cursor.value.name as string);
+}
+
+export function getFavorite() : Observable<string> {
+  return cursorToObservable<string>(
+    _db,
+    db => db.transaction('componentMetadata'),
+    (tx, callback) => {
+      const store = tx.objectStore('componentMetadata');
+      const index = store.index('favorite');
+      const range = IDBKeyRange.only('true');
+      index.iterateCursor(range, 'prev', callback);
+    },
+    cursor => cursor.value.name as string);
+}
+
+export async function toggleFavorite(name : string) {
+  const db = await _db;
+  const tx = db.transaction('componentMetadata', 'readwrite');
+  const store = tx.objectStore('componentMetadata');
+  const metadata = await store.get(name);
+  await store.put({
+    ...metadata,
+    favorite: (metadata && metadata.favorite === 'true') ? 'false' : 'true'
+  });
+}
+
+export function getComponentNames() : Observable<ComponentMetadata> {
+  return cursorToObservable<ComponentMetadata>(
+    _db,
+    db => db.transaction('componentMetadata'),
+    (tx, callback) => tx.objectStore('componentMetadata').iterateCursor(callback),
+    cursor => ({
+      ...cursor.value,
+      favorite: cursor.value.favorite === 'true'
+    }));
+}
 
 function cursorToObservable<T>(
   db : Promise<DB>,

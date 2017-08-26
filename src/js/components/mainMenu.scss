@@ -19,6 +19,19 @@
     text-align: left;
   }
 
+  & .item {
+    padding: 0.25em 0;
+    color: white;
+    text-decoration: none;
+    display: flex;
+  }
+
+  & .photo {
+    vertical-align: middle;
+    height: 1em;
+    padding-right: 0.25em;
+  }
+
   & .version {
     font-size: 10px;
   }

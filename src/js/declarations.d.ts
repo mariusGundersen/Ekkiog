@@ -109,9 +109,20 @@ declare module "offline-plugin/runtime" {
 }
 
 interface Window {
-  __REDUX_DEVTOOLS_EXTENSION_COMPOSE__<R>(a: R) : R,
+  __REDUX_DEVTOOLS_EXTENSION_COMPOSE__? : <R>(a: R) => R,
+  __OAUTH_DATA__? : OauthData,
   debugStorage : any
 }
 
 declare const __BuildDate__ : string;
 declare let debugStorage : any;
+
+declare interface OauthData {
+  provider : string,
+  server : string,
+  username : string,
+  photo : string,
+  name : string,
+  email : string,
+  access_token : string
+}

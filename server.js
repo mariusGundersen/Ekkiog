@@ -8,7 +8,6 @@ const morgan = require('koa-morgan');
 const route = require('koa-route');
 const mount = require('koa-mount');
 const Grant = require('grant-koa');
-const webpack = require('koa-webpack');
 const request = require('request');
 const proxy = require('@es-git/node-git-proxy').default;
 
@@ -30,7 +29,10 @@ const githubApi = purest({
   }
 }});
 
-app.use(webpack());
+if(process.env.NODE_ENV !== 'production'){
+  app.use(require('koa-webpack')());
+}
+
 app.use(favicon('./dist/favicon.ico'));
 app.use(morgan('short'));
 app.use(static('./dist'));
@@ -51,10 +53,13 @@ app.use(route.get('/github/callback', async (ctx, next) => {
     return ctx.redirect('/connect/github');
   }
 
-  const session = {
+  const data = {
     provider: "github",
     server: "github.com",
-    user: user.login,
+    username: user.login,
+    photo: user.avatar_url,
+    name: user.name,
+    email: user.email,
     access_token: ctx.session.grant.response.access_token
   };
 
@@ -63,8 +68,8 @@ app.use(route.get('/github/callback', async (ctx, next) => {
   ctx.body = `<!doctype html>
   <html>
     <script>
-      localStorage.setItem('session', '${JSON.stringify(session)}');
-      document.location = '/git';
+      localStorage.setItem('ekkiog-user', '${JSON.stringify(data).replace(/</g, '\\u003c')}');
+      document.location = '/';
     </script>
   </html>`
 }));

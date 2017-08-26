@@ -43,8 +43,7 @@ const postCssLoader = {
 
 module.exports = {
   entry: {
-    bundle: './src/js/index.ts',
-    git: './src/js/git.ts'
+    bundle: './src/js/index.ts'
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -67,7 +66,7 @@ module.exports = {
       '__BuildDate__': JSON.stringify(new Date().toISOString())
     }),
     new webpack.LoaderOptionsPlugin({
-      minimize: !debug,
+      minimize: false,
       debug: debug
     }),
     new OfflinePlugin({
@@ -79,7 +78,7 @@ module.exports = {
     ...(debug ? [
       new DashboardPlugin()
     ] : [
-      new BabiliPlugin()
+      //new BabiliPlugin()
     ])
   ],
   resolve: {

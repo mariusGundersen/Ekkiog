@@ -13,7 +13,7 @@ import { ThunkAction } from 'redux-thunk';
 import { State } from '../reduce';
 import { tap } from '../reducers/forest';
 import copyTo from '../editing/copyTo';
-import storage from '../storage';
+import * as storage from '../storage';
 
 import { ContextActions, newContext } from './context';
 import { ContextMenuActions, hideContextMenu } from './contextMenu';

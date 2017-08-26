@@ -5,9 +5,14 @@ import { Constructor, IRawRepo, Type, Mode, Hash } from '@es-git/core';
 import { IObjectRepo, Person, ModeHash, TreeBody, CommitBody, textToBlob } from '@es-git/object-mixin';
 import { ISaveAsRepo } from '@es-git/save-as-mixin';
 
+
+export interface User {
+  readonly name : string
+  readonly email : string
+};
+
 export interface ISaveForestRepo {
-  commit(branch : string, author : Person, forest : Forest, message : string) : Promise<string>
-  create(branch : string, author : Person, forest : Forest, message : string) : Promise<string>
+  commit(branch : string, author : User, forest : Forest, message : string) : Promise<string>
 }
 
 type EnneaLeaf = BoxedData<Item>;
@@ -20,17 +25,12 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
       this.hashCache = new WeakMap<BuddyNode | EnneaNode | EnneaLeaf[] | EnneaLeaf | Item, Hash>();
     }
 
-    async commit(branch : string, person : {name : string, email : string}, forest : Forest, message : string){
+    async commit(branch : string, person : User, forest : Forest, message : string){
       const parentHash = await super.getRef(branch);
-      if(!parentHash) throw new Error('could not load parent hash');
-      return this.saveAndCommit(branch, person, forest, message, [parentHash]);
+      return this.saveAndCommit(branch, person, forest, message, parentHash ? [parentHash] : []);
     }
 
-    async create(branch : string, person : {name : string, email : string}, forest : Forest, message : string){
-      return this.saveAndCommit(branch, person, forest, message, []);
-    }
-
-    async saveAndCommit(branch : string, person : {name : string, email : string}, forest : Forest, message : string, parents : Hash[]){
+    async saveAndCommit(branch : string, person : User, forest : Forest, message : string, parents : Hash[]){
       const tree = await this.saveForest(forest);
 
       const author : Person = {

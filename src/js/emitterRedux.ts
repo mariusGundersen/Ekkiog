@@ -49,7 +49,7 @@ import {
   MOVE_SELECTION
 } from './events';
 
-import storage from './storage';
+import * as storage from './storage';
 import Engine from './engines/Engine';
 
 type ViewportToTile = (x : number, y : number) => [number, number];

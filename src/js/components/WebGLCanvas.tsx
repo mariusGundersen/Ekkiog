@@ -51,7 +51,7 @@ const WebGLCanvas = connect(
     previousContext: context.previous,
     tickInterval: simulation.tickInterval
   })
-)(class WebGLCanvas extends React.Component<Props & DispatchProp<State>, any> {
+)(class WebGLCanvas extends React.Component<Props & {dispatch : Dispatch<State>}, any> {
   private canvas : HTMLCanvasElement | null;
   private engine : Engine;
   private perspective : Perspective;

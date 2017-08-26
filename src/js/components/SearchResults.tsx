@@ -23,7 +23,7 @@ import SearchResultView, { NoExactMatchView, SearchResult, RECENT, POPUPLAR, FAV
 
 import style from './search.scss';
 
-import storage from '../storage';
+import * as storage from '../storage';
 
 export interface Props {
   query : string,
