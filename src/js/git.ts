@@ -18,7 +18,7 @@ async function run(){
     .with(checkoutMixin)
     .with(pathToObjectMixin)
     .with(fetchMixin, fetch)
-    .with(pushMixin, fetchIt);
+    .with(pushMixin, fetch);
 
   const repo = new Repo();
 
@@ -54,14 +54,16 @@ async function run(){
   const commit = await repo.loadObject(hash) as CommitObject;
   const htmlFile = await repo.loadObjectByPath(commit.body.tree, 'src/git.html');
   console.log(htmlFile);
-  await repo.push('http://localhost:8080/git/github.com/es-git/test-pull.git', 'refs/heads/master');
+  await repo.push('http://localhost:8080/git/github.com/es-git/test-pull.git', 'refs/heads/master', auth());
 }
 
 run();
 
-function fetchIt(url : string, options : {}){
-  return fetch(url, {
-    ...options,
-    credentials: 'include'
-  });
+function auth(){
+  const session = JSON.parse(localStorage.getItem('session') || 'null');
+  if(!session) return undefined;
+  return {
+    username: session.user,
+    password: session.access_token
+  };
 }
