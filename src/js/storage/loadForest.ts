@@ -35,24 +35,24 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
     async loadEnnea(body : TreeBody, size = 128) : Promise<EnneaNode> {
       return {
         size,
-        topLeft: body['topLeft'] ? await this.loadEnnea(await super.loadTree(body['topLeft'].hash), size/2) : undefined,
-        topRight: body['topRight'] ? await this.loadEnnea(await super.loadTree(body['topRight'].hash), size/2) : undefined,
-        bottomLeft: body['bottomLeft'] ? await this.loadEnnea(await super.loadTree(body['bottomLeft'].hash), size/2) : undefined,
-        bottomRight: body['bottomRight'] ? await this.loadEnnea(await super.loadTree(body['bottomRight'].hash), size/2) : undefined,
-        top: body['top'] && body['top'] ? await this.loadList(await super.loadTree(body['top'].hash)) : [],
-        left: body['left'] && body['left'] ? await this.loadList(await super.loadTree(body['left'].hash)) : [],
-        right: body['right'] && body['right'] ? await this.loadList(await super.loadTree(body['right'].hash)) : [],
-        bottom: body['bottom'] && body['bottom'] ? await this.loadList(await super.loadTree(body['bottom'].hash)) : [],
-        center: body['center'] ? JSON.parse(await super.loadText(body['center'].hash)) : undefined,
-        data: body['data'] ? JSON.parse(await super.loadText(body['data'].hash)) : undefined
+        data: body['0'] ? JSON.parse(await super.loadText(body['0'].hash)) : undefined,
+        topLeft: body['1'] ? await this.loadEnnea(await super.loadTree(body['1'].hash), size/2) : undefined,
+        top: body['2'] ? await this.loadList(await super.loadTree(body['2'].hash)) : [],
+        topRight: body['3'] ? await this.loadEnnea(await super.loadTree(body['3'].hash), size/2) : undefined,
+        left: body['4'] ? await this.loadList(await super.loadTree(body['4'].hash)) : [],
+        center: body['5'] ? JSON.parse(await super.loadText(body['5'].hash)) : undefined,
+        right: body['6'] ? await this.loadList(await super.loadTree(body['6'].hash)) : [],
+        bottomLeft: body['7'] ? await this.loadEnnea(await super.loadTree(body['7'].hash), size/2) : undefined,
+        bottom: body['8'] ? await this.loadList(await super.loadTree(body['8'].hash)) : [],
+        bottomRight: body['9'] ? await this.loadEnnea(await super.loadTree(body['9'].hash), size/2) : undefined
       };
     }
 
     async loadBuddy(body : TreeBody) : Promise<BuddyNode> {
       return {
-        ...JSON.parse(await super.loadText(body['node'].hash)),
-        left: body['left'] ? await this.loadBuddy(await super.loadTree(body['left'].hash)) : undefined,
-        right: body['right'] ? await this.loadBuddy(await super.loadTree(body['right'].hash)) : undefined
+        ...JSON.parse(await super.loadText(body['d'].hash)),
+        left: body['l'] ? await this.loadBuddy(await super.loadTree(body['l'].hash)) : undefined,
+        right: body['r'] ? await this.loadBuddy(await super.loadTree(body['r'].hash)) : undefined
       };
     }
 

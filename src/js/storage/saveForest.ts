@@ -63,16 +63,16 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
     async saveEnnea(node : EnneaNode){
       const body = {};
 
-      addTree(body, 'topLeft', node.topLeft ? this.hashCache.get(node.topLeft) || await this.saveEnnea(node.topLeft) : undefined);
-      addTree(body, 'topRight', node.topRight ? this.hashCache.get(node.topRight) || await this.saveEnnea(node.topRight) : undefined);
-      addTree(body, 'bottomLeft', node.bottomLeft ? this.hashCache.get(node.bottomLeft) || await this.saveEnnea(node.bottomLeft) : undefined);
-      addTree(body, 'bottomRight', node.bottomRight ? this.hashCache.get(node.bottomRight) || await this.saveEnnea(node.bottomRight) : undefined);
-      addTree(body, 'top', node.top.length ? this.hashCache.get(node.top) || await this.saveList(node.top) : undefined);
-      addTree(body, 'left', node.left.length ? this.hashCache.get(node.left) || await this.saveList(node.left) : undefined);
-      addTree(body, 'right', node.right.length ? this.hashCache.get(node.right) || await this.saveList(node.right) : undefined);
-      addTree(body, 'bottom', node.bottom.length ? this.hashCache.get(node.bottom) || await this.saveList(node.bottom) : undefined);
-      addBlob(body, 'center', node.center ? this.hashCache.get(node.center) || await this.saveNode(node.center) : undefined);
-      addBlob(body, 'data', node.data ? this.hashCache.get(node.data) || await this.saveData(node.data) : undefined);
+      addBlob(body, '0', node.data ? this.hashCache.get(node.data) || await this.saveData(node.data) : undefined);
+      addTree(body, '1', node.topLeft ? this.hashCache.get(node.topLeft) || await this.saveEnnea(node.topLeft) : undefined);
+      addTree(body, '2', node.top.length ? this.hashCache.get(node.top) || await this.saveList(node.top) : undefined);
+      addTree(body, '3', node.topRight ? this.hashCache.get(node.topRight) || await this.saveEnnea(node.topRight) : undefined);
+      addTree(body, '4', node.left.length ? this.hashCache.get(node.left) || await this.saveList(node.left) : undefined);
+      addBlob(body, '5', node.center ? this.hashCache.get(node.center) || await this.saveNode(node.center) : undefined);
+      addTree(body, '6', node.right.length ? this.hashCache.get(node.right) || await this.saveList(node.right) : undefined);
+      addTree(body, '7', node.bottomLeft ? this.hashCache.get(node.bottomLeft) || await this.saveEnnea(node.bottomLeft) : undefined);
+      addTree(body, '8', node.bottom.length ? this.hashCache.get(node.bottom) || await this.saveList(node.bottom) : undefined);
+      addTree(body, '9', node.bottomRight ? this.hashCache.get(node.bottomRight) || await this.saveEnnea(node.bottomRight) : undefined);
 
       const hash = await super.saveTree(body);
       this.hashCache.set(node, hash);
@@ -82,9 +82,9 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
     async saveBuddy(node : BuddyNode){
       const body = {};
 
-      addTree(body, 'left', node.left ? this.hashCache.get(node.left) || await this.saveBuddy(node.left) : undefined);
-      addTree(body, 'right', node.right ? this.hashCache.get(node.right) || await this.saveBuddy(node.right) : undefined);
-      addBlob(body, 'node', await this.saveBuddyLeaf(node));
+      addBlob(body, 'd', await this.saveBuddyLeaf(node));
+      addTree(body, 'l', node.left ? this.hashCache.get(node.left) || await this.saveBuddy(node.left) : undefined);
+      addTree(body, 'r', node.right ? this.hashCache.get(node.right) || await this.saveBuddy(node.right) : undefined);
 
       const hash = await super.saveTree(body);
       this.hashCache.set(node, hash);

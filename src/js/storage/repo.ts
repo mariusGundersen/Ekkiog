@@ -46,8 +46,6 @@ export class Repo extends mix(IdbRepo)
 export default async function createRepo() : Promise<IRepo>{
   const db = await init('ekkiog-git');
 
-  const repo = new Repo({}, db);
-
-  return repo;
+  return new Repo({}, db);
 }
 

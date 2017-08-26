@@ -9,28 +9,26 @@ import {
   CompiledComponent
 } from 'ekkiog-editing';
 
-import createRepo, { IRepo } from './repo';
+import { IRepo, Repo } from './repo';
 
-import upgradeFrom0 from './upgrade/from0';
-import upgradeFrom5 from './upgrade/from5';
+import upgradeFrom10 from './upgrade/from10';
 import upgradeFrom7 from './upgrade/from7';
 
-const db = idb.open('ekkiog', 10, db => {
+const db = idb.open('ekkiog', 11, db => {
   switch(db.oldVersion){
     case 0:
-      upgradeFrom0(db);
     case 1:
     case 2:
     case 3:
     case 4:
     case 5:
-      upgradeFrom5(db);
     case 6:
     case 7:
     case 8:
       upgradeFrom7(db);
     case 9:
-      return;
+    case 10:
+      upgradeFrom10(db);
   }
 });
 
@@ -46,7 +44,7 @@ export class Storage{
   private readonly repo : Promise<IRepo>;
   constructor(db : Promise<DB>){
     this.db = db;
-    this.repo = createRepo();
+    this.repo = db.then(db => new Repo({}, db));
   }
 
   async save(name : string, forest : Forest, message : string){
@@ -54,16 +52,8 @@ export class Storage{
     await repo.save(name, forest, message);
     const db = await this.db;
     const transaction = db.transaction([
-      'components',
       'componentMetadata'
     ], 'readwrite');
-
-    await transaction
-      .objectStore('components')
-      .put({
-        name,
-        ...forest
-      });
 
     const metadataStore = transaction.objectStore('componentMetadata');
     const metadata = await metadataStore.get(name);
@@ -78,41 +68,9 @@ export class Storage{
     }
   }
 
-  async export(){
-    const db = await this.db;
-    const transaction = db.transaction([
-      'components',
-      'componentMetadata',
-    ], 'readonly');
-
-    const components = exportToArray(transaction.objectStore("components"));
-    const componentMetadata = exportToArray(transaction.objectStore("componentMetadata"));
-
-    return {
-      components: await components,
-      componentMetadata: await componentMetadata
-    };
-  }
-
-  async import(json : {components : any[], componentMetadata : any[]}){
-    const db = await this.db;
-    const transaction = db.transaction([
-      'components',
-      'componentMetadata',
-    ], 'readwrite');
-
-    const componentStore = transaction.objectStore('components');
-    await componentStore.clear();
-    await Promise.all(json.components.map(component => componentStore.put(component)));
-    const componentMetadataStore = transaction.objectStore('componentMetadata');
-    await componentMetadataStore.clear();
-    await Promise.all(json.componentMetadata.map(componentMetadata => componentMetadataStore.put(componentMetadata)));
-  }
-
   async load(name : string) : Promise<Forest>{
     const db = await this.db;
     const transaction = db.transaction([
-      'components',
       'componentMetadata',
     ], 'readwrite');
     const metadataStore = transaction.objectStore('componentMetadata');
@@ -129,8 +87,8 @@ export class Storage{
   }
 
   async loadPackage(name : string) : Promise<CompiledComponent>{
-    const namedForest = await this.load(name)
-    return packageComponent(namedForest, name);
+    const forest = await this.load(name)
+    return packageComponent(forest, name);
   }
 
   getRecent() : Observable<string> {
@@ -226,16 +184,5 @@ function cursorToObservable<T>(
     return () => {
       running = false;
     };
-  });
-}
-
-function exportToArray(objectStore : ObjectStore){
-  return new Promise(res => {
-    const content : any[] = [];
-    objectStore.iterateCursor(cursor => {
-      if (!cursor) return res(content);
-      content.push(cursor.value);
-      cursor.continue();
-    });
   });
 }
