@@ -3,10 +3,32 @@
   background: #424C57;
   width: 90%;
 
+  &.enter {
+    transform: translateX(-100%);
+
+    &.enter-active {
+      transform: none;
+      transition: transform .3s;
+    }
+  }
+
+  &.leave {
+    transform: none;
+
+    &.leave-active {
+      transform: translateX(-100%);
+      transition: transform .3s;
+    }
+  }
+
   & .photo {
-    vertical-align: middle;
     height: 1em;
-    padding-right: 0.25em;
+    border-radius: 16px;
+  }
+
+  & .user-details {
+    font-family: Courier Bold, Courier, monospace;
+    font-size: 10px;
   }
 
   & .version {

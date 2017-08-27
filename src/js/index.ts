@@ -23,6 +23,6 @@ const store = createStore<State>(
   )
 );
 
-store.dispatch(loadForest('Welcome'));
+store.dispatch(loadForest('WELCOME'));
 
 main(store);

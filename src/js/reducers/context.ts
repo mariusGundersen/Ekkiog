@@ -27,7 +27,7 @@ export interface Link<T> {
 }
 
 const initialState : ContextState = {
-  name: 'empty',
+  name: 'WELCOME',
   forest: createForest(),
   boundingBox: {top: 56, left: 56, right: 72, bottom: 72}
 };

@@ -41,7 +41,10 @@ const result = reax({
   query: (value : string) => value,
   insertPackage: (result : CompiledComponent) => result,
   openComponent: (result : string) => result,
-  createComponent: (result : string) => result
+  createComponent: (result : string) => result,
+  onUndo: (x : any) => true,
+  onRedo: (x : any) => true,
+  onSetTickInterval: (value : number) => value
 }, ({
   toggleSearch,
   toggleSimulationMenu,
@@ -49,11 +52,17 @@ const result = reax({
   query,
   insertPackage,
   openComponent,
-  createComponent
+  createComponent,
+  onUndo,
+  onRedo,
+  onSetTickInterval
 }, props, initialProps : Props) => {
   insertPackage.forEach(r => initialProps.dispatch(insertComponentPackage(r)));
   openComponent.forEach(r => initialProps.dispatch(loadForest(r)));
-  createComponent.forEach(r => initialProps.dispatch(loadForest(r)))
+  createComponent.forEach(r => initialProps.dispatch(loadForest(r)));
+  onUndo.forEach(() => initialProps.dispatch(undo()));
+  onRedo.forEach(() => initialProps.dispatch(redo()));
+  onSetTickInterval.forEach(x => initialProps.dispatch(setTickInterval(x)));
 
   const showSearch = toggleSearch
     .merge(
@@ -109,31 +118,23 @@ const result = reax({
         onClick={events.toggleSimulationMenu}
         isActive={values.showSimulationMenu} />
     </div>
-    { values.state == 'search' ?
-      <SearchResults
-        query={values.query}
-        insertPackage={events.insertPackage}
-        openComponent={events.openComponent}
-        createComponent={events.createComponent} />
-    : values.state == 'simulation' ?
-      <SimulationMenu
-        tickInterval={props.tickInterval}
-        undoCount={props.undoCount}
-        redoCount={props.redoCount}
-        setTickInterval={x => props.dispatch(setTickInterval(x))}
-        undo={() => props.dispatch(undo())}
-        redo={() => props.dispatch(redo())}/>
-    : values.state == 'main' ?
-      <MainMenu />
-    : null }
+    <MainMenu show={values.state === 'main'} />
+    { values.state == 'search' &&
+    <SearchResults
+      query={values.query}
+      insertPackage={events.insertPackage}
+      openComponent={events.openComponent}
+      createComponent={events.createComponent} />}
+    <SimulationMenu
+      show={values.state == 'simulation'}
+      tickInterval={props.tickInterval}
+      undoCount={props.undoCount}
+      redoCount={props.redoCount}
+      setTickInterval={events.onSetTickInterval}
+      undo={events.onUndo}
+      redo={events.onRedo}/>
   </div>
 ));
-
-function menus<V, E, P>(state : 'search' | 'simulation' | 'main' | '', values : V, events : E, props : P){
-  switch(state){
-
-  }
-}
 
 export default connect((state : State) => ({
   currentComponentName: state.context.name,

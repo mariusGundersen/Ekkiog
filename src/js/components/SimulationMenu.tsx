@@ -7,26 +7,37 @@ import MdMedium from 'react-icons/md/play-arrow';
 import MdFast from 'react-icons/md/fast-forward';
 import MdUndo from 'react-icons/md/undo';
 import MdRedo from 'react-icons/md/redo';
+import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import pure from './pure';
 
 import style from './simulationMenu.scss';
 
 export interface Props {
+  readonly show : boolean
   readonly tickInterval : number
   readonly undoCount : number
   readonly redoCount : number
   setTickInterval(tickInterval : number) : void
-  undo() : void
-  redo() : void
+  undo(x : any) : void
+  redo(x : any) : void
 }
 
 export default pure(
-  (prev, next) => prev.tickInterval != next.tickInterval
-               || prev.undoCount != next.undoCount
-               || prev.redoCount != next.redoCount,
+  (prev, next) => prev.show !== next.show
+               || prev.tickInterval !== next.tickInterval
+               || prev.undoCount !== next.undoCount
+               || prev.redoCount !== next.redoCount,
   (props : Props) => (
-  <div
+  <ReactCSSTransitionGroup
+  transitionName={style as any}
+  transitionEnterTimeout={300}
+  transitionLeaveTimeout={300}
+  component="div"
+  className={style.container}>
+  {props.show
+  && <div
+    key="menu"
     className={style.simulationMenu}>
       <button className={props.undoCount === 0 ? style.disabled : ''} onClick={props.undo}><MdUndo /></button>
       <button className={props.redoCount === 0 ? style.disabled : ''} onClick={props.redo}><MdRedo /></button>
@@ -35,5 +46,6 @@ export default pure(
       <button className={props.tickInterval == 2**11 ? style.selected : ''} onClick={() => props.setTickInterval(2**11)}><MdSlow /></button>
       <button className={props.tickInterval == 2**8 ? style.selected : ''} onClick={() => props.setTickInterval(2**8)}><MdMedium /></button>
       <button className={props.tickInterval == 2**1 ? style.selected : ''} onClick={() => props.setTickInterval(2**1)}><MdFast /></button>
-  </div>
+  </div>}
+  </ReactCSSTransitionGroup>
 ));
