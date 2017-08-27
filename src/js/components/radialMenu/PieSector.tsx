@@ -57,9 +57,9 @@ export default ({
       className={`${style.clickable} ${style.transTrans}`}
       style={{transform: `rotate(${degreesRotate}deg)`}}>
       <path
-        fill="#2a2d30"
-        stroke="#446364"
-        strokeWidth="2"
+        fill="#31363c"
+        stroke="#424C57"
+        strokeWidth="1"
         d={path}/>
         <g transform={`translate(${averageRadius} 0)`}>
           <g className={style.transTrans} style={{transform: `rotate(${-degreesRotate}deg)`}} >

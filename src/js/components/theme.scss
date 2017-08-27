@@ -1,0 +1,36 @@
+.bg {
+  background: #31363c;
+}
+
+.bg-active {
+  background: #424C57;
+}
+
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+
+  & .item {
+    display: flex;
+    flex-direction: row;
+    border: none;
+    border-bottom: 1px solid #31363c;
+    color: white;
+    text-decoration: none;
+
+    & .icon {
+      flex: 0 0 auto;
+      display: flex;
+      font-size: 32px;
+      padding: 4px;
+    }
+
+    & .label {
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  }
+}

@@ -32,7 +32,7 @@ export default class Loading extends React.Component<Props, any> {
         transition: 'stroke-dasharray 0.9s',
         strokeDashoffset: '0',
         strokeDasharray: `0 ${this.circumference}`,
-        stroke: '#446364',
+        stroke: '#424C57',
         fill: 'none'
       }}
       cx={0}

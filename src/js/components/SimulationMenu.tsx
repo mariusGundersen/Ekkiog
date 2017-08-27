@@ -28,8 +28,8 @@ export default pure(
   (props : Props) => (
   <div
     className={style.simulationMenu}>
-      <button className={props.undoCount > 0 ? style.selected : ''} onClick={props.undo}><MdUndo /></button>
-      <button className={props.redoCount > 0 ? style.selected : ''} onClick={props.redo}><MdRedo /></button>
+      <button className={props.undoCount === 0 ? style.disabled : ''} onClick={props.undo}><MdUndo /></button>
+      <button className={props.redoCount === 0 ? style.disabled : ''} onClick={props.redo}><MdRedo /></button>
       <div className={style.flexFill} />
       <button className={props.tickInterval == Infinity ? style.selected : ''} onClick={() => props.setTickInterval(Infinity)}><MdPause /></button>
       <button className={props.tickInterval == 2**11 ? style.selected : ''} onClick={() => props.setTickInterval(2**11)}><MdSlow /></button>

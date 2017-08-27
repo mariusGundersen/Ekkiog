@@ -43,6 +43,14 @@ export default connect(
       width={props.pixelWidth}
       height={props.pixelHeight}
       viewBox={`0 0 ${props.pixelWidth} ${props.pixelHeight}`}>
+      <filter id="dropshadow" height="200%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+        <feOffset dx="0" dy="2" result="offsetblur"/>
+        <feMerge>
+          <feMergeNode/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
       <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} editor={props.editor} editorMenu={props.editorMenu} dispatch={dispatch} />
       <ContextMenu radius={radius+gap} width={radius+gap} dispatch={dispatch} contextMenu={props.contextMenu} view={props.view} />
     </svg>

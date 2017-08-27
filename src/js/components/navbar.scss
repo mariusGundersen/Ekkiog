@@ -11,11 +11,11 @@
   & .bar {
     display: flex;
     background: #31363c;
-    border-bottom: 2px solid #446364;
     color: white;
     font-size: 16px;
     font-family: Arial, Helvetica, sans-serif;
     flex: 1 0 auto;
+    box-shadow: 0 3px 3px 0 black;
 
     & button.navbar-button {
       background: #31363c;
@@ -23,14 +23,15 @@
       outline: none;
 
       color: white;
-      padding: 0;
+      padding: 4px;
       margin: 0;
       font-size: 32px;
       line-height: 0;
       font-family: Arial, Helvetica, sans-serif;
 
       &[data-active=true] {
-        background: #446364;
+        background: #424C57;
+        color: #03d3ff;
       }
     }
 
@@ -64,7 +65,7 @@
 
       & .search-box {
         width: 0;
-        background: #446364;
+        background: #424C57;
         transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
         display: flex;
 

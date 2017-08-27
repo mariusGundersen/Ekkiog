@@ -2,7 +2,8 @@
   display: flex;
   align-items: center;
   color: white;
-  background: #446364;
+  background: #424C57;
+  box-shadow: 0 3px 3px 0 black;
 
   & .flex-fill {
     flex: 1 0 auto;
@@ -12,14 +13,18 @@
     background: transparent;
     border: none;
     outline: none;
-    color: #aaa;
-    padding: 0;
+    color: white;
+    padding: 4px;
     font-size: 32px;
     line-height: 0;
     font-family: Arial, Helvetica, sans-serif;
 
-    &.selected{
-      color: white
+    &.disabled {
+      color: #aaa;
+    }
+
+    &.selected {
+      color: #03d3ff;
     }
   }
 }

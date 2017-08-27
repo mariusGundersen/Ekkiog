@@ -95,6 +95,7 @@ const result = reax({
   <div className={style.navbar}>
     <div className={style.bar}>
       <MainMenuButton
+        isActive={values.showMainMenu}
         onClick={events.toggleMainMenu}/>
       <SearchBar
         currentComponentName={props.currentComponentName}

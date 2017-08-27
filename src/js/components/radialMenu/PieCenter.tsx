@@ -18,7 +18,15 @@ export default ({
   cy=0
 } : Props) => (
   <g onClick={onClick} className={`${style.clickable} ${style.transTrans}`} transform={`translate(${cx}, ${cy})`}>
-    <circle cx="0" cy="0" r={radius} fill="#2a2d30" stroke="#446364" strokeWidth="2" className={style.pieCenter} />
+    <circle
+      style={{filter:"url(#dropshadow)"}}
+      cx="0"
+      cy="0"
+      r={radius}
+      fill="#31363c"
+      stroke="#424C57"
+      strokeWidth="0"
+      className={style.pieCenter} />
     {icon}
   </g>
 );

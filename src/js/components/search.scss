@@ -2,17 +2,18 @@
   flex: 0 1 auto;
   overflow: auto;
   -webkit-overflow-scrolling: auto;
+  background: linear-gradient(to bottom, black 0, #424C57 6px);
 
   & .searchResults{
     display: flex;
     flex-direction: column;
+    padding-top: 6px;
 
     & .searchResult{
       display: flex;
       flex-direction: row;
-      background: #31363c;
-      border: 2px solid #446364;
-      border-top: none;
+      border: none;
+      border-bottom: 1px solid #31363c;
       color: white;
 
       & .noExactMatch,
@@ -38,7 +39,7 @@
       & .toggleFavorite {
         flex: 0 0 auto;
         display: flex;
-        font-size: 24px;
+        font-size: 32px;
         padding: 4px;
       }
     }
