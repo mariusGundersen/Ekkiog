@@ -175,3 +175,12 @@ function cursorToObservable<T>(
     };
   });
 }
+
+export async function push(name : string) {
+  if(!user) return;
+  const repo = await _repo;
+  await repo.push(`/git/${user.server}/${user.username}/ekkiog-workspace.git`, `refs/heads/${name}`, {
+    username: user.username,
+    password: user.access_token
+  });
+}
