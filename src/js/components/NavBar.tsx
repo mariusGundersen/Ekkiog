@@ -23,6 +23,7 @@ import style from './navbar.scss';
 
 import { insertComponentPackage, loadForest, setTickInterval, undo, redo } from '../actions';
 import { State } from '../reduce';
+import * as storage from '../storage';
 
 export interface Props {
   readonly dispatch : Dispatch<State>;
@@ -44,7 +45,8 @@ const result = reax({
   createComponent: (result : string) => result,
   onUndo: (x : any) => true,
   onRedo: (x : any) => true,
-  onSetTickInterval: (value : number) => value
+  onSetTickInterval: (value : number) => value,
+  onPush: (X : undefined) => true
 }, ({
   toggleSearch,
   toggleSimulationMenu,
@@ -55,7 +57,8 @@ const result = reax({
   createComponent,
   onUndo,
   onRedo,
-  onSetTickInterval
+  onSetTickInterval,
+  onPush
 }, props, initialProps : Props) => {
   insertPackage.forEach(r => initialProps.dispatch(insertComponentPackage(r)));
   openComponent.forEach(r => initialProps.dispatch(loadForest(r)));
@@ -63,6 +66,10 @@ const result = reax({
   onUndo.forEach(() => initialProps.dispatch(undo()));
   onRedo.forEach(() => initialProps.dispatch(redo()));
   onSetTickInterval.forEach(x => initialProps.dispatch(setTickInterval(x)));
+
+  const isPushing = onPush
+    .withLatestFrom(props)
+    .switchMap(([_, props]) => isBusy(storage.push(props.currentComponentName)))
 
   const showSearch = toggleSearch
     .merge(
@@ -94,7 +101,8 @@ const result = reax({
     showSimulationMenu: state.map(x => x == 'simulation'),
     showMainMenu: state.map(x => x == 'main'),
     query: state.map(x => x == 'search')
-      .switchMap(ifElse(query.startWith(''), ''))
+      .switchMap(ifElse(query.startWith(''), '')),
+    isPushing
   };
 } , ({
   events,
@@ -118,7 +126,10 @@ const result = reax({
         onClick={events.toggleSimulationMenu}
         isActive={values.showSimulationMenu} />
     </div>
-    <MainMenu show={values.state === 'main'} />
+    <MainMenu
+      show={values.state === 'main'}
+      push={events.onPush}
+      isPushing={values.isPushing}/>
     { values.state == 'search' &&
     <SearchResults
       query={values.query}
@@ -147,4 +158,10 @@ export default connect((state : State) => ({
 
 export function ifElse<T>(observable : Observable<T>, fallback : T){
   return (condition : boolean) => condition ? observable : Observable.of(fallback);
+}
+
+function isBusy(p : Promise<any>){
+  return Observable.merge(
+    Observable.of(true),
+    Observable.fromPromise(p.then(x => false, x => (console.error(x), false))));
 }
