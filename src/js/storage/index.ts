@@ -184,3 +184,12 @@ export async function push(name : string) {
     password: user.access_token
   });
 }
+
+export async function fetch(url : string, component : string) {
+  const repo = await _repo;
+  const response = await repo.fetch(`/git/${url}.git`, {
+    refspec: `refs/heads/${component}:refs/remotes/${url}/${component}`,
+    depth: 1
+  });
+  console.log(response);
+}

@@ -7,6 +7,7 @@ import loadAsMixin from '@es-git/load-as-mixin';
 import saveAsMixin from '@es-git/save-as-mixin';
 import walkersMixin from '@es-git/walkers-mixin';
 import pushMixin from '@es-git/push-mixin';
+import fetchMixin from '@es-git/fetch-mixin';
 
 import saveForestMixin, { User } from './saveForest';
 import loadForestMixin from './loadForest';
@@ -30,6 +31,7 @@ export default class Repo extends mix(IdbRepo)
   .with(saveForestMixin)
   .with(walkersMixin)
   .with(pushMixin, fetch)
+  .with(fetchMixin, fetch)
   implements IRepo {
     async save(name : string, forest : Forest, message : string, user : User | null){
       return await super.commit(`refs/heads/${name}`, user || defaultUser, forest, message);

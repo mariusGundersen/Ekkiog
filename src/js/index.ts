@@ -12,6 +12,10 @@ import { loadForest } from './actions';
 
 import main from './main';
 
+if('asyncIterator' in Symbol === false){
+  (Symbol as any).asyncIterator = Symbol();
+}
+
 offline();
 
 const store = createStore<State>(
