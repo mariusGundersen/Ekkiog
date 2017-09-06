@@ -79,8 +79,8 @@ export default class WebGLCanvas extends React.Component<Props, any> {
         if(changed){
           this.props.dispatch(panZoom(
             this.perspective.tileToViewport.bind(this.perspective),
-            this.perspective.viewportToTileFloored.bind(this.perspective),
-            this.perspective.transformation));
+            this.perspective.viewportToTileFloored.bind(this.perspective)
+          ));
         }
 
         this.engine.render(this.perspective.mapToViewportMatrix);
@@ -112,8 +112,8 @@ export default class WebGLCanvas extends React.Component<Props, any> {
 
         this.props.dispatch(panZoom(
           this.perspective.tileToViewport.bind(this.perspective),
-          this.perspective.viewportToTileFloored.bind(this.perspective),
-          this.perspective.transformation));
+          this.perspective.viewportToTileFloored.bind(this.perspective)
+        ));
       }
     });
   }

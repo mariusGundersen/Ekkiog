@@ -12,18 +12,15 @@ export const resize = (pixelWidth : number, pixelHeight : number) : ResizeAction
 export type PanZoomAction = {
   readonly type : 'panZoom',
   readonly tileToViewport : (...pos : number[]) => [number, number],
-  readonly viewportToTileFloored : (...pos : number[]) => [number, number],
-  readonly transform : {x : number, y : number, s : number}
+  readonly viewportToTileFloored : (...pos : number[]) => [number, number]
 }
 export const panZoom = (
   tileToViewport : (...pos : number[]) => [number, number],
-  viewportToTileFloored : (...pos : number[]) => [number, number],
-  transform : {x : number, y : number, s : number}
+  viewportToTileFloored : (...pos : number[]) => [number, number]
 ) : PanZoomAction => ({
   type: 'panZoom',
   tileToViewport,
-  viewportToTileFloored,
-  transform
+  viewportToTileFloored
 });
 
 export type ViewActions =
