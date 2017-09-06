@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
 import reax from 'reaxjs';
 import { Dispatch } from 'redux';
 import { Observable } from 'rxjs/Observable';
@@ -35,7 +34,7 @@ export interface Props {
   readonly redoCount : number;
 }
 
-const result = reax({
+export default reax({
   toggleSearch: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   toggleMainMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
@@ -146,15 +145,6 @@ const result = reax({
       redo={events.onRedo}/>
   </div>
 ));
-
-export default connect((state : State) => ({
-  currentComponentName: state.context.name,
-  tickCount: state.simulation.tickCount,
-  tickInterval: state.simulation.tickInterval,
-  gateCount: (state.context.forest.buddyTree.usedSize||2) - 2,
-  undoCount: state.context.done && state.context.done.count || 0,
-  redoCount: state.context.undone && state.context.undone.count || 0
-}))(result);
 
 export function ifElse<T>(observable : Observable<T>, fallback : T){
   return (condition : boolean) => condition ? observable : Observable.of(fallback);

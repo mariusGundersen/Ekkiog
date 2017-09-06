@@ -9,13 +9,13 @@ import selection, { SelectionState } from './reducers/selection';
 import simulation, { SimulationState } from './reducers/simulation';
 
 export interface State {
-  view : ViewState,
-  editor : EditorState,
-  editorMenu : EditorMenuState,
-  contextMenu : ContextMenuState,
-  context : ContextState,
-  selection : SelectionState,
-  simulation : SimulationState
+  readonly view : ViewState,
+  readonly editor : EditorState,
+  readonly editorMenu : EditorMenuState,
+  readonly contextMenu : ContextMenuState,
+  readonly context : ContextState | null,
+  readonly selection : SelectionState,
+  readonly simulation : SimulationState
 }
 
 export default combineReducers<State>({

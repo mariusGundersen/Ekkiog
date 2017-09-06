@@ -8,14 +8,14 @@ import {
 
 export interface ContextState {
   readonly name : string
-  readonly previous? : PushedContextState
+  readonly previous? : ParentContextState
   readonly forest : Forest
   readonly boundingBox : Box
-  readonly done? : Link<Forest>
-  readonly undone? : Link<Forest>
+  readonly undoStack? : Link<Forest>
+  readonly redoStack? : Link<Forest>
 }
 
-export interface PushedContextState extends ContextState {
+export interface ParentContextState extends ContextState {
   readonly centerX : number
   readonly centerY : number
 }
@@ -26,58 +26,56 @@ export interface Link<T> {
   readonly count : number
 }
 
-const initialState : ContextState = {
-  name: 'WELCOME',
-  forest: createForest(),
-  boundingBox: {top: 56, left: 56, right: 72, bottom: 72}
-};
-
-export default function context(state = initialState, action: Action) : ContextState {
-  switch(action.type){
-    case 'new-context':
-      return {
-        name: action.name,
-        forest: action.forest,
-        boundingBox: getComponentBoundingBox(action.forest.enneaTree)
-      };
-    case 'push-context':
-      return {
-        name: action.name,
-        forest: action.forest,
-        boundingBox: getComponentBoundingBox(action.forest.enneaTree),
-        previous: {
+export default function context(state : ContextState | null, action: Action) : ContextState | null {
+  if(action.type === 'new-context'){
+    return {
+      name: action.name,
+      forest: action.forest,
+      boundingBox: getComponentBoundingBox(action.forest.enneaTree)
+    }
+  }else if(state == undefined){
+    return null;
+  }else{
+    switch(action.type){
+      case 'push-context':
+        return {
+          name: action.name,
+          forest: action.forest,
+          boundingBox: getComponentBoundingBox(action.forest.enneaTree),
+          previous: {
+            ...state,
+            boundingBox: action.boundingBox,
+            centerX: action.centerX,
+            centerY: action.centerY
+          }
+        };
+      case 'pop-context':
+        return state.previous || state;
+      case 'undo-context':
+        return !state.undoStack ? state : {
           ...state,
-          boundingBox: action.boundingBox,
-          centerX: action.centerX,
-          centerY: action.centerY
-        }
-      };
-    case 'pop-context':
-      return state.previous || initialState;
-    case 'undo-context':
-      return !state.done ? state : {
-        ...state,
-        forest: state.done.value,
-        done: state.done.next,
-        undone: {
-          value: state.forest,
-          next: state.undone,
-          count: state.undone ? state.undone.count+1 : 1
-        }
-      };
-    case 'redo-context':
-      return !state.undone ? state : {
-        ...state,
-        forest: state.undone.value,
-        undone: state.undone.next,
-        done: {
-          value: state.forest,
-          next: state.done,
-          count: state.done ? state.done.count+1 : 1
-        }
-      };
-    default:
-      return combine(state, action, state.forest, forest);
+          forest: state.undoStack.value,
+          undoStack: state.undoStack.next,
+          redoStack: {
+            value: state.forest,
+            next: state.redoStack,
+            count: state.redoStack ? state.redoStack.count+1 : 1
+          }
+        };
+      case 'redo-context':
+        return !state.redoStack ? state : {
+          ...state,
+          forest: state.redoStack.value,
+          redoStack: state.redoStack.next,
+          undoStack: {
+            value: state.forest,
+            next: state.undoStack,
+            count: state.undoStack ? state.undoStack.count+1 : 1
+          }
+        };
+      default:
+        return combine(state, action, state.forest, forest);
+    }
   }
 }
 
@@ -96,11 +94,11 @@ function combine(
   return {
     ...state,
     forest: next,
-    undone: undefined,
-    done: {
-      next: state.done,
+    redoStack: undefined,
+    undoStack: {
+      next: state.undoStack,
       value: current,
-      count: state.done ? state.done.count+1 : 1
+      count: state.undoStack ? state.undoStack.count+1 : 1
     }
   };
 }

@@ -1,4 +1,11 @@
 import * as React from 'react';
+import { connect, Dispatch } from 'react-redux';
+import reax from 'reaxjs';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/fromEvent';
+
+import { State } from '../reduce';
 
 import Menu from './Menu';
 import WebGLCanvas from './WebGLCanvas';
@@ -6,10 +13,55 @@ import NavBar from './NavBar';
 
 import style from './main.css';
 
-export default () => (
-  <div className={style.root}>
-    <Menu />
-    <WebGLCanvas />
-    <NavBar />
-  </div>
-);
+type Props = State & {dispatch: Dispatch<State>};
+
+export default connect((s : State) => s)(
+  reax({
+  },
+  ({}, props, initialProps : Props) => ({
+    size: Observable.fromEvent(window, 'resize')
+      .startWith(undefined)
+      .map(e => ({
+        pixelWidth: window.document.body.clientWidth*window.devicePixelRatio,
+        pixelHeight: window.document.body.clientHeight*window.devicePixelRatio
+      }))
+  }),
+  ({events, props, values}) => {
+  if(props.context == undefined){
+    return (
+      <div>Loading</div>
+    );
+  }
+  return (
+    <div className={style.root}>
+      <Menu
+        contextMenu={props.contextMenu}
+        dispatch={props.dispatch}
+        editor={props.editor}
+        editorMenu={props.editorMenu}
+        pixelWidth={values.size.pixelWidth}
+        pixelHeight={values.size.pixelHeight}
+        view={props.view}
+      />
+      <WebGLCanvas
+        contextMenu={props.contextMenu}
+        currentContext={props.context}
+        dispatch={props.dispatch}
+        previousContext={props.context.previous}
+        selection={props.selection}
+        tickInterval={props.simulation.tickInterval}
+        width={values.size.pixelWidth}
+        height={values.size.pixelHeight}
+      />
+      <NavBar
+        dispatch={props.dispatch}
+        currentComponentName={props.context.name}
+        tickCount={props.simulation.tickCount}
+        tickInterval={props.simulation.tickInterval}
+        gateCount={(props.context.forest.buddyTree.usedSize||2) - 2}
+        undoCount={props.context.undoStack && props.context.undoStack.count || 0}
+        redoCount={props.context.redoStack && props.context.redoStack.count || 0}
+      />
+    </div>
+  )
+}));

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import style from './main.css';
@@ -22,16 +21,7 @@ export interface Props {
   readonly editorMenu : EditorMenuState
 }
 
-export default connect(
-  ({view, contextMenu, editor, editorMenu} : State) => ({
-    pixelWidth: view.pixelWidth/devicePixelRatio,
-    pixelHeight: view.pixelHeight/devicePixelRatio,
-    view,
-    contextMenu,
-    editor,
-    editorMenu
-  })
-)(({dispatch, ...props} : Props) => {
+export default ({dispatch, ...props} : Props) => {
   const radius = 40;
   const gap = 10;
   const cx = props.pixelWidth;
@@ -55,4 +45,4 @@ export default connect(
       <ContextMenu radius={radius+gap} width={radius+gap} dispatch={dispatch} contextMenu={props.contextMenu} view={props.view} />
     </svg>
   )
-});
+};

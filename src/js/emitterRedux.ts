@@ -85,7 +85,9 @@ export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
 
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128) return;
 
-      const {context: {forest}, editor : {selectedTool, toolDirection}} = getState();
+      const {context, editor : {selectedTool, toolDirection}} = getState();
+      if(context == undefined) return;
+      const forest = context.forest;
       window.requestAnimationFrame(() => {
         const area = getTileAt(forest.enneaTree, ty, tx);
         if(area && area.data && area.data.type === BUTTON){
@@ -96,7 +98,10 @@ export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
           if(selectedTool == BUTTON
           || selectedTool == GATE
           || selectedTool == LIGHT){
-            const mutatedForest = getState().context.forest;
+            const context = getState().context;
+            if(context == undefined) return;
+
+            const mutatedForest = context.forest;
             if(forest === mutatedForest){
               dispatch(insertMovableItem(selectedTool, toolDirection, tx, ty));
             }else{
@@ -116,6 +121,8 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
       const [tx, ty] = viewportToTile(x, y);
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
         const context = getState().context;
+        if(context == undefined) return;
+
         const previousContext = context.previous;
         if(previousContext){
           const component = packageComponent(context.forest, context.name);
@@ -132,6 +139,8 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
         }
       }else{
         const state = getState();
+        if(state.context == undefined) return;
+
         const areaData = getTileAt(state.context.forest.enneaTree, ty|0, tx|0);
         if(areaData && areaData.data.type === 'component' && areaData.data.name){
           const name = areaData.data.name;
@@ -153,7 +162,10 @@ export function handleShowContextMenu(viewportToTile : ViewportToTile){
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
         dispatch(abortLoadContextMenu());
       }else{
-        const enneaTree = getState().context.forest.enneaTree;
+        const context = getState().context;
+        if(context == undefined) return;
+
+        const enneaTree = context.forest.enneaTree;
         const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
         dispatch(showContextMenu(
           tile,
@@ -182,6 +194,8 @@ export function handleMoveSelection({dx, dy} : {dx : number, dy : number}){
   return (dispatch : Dispatch<State>, getState : () => State) => {
     dispatch(moveSelection(dx, dy));
     const state = getState();
+    if(state.context == undefined) return;
+
     const selection = state.selection;
     if(!selection.selection) return;
     const isValid = isEmpty(

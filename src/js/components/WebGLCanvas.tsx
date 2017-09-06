@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { connect, DispatchProp } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Forest, Box } from 'ekkiog-editing';
 import { EventEmitter } from 'events';
@@ -13,7 +12,7 @@ import {
 } from '../actions';
 import { State } from '../reduce';
 import { SelectionState } from '../reducers/selection';
-import { ContextState, PushedContextState } from '../reducers/context';
+import { ContextState, ParentContextState } from '../reducers/context';
 import {
   TOUCH_START,
   TOUCH_MOVE,
@@ -38,20 +37,11 @@ export interface Props{
   readonly selection : SelectionState,
   readonly contextMenu : ContextMenuState,
   readonly currentContext : ContextState,
-  readonly previousContext? : PushedContextState
+  readonly previousContext? : ParentContextState
+  readonly dispatch : Dispatch<State>
 }
 
-const WebGLCanvas = connect(
-  ({view, context, selection, contextMenu, simulation} : State) : Props => ({
-    selection,
-    width: view.pixelWidth,
-    height: view.pixelHeight,
-    contextMenu,
-    currentContext: context,
-    previousContext: context.previous,
-    tickInterval: simulation.tickInterval
-  })
-)(class WebGLCanvas extends React.Component<Props & {dispatch : Dispatch<State>}, any> {
+export default class WebGLCanvas extends React.Component<Props, any> {
   private canvas : HTMLCanvasElement | null;
   private engine : Engine;
   private perspective : Perspective;
@@ -193,9 +183,7 @@ const WebGLCanvas = connect(
         height={this.props.height} />
     );
   }
-});
-
-export default WebGLCanvas;
+};
 
 function getContext(canvas : HTMLCanvasElement) {
   return canvas.getContext("webgl", {})

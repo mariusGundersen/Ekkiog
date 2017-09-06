@@ -45,6 +45,8 @@ export type Action =
 
 export const insertComponentPackage = (componentPackage : CompiledComponent) => (dispatch : Dispatch<State>, getState : () => State) => {
   const state = getState();
+  if(state.context == undefined) return;
+
   if(state.selection.selection){
     dispatch(stopSelection());
     dispatch(resetEditorMenu());
@@ -135,6 +137,8 @@ export const loadForest = (name : string) => async (dispatch : Dispatch<State>) 
 
 export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
   const state = getState();
+  if(state.context == undefined) return;
+
   const item = getTileAt(state.context.forest.enneaTree, ty, tx);
   dispatch(removeTileAt(tx, ty));
   dispatch(selectItem(copyTo(createForest(), item.data, item), item));
@@ -151,6 +155,7 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
       dispatch(resetEditorMenu());
     },
     () => {
+      if(state.context == undefined) return;
       dispatch(setForest(state.context.forest));
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
@@ -160,21 +165,30 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
 };
 
 export const save = (message : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
-  const {forest, name} = getState().context;
+  const context = getState().context;
+  if(context == undefined) return;
+
+  const {forest, name} = context;
   await storage.save(name, forest, message);
 };
 
 export const saveAfter = (action : Action, mesage : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
-  const oldForest = getState().context.forest;
+  const context = getState().context;
+  if(context == undefined) return;
+
+  const oldForest = context.forest;
   dispatch(action);
-  const newForest = getState().context.forest;
+  const newForest = (getState().context as any).forest;
   if(oldForest !== newForest){
     await dispatch(save(mesage));
   }
 };
 
 export const insertMovableItem = (tool : Tool, direction : Direction, tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const buddyTree = getState().context.forest.buddyTree;
+  const context = getState().context;
+  if(context == undefined) return;
+
+  const buddyTree = context.forest.buddyTree;
   const forest = tap(createForest(buddyTree), tool, direction, tx, ty);
   const item = getTileAt(forest.enneaTree, ty, tx);
   dispatch(selectItem(forest, item));
@@ -200,7 +214,10 @@ export const insertMovableItem = (tool : Tool, direction : Direction, tx : numbe
 
 
 export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const buddyTree = getState().context.forest.buddyTree;
+  const context = getState().context;
+  if(context == undefined) return;
+
+  const buddyTree = context.forest.buddyTree;
   dispatch(selectItem(
     drawComponent(createForest(buddyTree), position.x|0, position.y|0, component),
     {
