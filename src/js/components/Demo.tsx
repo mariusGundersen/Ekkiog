@@ -33,15 +33,6 @@ export default connect((s : State) => s)(
     }else{
       return (
         <div className={style.root}>
-          <Menu
-            contextMenu={props.contextMenu}
-            dispatch={props.dispatch}
-            editor={props.editor}
-            editorMenu={props.editorMenu}
-            pixelWidth={values.size.pixelWidth}
-            pixelHeight={values.size.pixelHeight}
-            view={props.view}
-          />
           <WebGLCanvas
             contextMenu={props.contextMenu}
             currentContext={props.context}

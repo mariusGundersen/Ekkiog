@@ -27,6 +27,7 @@ const store = createStore<State>(
   )
 );
 
-store.dispatch(loadForest('WELCOME'));
-
 main(store);
+
+const search = new URLSearchParams(document.location.search);
+store.dispatch(loadForest(search.get('component') || 'WELCOME'));
