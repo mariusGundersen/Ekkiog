@@ -24,7 +24,7 @@ import {
   menuItem
 } from './radialMenu/menuItems';
 
-import { toggleEditorMenu, setToolDirection } from '../actions';
+import { toggleEditorMenu, setToolDirection, okCancel } from '../actions';
 import { State } from '../reduce';
 import { EditorState } from '../reduce/editor';
 import { EditorMenuState, OkCancelMenuState, ToolsMenuState, ContextMenuState } from '../reduce/editorMenu';
@@ -142,8 +142,8 @@ function createOkCancelMenuTree(editorMenu : OkCancelMenuState, dispatch : Dispa
   return [
     {
       menuItems: [
-        menuItem('ok', <IconAccept />, editorMenu.okAction, false, editorMenu.isValid),
-        menuItem('cancel', <IconCancel />, editorMenu.cancelAction)
+        menuItem('ok', <IconAccept />, () => dispatch(okCancel(true)), false, editorMenu.isValid),
+        menuItem('cancel', <IconCancel />, () => dispatch(okCancel(false)))
       ]
     }
   ];

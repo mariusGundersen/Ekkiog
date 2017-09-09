@@ -36,7 +36,7 @@ export default function editing(forest=createForest(), action : Action) : Forest
   switch(action.type){
     case 'set-forest':
       return action.forest || forest;
-    case 'tap-tile':
+    case 'draw':
       return tap(forest, action.tool, action.direction, action.x, action.y);
     case 'remove-tile-at':
       return clear(forest, action.x, action.y);

@@ -15,7 +15,7 @@ import { tap } from '../reduce/forest';
 import copyTo from '../editing/copyTo';
 import * as storage from '../storage';
 
-import { ContextActions, forestLoaded, forestSaved, newContextLoading } from './context';
+import { ContextActions, saveForest, forestLoaded, forestSaved, newContextLoading } from './context';
 import { ContextMenuActions, hideContextMenu } from './contextMenu';
 import { EditorActions } from './editor';
 import { EditorMenuActions, resetEditorMenu, showOkCancelMenu } from './editorMenu';
@@ -43,194 +43,20 @@ export type Action =
   SelectionActions |
   SimulationActions;
 
-export const insertComponentPackage = (componentPackage : CompiledComponent) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const state = getState();
-  if(state.context == undefined) return;
-
-  if(state.selection.selection){
-    dispatch(stopSelection());
-    dispatch(resetEditorMenu());
-  }
-
-  const tile = state.view.viewportToTileFloored(state.view.pixelWidth/2, state.view.pixelHeight/2);
-  const centerTile = {
-    x: tile[0],
-    y: tile[1]
-  };
-  const top = centerTile.y - (componentPackage.height>>1);
-  const left = centerTile.x - (componentPackage.width>>1);
-  const right = centerTile.x - (componentPackage.width>>1) + componentPackage.width;
-  const bottom = centerTile.y - (componentPackage.height>>1) + componentPackage.height;
-
-  const isValid = isEmpty(state.context.forest.enneaTree, top, left, right, bottom);
-  dispatch(showOkCancelMenu(
-    () => {
-      const selection = getState().selection;
-      if(selection.selection == false) return;
-      dispatch(insertComponent(componentPackage, {
-        x: selection.x + selection.dx,
-        y: selection.y + selection.dy
-      }));
-      dispatch(save(`Inserted ${componentPackage.name}`));
-      dispatch(stopSelection());
-      dispatch(resetEditorMenu());
-    },
-    () => {
-      dispatch(stopSelection());
-      dispatch(resetEditorMenu());
-    },
-    isValid
-  ));
-  dispatch(selectComponent(componentPackage, centerTile));
-}
-
-export const insertComponentPackages = (componentPackage : CompiledComponent, positions : IterableIterator<{x : number, y : number}>) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const state = getState();
-  if(state.selection.selection){
-    dispatch(stopSelection());
-    dispatch(resetEditorMenu());
-  }
-
-  const insertIntoNextPosition = (position : IteratorResult<{x : number, y : number}>) => {
-    if(position.done) {
-      dispatch(save(`Updated ${componentPackage.name}`));
-      return;
-    }
-
-    dispatch(showOkCancelMenu(
-      () => {
-        const selection = getState().selection;
-        if(selection.selection == false) return;
-        dispatch(insertComponent(componentPackage, {
-          x: selection.x + selection.dx,
-          y: selection.y + selection.dy
-        }));
-        dispatch(stopSelection());
-        dispatch(resetEditorMenu());
-        insertIntoNextPosition(positions.next());
-      },
-      () => {
-        dispatch(stopSelection());
-        dispatch(resetEditorMenu());
-        insertIntoNextPosition(positions.next());
-      },
-      false
-    ));
-
-    dispatch(removeTileAt(position.value.x, position.value.y))
-    dispatch(selectComponent(componentPackage, position.value));
-  };
-
-  insertIntoNextPosition(positions.next());
-}
-
-export const hideContextMenuAfter = (action : ThunkAction<any, State, any>) => (dispatch : Dispatch<State>) => {
+export const hideContextMenuAfter = (action : ThunkAction<any, State, any> | Action) => (dispatch : Dispatch<State>) => {
   dispatch(resetEditorMenu());
-  dispatch(action);
+  dispatch(action as any);
   dispatch(hideContextMenu());
 };
 
-export const loadForest = (repo : string, name : string, version : string) => async (dispatch : Dispatch<State>) => {
-  dispatch(newContextLoading(repo, name, version));
-  const component = await storage.load(name);
-  dispatch(forestLoaded(component, component.hash));
-};
-
-export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const state = getState();
-  if(state.context == undefined) return;
-
-  const item = getTileAt(state.context.forest.enneaTree, ty, tx);
-  dispatch(removeTileAt(tx, ty));
-  dispatch(selectItem(copyTo(createForest(), item.data, item), item));
-  dispatch(showOkCancelMenu(
-    () => {
-      const selection = getState().selection;
-      if(selection.selection == false) return;
-      dispatch(insertItem(item.data, {
-        left: selection.x + selection.dx,
-        top: selection.y + selection.dy,
-        width: item.width,
-        height: item.height
-      }, selection.forest.buddyTree));
-      dispatch(save(`Moved ${item.data.type}`));
-      dispatch(stopSelection());
-      dispatch(resetEditorMenu());
-    },
-    () => {
-      if(state.context == undefined) return;
-      dispatch(setForest(state.context.forest));
-      dispatch(stopSelection());
-      dispatch(resetEditorMenu());
-    },
-    true
-  ));
-};
-
-export const save = (message : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
-  const context = getState().context;
-  if(context == undefined) return;
-
-  const {forest, name} = context;
-  const hash = await storage.save(name, forest, message);
-  dispatch(forestSaved(hash));
-};
 
 export const saveAfter = (action : Action, mesage : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
   const context = getState().context;
-  if(context == undefined) return;
 
   const oldForest = context.forest;
   dispatch(action);
   const newForest = (getState().context as any).forest;
   if(oldForest !== newForest){
-    await dispatch(save(mesage));
+    await dispatch(saveForest(mesage));
   }
 };
-
-export const insertMovableItem = (tool : Tool, direction : Direction, tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const context = getState().context;
-  if(context == undefined) return;
-
-  const buddyTree = context.forest.buddyTree;
-  const forest = tap(createForest(buddyTree), tool, direction, tx, ty);
-  const item = getTileAt(forest.enneaTree, ty, tx);
-  dispatch(selectItem(forest, item));
-  dispatch(showOkCancelMenu(
-    () => {
-      const selection = getState().selection;
-      if(selection.selection == false) return;
-      dispatch(insertItem(item.data, {
-        left: selection.x + selection.dx,
-        top: selection.y + selection.dy,
-        width: item.width,
-        height: item.height
-      }, selection.forest.buddyTree));
-      dispatch(save(`Inserted ${tool}`));
-      dispatch(stopSelection());
-      dispatch(resetEditorMenu());
-    },
-    () => {
-      dispatch(stopSelection());
-      dispatch(resetEditorMenu());
-    },
-    false
-  ));
-};
-
-
-export const selectComponent = (component : CompiledComponent, position : {x : number, y : number}) => (dispatch : Dispatch<State>, getState : () => State) => {
-  const context = getState().context;
-  if(context == undefined) return;
-
-  const buddyTree = context.forest.buddyTree;
-  dispatch(selectItem(
-    drawComponent(createForest(buddyTree), position.x|0, position.y|0, component),
-    {
-      top : (position.y|0) - (component.height>>1),
-      left: (position.x|0) - (component.width>>1),
-      width: component.width|0,
-      height: component.height|0
-    }
-  ));
-}

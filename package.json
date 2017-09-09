@@ -104,6 +104,7 @@
     "react-redux": "^5.0.6",
     "reaxjs": "^0.4.0",
     "redux": "^3.7.2",
+    "redux-saga": "^0.15.6",
     "redux-thunk": "^2.2.0",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",

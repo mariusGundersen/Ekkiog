@@ -36,9 +36,8 @@ import {
   forestLoaded,
   pushContextLoading,
   popContext,
-  insertComponentPackages,
-  insertMovableItem,
-  save
+  saveForest,
+  doubleTap
 } from './actions';
 import { State } from './reduce';
 import {
@@ -83,77 +82,17 @@ export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
   return ({x, y} : {x : number, y : number}) =>
     (dispatch : Dispatch<State>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y).map(Math.floor);
-
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128) return;
-
-      const {context, editor : {selectedTool, toolDirection}} = getState();
-      if(context == undefined) return;
-      const forest = context.forest;
-      window.requestAnimationFrame(() => {
-        const area = getTileAt(forest.enneaTree, ty, tx);
-        if(area && area.data && area.data.type === BUTTON){
-          const net = area.data.net;
-          engine.mutateContext(mutator => mutator.toggleGate(net));
-        }else{
-          dispatch(tapTile(tx, ty, selectedTool, toolDirection));
-          if(selectedTool == BUTTON
-          || selectedTool == GATE
-          || selectedTool == LIGHT){
-            const context = getState().context;
-            if(context == undefined) return;
-
-            const mutatedForest = context.forest;
-            if(forest === mutatedForest){
-              dispatch(insertMovableItem(selectedTool, toolDirection, tx, ty));
-            }else{
-              dispatch(save(`Inserted ${selectedTool}`));
-            }
-          }else{
-            dispatch(save(`Inserted ${selectedTool}`));
-          }
-        }
-      });
+      const {editor : {selectedTool, toolDirection}} = getState();
+      dispatch(tapTile(tx, ty, selectedTool, toolDirection));
   };
 }
 
 export function handleDoubleTap(viewportToTile : ViewportToTile){
   return ({x, y} : {x : number, y : number}) =>
-    async (dispatch : Dispatch<State>, getState : () => State) => {
+    (dispatch : Dispatch<State>) => {
       const [tx, ty] = viewportToTile(x, y);
-      if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
-        const context = getState().context;
-        if(context == undefined) return;
-
-        const previousContext = context.previous;
-        if(previousContext){
-          const component = packageComponent(context.forest, context.repo, context.name, context.version, context.hash);
-          dispatch(popContext());
-          const {forest, didntFit} = replaceComponents(previousContext.forest, component);
-          if(previousContext.forest !== forest){
-            dispatch(setForest(forest));
-          }
-          if(didntFit.length > 0){
-            dispatch(insertComponentPackages(component, getIterableIterator(didntFit)));
-          }else if(previousContext.forest !== forest){
-            dispatch(save(`Updated ${component.name}`));
-          }
-        }
-      }else{
-        const state = getState();
-        if(state.context == undefined) return;
-
-        const areaData = getTileAt(state.context.forest.enneaTree, ty|0, tx|0);
-        if(areaData && areaData.data.type === 'component' && areaData.data.name){
-          const {repo, name, version} = areaData.data;
-          const centerX = areaData.left + areaData.width/2;
-          const centerY = areaData.top + areaData.height/2;
-          const posA = viewportToTile(0, 0);
-          const posB = viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
-          dispatch(pushContextLoading(repo, name, version, box(posA, posB), centerX, centerY));
-          const forest = await storage.load(name);
-          dispatch(forestLoaded(forest, forest.hash));
-        }
-      }
+      dispatch(doubleTap(tx, ty));
   };
 }
 
@@ -165,7 +104,6 @@ export function handleShowContextMenu(viewportToTile : ViewportToTile){
         dispatch(abortLoadContextMenu());
       }else{
         const context = getState().context;
-        if(context == undefined) return;
 
         const enneaTree = context.forest.enneaTree;
         const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
@@ -196,7 +134,6 @@ export function handleMoveSelection({dx, dy} : {dx : number, dy : number}){
   return (dispatch : Dispatch<State>, getState : () => State) => {
     dispatch(moveSelection(dx, dy));
     const state = getState();
-    if(state.context == undefined) return;
 
     const selection = state.selection;
     if(!selection.selection) return;
@@ -207,44 +144,5 @@ export function handleMoveSelection({dx, dy} : {dx : number, dy : number}){
       selection.right + selection.dx,
       selection.bottom + selection.dy);
     dispatch(setOkCancelMenuValid(isValid));
-  };
-}
-
-function replaceComponents(forest : Forest, newComponent : CompiledComponent){
-  const didntFit = [] as {x : number, y : number}[];
-  for(const item of getComponents(forest, newComponent.name)){
-    const x = item.left + (item.width>>1);
-    const y = item.top + (item.height>>1);
-    const clearedForest = clear(forest, x, y);
-    const newForest = drawComponent(clearedForest, x, y, newComponent);
-    if(newForest === clearedForest){
-      didntFit.push({x, y});
-    }else{
-      forest = newForest;
-    }
-  }
-  return {forest, didntFit};
-}
-
-function *getComponents(forest : Forest, name : string) : IterableIterator<AreaData<Component>>{
-  const size = forest.enneaTree.size;
-  for(const item of getIterator(forest.enneaTree, box([0,0], [size, size]))){
-    if(item.data.type === COMPONENT
-    && item.data.name === name){
-      yield {
-        ...item,
-        data: item.data
-      };
-    }
-  }
-}
-
-function box([left, top] : number[], [right, bottom] : number[]){
-  return {top, left, right, bottom};
-}
-
-function *getIterableIterator<T>(list : T[]) : IterableIterator<T>{
-  for(const item of list){
-    yield item;
   };
 }

@@ -25,8 +25,23 @@ export type TapTileAction = {
   readonly tool : Tool,
   readonly direction : Direction
 }
-export const tapTile = (tx : number, ty : number, tool : Tool, direction : Direction) : TapTileAction => ({
+export const tapTile = (x : number, y : number, tool : Tool, direction : Direction) : TapTileAction => ({
   type: 'tap-tile',
+  x,
+  y,
+  tool,
+  direction
+});
+
+export type DrawAction = {
+  readonly type : 'draw',
+  readonly x : number,
+  readonly y : number,
+  readonly tool : Tool,
+  readonly direction : Direction
+}
+export const draw = (tx : number, ty : number, tool : Tool, direction : Direction) : DrawAction => ({
+  type: 'draw',
   x: tx,
   y: ty,
   tool,
@@ -93,11 +108,35 @@ export const insertItem = (item : Item, position : BoxArea, buddyTree : BuddyNod
   buddyTree
 });
 
+export type InsertComponentPackageAction = {
+  readonly type : 'insert-component-package'
+  readonly componentPackage : CompiledComponent
+}
+export const insertComponentPackage = (componentPackage : CompiledComponent) : InsertComponentPackageAction => ({
+  type: 'insert-component-package',
+  componentPackage
+});
+
+export type MoveItemAtAction = {
+  readonly type : 'move-item-at'
+  readonly tx : number
+  readonly ty : number
+}
+export const moveItemAt = (tx : number, ty : number) : MoveItemAtAction => ({
+  type: 'move-item-at',
+  tx,
+  ty
+});
+
+
 export type ForestActions =
   SetForestAction |
+  DrawAction |
   TapTileAction |
   RemoveTileAtAction |
   ToUnderpassAction |
   ToWireAction |
   InsertComponentAction |
-  InsertItemAction;
+  InsertItemAction |
+  InsertComponentPackageAction |
+  MoveItemAtAction;

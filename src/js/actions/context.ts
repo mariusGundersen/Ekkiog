@@ -1,4 +1,27 @@
+import { read } from 'fs';
 import { Forest, Box } from 'ekkiog-editing';
+
+export type LoadForestAction = {
+  readonly type : 'load-forest'
+  readonly repo : string
+  readonly name : string
+  readonly version : string
+}
+export const loadForest = (repo : string, name : string, version : string) : LoadForestAction => ({
+  type: 'load-forest',
+  repo,
+  name,
+  version
+});
+
+export type SaveForestAction = {
+  readonly type : 'save-forest'
+  readonly message : string
+}
+export const saveForest = (message : string) : SaveForestAction => ({
+  type: 'save-forest',
+  message
+});
 
 export type NewContextLoadingAction = {
   readonly type : 'new-context-loading',
@@ -22,6 +45,17 @@ export const forestLoaded = (forest : Forest, hash : string) : ForestLoadedActio
   type: 'forest-loaded',
   forest,
   hash
+});
+
+export type DoubleTapAction = {
+  readonly type : 'double-tap',
+  readonly x : number,
+  readonly y : number
+}
+export const doubleTap = (x : number, y : number) : DoubleTapAction => ({
+  type: 'double-tap',
+  x,
+  y
 });
 
 export type PushContextLoadingAction = {
@@ -74,8 +108,11 @@ export const redo = () : RedoAction => ({
 });
 
 export type ContextActions =
+  LoadForestAction |
+  SaveForestAction |
   NewContextLoadingAction |
   ForestLoadedAction |
+  DoubleTapAction |
   PushContextLoadingAction |
   PopContextAction |
   ForestSavedAction |

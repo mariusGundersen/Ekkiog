@@ -8,12 +8,12 @@ import {
 export interface ViewState {
   readonly pixelWidth : number,
   readonly pixelHeight : number,
-  viewportToTileFloored(...pos : number[]) : [number, number],
+  viewportToTile(...pos : number[]) : [number, number],
   tileToViewport(...pos : number[]) : [number, number]
 }
 
 const initialState : ViewState = {
-  viewportToTileFloored: () => [0,0],
+  viewportToTile: () => [0,0],
   tileToViewport: () => [0, 0],
   pixelWidth: 100,
   pixelHeight: 100
@@ -24,7 +24,7 @@ export default function view(state = initialState, action : Action) : ViewState 
     case 'panZoom':
       return {
         ...state,
-        viewportToTileFloored: action.viewportToTileFloored,
+        viewportToTile: action.viewportToTile,
         tileToViewport: action.tileToViewport
       }
     case 'resize':

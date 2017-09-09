@@ -8,17 +8,15 @@ export interface ContextMenuState {
 }
 
 export interface ToolsMenuState {
-  readonly menuType : 'tools',
-  readonly open : boolean,
+  readonly menuType : 'tools'
+  readonly open : boolean
 }
 
 export interface OkCancelMenuState {
-  readonly menuType : 'okCancel',
-  readonly open : true,
-  readonly isValid : boolean,
-  readonly previousMenu : EditorMenuState,
-  okAction() : void,
-  cancelAction() : void
+  readonly menuType : 'okCancel'
+  readonly open : true
+  readonly isValid : boolean
+  readonly previousMenu : EditorMenuState
 }
 
 export type EditorMenuState = ToolsMenuState | OkCancelMenuState | ContextMenuState;
@@ -50,8 +48,6 @@ export default function editorMenu(state = initialState, action : Action) : Edit
         menuType: 'okCancel',
         open: true,
         isValid: action.isValid,
-        okAction: action.okAction,
-        cancelAction: action.cancelAction,
         previousMenu: state
       };
     case 'setOkCancelMenuValid':

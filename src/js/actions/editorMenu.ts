@@ -8,15 +8,20 @@ export const toggleEditorMenu = () : ToggleEditorMenuAction => ({
 
 export type ShowOkCancelMenuAction = {
   readonly type : 'showOkCancelMenu',
-  okAction() : void,
-  cancelAction() : void,
   isValid : boolean
 }
-export const showOkCancelMenu = (okAction : () => void, cancelAction : () => void, isValid = true) : ShowOkCancelMenuAction => ({
+export const showOkCancelMenu = (isValid = true) : ShowOkCancelMenuAction => ({
   type: 'showOkCancelMenu',
-  okAction,
-  cancelAction,
   isValid
+});
+
+export type OkCancelAction = {
+  readonly type : 'okCancel',
+  readonly ok : boolean
+}
+export const okCancel = (ok : boolean) : OkCancelAction => ({
+  type: 'okCancel',
+  ok
 });
 
 export type SetOkCancelMenuValidAction = {
