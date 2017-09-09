@@ -30,8 +30,8 @@ export default ({dispatch, ...props} : Props) => {
   return (
     <svg
       className={style.svg}
-      width={props.pixelWidth}
-      height={props.pixelHeight}
+      width={props.pixelWidth/window.devicePixelRatio}
+      height={props.pixelHeight/window.devicePixelRatio}
       viewBox={`0 0 ${props.pixelWidth} ${props.pixelHeight}`}>
       <filter id="dropshadow" height="200%">
         <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>

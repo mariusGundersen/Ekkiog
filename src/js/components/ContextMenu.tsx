@@ -60,7 +60,7 @@ export default class ContextMenu extends React.Component<Props, any>{
     if(this.props.contextMenu.loading){
       const { x, y } = this.props.contextMenu;
       return (
-        <g transform={`translate(${x/window.devicePixelRatio} ${y/window.devicePixelRatio})`}>
+        <g transform={`translate(${x} ${y})`}>
           <Loading radius={this.props.radius} width={this.props.width+2} />
         </g>
       );
@@ -70,7 +70,7 @@ export default class ContextMenu extends React.Component<Props, any>{
       const { tile, tx, ty } = this.props.contextMenu;
       const [x, y] = this.props.view.tileToViewport(tx, ty);
       return (
-        <g transform={`translate(${x/window.devicePixelRatio} ${y/window.devicePixelRatio})`}>
+        <g transform={`translate(${x} ${y})`}>
           <RadialMenu
           cx={0}
           cy={0}
