@@ -15,7 +15,7 @@ import { tap } from '../reduce/forest';
 import copyTo from '../editing/copyTo';
 import * as storage from '../storage';
 
-import { ContextActions, newContext } from './context';
+import { ContextActions, forestLoaded, newContextLoading } from './context';
 import { ContextMenuActions, hideContextMenu } from './contextMenu';
 import { EditorActions } from './editor';
 import { EditorMenuActions, resetEditorMenu, showOkCancelMenu } from './editorMenu';
@@ -131,8 +131,9 @@ export const hideContextMenuAfter = (action : ThunkAction<any, State, any>) => (
 };
 
 export const loadForest = (name : string) => async (dispatch : Dispatch<State>) => {
+  dispatch(newContextLoading(name));
   const component = await storage.load(name);
-  dispatch(newContext(name, component));
+  dispatch(forestLoaded(component));
 };
 
 export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {

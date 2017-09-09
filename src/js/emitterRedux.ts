@@ -33,7 +33,8 @@ import {
   setOkCancelMenuValid,
   moveSelection,
   setForest,
-  pushContext,
+  forestLoaded,
+  pushContextLoading,
   popContext,
   insertComponentPackages,
   insertMovableItem,
@@ -148,8 +149,9 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
           const centerY = areaData.top + areaData.height/2;
           const posA = viewportToTile(0, 0);
           const posB = viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
+          dispatch(pushContextLoading(name, box(posA, posB), centerX, centerY));
           const forest = await storage.load(name);
-          dispatch(pushContext(name, forest, box(posA, posB), centerX, centerY));
+          dispatch(forestLoaded(forest));
         }
       }
   };

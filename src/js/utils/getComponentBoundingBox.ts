@@ -22,7 +22,7 @@ export default function getComponentBoundingBox(tree : TreeNode) : Box {
       left: 56,
       right: 72,
       bottom: 72
-    }
+    };
   }
 
   return box;

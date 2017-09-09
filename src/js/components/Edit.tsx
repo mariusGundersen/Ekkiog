@@ -26,44 +26,38 @@ export default connect((s : State) => s)(
     props,
     values
   }) => {
-    if(props.context == undefined){
-      return (
-        <div>Loading</div>
-      );
-    }else{
-      return (
-        <div className={style.root}>
-          <Menu
-            contextMenu={props.contextMenu}
-            dispatch={props.dispatch}
-            editor={props.editor}
-            editorMenu={props.editorMenu}
-            pixelWidth={values.size.pixelWidth}
-            pixelHeight={values.size.pixelHeight}
-            view={props.view}
-          />
-          <WebGLCanvas
-            contextMenu={props.contextMenu}
-            currentContext={props.context}
-            dispatch={props.dispatch}
-            previousContext={props.context.previous}
-            selection={props.selection}
-            tickInterval={props.simulation.tickInterval}
-            width={values.size.pixelWidth}
-            height={values.size.pixelHeight}
-          />
-          <NavBar
-            dispatch={props.dispatch}
-            currentComponentName={props.context.name}
-            tickCount={props.simulation.tickCount}
-            tickInterval={props.simulation.tickInterval}
-            gateCount={(props.context.forest.buddyTree.usedSize||2) - 2}
-            undoCount={props.context.undoStack && props.context.undoStack.count || 0}
-            redoCount={props.context.redoStack && props.context.redoStack.count || 0}
-          />
-        </div>
-      );
-    }
+    return (
+      <div className={style.root}>
+        <WebGLCanvas
+          contextMenu={props.contextMenu}
+          currentContext={props.context}
+          dispatch={props.dispatch}
+          previousContext={props.context.previous}
+          selection={props.selection}
+          tickInterval={props.simulation.tickInterval}
+          width={values.size.pixelWidth}
+          height={values.size.pixelHeight}
+        />
+        <Menu
+          contextMenu={props.contextMenu}
+          dispatch={props.dispatch}
+          editor={props.editor}
+          editorMenu={props.editorMenu}
+          pixelWidth={values.size.pixelWidth}
+          pixelHeight={values.size.pixelHeight}
+          view={props.view}
+        />
+        <NavBar
+          dispatch={props.dispatch}
+          currentComponentName={props.context.name}
+          tickCount={props.simulation.tickCount}
+          tickInterval={props.simulation.tickInterval}
+          gateCount={(props.context.forest.buddyTree.usedSize||2) - 2}
+          undoCount={props.context.undoStack && props.context.undoStack.count || 0}
+          redoCount={props.context.redoStack && props.context.redoStack.count || 0}
+        />
+      </div>
+    );
   }
 ));
 

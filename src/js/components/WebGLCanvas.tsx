@@ -28,7 +28,6 @@ import moveHandler from '../editing/moveHandler';
 import forestHandler from '../editing/forestHandler';
 import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reduce/contextMenu';
-import ease, { Step, easeOut } from '../utils/ease';
 
 export interface Props{
   readonly tickInterval : number,
@@ -68,20 +67,17 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     this.shellConfig = startShell({
       tickInterval : this.props.tickInterval,
       render: (delta : number) => {
-        if(this.ease){
-          const box = this.ease.next(delta);
-          if(!box.done){
-            this.perspective.reset(arrayToBox(box.value));
-          }else{
-            this.ease = undefined;
+        const ease = this.props.currentContext.ease.next(delta);
+        if(ease.done){
+          const changed = this.touchControls.panZoomSaga.process();
+          if(changed){
+            this.props.dispatch(panZoom(
+              this.perspective.tileToViewport.bind(this.perspective),
+              this.perspective.viewportToTileFloored.bind(this.perspective)
+            ));
           }
-        }
-        const changed = this.touchControls.panZoomSaga.process();
-        if(changed){
-          this.props.dispatch(panZoom(
-            this.perspective.tileToViewport.bind(this.perspective),
-            this.perspective.viewportToTileFloored.bind(this.perspective)
-          ));
+        }else{
+          this.perspective.reset(arrayToBox(ease.value));
         }
 
         this.engine.render(this.perspective.mapToViewportMatrix);
@@ -150,20 +146,6 @@ export default class WebGLCanvas extends React.Component<Props, any> {
         this.touchControls.pointerSaga.disable();
       }else{
         this.touchControls.pointerSaga.enable();
-      }
-    }
-
-    if(nextContext.boundingBox !== currentContext.boundingBox){
-      if(previousContext && previousContext.name === nextContext.name){
-        const from = scaleBox(nextContext.boundingBox, 0.7, previousContext.centerX, previousContext.centerY);
-        this.perspective.reset(from);
-        this.ease = ease(boxToArray(from), boxToArray(nextContext.boundingBox), easeOut, 200);
-      }else if(nextProps.previousContext === undefined){
-        this.perspective.reset(nextContext.boundingBox);
-      }else if(nextProps.previousContext.name === currentContext.name){
-        const from = scaleBox(nextContext.boundingBox, 1.4);
-        this.perspective.reset(from);
-        this.ease = ease(boxToArray(from), boxToArray(nextContext.boundingBox), easeOut, 200);
       }
     }
   }

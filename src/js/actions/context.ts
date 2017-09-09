@@ -1,28 +1,33 @@
 import { Forest, Box } from 'ekkiog-editing';
 
-export type NewContextAction = {
-  readonly type : 'new-context',
-  readonly name : string,
+export type NewContextLoadingAction = {
+  readonly type : 'new-context-loading',
+  readonly name : string
+}
+export const newContextLoading = (name : string) : NewContextLoadingAction => ({
+  type: 'new-context-loading',
+  name
+});
+
+export type ForestLoadedAction = {
+  readonly type : 'forest-loaded',
   readonly forest : Forest
 }
-export const newContext = (name : string, forest : Forest) : NewContextAction => ({
-  type: 'new-context',
-  name,
+export const forestLoaded = (forest : Forest) : ForestLoadedAction => ({
+  type: 'forest-loaded',
   forest
 });
 
-export type PushContextAction = {
-  readonly type : 'push-context',
+export type PushContextLoadingAction = {
+  readonly type : 'push-context-loading',
   readonly name : string,
-  readonly forest : Forest,
   readonly boundingBox : Box,
   readonly centerX : number,
   readonly centerY : number
 }
-export const pushContext = (name : string, forest : Forest, boundingBox : Box, centerX : number, centerY : number) : PushContextAction => ({
-  type: 'push-context',
+export const pushContextLoading = (name : string, boundingBox : Box, centerX : number, centerY : number) : PushContextLoadingAction => ({
+  type: 'push-context-loading',
   name,
-  forest,
   boundingBox,
   centerX,
   centerY
@@ -50,8 +55,9 @@ export const redo = () : RedoAction => ({
 });
 
 export type ContextActions =
-  NewContextAction |
-  PushContextAction |
+  NewContextLoadingAction |
+  ForestLoadedAction |
+  PushContextLoadingAction |
   PopContextAction |
   UndoAction |
   RedoAction;

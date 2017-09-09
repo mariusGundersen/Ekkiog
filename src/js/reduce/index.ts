@@ -10,7 +10,7 @@ import simulation, { SimulationState } from './simulation';
 import view, { ViewState } from './view';
 
 export interface State {
-  readonly context : ContextState | null,
+  readonly context : ContextState,
   readonly contextMenu : ContextMenuState,
   readonly editor : EditorState,
   readonly editorMenu : EditorMenuState,
