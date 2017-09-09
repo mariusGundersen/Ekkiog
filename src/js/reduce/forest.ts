@@ -47,7 +47,6 @@ export default function editing(forest=createForest(), action : Action) : Forest
     case 'insert-component':
       return drawComponent(forest, action.position.x+(action.component.width>>1), action.position.y+(action.component.height>>1), action.component);
     case 'insert-item':
-      console.log(insertItem);
       return insertItem(forest, action.buddyTree, action.item, action.position);
     default:
       return forest;
