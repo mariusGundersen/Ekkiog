@@ -4,26 +4,17 @@ import Texture from './Texture';
 
 export default class ImageTexture extends Texture{
   image? : HTMLImageElement;
-  readonly loading : Promise<ImageTexture>;
-  constructor(gl : WebGLRenderingContext, image : Promise<HTMLImageElement>){
+  constructor(gl : WebGLRenderingContext, image : HTMLImageElement){
     super(gl, 0);
-    this.image = undefined;
-    this.loading = image.then(image => {
-      this.width = image.width;
-      this.height = image.height;
-      this.image = image;
+    this.width = image.width;
+    this.height = image.height;
+    this.image = image;
 
-      vec2.set(this.size, image.width, image.height);
-      vec2.set(this.halfSize, image.width/2, image.height/2);
-      vec2.set(this.inverseSize, 1/image.width, 1/image.height);
+    vec2.set(this.size, image.width, image.height);
+    vec2.set(this.halfSize, image.width/2, image.height/2);
+    vec2.set(this.inverseSize, 1/image.width, 1/image.height);
 
-      this.update();
-      return this;
-    });
-  }
-
-  get ready(){
-    return this.image !== undefined;
+    this.update();
   }
 
   update(){

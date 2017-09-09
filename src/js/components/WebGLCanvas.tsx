@@ -47,15 +47,15 @@ export default class WebGLCanvas extends React.Component<Props, any> {
   private perspective : Perspective;
   private touchControls : TouchControls;
   private shellConfig : Config
-  private ease? : Step
+  private ease? : IterableIterator<number[]>
+
   componentDidMount(){
     if(!this.canvas) return
     const gl = getContext(this.canvas);
     const emitter = new EventEmitter();
-    this.engine = new Engine(gl);
-    this.engine.setViewport(this.props.width, this.props.height);
     this.perspective = new Perspective();
     this.touchControls = new TouchControls(emitter, this.perspective);
+    this.engine = new Engine(gl, this.props.width, this.props.height);
 
     // The react event system is too slow, so using the native events
     this.canvas.addEventListener('touchstart', emit(emitter, TOUCH_START), false)
@@ -63,14 +63,15 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     this.canvas.addEventListener('touchend', emit(emitter, TOUCH_END), false);
 
     fromEmitter(emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch, this.engine);
+    forestHandler(undefined, this.props.currentContext.forest, this.engine);
 
     this.shellConfig = startShell({
       tickInterval : this.props.tickInterval,
       render: (delta : number) => {
         if(this.ease){
-          const box = this.ease(delta);
-          if(box){
-            this.perspective.reset(arrayToBox(box));
+          const box = this.ease.next(delta);
+          if(!box.done){
+            this.perspective.reset(arrayToBox(box.value));
           }else{
             this.ease = undefined;
           }
@@ -116,6 +117,8 @@ export default class WebGLCanvas extends React.Component<Props, any> {
         ));
       }
     });
+
+    this.perspective.reset(this.props.currentContext.boundingBox);
   }
 
   componentWillReceiveProps(nextProps : Props){
@@ -152,13 +155,13 @@ export default class WebGLCanvas extends React.Component<Props, any> {
 
     if(nextContext.boundingBox !== currentContext.boundingBox){
       if(previousContext && previousContext.name === nextContext.name){
-        const from = scaleBox(nextContext.boundingBox, 0.5, previousContext.centerX, previousContext.centerY);
+        const from = scaleBox(nextContext.boundingBox, 0.7, previousContext.centerX, previousContext.centerY);
         this.perspective.reset(from);
         this.ease = ease(boxToArray(from), boxToArray(nextContext.boundingBox), easeOut, 200);
       }else if(nextProps.previousContext === undefined){
         this.perspective.reset(nextContext.boundingBox);
       }else if(nextProps.previousContext.name === currentContext.name){
-        const from = scaleBox(nextContext.boundingBox, 1.5);
+        const from = scaleBox(nextContext.boundingBox, 1.4);
         this.perspective.reset(from);
         this.ease = ease(boxToArray(from), boxToArray(nextContext.boundingBox), easeOut, 200);
       }
@@ -215,14 +218,14 @@ function arrayToBox([top, left, right, bottom] : number[]){
 }
 
 function scaleBox({top, left, right, bottom} : Box, scale : number, x = (left+right)/2, y = ((top+bottom)/2)){
-  const w = right - left;
-  const h = bottom - top;
-  const scaleX = scale;
-  const scaleY = h/w*scale;
+  const halfWidth = (right - left)/2;
+  const halfHeight = (bottom - top)/2;
+  const scaleX = halfHeight <= halfWidth ? scale : halfWidth/halfHeight*scale;
+  const scaleY = halfHeight >= halfWidth ? scale : halfHeight/halfWidth*scale;
   return {
-    top: y - h/2*scaleY,
-    left: x - w/2*scaleX,
-    right: x + w/2*scaleX,
-    bottom: y + h/2*scaleY
+    top: y - halfHeight**scaleY,
+    left: x - halfWidth**scaleX,
+    right: x + halfWidth**scaleX,
+    bottom: y + halfHeight**scaleY
   };
 }

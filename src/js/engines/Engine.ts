@@ -10,12 +10,14 @@ export default class Engine {
   private readonly moveContext : Context;
   private readonly renderer : Renderer;
   constructor(
-    private readonly gl : WebGLRenderingContext
+    private readonly gl : WebGLRenderingContext,
+    width : number,
+    height : number
   ) {
     const atomicBind = makeAtomicBind();
     this.context = new Context(gl, atomicBind);
     this.moveContext = new Context(gl, atomicBind);
-    this.renderer = new Renderer(gl);
+    this.renderer = new Renderer(gl, width, height);
   }
 
   setViewport(width : number, height : number){

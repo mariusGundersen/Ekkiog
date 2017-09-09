@@ -23,9 +23,11 @@ export default class Renderer {
   private readonly debugEngine : DebugEngine;
   private width : number;
   private height : number;
-  constructor(gl : WebGLRenderingContext) {
+  constructor(gl : WebGLRenderingContext, width : number, height : number) {
     this.gl = gl;
     this.currentTick = 0;
+    this.width = width;
+    this.height = height;
 
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.enable(this.gl.BLEND);
@@ -45,8 +47,6 @@ export default class Renderer {
   }
 
   renderMap(context : RenderContext){
-    if(!context.spriteSheetTexture.ready) return;
-
     this.tileMapEngine.render(
       context.triangle,
       context.mapTexture,
@@ -54,8 +54,6 @@ export default class Renderer {
   }
 
   simulateTick(context : RenderContext, tick=this.currentTick){
-    if(!context.spriteSheetTexture.ready) return;
-
     this.currentTick = tick;
 
     const prevousCharges = context.netChargeTextures[(tick+1)%2];
@@ -78,8 +76,6 @@ export default class Renderer {
   }
 
   renderView(context : RenderContext, mapToViewportMatrix : mat3) {
-    if(!context.spriteSheetTexture.ready) return;
-
     this.gl.viewport(0, 0, this.width, this.height);
     this.viewEngine.render(context, mapToViewportMatrix);
     this.wordEngine.render(context, mapToViewportMatrix);
@@ -89,8 +85,6 @@ export default class Renderer {
   }
 
   renderMove(context : RenderContext, mapToViewportMatrix : mat3, {top, left, right, bottom} : Box, dx : number, dy : number){
-    if(!context.spriteSheetTexture.ready) return;
-
     this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
   }
 

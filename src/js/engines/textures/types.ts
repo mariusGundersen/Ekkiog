@@ -20,7 +20,7 @@ export interface RenderContext {
   readonly tileSize : number;
   readonly triangle : VertexBuffer;
   readonly wordQuadList : VertexBuffer;
-  readonly spriteSheetTexture : TextureBuffer & { readonly ready : boolean };
+  readonly spriteSheetTexture : TextureBuffer;
   readonly chargeMapTexture : TextureBuffer & FrameBuffer;
   readonly tileMapTexture : TextureBuffer & FrameBuffer;
   readonly netChargeTextures : [TextureBuffer & FrameBuffer, TextureBuffer & FrameBuffer];

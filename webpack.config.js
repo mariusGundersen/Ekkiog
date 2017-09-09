@@ -115,10 +115,7 @@ module.exports = {
       },
       {
         test: /\.png$/,
-        loader: 'file-loader',
-        options: {
-          name: 'img/[name].[hash].[ext]'
-        }
+        loader: 'url-loader'
       },
       {
         test: /\.s?css$/,
