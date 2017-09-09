@@ -15,7 +15,7 @@ import { tap } from '../reduce/forest';
 import copyTo from '../editing/copyTo';
 import * as storage from '../storage';
 
-import { ContextActions, forestLoaded, newContextLoading } from './context';
+import { ContextActions, forestLoaded, forestSaved, newContextLoading } from './context';
 import { ContextMenuActions, hideContextMenu } from './contextMenu';
 import { EditorActions } from './editor';
 import { EditorMenuActions, resetEditorMenu, showOkCancelMenu } from './editorMenu';
@@ -130,10 +130,10 @@ export const hideContextMenuAfter = (action : ThunkAction<any, State, any>) => (
   dispatch(hideContextMenu());
 };
 
-export const loadForest = (name : string) => async (dispatch : Dispatch<State>) => {
-  dispatch(newContextLoading(name));
+export const loadForest = (repo : string, name : string, version : string) => async (dispatch : Dispatch<State>) => {
+  dispatch(newContextLoading(repo, name, version));
   const component = await storage.load(name);
-  dispatch(forestLoaded(component));
+  dispatch(forestLoaded(component, component.hash));
 };
 
 export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<State>, getState : () => State) => {
@@ -148,9 +148,11 @@ export const moveItemAt = (tx : number, ty : number) => (dispatch : Dispatch<Sta
       const selection = getState().selection;
       if(selection.selection == false) return;
       dispatch(insertItem(item.data, {
-        x: selection.x + selection.dx,
-        y: selection.y + selection.dy
-      }));
+        left: selection.x + selection.dx,
+        top: selection.y + selection.dy,
+        width: item.width,
+        height: item.height
+      }, selection.forest.buddyTree));
       dispatch(save(`Moved ${item.data.type}`));
       dispatch(stopSelection());
       dispatch(resetEditorMenu());
@@ -170,7 +172,8 @@ export const save = (message : string) => async (dispatch : Dispatch<State>, get
   if(context == undefined) return;
 
   const {forest, name} = context;
-  await storage.save(name, forest, message);
+  const hash = await storage.save(name, forest, message);
+  dispatch(forestSaved(hash));
 };
 
 export const saveAfter = (action : Action, mesage : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
@@ -198,9 +201,11 @@ export const insertMovableItem = (tool : Tool, direction : Direction, tx : numbe
       const selection = getState().selection;
       if(selection.selection == false) return;
       dispatch(insertItem(item.data, {
-        x: selection.x + selection.dx,
-        y: selection.y + selection.dy
-      }));
+        left: selection.x + selection.dx,
+        top: selection.y + selection.dy,
+        width: item.width,
+        height: item.height
+      }, selection.forest.buddyTree));
       dispatch(save(`Inserted ${tool}`));
       dispatch(stopSelection());
       dispatch(resetEditorMenu());

@@ -19,25 +19,27 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/withLatestFrom';
 import { CompiledComponent } from 'ekkiog-editing';
 
-import SearchResultView, { NoExactMatchView, SearchResult, RECENT, POPUPLAR, FAVORITE, NORMAL } from './SearchResultView';
+import SearchResultView, { NoExactMatchView, SearchResult, RepoNameVersion, RECENT, POPUPLAR, FAVORITE, NORMAL } from './SearchResultView';
 
 import style from './search.scss';
 
 import * as storage from '../storage';
 
+export { RepoNameVersion };
+
 export interface Props {
   query : string,
   createComponent(name : string) : void;
-  openComponent(name : string) : void;
-  insertPackage(name : CompiledComponent) : void;
+  openComponent(component : RepoNameVersion) : void;
+  insertPackage(component : CompiledComponent) : void;
 }
 
 type ObservableProps = Observable<Props>;
 
 export default reax<Props>()(({
-  insertPackage: (result : string) => result,
-  openComponent: (result : string) => result,
-  toggleFavorite: (result : string) => result
+  insertPackage: (result : RepoNameVersion) => result,
+  openComponent: (result : RepoNameVersion) => result,
+  toggleFavorite: (result : RepoNameVersion) => result
 }), ({
   insertPackage,
   openComponent,
@@ -46,14 +48,14 @@ export default reax<Props>()(({
 
   insertPackage
     .withLatestFrom(props)
-    .subscribe(([name, props]) => storage.loadPackage(name).then(props.insertPackage));
+    .subscribe(([result, props]) => storage.loadPackage(result.repo, result.name, result.version).then(props.insertPackage));
 
   openComponent
     .withLatestFrom(props)
-    .subscribe(([name, props]) => props.openComponent(name));
+    .subscribe(([result, props]) => props.openComponent(result));
 
   const updateList = toggleFavorite
-    .switchMap(name => Observable.fromPromise(storage.toggleFavorite(name)))
+    .switchMap(result => Observable.fromPromise(storage.toggleFavorite(result.name)))
     .withLatestFrom(props)
     .map(([_, props]) => props.query);
 
@@ -69,7 +71,7 @@ export default reax<Props>()(({
 
   const noExactMatch = searchResults
     .withLatestFrom(props)
-    .map(([results, props]) => props.query && results.map(r => r.name).indexOf(props.query) === -1);
+    .map(([results, props]) => props.query && results.map(r => r.data.name).indexOf(props.query) === -1);
 
   return {
     searchResults,
@@ -80,7 +82,7 @@ export default reax<Props>()(({
     <div className={style.searchResults}>
       {noExactMatch && <NoExactMatchView key="no-exact-match" query={props.query} createComponent={props.createComponent} />}
       {searchResults.map(r => <SearchResultView
-        key={`${r.name}_${r.type}`}
+        key={`${r.data.name}_${r.type}`}
         result={r}
         insertPackage={events.insertPackage}
         openComponent={events.openComponent}
@@ -96,9 +98,16 @@ function searchDatabase(query : string){
 function find(query : string) : Observable<SearchResult[]>{
   return storage.getComponentNames()
     .filter(data => data.name.toUpperCase().indexOf(query) >= 0)
-    .map(data => ({name : data.name, type: data.favorite ? FAVORITE : NORMAL}))
+    .map(data => ({
+      data: {
+        repo: '',
+        name: data.name,
+        version: '0',
+      },
+      type: data.favorite ? FAVORITE : NORMAL
+    }))
     .scan((acc, val) => [...acc, val], [])
-    .map(list => [...list].sort((a, b) => (a.name.indexOf(query) - b.name.indexOf(query)) || (a > b ? 1 : a < b ? -1 : 0)))
+    .map(list => [...list].sort(bySimilarityTo(query)))
     .startWith([]);
 }
 
@@ -113,18 +122,43 @@ function showEmpty(){
 
 function getRecent() : Observable<SearchResult>{
   return storage.getRecent()
-    .map(name => ({name, type: RECENT}))
+    .map(name => ({
+      data: {
+        repo: '',
+        name,
+        version: '0'
+      },
+      type: RECENT
+    }))
     .take(5);
 }
 
 function getFavorite() : Observable<SearchResult>{
   return storage.getFavorite()
-    .map(name => ({name, type: FAVORITE}))
+    .map(name => ({
+      data: {
+        repo: '',
+        name,
+        version: '0'
+      },
+      type: FAVORITE
+    }))
     .take(5);
 }
 
 function getPopular() : Observable<SearchResult>{
   return storage.getPopular()
-    .map(name => ({name, type: POPUPLAR}))
+    .map(name => ({
+      data: {
+        repo: '',
+        name,
+        version: '0'
+      },
+      type: POPUPLAR
+    }))
     .take(5);
+}
+
+function bySimilarityTo(query : string){
+  return (a : SearchResult, b : SearchResult) => (a.data.name.indexOf(query) - b.data.name.indexOf(query)) || (a > b ? 1 : a < b ? -1 : 0)
 }

@@ -42,9 +42,9 @@ const _db = idb.open('ekkiog', 11, db => {
 const _repo = _db.then(db => new Repo({}, db));
 export const user : OauthData | null = JSON.parse(localStorage.getItem('ekkiog-user') || 'null') as OauthData | null;
 
-export async function save(name : string, forest : Forest, message : string){
+export async function save(name : string, forest : Forest, message : string) : Promise<string> {
   const repo = await _repo;
-  await repo.save(name, forest, message, user);
+  const hash = await repo.save(name, forest, message, user);
   const db = await _db;
   const transaction = db.transaction([
     'componentMetadata'
@@ -61,9 +61,11 @@ export async function save(name : string, forest : Forest, message : string){
         favorite: 'false'
       });
   }
+
+  return hash;
 }
 
-export async function load(name : string) : Promise<Forest>{
+export async function load(name : string){
   const db = await _db;
   const transaction = db.transaction([
     'componentMetadata',
@@ -81,9 +83,9 @@ export async function load(name : string) : Promise<Forest>{
   return await repo.load(name);
 }
 
-export async function loadPackage(name : string) : Promise<CompiledComponent>{
+export async function loadPackage(repo : string, name : string, version : string) : Promise<CompiledComponent>{
   const forest = await load(name)
-  return packageComponent(forest, name);
+  return packageComponent(forest, repo, name, version, forest.hash);
 }
 
 export function getRecent() : Observable<string> {

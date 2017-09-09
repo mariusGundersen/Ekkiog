@@ -13,5 +13,5 @@ export default function main(store : Store<State>){
       <App />
     </Provider>,
     document.querySelector('.react-app')
-  )
+  );
 }

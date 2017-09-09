@@ -1,4 +1,4 @@
-import { Item, TreeNode as EnneaNode, Forest, Box, BuddyNode } from 'ekkiog-editing';
+import { Item, TreeNode as EnneaNode, Forest, Box, BuddyNode, upgradeItem } from 'ekkiog-editing';
 import { BoxedData } from 'ennea-tree';
 
 import { Constructor, IRawRepo, Type, Mode, Hash } from '@es-git/core';
@@ -6,7 +6,11 @@ import { IObjectRepo, Person, ModeHash, TreeBody, CommitBody, textToBlob } from 
 import { ILoadAsRepo } from '@es-git/load-as-mixin';
 
 export interface ILoadForestRepo {
-   checkout(branch : string) : Promise<Forest>
+   checkout(branch : string) : Promise<ForestWithHash>
+}
+
+export interface ForestWithHash extends Forest {
+  readonly hash : Hash
 }
 
 type EnneaLeaf = BoxedData<Item>;
@@ -27,6 +31,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
       const buddyTree = await this.loadBuddy(await super.loadTree(tree['buddy'].hash));
 
       return {
+        hash,
         enneaTree,
         buddyTree
       }
@@ -35,7 +40,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
     async loadEnnea(body : TreeBody, size = 128) : Promise<EnneaNode> {
       return {
         size,
-        data: body['0'] ? JSON.parse(await super.loadText(body['0'].hash)) : undefined,
+        data: body['0'] ? upgradeItem(JSON.parse(await super.loadText(body['0'].hash))) : undefined,
         topLeft: body['1'] ? await this.loadEnnea(await super.loadTree(body['1'].hash), size/2) : undefined,
         top: body['2'] ? await this.loadList(await super.loadTree(body['2'].hash)) : [],
         topRight: body['3'] ? await this.loadEnnea(await super.loadTree(body['3'].hash), size/2) : undefined,
@@ -59,9 +64,16 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
     async loadList(items : TreeBody) : Promise<EnneaLeaf[]> {
       const result = [] as EnneaLeaf[];
       for(const item of Object.keys(items)){
-        result[parseInt(item)] = JSON.parse(await super.loadText(items[item].hash));
+        result[parseInt(item)] = upgradeAreaItem(JSON.parse(await super.loadText(items[item].hash)));
       }
       return result;
     }
+  }
+}
+
+function upgradeAreaItem(area : EnneaLeaf){
+  return {
+    ...area,
+    data: upgradeItem(area.data)
   }
 }

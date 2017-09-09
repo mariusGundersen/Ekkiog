@@ -34,7 +34,10 @@ const store = createStore<State>(
 main(store);
 
 const search = new URLSearchParams(document.location.search);
-store.dispatch(loadForest(search.get('component') || 'WELCOME'));
+store.dispatch(loadForest(
+  search.get('repo') || '',
+  search.get('component') || 'WELCOME',
+  search.get('version') || '0'));
 
 function pageFromUrl() : PageState {
   const search = new URLSearchParams(document.location.search);

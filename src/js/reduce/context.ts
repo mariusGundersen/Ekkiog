@@ -8,7 +8,10 @@ import {
 import ease, { noEase, Easing, easeOut, easeIn } from '../utils/ease';
 
 export interface ContextState {
+  readonly repo : string
   readonly name : string
+  readonly version : string
+  readonly hash : string
   readonly previous? : ParentContextState
   readonly forest : Forest
   readonly boundingBox : Box
@@ -30,11 +33,17 @@ export interface Link<T> {
 }
 
 export interface LoadingState {
+  readonly repo : string
   readonly name : string
+  readonly version : string
   readonly scaleInFrom : number
 }
 
 const initialContext : ContextState = {
+  repo: '',
+  name: '',
+  version: '0',
+  hash: '0000000000000000000000000000000000000000',
   forest: createForest(),
   boundingBox: {
     top: 56,
@@ -42,7 +51,6 @@ const initialContext : ContextState = {
     right: 72,
     bottom: 72
   },
-  name: '',
   ease: noEase(boxToArray({
     top: 56,
     left: 56,
@@ -55,11 +63,14 @@ export default function context(state = initialContext, action: Action) : Contex
   switch(action.type){
     case 'new-context-loading':
       return {
-        forest: state.forest,
-        boundingBox: state.boundingBox,
-        name: state.name,
+        ...state,
+        previous: undefined,
+        undoStack: undefined,
+        redoStack: undefined,
         loading: {
+          repo: action.repo,
           name: action.name,
+          version: action.version,
           scaleInFrom: 1
         },
         ease: state.ease
@@ -68,18 +79,21 @@ export default function context(state = initialContext, action: Action) : Contex
       const boundingBox = getComponentBoundingBox(action.forest.enneaTree);
       return state.loading ? {
         ...state,
+        repo: state.loading.repo,
         name: state.loading.name,
+        version: state.loading.version,
         forest: action.forest,
+        hash: action.hash,
         boundingBox,
         ease: ease(boxToArray(scaleBox(boundingBox, state.loading.scaleInFrom)), boxToArray(boundingBox), easeOut, 200),
         loading: undefined
       } : state;
     case 'push-context-loading':
       return {
-        name: state.name,
-        forest: state.forest,
-        boundingBox: state.boundingBox,
+        ...state,
         ease: ease(boxToArray(action.boundingBox), boxToArray(scaleBox(action.boundingBox, 0.7, action.centerX, action.centerY)), easeIn, 200),
+        undoStack: undefined,
+        redoStack: undefined,
         previous: {
           ...state,
           boundingBox: action.boundingBox,
@@ -88,7 +102,9 @@ export default function context(state = initialContext, action: Action) : Contex
           ease: ease(boxToArray(scaleBox(action.boundingBox, 0.7, action.centerX, action.centerY)), boxToArray(action.boundingBox), easeOut, 200)
         },
         loading: {
+          repo: action.repo,
           name: action.name,
+          version: action.version,
           scaleInFrom: 1.4
         }
       };

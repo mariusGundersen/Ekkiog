@@ -15,14 +15,21 @@ export const FAVORITE : 'favorite' = 'favorite';
 export const NORMAL : 'normal' = 'normal';
 
 export interface SearchResult {
-  readonly name : string;
+  readonly data : RepoNameVersion
   readonly type : 'recent' | 'popular' | 'favorite' | 'normal'
 }
 
+export interface RepoNameVersion {
+  readonly repo : string
+  readonly name : string
+  readonly version : string
+
+}
+
 export interface SearchResultViewProps {
-  insertPackage(result : string) : void;
-  openComponent(result : string) : void;
-  toggleFavorite(result : string) : void;
+  insertPackage(result : RepoNameVersion) : void;
+  openComponent(result : RepoNameVersion) : void;
+  toggleFavorite(result : RepoNameVersion) : void;
   readonly result : SearchResult;
 }
 
@@ -31,17 +38,17 @@ export default function SearchResultView<T>({insertPackage, openComponent, toggl
     <div className={style.searchResult}>
       <button
         className={style.toggleFavorite}
-        onClick={e => toggleFavorite(result.name)}>
+        onClick={e => toggleFavorite(result.data)}>
         {getIcon(result)}
       </button>
       <button
         className={style.insertPackage}
-        onClick={e => insertPackage(result.name)}>
-        {result.name}
+        onClick={e => insertPackage(result.data)}>
+        {result.data.name}
       </button>
       <button
         className={style.openComponent}
-        onClick={e => openComponent(result.name)}>
+        onClick={e => openComponent(result.data)}>
         <MdEdit />
       </button>
     </div>

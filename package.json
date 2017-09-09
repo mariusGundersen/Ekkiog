@@ -80,7 +80,7 @@
     "babel-runtime": "^6.26.0",
     "base64-arraybuffer": "^0.1.5",
     "buddy-tree": "^2.1.1",
-    "ekkiog-editing": "^4.2.0",
+    "ekkiog-editing": "^5.1.0",
     "ennea-tree": "^2.1.0",
     "event-saga": "^3.0.0",
     "gl-matrix": "^2.4.0",

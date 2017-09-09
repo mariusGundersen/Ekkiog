@@ -10,11 +10,11 @@ import pushMixin from '@es-git/push-mixin';
 import fetchMixin from '@es-git/fetch-mixin';
 
 import saveForestMixin, { User } from './saveForest';
-import loadForestMixin from './loadForest';
+import loadForestMixin, { ForestWithHash } from './loadForest';
 
 export interface IRepo {
   save(name : string, forest : Forest, message : string, user : User | null) : Promise<string>
-  load(name : string) : Promise<Forest>
+  load(name : string) : Promise<ForestWithHash>
 }
 
 const defaultUser = {
@@ -41,7 +41,10 @@ export default class Repo extends mix(IdbRepo)
       try{
         return await super.checkout(`refs/heads/${name}`);
       }catch(e){
-        return createForest();
+        return {
+          ...createForest(),
+          hash: '0000000000000000000000000000000000000000'
+        };
       }
     }
 };

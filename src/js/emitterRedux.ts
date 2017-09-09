@@ -126,7 +126,7 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
 
         const previousContext = context.previous;
         if(previousContext){
-          const component = packageComponent(context.forest, context.name);
+          const component = packageComponent(context.forest, context.repo, context.name, context.version, context.hash);
           dispatch(popContext());
           const {forest, didntFit} = replaceComponents(previousContext.forest, component);
           if(previousContext.forest !== forest){
@@ -144,14 +144,14 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
 
         const areaData = getTileAt(state.context.forest.enneaTree, ty|0, tx|0);
         if(areaData && areaData.data.type === 'component' && areaData.data.name){
-          const name = areaData.data.name;
+          const {repo, name, version} = areaData.data;
           const centerX = areaData.left + areaData.width/2;
           const centerY = areaData.top + areaData.height/2;
           const posA = viewportToTile(0, 0);
           const posB = viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
-          dispatch(pushContextLoading(name, box(posA, posB), centerX, centerY));
+          dispatch(pushContextLoading(repo, name, version, box(posA, posB), centerX, centerY));
           const forest = await storage.load(name);
-          dispatch(forestLoaded(forest));
+          dispatch(forestLoaded(forest, forest.hash));
         }
       }
   };

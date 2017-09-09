@@ -3,7 +3,9 @@ import {
   Tool,
   Direction,
   CompiledComponent,
-  Item
+  Item,
+  BoxArea,
+  BuddyNode
 } from 'ekkiog-editing';
 
 export type SetForestAction = {
@@ -81,15 +83,14 @@ export const insertComponent = (component : CompiledComponent, position : {x : n
 export type InsertItemAction = {
   readonly type : 'insert-item',
   readonly item : Item,
-  readonly position : {
-    readonly x : number,
-    readonly y : number
-  }
+  readonly position : BoxArea,
+  readonly buddyTree : BuddyNode
 }
-export const insertItem = (item : Item, position : {x : number, y : number}) : InsertItemAction => ({
+export const insertItem = (item : Item, position : BoxArea, buddyTree : BuddyNode) : InsertItemAction => ({
   type: 'insert-item',
   item,
-  position
+  position,
+  buddyTree
 });
 
 export type ForestActions =
