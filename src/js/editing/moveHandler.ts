@@ -1,7 +1,7 @@
 import { createForest, diffAndReconcile } from 'ekkiog-editing';
 
 import Engine from '../engines/Engine';
-import { SelectionState } from '../reducers/selection';
+import { SelectionState } from '../reduce/selection';
 
 export default function moveHandler(before : SelectionState, after : SelectionState, engine : Engine){
   if(!before.selection && !after.selection) return;

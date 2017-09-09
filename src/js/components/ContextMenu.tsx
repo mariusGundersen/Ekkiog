@@ -3,8 +3,8 @@ import { connect, Dispatch } from 'react-redux';
 import { TileType } from 'ekkiog-editing';
 
 import { State } from '../reduce';
-import { ContextMenuState } from '../reducers/contextMenu';
-import { ViewState } from '../reducers/view';
+import { ContextMenuState } from '../reduce/contextMenu';
+import { ViewState } from '../reduce/view';
 import Loading from './radialMenu/Loading';
 import RadialMenu, { PieCenterProps, PieRingProps } from './radialMenu';
 

@@ -26,8 +26,8 @@ import {
 
 import { toggleEditorMenu, setToolDirection } from '../actions';
 import { State } from '../reduce';
-import { EditorState } from '../reducers/editor';
-import { EditorMenuState, OkCancelMenuState, ToolsMenuState, ContextMenuState } from '../reducers/editorMenu';
+import { EditorState } from '../reduce/editor';
+import { EditorMenuState, OkCancelMenuState, ToolsMenuState, ContextMenuState } from '../reduce/editorMenu';
 
 export interface Props {
   cx : number,

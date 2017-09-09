@@ -11,7 +11,7 @@ import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
 import { State } from '../reduce';
-import { tap } from '../reducers/forest';
+import { tap } from '../reduce/forest';
 import copyTo from '../editing/copyTo';
 import * as storage from '../storage';
 

@@ -4,10 +4,10 @@ import { Dispatch } from 'redux';
 import style from './main.css';
 
 import { State } from '../reduce';
-import { ContextMenuState } from '../reducers/contextMenu';
-import { EditorState } from '../reducers/editor';
-import { EditorMenuState } from '../reducers/editorMenu';
-import { ViewState } from '../reducers/view';
+import { ContextMenuState } from '../reduce/contextMenu';
+import { EditorState } from '../reduce/editor';
+import { EditorMenuState } from '../reduce/editorMenu';
+import { ViewState } from '../reduce/view';
 import EditorMenu from './EditorMenu';
 import ContextMenu from './ContextMenu';
 

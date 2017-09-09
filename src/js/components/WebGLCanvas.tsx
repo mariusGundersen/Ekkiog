@@ -11,8 +11,8 @@ import {
   simulationTick
 } from '../actions';
 import { State } from '../reduce';
-import { SelectionState } from '../reducers/selection';
-import { ContextState, ParentContextState } from '../reducers/context';
+import { SelectionState } from '../reduce/selection';
+import { ContextState, ParentContextState } from '../reduce/context';
 import {
   TOUCH_START,
   TOUCH_MOVE,
@@ -27,7 +27,7 @@ import TouchControls from '../interaction/TouchControls';
 import moveHandler from '../editing/moveHandler';
 import forestHandler from '../editing/forestHandler';
 import fromEmitter from '../emitterRedux';
-import { ContextMenuState } from '../reducers/contextMenu';
+import { ContextMenuState } from '../reduce/contextMenu';
 import ease, { Step, easeOut } from '../utils/ease';
 
 export interface Props{
