@@ -4,7 +4,7 @@ import {
   Action
 } from '../actions';
 
-export interface ComponentSelectedState {
+export interface ItemSelectedState {
   readonly selection : true,
   readonly forest : Forest,
   readonly top : number,
@@ -21,7 +21,7 @@ export interface NothingSelectedState {
   readonly selection : false
 }
 
-export type SelectionState = ComponentSelectedState | NothingSelectedState;
+export type SelectionState = ItemSelectedState | NothingSelectedState;
 
 const initialState : NothingSelectedState = {
   selection: false
