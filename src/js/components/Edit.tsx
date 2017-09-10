@@ -55,6 +55,7 @@ export default connect((s : State) => s)(
           gateCount={(props.context.forest.buddyTree.usedSize||2) - 2}
           undoCount={props.context.undoStack && props.context.undoStack.count || 0}
           redoCount={props.context.redoStack && props.context.redoStack.count || 0}
+          isLoading={props.context.loading !== undefined}
         />
       </div>
     );

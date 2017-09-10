@@ -32,6 +32,7 @@ export interface Props {
   readonly gateCount : number;
   readonly undoCount : number;
   readonly redoCount : number;
+  readonly isLoading : boolean;
 }
 
 export default reax({
@@ -68,7 +69,7 @@ export default reax({
 
   const isPushing = onPush
     .withLatestFrom(props)
-    .switchMap(([_, props]) => isBusy(storage.push(props.currentComponentName)))
+    .switchMap(([_, props]) => isBusy(storage.push(props.currentComponentName)));
 
   const showSearch = toggleSearch
     .merge(
@@ -109,7 +110,7 @@ export default reax({
   props
 }) => (
   <div className={style.navbar}>
-    <div className={style.bar}>
+    <div className={style.bar} data-loading={props.isLoading}>
       <MainMenuButton
         isActive={values.showMainMenu}
         onClick={events.toggleMainMenu}/>
