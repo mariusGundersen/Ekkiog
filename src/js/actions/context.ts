@@ -23,6 +23,16 @@ export const saveForest = (message : string) : SaveForestAction => ({
   message
 });
 
+
+export type CreateForestAction = {
+  readonly type : 'create-forest'
+  readonly name : string
+}
+export const createForest = (name : string) : CreateForestAction => ({
+  type: 'create-forest',
+  name
+});
+
 export type NewContextLoadingAction = {
   readonly type : 'new-context-loading',
   readonly repo : string
@@ -110,6 +120,7 @@ export const redo = () : RedoAction => ({
 export type ContextActions =
   LoadForestAction |
   SaveForestAction |
+  CreateForestAction |
   NewContextLoadingAction |
   ForestLoadedAction |
   DoubleTapAction |

@@ -2,9 +2,23 @@ import { put } from 'redux-saga/effects';
 
 import { forestLoaded, newContextLoading, LoadForestAction } from '../actions';
 import * as storage from '../storage';
+import { createForest } from 'ekkiog-editing';
 
 export default function* loadForest({repo, name, version} : LoadForestAction) {
   yield put(newContextLoading(repo, name, version));
-  const component = yield storage.load(name);
+  const component = yield* loadOrCreate(repo, name, version);
   yield put(forestLoaded(component, component.hash));
 };
+
+function* loadOrCreate(repo : string, name : string, version : string){
+  try{
+    return yield storage.load(repo, name, version);
+  }catch(e){
+    if(repo.length === 0){
+      return {
+        ...createForest(),
+        hash: '0000000000000000000000000000000000000000'
+      };
+    }
+  }
+}

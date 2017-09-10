@@ -66,7 +66,7 @@ export default function* doubleTap({x, y} : DoubleTapAction){
       const posA = state.view.viewportToTile(0, 0);
       const posB = state.view.viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
       yield put(pushContextLoading(repo, name, version, box(posA, posB), centerX, centerY));
-      const forest = yield storage.load(name);
+      const forest = yield storage.load(repo, name, version);
       yield put(forestLoaded(forest, forest.hash));
     }
   }

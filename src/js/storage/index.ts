@@ -65,7 +65,7 @@ export async function save(name : string, forest : Forest, message : string) : P
   return hash;
 }
 
-export async function load(name : string){
+export async function load(repo : string, name : string, version : string){
   const db = await _db;
   const transaction = db.transaction([
     'componentMetadata',
@@ -79,12 +79,11 @@ export async function load(name : string){
       usedAt: new Date(),
       favorite: (metadata && metadata.favorite === 'true') ? 'true' : 'false'
     });
-  const repo = await _repo;
-  return await repo.load(name);
+  return await (await _repo).load(repo, name);
 }
 
 export async function loadPackage(repo : string, name : string, version : string) : Promise<CompiledComponent>{
-  const forest = await load(name)
+  const forest = await load(repo, name, version);
   return packageComponent(forest, repo, name, version, forest.hash);
 }
 

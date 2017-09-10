@@ -20,7 +20,7 @@ import SearchBar from './SearchBar';
 
 import style from './navbar.scss';
 
-import { insertComponentPackage, loadForest, setTickInterval, undo, redo } from '../actions';
+import { insertComponentPackage, loadForest, setTickInterval, undo, redo, createForest } from '../actions';
 import { State } from '../reduce';
 import * as storage from '../storage';
 
@@ -61,7 +61,7 @@ export default reax({
 }, props, initialProps : Props) => {
   insertPackage.forEach(r => initialProps.dispatch(insertComponentPackage(r)));
   openComponent.forEach(r => initialProps.dispatch(loadForest(r.repo, r.name, r.version)));
-  createComponent.forEach(r => initialProps.dispatch(loadForest('', r, '0')));
+  createComponent.forEach(r => initialProps.dispatch(createForest(r)));
   onUndo.forEach(() => initialProps.dispatch(undo()));
   onRedo.forEach(() => initialProps.dispatch(redo()));
   onSetTickInterval.forEach(x => initialProps.dispatch(setTickInterval(x)));

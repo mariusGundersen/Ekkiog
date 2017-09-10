@@ -14,7 +14,7 @@ import loadForestMixin, { ForestWithHash } from './loadForest';
 
 export interface IRepo {
   save(name : string, forest : Forest, message : string, user : User | null) : Promise<string>
-  load(name : string) : Promise<ForestWithHash>
+  load(repo : string, name : string) : Promise<ForestWithHash>
 }
 
 const defaultUser = {
@@ -37,14 +37,11 @@ export default class Repo extends mix(IdbRepo)
       return await super.commit(`refs/heads/${name}`, user || defaultUser, forest, message);
     }
 
-    async load(name : string){
-      try{
+    async load(repo : string, name : string){
+      if(repo.length === 0){
         return await super.checkout(`refs/heads/${name}`);
-      }catch(e){
-        return {
-          ...createForest(),
-          hash: '0000000000000000000000000000000000000000'
-        };
+      }else{
+        return await super.checkout(`refs/remotes/${repo}/${name}`);
       }
     }
 };

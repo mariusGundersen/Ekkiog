@@ -7,11 +7,12 @@ import loadForest from './loadForest';
 import moveItemAt from './moveItemAt';
 import { Action } from '../actions';
 import save from './save';
-
+import createForest from './createForest';
 
 export default function* rootSaga() {
   yield all([
     watchLatest('load-forest', loadForest),
+    watchLatest('create-forest', createForest),
     watchLatest('insert-component-package', insertComponentPackage),
     watchLatest('move-item-at', moveItemAt),
     watchLatest('tap-tile', tapTile),
