@@ -43,8 +43,8 @@ export default connect((s : State) => s)(
           dispatch={props.dispatch}
           editor={props.editor}
           editorMenu={props.editorMenu}
-          pixelWidth={values.size.pixelWidth}
-          pixelHeight={values.size.pixelHeight}
+          width={values.size.svgWidth}
+          height={values.size.svgHeight}
           view={props.view}
         />
         <NavBar
@@ -65,6 +65,8 @@ function onResize(){
   return Observable.fromEvent(window, 'resize')
   .startWith(undefined)
   .map(e => ({
+    svgWidth: window.document.body.clientWidth,
+    svgHeight: window.document.body.clientHeight,
     pixelWidth: window.document.body.clientWidth*window.devicePixelRatio,
     pixelHeight: window.document.body.clientHeight*window.devicePixelRatio
   }));

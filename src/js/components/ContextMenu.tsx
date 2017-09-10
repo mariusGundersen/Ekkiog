@@ -3,7 +3,7 @@ import { connect, Dispatch } from 'react-redux';
 import { TileType } from 'ekkiog-editing';
 
 import { State } from '../reduce';
-import { ContextMenuState } from '../reduce/contextMenu';
+import { ContextMenuState, ContextMenuShowState } from '../reduce/contextMenu';
 import { ViewState } from '../reduce/view';
 import Loading from './radialMenu/Loading';
 import RadialMenu, { PieCenterProps, PieRingProps } from './radialMenu';
@@ -24,7 +24,7 @@ import {
 } from './radialMenu/menuItems';
 
 export type Props = {
-  readonly contextMenu : ContextMenuState;
+  readonly contextMenu : ContextMenuShowState;
   readonly view : ViewState;
   readonly radius : number;
   readonly width : number;
@@ -34,69 +34,43 @@ export type Props = {
 export default class ContextMenu extends React.Component<Props, any>{
 
   shouldComponentUpdate(nextProps : Props){
-    if(nextProps.contextMenu.loading && this.props.contextMenu.loading){
-      return nextProps.contextMenu.x !== this.props.contextMenu.x
-        || nextProps.contextMenu.y !== this.props.contextMenu.y
-        || nextProps.contextMenu.loading !== this.props.contextMenu.loading
-        || nextProps.radius !== this.props.radius
-        || nextProps.width !== this.props.width;
-    }
-
-    if(nextProps.contextMenu.show && this.props.contextMenu.show){
-      return nextProps.contextMenu.tx !== this.props.contextMenu.tx
+    return nextProps.contextMenu.tx !== this.props.contextMenu.tx
         || nextProps.contextMenu.ty !== this.props.contextMenu.ty
         || nextProps.contextMenu.tile !== this.props.contextMenu.tile
         || nextProps.contextMenu.show !== this.props.contextMenu.show
         || nextProps.view.tileToViewport !== this.props.view.tileToViewport
         || nextProps.radius !== this.props.radius
         || nextProps.width !== this.props.width;
-    }
-
-    return nextProps.contextMenu.loading !== this.props.contextMenu.loading
-      || nextProps.contextMenu.show !== this.props.contextMenu.show;
   }
 
   render(){
-    if(this.props.contextMenu.loading){
-      const { x, y } = this.props.contextMenu;
-      return (
-        <g transform={`translate(${x} ${y})`}>
-          <Loading radius={this.props.radius} width={this.props.width+2} />
-        </g>
-      );
-    }
-
-    if(this.props.contextMenu.show){
-      const { tile, tx, ty } = this.props.contextMenu;
-      const [x, y] = this.props.view.tileToViewport(tx, ty);
-      return (
-        <g transform={`translate(${x} ${y})`}>
-          <RadialMenu
-          cx={0}
-          cy={0}
-          showMenu={true}
-          center={undefined}
-          menuTree={[
-            createRing(this.props.radius, this.props.width, [
-              ...tileMenuItems(tile, Math.floor(tx), Math.floor(ty), this.props.dispatch)
-            ]),
-            {
-              ringKey: 2,
-              radius: this.props.radius,
-              width: this.props.width,
-              fromTurnFraction: 1/8,
-              toTurnFraction: 3/8,
-              show: true,
-              menuItems: [
-                acceptMenuItem(this.props.dispatch)
-              ]
-            }
-          ]} />
-        </g>
-      );
-    }
-
-    return null;
+    const { tile, tx, ty } = this.props.contextMenu;
+    const [x, y] = this.props.view.tileToViewport(tx, ty);
+    return (
+      <g transform={`translate(${x/window.devicePixelRatio} ${y/window.devicePixelRatio})`}>
+        <RadialMenu
+        cx={0}
+        cy={0}
+        showMenu={true}
+        center={undefined}
+        menuTree={[
+          createRing(this.props.radius, this.props.width, [
+            ...tileMenuItems(tile, Math.floor(tx), Math.floor(ty), this.props.dispatch)
+          ]),
+          {
+            ringKey: 2,
+            radius: this.props.radius,
+            width: this.props.width,
+            fromTurnFraction: 1/8,
+            toTurnFraction: 3/8,
+            show: true,
+            menuItems: [
+              acceptMenuItem(this.props.dispatch)
+            ]
+          }
+        ]} />
+      </g>
+    );
   }
 }
 
