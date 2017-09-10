@@ -11,6 +11,7 @@ import {
   showOkCancelMenu,
   stopSelection,
   TapTileAction,
+  toggleButton,
 } from '../actions';
 import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
@@ -25,7 +26,7 @@ export default function* tapTile({x, y, tool, direction} : TapTileAction) {
   const area = getTileAt(forest.enneaTree, y, x);
   if(area && area.data && area.data.type === BUTTON){
     const net = area.data.net;
-    //engine.mutateContext(mutator => mutator.toggleGate(net));
+    yield put(toggleButton(net));
   }else{
     yield put(draw(x, y, tool, direction));
     if(tool == BUTTON

@@ -128,6 +128,15 @@ export const moveItemAt = (tx : number, ty : number) : MoveItemAtAction => ({
   ty
 });
 
+export type ToggleButtonAction = {
+  readonly type : 'toggle-button'
+  readonly net : number
+}
+export const toggleButton = (net : number) : ToggleButtonAction => ({
+  type: 'toggle-button',
+  net
+});
+
 
 export type ForestActions =
   SetForestAction |
@@ -139,4 +148,5 @@ export type ForestActions =
   InsertComponentAction |
   InsertItemAction |
   InsertComponentPackageAction |
-  MoveItemAtAction;
+  MoveItemAtAction |
+  ToggleButtonAction;

@@ -6,6 +6,7 @@ import {
   Action
 } from '../actions';
 import ease, { noEase, Easing, easeOut, easeIn } from '../utils/ease';
+import { createButtonTree, ButtonNode, toggleButton } from './buttonTree';
 
 export interface ContextState {
   readonly repo : string
@@ -14,6 +15,7 @@ export interface ContextState {
   readonly hash : string
   readonly previous? : ParentContextState
   readonly forest : Forest
+  readonly buttonTree : ButtonNode
   readonly boundingBox : Box
   readonly undoStack? : Link<Forest>
   readonly redoStack? : Link<Forest>
@@ -45,6 +47,7 @@ const initialContext : ContextState = {
   version: '0',
   hash: '0000000000000000000000000000000000000000',
   forest: createForest(),
+  buttonTree: createButtonTree(256*256),
   boundingBox: {
     top: 56,
     left: 56,
@@ -83,6 +86,7 @@ export default function context(state = initialContext, action: Action) : Contex
         name: state.loading.name,
         version: state.loading.version,
         forest: action.forest,
+        buttonTree: createButtonTree(256*256),
         hash: action.hash,
         boundingBox,
         ease: ease(boxToArray(scaleBox(boundingBox, state.loading.scaleInFrom)), boxToArray(boundingBox), easeOut, 200),
@@ -132,20 +136,24 @@ export default function context(state = initialContext, action: Action) : Contex
           count: state.undoStack ? state.undoStack.count+1 : 1
         }
       };
+    case 'toggle-button':
+      return {
+        ...state,
+        buttonTree: toggleButton(state.buttonTree, action.net)
+      }
     default:
-      return combine(state, action, state.forest, forest);
+      return combine(state, action, forest);
   }
 }
 
 function combine(
   state : ContextState,
   action : Action,
-  current : Forest,
   reducer : (forest : Forest, action : Action) => Forest)
    : ContextState {
-  const next = reducer(current, action);
+  const next = reducer(state.forest, action);
 
-  if(next === current) {
+  if(next === state.forest) {
     return state;
   }
 
@@ -155,7 +163,7 @@ function combine(
     redoStack: undefined,
     undoStack: {
       next: state.undoStack,
-      value: current,
+      value: state.forest,
       count: state.undoStack ? state.undoStack.count+1 : 1
     }
   };

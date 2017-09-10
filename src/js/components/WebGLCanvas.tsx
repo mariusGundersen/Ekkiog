@@ -28,6 +28,7 @@ import moveHandler from '../editing/moveHandler';
 import forestHandler from '../editing/forestHandler';
 import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reduce/contextMenu';
+import buttonHandler from '../editing/buttonHandler';
 
 export interface Props{
   readonly tickInterval : number,
@@ -126,6 +127,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
 
     forestHandler(currentContext.forest, nextContext.forest, this.engine);
     moveHandler(this.props.selection, nextProps.selection, this.engine);
+    buttonHandler(currentContext.buttonTree, nextContext.buttonTree, this.engine);
 
     if(nextProps.selection.selection){
       if(!this.props.selection.selection
