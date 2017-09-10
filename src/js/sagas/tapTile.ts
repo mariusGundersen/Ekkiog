@@ -42,22 +42,17 @@ export default function* tapTile({x, y, tool, direction} : TapTileAction) {
   }
 }
 
-function* insertMovableItem(context : ContextState, tool : Tool, direction : Direction, tx : number, ty : number){
+function* insertMovableItem(context : ContextState, tool : Tool, direction : Direction, x : number, y : number){
   const buddyTree = context.forest.buddyTree;
-  const forest = tap(createForest(buddyTree), tool, direction, tx, ty);
-  const item = getTileAt(forest.enneaTree, ty, tx);
+  const forest = tap(createForest(buddyTree), tool, direction, x, y);
+  const item = getTileAt(forest.enneaTree, y, x);
   yield put(selectItem(forest, item));
   yield put(showOkCancelMenu(false));
   const {ok} = yield take('okCancel');
   if(ok) {
     const {selection} : State = yield select();
     if(selection.selection == false) return;
-    yield put(insertItem(item.data, {
-      left: selection.x + selection.dx,
-      top: selection.y + selection.dy,
-      width: item.width,
-      height: item.height
-    }, selection.forest.buddyTree));
+    yield put(draw(x + selection.dx, y + selection.dy, tool, direction));
     yield put(stopSelection());
     yield put(resetEditorMenu());
   } else {
