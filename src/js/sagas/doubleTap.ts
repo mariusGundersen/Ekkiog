@@ -1,3 +1,4 @@
+import { RepoNameVersion } from '../components/SearchResultView';
 import { get as getTileAt, AreaData, getIterator } from 'ennea-tree';
 import { CompiledComponent, createForest, drawComponent, IHavePosition, isEmpty, packageComponent, clear, Forest, Component, COMPONENT } from 'ekkiog-editing';
 import { put, select, take } from 'redux-saga/effects';
@@ -20,11 +21,12 @@ import {
 import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
 import * as storage from '../storage';
+import { loadOrCreate } from './loadForest';
 
 export default function* doubleTap({x, y} : DoubleTapAction){
   const state : State = yield select();
+  const context = state.context;
   if(x < 0 || y < 0 || x > 128 || y > 128){
-    const context = state.context;
     const previousContext = context.previous;
     if(previousContext){
       const component = packageComponent(context.forest, context.repo, context.name, context.version, context.hash);
@@ -60,13 +62,13 @@ export default function* doubleTap({x, y} : DoubleTapAction){
   }else{
     const areaData = getTileAt(state.context.forest.enneaTree, y|0, x|0);
     if(areaData && areaData.data.type === 'component' && areaData.data.name){
-      const {repo, name, version} = areaData.data;
+      const {repo, name, version} = locateRepo(areaData.data, context);
       const centerX = areaData.left + areaData.width/2;
       const centerY = areaData.top + areaData.height/2;
       const posA = state.view.viewportToTile(0, 0);
       const posB = state.view.viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
       yield put(pushContextLoading(repo, name, version, box(posA, posB), centerX, centerY));
-      const forest = yield storage.load(repo, name, version);
+      const forest = yield* loadOrCreate(repo, name, version);
       yield put(forestLoaded(forest, forest.hash));
     }
   }
@@ -117,4 +119,12 @@ function *getComponents(forest : Forest, name : string) : IterableIterator<AreaD
 
 function box([left, top] : number[], [right, bottom] : number[]){
   return {top, left, right, bottom};
+}
+
+function locateRepo({repo, name, version} : RepoNameVersion, context : ContextState){
+  return {
+    repo: repo && repo.length > 0 ? repo : context.repo,
+    name,
+    version
+  };
 }

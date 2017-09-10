@@ -188,7 +188,6 @@ export async function push(name : string) {
 
 export async function fetch(url : string, component : string) {
   const repo = await _repo;
-  debugger;
   const response = await repo.fetch(`/git/${url}.git`, {
     refspec: `refs/heads/${component}:refs/remotes/${url}/${component}`,
     depth: 1

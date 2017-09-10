@@ -10,7 +10,7 @@ export default function* loadForest({repo, name, version} : LoadForestAction) {
   yield put(forestLoaded(component, component.hash));
 };
 
-function* loadOrCreate(repo : string, name : string, version : string){
+export function* loadOrCreate(repo : string, name : string, version : string){
   try{
     return yield storage.load(repo, name, version);
   }catch(e){
@@ -25,6 +25,10 @@ function* loadOrCreate(repo : string, name : string, version : string){
         return yield storage.load(repo, name, version);
       }catch(e){
         console.log(e);
+        return {
+          ...createForest(),
+          hash: '0000000000000000000000000000000000000000'
+        };
       }
     }
   }
