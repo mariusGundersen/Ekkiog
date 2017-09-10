@@ -19,6 +19,13 @@ function* loadOrCreate(repo : string, name : string, version : string){
         ...createForest(),
         hash: '0000000000000000000000000000000000000000'
       };
+    }else{
+      try{
+        yield storage.fetch(repo, name).catch(e => console.log(e));
+        return yield storage.load(repo, name, version);
+      }catch(e){
+        console.log(e);
+      }
     }
   }
 }
