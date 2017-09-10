@@ -17,6 +17,8 @@ const MAP_SIZE = 128;
 const TILE_SIZE = 16;
 const SQRT_NET_COUNT = 256;
 
+const SpriteSheet = loadImage(tiles);
+
 export default class Context implements RenderContext {
   private readonly gl : WebGLRenderingContext;
   private readonly width : number;
@@ -42,7 +44,7 @@ export default class Context implements RenderContext {
     this.wordQuadList = new QuadList(bindingTracker, gl, 256);
     this.textScene = new TextScene(this.wordQuadList);
 
-    this.spriteSheetTexture = new ImageTexture(gl, loadImage(tiles));
+    this.spriteSheetTexture = new ImageTexture(gl, SpriteSheet);
 
     this.mapTexture = new DataTexture(gl, MAP_SIZE);
     this.netMapTexture = new DataTexture(gl, MAP_SIZE);
