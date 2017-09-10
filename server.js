@@ -13,10 +13,10 @@ const proxy = require('@es-git/node-git-proxy').default;
 
 const purest = require('purest')({request, promise: Promise});
 const providers = require('@purest/providers');
-const config = require('./config/secrets.json');
+const config = getConfig();
 const app = new Koa();
 
-app.keys = [process.env.SECRET || config["session-key"]];
+app.keys = config["session-key"];
 
 const grant = new Grant(grantConfig());
 
@@ -122,4 +122,11 @@ function grantConfig(){
       "callback": "/github/callback"
     }
   };
+}
+
+function getConfig(){
+  if(process.env.SECRET){
+    return JSON.parse(process.env.SECRET);
+  }
+  return require('./config/secrets.json');
 }
