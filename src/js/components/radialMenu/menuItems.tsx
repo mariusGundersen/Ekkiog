@@ -11,7 +11,8 @@ import {
   toUnderpass,
   toWire,
   moveItemAt,
-  saveAfter
+  saveAfter,
+  resetEditorMenu
 } from '../../actions';
 import { State } from '../../reduce';
 
@@ -56,7 +57,10 @@ export function toWireMenuItem(dispatch : Dispatch<State>, tx : number, ty : num
 }
 
 export function acceptMenuItem(dispatch : Dispatch<State>){
-  return menuItem('accept', <IconAccept />, () => dispatch(hideContextMenu()));
+  return menuItem('accept', <IconAccept />, () => {
+    dispatch(resetEditorMenu());
+    dispatch(hideContextMenu());
+  });
 }
 
 export function moveMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
