@@ -84,8 +84,11 @@ export default class Renderer {
     }
   }
 
+  private readonly moveMatrix = mat3.create();
   renderMove(context : RenderContext, mapToViewportMatrix : mat3, {top, left, right, bottom} : Box, dx : number, dy : number){
-    this.moveEngine.render(context, mapToViewportMatrix, [top, left, right, bottom], dx, dy);
+    mat3.translate(this.moveMatrix, mapToViewportMatrix, [dx/context.tileMapTexture.size[0]*2, dy/context.tileMapTexture.size[1]*2]);
+    this.moveEngine.render(context, this.moveMatrix, [top, left, right, bottom]);
+    this.wordEngine.render(context, this.moveMatrix);
   }
 
   renderChargeMap(context : RenderContext, chargeContext : RenderContext){

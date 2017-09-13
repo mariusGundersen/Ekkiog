@@ -9,7 +9,6 @@ uniform sampler2D chargeMap;
 uniform vec2 spriteTextureSize;
 uniform vec2 inverseSpriteTextureSize;
 uniform vec2 mapTextureSize;
-uniform vec2 translate;
 uniform float tileSize;
 
 void main(void) {
@@ -18,7 +17,7 @@ void main(void) {
     discard;
   }
 
-  vec2 movedCoord = tileCoord - translate/mapTextureSize;
+  vec2 movedCoord = tileCoord;
   vec2 tilePos = floor(movedCoord * mapTextureSize);
 
   if(tilePos.y <= boundingBox.x

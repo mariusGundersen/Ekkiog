@@ -14,7 +14,7 @@ export default class MoveEngine {
     this.shader = createShader(gl, moveVS, moveFS);
   }
 
-  render(context : RenderContext, matrix : mat3, [top, left, right, bottom] : number[], dx : number, dy : number) {
+  render(context : RenderContext, matrix : mat3, [top, left, right, bottom] : number[]) {
     this.shader.bind();
 
     this.shader.uniforms['spriteTextureSize'] = context.spriteSheetTexture.size;
@@ -33,7 +33,6 @@ export default class MoveEngine {
       right,
       bottom
     ];
-    this.shader.uniforms['translate'] = [dx, dy];
 
     context.triangle.draw();
   }
