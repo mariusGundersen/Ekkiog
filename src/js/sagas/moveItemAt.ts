@@ -41,7 +41,7 @@ export default function* moveItemAt({tx, ty} : MoveItemAtAction){
       width: item.width,
       height: item.height
     };
-    yield put(insertItem(setInputs(item.data, state.context.forest.enneaTree, box), box, selection.forest.buddyTree));
+    yield put(insertItem(setInputs(item.data, state.context.forest.enneaTree, box), box, state.context.forest.buddyTree));
     yield put(saveForest(`Moved ${item.data.type}`));
     yield put(stopSelection());
     yield put(resetEditorMenu());
