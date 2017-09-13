@@ -6,6 +6,7 @@ import thunk from 'redux-thunk';
 
 import '../css/main.css';
 import '../manifest.json';
+import tiles from '../img/tiles.png';
 
 import offline from './offline';
 import reduce, { State } from './reduce';
@@ -14,47 +15,51 @@ import { loadForest } from './actions';
 import sagas from './sagas';
 
 import main from './main';
+import { ifOnlyWeHadTopLevelAwaitAndNotSyncModules } from './loadImage';
 
 if('asyncIterator' in Symbol === false){
   (Symbol as any).asyncIterator = Symbol();
 }
 
-offline();
+ifOnlyWeHadTopLevelAwaitAndNotSyncModules(tiles).then(() => {
 
-const sagaMiddleware = createSagaMiddleware();
+  offline();
 
-const store = createStore<State>(
-  reduce,
-  {
-    page: pageFromUrl()
-  } as any,
-  (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
-    applyMiddleware(
-      thunk,
-      sagaMiddleware
+  const sagaMiddleware = createSagaMiddleware();
+
+  const store = createStore<State>(
+    reduce,
+    {
+      page: pageFromUrl()
+    } as any,
+    (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
+      applyMiddleware(
+        thunk,
+        sagaMiddleware
+      )
     )
-  )
-);
+  );
 
-sagaMiddleware.run(sagas)
+  sagaMiddleware.run(sagas)
 
-main(store);
+  main(store);
 
-const search = new URLSearchParams(document.location.search);
-store.dispatch(loadForest(
-  search.get('repo') || '',
-  search.get('component') || 'WELCOME',
-  search.get('version') || '0'));
-
-function pageFromUrl() : PageState {
   const search = new URLSearchParams(document.location.search);
-  if(search.get('demo')){
+  store.dispatch(loadForest(
+    search.get('repo') || '',
+    search.get('component') || 'WELCOME',
+    search.get('version') || '0'));
+
+  function pageFromUrl() : PageState {
+    const search = new URLSearchParams(document.location.search);
+    if(search.get('demo')){
+      return {
+        name: 'demo'
+      }
+    }
+
     return {
-      name: 'demo'
+      name: 'edit'
     }
   }
-
-  return {
-    name: 'edit'
-  }
-}
+});
