@@ -41,7 +41,7 @@ export default class Context implements RenderContext {
     this.tileSize = TILE_SIZE;
 
     this.triangle = new Triangle(bindingTracker, gl);
-    this.wordQuadList = new QuadList(bindingTracker, gl, 256);
+    this.wordQuadList = new QuadList(bindingTracker, gl);
     this.textScene = new TextScene(this.wordQuadList);
 
     this.spriteSheetTexture = new ImageTexture(gl, SpriteSheet);
