@@ -19,9 +19,8 @@ import { tap } from '../reduce/forest';
 import nextFrame from '../utils/nextFrame';
 
 export default function* tapTile({x, y, tool, direction} : TapTileAction) {
-  const {context} : State = yield select();
+  const {context: {forest}} : State = yield select();
 
-  const forest = context.forest;
   yield nextFrame();
   const area = getTileAt(forest.enneaTree, y, x);
   if(area && area.data && area.data.type === BUTTON){
@@ -29,17 +28,17 @@ export default function* tapTile({x, y, tool, direction} : TapTileAction) {
     yield put(toggleButton(net));
   }else{
     yield put(draw(x, y, tool, direction));
-    if(tool == BUTTON
-    || tool == GATE
-    || tool == LIGHT){
-      const {context} : State = yield select();
 
-      const mutatedForest = context.forest;
-      if(forest === mutatedForest){
+    const {context, context: {forest: mutatedForest}} : State = yield select();
+    if(forest === mutatedForest){
+      if(tool == BUTTON
+      || tool == GATE
+      || tool == LIGHT){
         yield* insertMovableItem(context, tool, direction, x, y);
       }
+    }else{
+      yield put(saveForest(`Inserted ${tool}`));
     }
-    yield put(saveForest(`Inserted ${tool}`));
   }
 }
 
