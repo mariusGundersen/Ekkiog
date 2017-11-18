@@ -36,7 +36,6 @@ import {
   forestLoaded,
   pushContextLoading,
   popContext,
-  saveForest,
   doubleTap
 } from './actions';
 import { State } from './reduce';

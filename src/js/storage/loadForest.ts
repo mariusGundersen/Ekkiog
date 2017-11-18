@@ -27,8 +27,10 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
       const commit = await super.loadCommit(hash);
 
       const tree = await super.loadTree(commit.tree);
-      const enneaTree = await this.loadEnnea(await super.loadTree(tree['ennea'].hash));
-      const buddyTree = await this.loadBuddy(await super.loadTree(tree['buddy'].hash));
+      const [enneaTree, buddyTree] = await Promise.all([
+        super.loadTree(tree['ennea'].hash).then(t => this.loadEnnea(t)),
+        super.loadTree(tree['buddy'].hash).then(t => this.loadBuddy(t))
+      ]);
 
       return {
         hash,
@@ -38,33 +40,56 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
     }
 
     async loadEnnea(body : TreeBody, size = 128) : Promise<EnneaNode> {
+      const [
+        data,
+        topLeft,
+        top,
+        topRight,
+        left,
+        center,
+        right,
+        bottomLeft,
+        bottom,
+        bottomRight
+      ] = await Promise.all([
+        body['0'] ? super.loadText(body['0'].hash).then(JSON.parse).then(upgradeItem) : undefined,
+        body['1'] ? super.loadTree(body['1'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
+        body['2'] ? super.loadTree(body['2'].hash).then(t => this.loadList(t)) : [],
+        body['3'] ? super.loadTree(body['3'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
+        body['4'] ? super.loadTree(body['4'].hash).then(t => this.loadList(t)) : [],
+        body['5'] ? super.loadText(body['5'].hash).then(JSON.parse) : undefined,
+        body['6'] ? super.loadTree(body['6'].hash).then(t => this.loadList(t)) : [],
+        body['7'] ? super.loadTree(body['7'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
+        body['8'] ? super.loadTree(body['8'].hash).then(t => this.loadList(t)) : [],
+        body['9'] ? super.loadTree(body['9'].hash).then(t => this.loadEnnea(t, size/2)) : undefined
+      ] as any[]);
       return {
         size,
-        data: body['0'] ? upgradeItem(JSON.parse(await super.loadText(body['0'].hash))) : undefined,
-        topLeft: body['1'] ? await this.loadEnnea(await super.loadTree(body['1'].hash), size/2) : undefined,
-        top: body['2'] ? await this.loadList(await super.loadTree(body['2'].hash)) : [],
-        topRight: body['3'] ? await this.loadEnnea(await super.loadTree(body['3'].hash), size/2) : undefined,
-        left: body['4'] ? await this.loadList(await super.loadTree(body['4'].hash)) : [],
-        center: body['5'] ? JSON.parse(await super.loadText(body['5'].hash)) : undefined,
-        right: body['6'] ? await this.loadList(await super.loadTree(body['6'].hash)) : [],
-        bottomLeft: body['7'] ? await this.loadEnnea(await super.loadTree(body['7'].hash), size/2) : undefined,
-        bottom: body['8'] ? await this.loadList(await super.loadTree(body['8'].hash)) : [],
-        bottomRight: body['9'] ? await this.loadEnnea(await super.loadTree(body['9'].hash), size/2) : undefined
+        data,
+        topLeft,
+        top,
+        topRight,
+        left,
+        center,
+        right,
+        bottomLeft,
+        bottom,
+        bottomRight,
       };
     }
 
     async loadBuddy(body : TreeBody) : Promise<BuddyNode> {
       return {
-        ...JSON.parse(await super.loadText(body['d'].hash)),
-        left: body['l'] ? await this.loadBuddy(await super.loadTree(body['l'].hash)) : undefined,
-        right: body['r'] ? await this.loadBuddy(await super.loadTree(body['r'].hash)) : undefined
+        ...(await super.loadText(body['d'].hash).then(JSON.parse)),
+        left: body['l'] ? await super.loadTree(body['l'].hash).then(x => this.loadBuddy(x)) : undefined,
+        right: body['r'] ? await super.loadTree(body['r'].hash).then(x => this.loadBuddy(x)) : undefined
       };
     }
 
     async loadList(items : TreeBody) : Promise<EnneaLeaf[]> {
       const result = [] as EnneaLeaf[];
-      for(const item of Object.keys(items)){
-        result[parseInt(item)] = upgradeAreaItem(JSON.parse(await super.loadText(items[item].hash)));
+      for(const {index, item} of await Promise.all(Object.keys(items).map(async item => ({index: parseInt(item), item: upgradeAreaItem(JSON.parse(await super.loadText(items[item].hash)))})))){
+        result[index] = item;
       }
       return result;
     }
