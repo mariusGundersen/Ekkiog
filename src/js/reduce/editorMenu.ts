@@ -51,7 +51,9 @@ export default function editorMenu(state = initialState, action : Action) : Edit
         previousMenu: state
       };
     case 'setOkCancelMenuValid':
-      return {
+      return state.menuType != 'okCancel'
+      ? state
+      : {
         ...state,
         isValid: action.isValid
       };

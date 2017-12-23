@@ -23,7 +23,7 @@ export interface NothingSelectedState {
 
 export type SelectionState = ItemSelectedState | NothingSelectedState;
 
-const initialState : NothingSelectedState = {
+const initialState : SelectionState = {
   selection: false
 };
 
@@ -43,7 +43,9 @@ export default function reduce(state = initialState, action : Action) : Selectio
         selection: true
       };
     case 'moveSelection':
-      return {
+      return state.selection !== true
+      ? state
+      : {
         ...state,
         dx: action.dx,
         dy: action.dy
