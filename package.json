@@ -8,7 +8,7 @@
     "build": "npm run compile && npm run source-map-explorer",
     "compile": "NODE_ENV=production webpack --progress --colors",
     "dev": "webpack-dashboard -- webpack-dev-server --content-base dist/ --colors --hot --inline",
-    "source-map-explorer": "source-map-explorer dist/bundle.js --html > dist/bundle.js.map.html",
+    "source-map-explorer": "source-map-explorer dist/index.js --html > dist/index.js.map.html",
     "test": "ava"
   },
   "author": "",
