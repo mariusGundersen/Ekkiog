@@ -69,7 +69,7 @@ export default reax({
 
   const isPushing = onPush
     .withLatestFrom(props)
-    .switchMap(([_, props]) => isBusy(storage.push(props.currentComponentName)));
+    .switchMap(([_, props]) => isBusy(storage.push("ekkiog-workspace", props.currentComponentName)));
 
   const showSearch = toggleSearch
     .merge(

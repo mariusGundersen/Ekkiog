@@ -22,6 +22,7 @@ import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
 import * as storage from '../storage';
 import { loadOrCreate } from './loadForest';
+import { matchPath } from 'react-router';
 
 export default function* doubleTap({x, y} : DoubleTapAction){
   const state : State = yield select();
@@ -31,6 +32,7 @@ export default function* doubleTap({x, y} : DoubleTapAction){
     if(previousContext){
       const component = packageComponent(context.forest, context.repo, context.name, context.version, context.hash);
       yield put(popContext());
+      if(state.router.isReadOnly) return;
       const {forest, didntFit} = replaceComponents(previousContext.forest, component);
       if(previousContext.forest !== forest){
         yield put(setForest(forest));

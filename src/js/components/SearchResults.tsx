@@ -28,7 +28,7 @@ import * as storage from '../storage';
 export { RepoNameVersion };
 
 export interface Props {
-  query : string,
+  readonly query : string,
   createComponent(name : string) : void;
   openComponent(component : RepoNameVersion) : void;
   insertPackage(component : CompiledComponent) : void;
@@ -86,7 +86,7 @@ export default reax<Props>()(({
         result={r}
         insertPackage={events.insertPackage}
         openComponent={events.openComponent}
-        toggleFavorite={events.toggleFavorite}/>)}
+        toggleFavorite={events.toggleFavorite} />)}
     </div>
   </div>
 ));

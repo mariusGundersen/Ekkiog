@@ -11,7 +11,7 @@ const debug = process.env.NODE_ENV !== 'production';
 
 const babelLoader = {
   loader: 'babel-loader',
-  query: {
+  options: {
     cacheDirectory: true
   }
 };
@@ -43,7 +43,7 @@ const postCssLoader = {
 
 module.exports = {
   entry: {
-    bundle: './src/js/index.ts'
+    index: './src/js/index.ts'
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -57,7 +57,14 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Ekkiog',
-      template: './src/index.html',
+      chunks: ['index'],
+      template: './src/pages/index.html',
+      favicon: './src/icons/favicon.ico'
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Ekkiog',
+      chunks: ['index'],
+      template: './src/pages/demo/index.html',
       favicon: './src/icons/favicon.ico'
     }),
     new webpack.DefinePlugin({

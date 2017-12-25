@@ -8,6 +8,7 @@ import MdFavorite from 'react-icons/md/favorite';
 import MdFavoriteBorder from 'react-icons/md/favorite-border';
 
 import style from './search.scss';
+import { Switch, Route } from 'react-router-dom';
 
 export const RECENT : 'recent' = 'recent';
 export const POPUPLAR : 'popular' = 'popular';
@@ -41,11 +42,13 @@ export default function SearchResultView<T>({insertPackage, openComponent, toggl
         onClick={e => toggleFavorite(result.data)}>
         {getIcon(result)}
       </button>
-      <button
-        className={style.insertPackage}
-        onClick={e => insertPackage(result.data)}>
-        {result.data.name}
-      </button>
+        <Route path="/demo" children={props =>
+          <button
+            className={style.insertPackage}
+            onClick={() => props.match ? openComponent(result.data) : insertPackage(result.data)}>
+            {result.data.name}
+          </button>
+        } />
       <button
         className={style.openComponent}
         onClick={e => openComponent(result.data)}>
