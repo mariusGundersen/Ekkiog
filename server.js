@@ -16,9 +16,11 @@ const providers = require('@purest/providers');
 const config = getConfig();
 const app = new Koa();
 
-app.keys = config["session-key"];
+app.keys = [
+  config["session-key"]
+];
 
-const grant = new Grant(grantConfig());
+const grant = new Grant(grantConfig(config));
 
 const githubApi = purest({
   provider: 'github',
@@ -107,11 +109,11 @@ function sessionConfig(){
   };
 }
 
-function grantConfig(){
+function grantConfig(config){
   return {
     "server": {
       "protocol": "http",
-      "host": "localhost:8080",
+      "host": config.host,
       "callback": "/callback",
       "transport": "session",
       "state": true
