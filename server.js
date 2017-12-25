@@ -20,7 +20,7 @@ app.keys = [
   config["session-key"]
 ];
 
-const grant = new Grant(grantConfig(config));
+const grant = new Grant(grantConfig(config.grant));
 
 const githubApi = purest({
   provider: 'github',
@@ -41,8 +41,8 @@ app.use(static('./dist'));
 app.use(session(sessionConfig(), app));
 app.use(mount(grant));
 app.use(route.get('/github/callback', async (ctx, next) => {
-  if(ctx.query.error){
-    ctx.body = ctx.query.error;
+  if(ctx.query['error[error]']){
+    ctx.body = ctx.query['error[error_description]'];
     return;
   }
 
@@ -112,14 +112,14 @@ function sessionConfig(){
 function grantConfig(config){
   return {
     "server": {
-      "protocol": "http",
+      "protocol": config.protocol,
       "host": config.host,
       "callback": "/callback",
       "transport": "session",
       "state": true
     },
     "github": {
-      ...config.grant["github"],
+      ...config["github"],
       "scope": ["public_repo"],
       "callback": "/github/callback"
     }
