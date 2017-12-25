@@ -79,10 +79,19 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
     }
 
     async loadBuddy(body : TreeBody) : Promise<BuddyNode> {
+      const [
+        data,
+        left,
+        right
+      ] = await Promise.all([
+        super.loadText(body['d'].hash).then(JSON.parse),
+        body['l'] ? super.loadTree(body['l'].hash).then(x => this.loadBuddy(x)) : null,
+        body['r'] ? super.loadTree(body['r'].hash).then(x => this.loadBuddy(x)) : null,
+      ] as any[]);
       return {
-        ...(await super.loadText(body['d'].hash).then(JSON.parse)),
-        left: body['l'] ? await super.loadTree(body['l'].hash).then(x => this.loadBuddy(x)) : undefined,
-        right: body['r'] ? await super.loadTree(body['r'].hash).then(x => this.loadBuddy(x)) : undefined
+        ...data,
+        left,
+        right
       };
     }
 

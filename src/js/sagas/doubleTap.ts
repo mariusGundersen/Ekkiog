@@ -77,6 +77,7 @@ export default function* doubleTap({x, y} : DoubleTapAction){
 function replaceComponents(forest : Forest, newComponent : CompiledComponent){
   const didntFit = [] as {x : number, y : number}[];
   for(const item of getComponents(forest, newComponent.name)){
+    if(item.data.hash === newComponent.hash) continue;
     const x = item.left + (item.width>>1);
     const y = item.top + (item.height>>1);
     const clearedForest = clear(forest, x, y);
