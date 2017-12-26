@@ -5,7 +5,7 @@ const DashboardPlugin = require('webpack-dashboard/plugin');
 const OfflinePlugin = require('offline-plugin');
 const autoprefixer = require('autoprefixer');
 const nesting = require('postcss-nesting');
-const BabiliPlugin = require("babili-webpack-plugin");
+const BabelMinifyPlugin = require("babel-minify-webpack-plugin");
 
 const debug = process.env.NODE_ENV !== 'production';
 
@@ -82,13 +82,15 @@ module.exports = {
       title: 'Ekkiog',
       chunks: ['index'],
       template: './src/pages/index.html',
-      favicon: './src/icons/favicon.ico'
+      favicon: './src/icons/favicon.ico',
+      filename: 'index.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Ekkiog',
       chunks: ['index'],
-      template: './src/pages/demo/index.html',
-      favicon: './src/icons/favicon.ico'
+      template: './src/pages/index.html',
+      favicon: './src/icons/favicon.ico',
+      filename: 'demo/index.html'
     }),
     new webpack.DefinePlugin({
       '__DEV__': debug,
@@ -108,7 +110,7 @@ module.exports = {
     ...(debug ? [
       new DashboardPlugin()
     ] : [
-      //new BabiliPlugin()
+      new BabelMinifyPlugin()
     ])
   ],
   resolve: {
@@ -118,7 +120,7 @@ module.exports = {
     ],
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
-  devtool: debug ? 'eval-source-map' : 'source-map',
+  devtool: debug ? 'eval-source-map' : 'cheap',
   module: {
     rules: [
       {
