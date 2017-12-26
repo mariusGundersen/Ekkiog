@@ -31,7 +31,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
     }
 
     async saveAndCommit(branch : string, person : User, forest : Forest, message : string, parents : Hash[]){
-      const tree = await this.saveForest(forest);
+      const tree = await this.saveForest(forest, branch);
 
       const author : Person = {
         date: new Date(),
@@ -50,16 +50,18 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
       return hash;
     }
 
-    async saveForest({enneaTree, buddyTree} : Forest){
+    async saveForest({enneaTree, buddyTree} : Forest, name : string){
       const body = {};
 
-      const [ennea, buddy] = await Promise.all([
+      const [ennea, buddy, readme] = await Promise.all([
         enneaTree ? this.saveEnnea(enneaTree) : undefined,
-        buddyTree ? this.saveBuddy(buddyTree) : undefined
+        buddyTree ? this.saveBuddy(buddyTree) : undefined,
+        this.saveReadme(name)
       ] as any[]);
 
       addTree(body, 'ennea', ennea);
       addTree(body, 'buddy', buddy);
+      addBlob(body, 'readme.md', readme);
 
       const hash = await super.saveTree(body);
       return {hash, mode : Mode.tree};
@@ -161,6 +163,14 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
     async saveBuddyLeaf({address, size, usedSize, used, level} : BuddyNode){
       const body = JSON.stringify({address, size, usedSize, used, level});
       return await super.saveText(body);
+    }
+
+    async saveReadme(name : string){
+      return await super.saveText(`#${name}
+
+## [Try it out](https://ekkiog.mariusgundersen.net/demo)
+
+This is a component made using [Ekkiog](https://ekkiog.mariusgundersen.net), a mobile webapp for building logic circuits`);
     }
   }
 }

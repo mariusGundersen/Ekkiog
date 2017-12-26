@@ -17,6 +17,7 @@ import sagas from './sagas';
 
 import main from './main';
 import { ifOnlyWeHadTopLevelAwaitAndNotSyncModules } from './loadImage';
+import getRepoFromUrl from './utils/getRepoFromUrl';
 
 if('asyncIterator' in Symbol === false){
   (Symbol as any).asyncIterator = Symbol();
@@ -46,8 +47,20 @@ ifOnlyWeHadTopLevelAwaitAndNotSyncModules(tiles).then(() => {
   main(store, history);
 
   const search = new URLSearchParams(document.location.search);
-  store.dispatch(loadForest(
-    search.get('repo') || '',
-    search.get('component') || 'WELCOME',
-    search.get('version') || '0'));
+  if(search.has('repo') && search.has('component')){
+    store.dispatch(loadForest(
+      search.get('repo') || '',
+      search.get('component') || 'WELCOME',
+      search.get('version') || '0'));
+  }else{
+    const match = getRepoFromUrl(document.referrer);
+    if(match){
+      store.dispatch(loadForest(
+        match.repo,
+        match.branch,
+        '0'));
+    }else{
+      store.dispatch(loadForest('', 'WELCOME', '0'));
+    }
+  }
 });

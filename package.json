@@ -9,7 +9,8 @@
     "compile": "NODE_ENV=production webpack --progress --colors",
     "dev": "webpack-dashboard -- webpack-dev-server --content-base dist/ --colors --hot --inline",
     "source-map-explorer": "source-map-explorer dist/index.js --html > dist/index.js.map.html",
-    "test": "ava"
+    "test": "ava",
+    "watch": "tsc -w & ava -w"
   },
   "author": "",
   "license": "MIT",
@@ -116,6 +117,12 @@
     "rxjs": "^5.4.3"
   },
   "ava": {
+    "files": [
+      "dist/**/*.test.js"
+    ],
+    "source": [
+      "src/**/*.js"
+    ],
     "require": [
       "babel-register"
     ]

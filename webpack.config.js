@@ -12,7 +12,30 @@ const debug = process.env.NODE_ENV !== 'production';
 const babelLoader = {
   loader: 'babel-loader',
   options: {
-    cacheDirectory: true
+    cacheDirectory: true,
+
+    presets: [
+      ["env", {
+        spec: true,
+        modules: false,
+        targets : {
+          ios: 10,
+          chrome: 58,
+          firefox: 53
+        }
+      }],
+      "es2016",
+      "es2017",
+      "react"
+    ],
+    plugins: [
+      ["transform-runtime", {
+        polyfill: false,
+        regenerator: false
+      }],
+      "transform-class-properties",
+      "transform-object-rest-spread"
+    ]
   }
 };
 
