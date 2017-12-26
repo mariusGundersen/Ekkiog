@@ -64,7 +64,6 @@ export async function load(repo : string, name : string, version : string){
     'recent',
   ], 'readwrite');
   const metadataStore = transaction.objectStore<RecentComponent>('recent');
-  const metadata = await metadataStore.get(name);
   await metadataStore
     .put({
       repo,
