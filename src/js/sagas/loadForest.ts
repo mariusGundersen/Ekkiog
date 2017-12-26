@@ -3,10 +3,12 @@ import { put } from 'redux-saga/effects';
 import { forestLoaded, newContextLoading, LoadForestAction } from '../actions';
 import * as storage from '../storage';
 import { createForest } from 'ekkiog-editing';
+import setUrl from '../actions/router';
 
 export default function* loadForest({repo, name, version} : LoadForestAction) {
   yield put(newContextLoading(repo, name, version));
   const component = yield* loadOrCreate(repo, name, version);
+  yield put(setUrl(repo, name));
   yield put(forestLoaded(component, component.hash));
 };
 

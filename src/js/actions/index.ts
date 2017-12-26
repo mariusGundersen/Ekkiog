@@ -16,6 +16,7 @@ export * from './contextMenu';
 export * from './editor';
 export * from './editorMenu';
 export * from './forest';
+export * from './router';
 export * from './view';
 export * from './selection';
 export * from './simulation';
