@@ -12,16 +12,26 @@ import {
 import Repo, { IRepo } from './repo';
 
 import upgradeFrom10 from './upgrade/from10';
-import upgradeFrom7 from './upgrade/from7';
+import upgradeFrom11 from './upgrade/from11';
 
 export interface ComponentMetadata {
+  readonly repo : string
   readonly name : string
-  readonly usedAt : Date
-  readonly useCount : number
   readonly favorite : boolean
 }
 
-const _db = idb.open('ekkiog', 11, db => {
+export interface RecentComponent {
+  readonly repo : string
+  readonly name : string
+  readonly usedAt : Date
+}
+
+export interface FavoriteComponent {
+  readonly repo : string
+  readonly name : string
+}
+
+const _db = idb.open('ekkiog', 12, db => {
   switch(db.oldVersion){
     case 0:
     case 1:
@@ -32,10 +42,11 @@ const _db = idb.open('ekkiog', 11, db => {
     case 6:
     case 7:
     case 8:
-      upgradeFrom7(db);
     case 9:
     case 10:
       upgradeFrom10(db);
+    case 11:
+      upgradeFrom11(db);
   }
 });
 
@@ -44,40 +55,21 @@ export const user : OauthData | null = JSON.parse(localStorage.getItem('ekkiog-u
 
 export async function save(name : string, forest : Forest, message : string) : Promise<string> {
   const repo = await _repo;
-  const hash = await repo.save(name, forest, message, user);
-  const db = await _db;
-  const transaction = db.transaction([
-    'componentMetadata'
-  ], 'readwrite');
-
-  const metadataStore = transaction.objectStore('componentMetadata');
-  const metadata = await metadataStore.get(name);
-  if(metadata == undefined){
-    await metadataStore
-      .put({
-        name,
-        useCount: 1,
-        usedAt: new Date(),
-        favorite: 'false'
-      });
-  }
-
-  return hash;
+  return await repo.save(name, forest, message, user);
 }
 
 export async function load(repo : string, name : string, version : string){
   const db = await _db;
   const transaction = db.transaction([
-    'componentMetadata',
+    'recent',
   ], 'readwrite');
-  const metadataStore = transaction.objectStore('componentMetadata');
+  const metadataStore = transaction.objectStore<RecentComponent>('recent');
   const metadata = await metadataStore.get(name);
   await metadataStore
     .put({
+      repo,
       name,
-      useCount: metadata ? (metadata.useCount||0)+1 : 1,
-      usedAt: new Date(),
-      favorite: (metadata && metadata.favorite === 'true') ? 'true' : 'false'
+      usedAt: new Date()
     });
   return await (await _repo).load(repo, name);
 }
@@ -87,78 +79,93 @@ export async function loadPackage(repo : string, name : string, version : string
   return packageComponent(forest, repo, name, version, forest.hash);
 }
 
-export function getRecent() : Observable<string> {
-  return cursorToObservable<string>(
+export function getRecent() : Observable<RecentComponent> {
+  return cursorToObservable<RecentComponent>(
     _db,
-    db => db.transaction('componentMetadata'),
+    'recent',
     (tx, callback) => {
-      const store = tx.objectStore('componentMetadata');
+      const store = tx.objectStore<RecentComponent>('recent');
       const index = store.index('usedAt');
       const range = IDBKeyRange.upperBound(new Date(2100, 1));
       index.iterateCursor(range, 'prev', callback);
     },
-    cursor => cursor.value.name as string);
+    c => c.value);
 }
 
-export function getPopular() : Observable<string> {
-  return cursorToObservable<string>(
+export function getFavorite() : Observable<FavoriteComponent> {
+  return cursorToObservable<FavoriteComponent>(
     _db,
-    db => db.transaction('componentMetadata'),
+    'favorite',
     (tx, callback) => {
-      const store = tx.objectStore('componentMetadata');
-      const index = store.index('useCount');
-      const range = IDBKeyRange.upperBound(Number.MAX_SAFE_INTEGER);
-      index.iterateCursor(range, 'prev', callback);
+      const store = tx.objectStore<FavoriteComponent>('favorite');
+      store.iterateCursor(callback);
     },
-    cursor => cursor.value.name as string);
+    c => c.value);
 }
 
-export function getFavorite() : Observable<string> {
-  return cursorToObservable<string>(
-    _db,
-    db => db.transaction('componentMetadata'),
-    (tx, callback) => {
-      const store = tx.objectStore('componentMetadata');
-      const index = store.index('favorite');
-      const range = IDBKeyRange.only('true');
-      index.iterateCursor(range, 'prev', callback);
-    },
-    cursor => cursor.value.name as string);
-}
-
-export async function toggleFavorite(name : string) {
+export async function toggleFavorite(repo : string, name : string) {
   const db = await _db;
-  const tx = db.transaction('componentMetadata', 'readwrite');
-  const store = tx.objectStore('componentMetadata');
-  const metadata = await store.get(name);
-  await store.put({
-    ...metadata,
-    favorite: (metadata && metadata.favorite === 'true') ? 'false' : 'true'
-  });
+  const tx = db.transaction('favorite', 'readwrite');
+  const store = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
+  const favorite = await store.get([repo, name]).catch(e => undefined);
+  if(favorite){
+    await store.delete([repo, name]);
+  }else{
+    await store.put({repo, name});
+  }
 }
 
-export function getComponentNames() : Observable<ComponentMetadata> {
-  return cursorToObservable<ComponentMetadata>(
-    _db,
-    db => db.transaction('componentMetadata'),
-    (tx, callback) => tx.objectStore('componentMetadata').iterateCursor(callback),
-    cursor => ({
-      ...cursor.value,
-      favorite: cursor.value.favorite === 'true'
-    }));
+export async function searchComponents(query : string) : Promise<ComponentMetadata[]> {
+  const repo = await _repo;
+  const refs = await repo.listRefs();
+  const db = await _db;
+  const tx = db.transaction('favorite', 'readwrite');
+  const store = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
+  return await Promise.all(refs
+    .map(refToRepoAndName)
+    .filter(data => data.name.toUpperCase().indexOf(query) >= 0)
+    .sort(bySimilarityTo(query))
+    .map(async ({name, repo}) => ({
+      name,
+      repo,
+      favorite: await store.get([repo, name]).then(x => x ? true : false, () => false)
+    })));
 }
 
-function cursorToObservable<T>(
-  db : Promise<DB>,
-  getTransaction : (db : DB) => Transaction,
-  getCursor : (tx : Transaction, callback : (cursor : Cursor) => void) => void,
-  getValue : (cursor : Cursor) => T) {
+function bySimilarityTo(query : string){
+  return (a : {name : string, repo : string}, b : {name : string, repo : string}) => (
+    (a.repo > b.repo ? 1 : a.repo < b.repo ? -1 : 0)
+    || (a.name.indexOf(query) - b.name.indexOf(query))
+    || (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
+}
 
-  return new Observable<T>(s => {
+function refToRepoAndName(ref : string){
+  const [_, type, ...repoAndName] = ref.split('/');
+  if(type === 'heads'){
+    return {
+      repo: '',
+      name: repoAndName.join('/')
+    }
+  } else {
+    const [name, ...repo] = repoAndName.reverse();
+    return {
+      repo: repo.reverse().join('/'),
+      name
+    }
+  }
+}
+
+function cursorToObservable<TStored, TValue=TStored>(
+  dbPromise : Promise<DB>,
+  objectStore : string,
+  getCursor : (tx : Transaction, callback : (cursor : Cursor<TStored, any>) => void) => void,
+  getValue : (cursor : Cursor<TStored, any>) => TValue) {
+
+  return new Observable<TValue>(s => {
     let running = false;
-    db.then(db => {
+    dbPromise.then(db => {
+      const tx = db.transaction(objectStore);
       running = true;
-      const tx = getTransaction(db);
       getCursor(tx, cursor => {
         if (!cursor) return;
         s.next(getValue(cursor));

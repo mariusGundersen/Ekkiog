@@ -1,4 +1,3 @@
-import { RepoNameVersion } from '../components/SearchResultView';
 import { get as getTileAt, AreaData, getIterator } from 'ennea-tree';
 import { CompiledComponent, createForest, drawComponent, IHavePosition, isEmpty, packageComponent, clear, Forest, Component, COMPONENT } from 'ekkiog-editing';
 import { put, select, take } from 'redux-saga/effects';
@@ -124,7 +123,7 @@ function box([left, top] : number[], [right, bottom] : number[]){
   return {top, left, right, bottom};
 }
 
-function locateRepo({repo, name, version} : RepoNameVersion, context : ContextState){
+function locateRepo({repo, name, version} : {repo : string, name : string, version : string}, context : ContextState){
   return {
     repo: repo && repo.length > 0 ? repo : context.repo,
     name,

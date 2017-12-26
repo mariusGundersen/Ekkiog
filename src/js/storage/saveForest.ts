@@ -12,7 +12,7 @@ export interface User {
 };
 
 export interface ISaveForestRepo {
-  commit(branch : string, author : User, forest : Forest, message : string) : Promise<string>
+  commit(branch : string, author : User, forest : Forest, message : string, name : string) : Promise<string>
 }
 
 type EnneaLeaf = BoxedData<Item>;
@@ -25,13 +25,13 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
       this.hashCache = new WeakMap<BuddyNode | EnneaNode | EnneaLeaf[] | EnneaLeaf | Item, Hash>();
     }
 
-    async commit(branch : string, person : User, forest : Forest, message : string){
+    async commit(branch : string, person : User, forest : Forest, message : string, name : string){
       const parentHash = await super.getRef(branch);
-      return this.saveAndCommit(branch, person, forest, message, parentHash ? [parentHash] : []);
+      return this.saveAndCommit(branch, person, forest, message, parentHash ? [parentHash] : [], name);
     }
 
-    async saveAndCommit(branch : string, person : User, forest : Forest, message : string, parents : Hash[]){
-      const tree = await this.saveForest(forest, branch);
+    async saveAndCommit(branch : string, person : User, forest : Forest, message : string, parents : Hash[], name : string){
+      const tree = await this.saveForest(forest, name);
 
       const author : Person = {
         date: new Date(),
@@ -166,7 +166,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
     }
 
     async saveReadme(name : string){
-      return await super.saveText(`#${name}
+      return await super.saveText(`# ${name}
 
 ## [Try it out](https://ekkiog.mariusgundersen.net/demo)
 

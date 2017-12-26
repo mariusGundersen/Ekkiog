@@ -34,7 +34,7 @@ export default class Repo extends mix(IdbRepo)
   .with<IFetchRepo, Fetch>(fetchMixin, fetch)
   implements IRepo {
     async save(name : string, forest : Forest, message : string, user : User | null){
-      return await super.commit(`refs/heads/${name}`, user || defaultUser, forest, message);
+      return await super.commit(`refs/heads/${name}`, user || defaultUser, forest, message, name);
     }
 
     async load(repo : string, name : string){

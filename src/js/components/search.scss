@@ -30,6 +30,18 @@
         padding: 8px;
       }
 
+      & .insertPackage {
+        padding: 0 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+
+        & .repo{
+          font-size: .6em;
+          color: #ccc;
+        }
+      }
+
       & .noExactMatch,
       & .insertPackage{
         flex: 1 0 auto;

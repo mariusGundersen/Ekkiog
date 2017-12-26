@@ -12,7 +12,7 @@ import 'rxjs/add/observable/merge';
 import { CompiledComponent } from 'ekkiog-editing';
 
 import MainMenuButton from './MainMenuButton';
-import SearchResults, { RepoNameVersion } from './SearchResults';
+import SearchResults from './SearchResults';
 import SimulationMenuButton from './SimulationMenuButton';
 import SimulationMenu from './SimulationMenu';
 import MainMenu from './MainMenu';
@@ -23,6 +23,7 @@ import style from './navbar.scss';
 import { insertComponentPackage, loadForest, setTickInterval, undo, redo, createForest } from '../actions';
 import { State } from '../reduce';
 import * as storage from '../storage';
+import { RepoName } from './SearchResultView';
 
 export interface Props {
   readonly dispatch : Dispatch<State>;
@@ -41,7 +42,7 @@ export default reax({
   toggleMainMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   query: (value : string) => value,
   insertPackage: (result : CompiledComponent) => result,
-  openComponent: (result : RepoNameVersion) => result,
+  openComponent: (result : RepoName) => result,
   createComponent: (result : string) => result,
   onUndo: (x : any) => true,
   onRedo: (x : any) => true,
@@ -61,7 +62,7 @@ export default reax({
   onPush
 }, props, initialProps : Props) => {
   insertPackage.forEach(r => initialProps.dispatch(insertComponentPackage(r)));
-  openComponent.forEach(r => initialProps.dispatch(loadForest(r.repo, r.name, r.version)));
+  openComponent.forEach(r => initialProps.dispatch(loadForest(r.repo, r.name, '0')));
   createComponent.forEach(r => initialProps.dispatch(createForest(r)));
   onUndo.forEach(() => initialProps.dispatch(undo()));
   onRedo.forEach(() => initialProps.dispatch(redo()));

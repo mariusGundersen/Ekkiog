@@ -9,6 +9,7 @@ import MdFavoriteBorder from 'react-icons/md/favorite-border';
 
 import style from './search.scss';
 import { Switch, Route } from 'react-router-dom';
+import { ComponentMetadata } from '../storage/index';
 
 export const RECENT : 'recent' = 'recent';
 export const POPUPLAR : 'popular' = 'popular';
@@ -16,25 +17,23 @@ export const FAVORITE : 'favorite' = 'favorite';
 export const NORMAL : 'normal' = 'normal';
 
 export interface SearchResult {
-  readonly data : RepoNameVersion
+  readonly data : RepoName
   readonly type : 'recent' | 'popular' | 'favorite' | 'normal'
 }
 
-export interface RepoNameVersion {
+export interface RepoName {
   readonly repo : string
   readonly name : string
-  readonly version : string
-
 }
 
 export interface SearchResultViewProps {
-  insertPackage(result : RepoNameVersion) : void;
-  openComponent(result : RepoNameVersion) : void;
-  toggleFavorite(result : RepoNameVersion) : void;
+  insertPackage(result : RepoName) : void;
+  openComponent(result : RepoName) : void;
+  toggleFavorite(result : RepoName) : void;
   readonly result : SearchResult;
 }
 
-export default function SearchResultView<T>({insertPackage, openComponent, toggleFavorite, result} : SearchResultViewProps){
+export default function SearchResultView({insertPackage, openComponent, toggleFavorite, result} : SearchResultViewProps){
   return (
     <div className={style.searchResult}>
       <button
@@ -46,7 +45,8 @@ export default function SearchResultView<T>({insertPackage, openComponent, toggl
           <button
             className={style.insertPackage}
             onClick={() => props.match ? openComponent(result.data) : insertPackage(result.data)}>
-            {result.data.name}
+            <span>{result.data.name}</span>
+            {result.data.repo && result.data.repo.length && <span className={style.repo}>{result.data.repo}</span>}
           </button>
         } />
       <button
