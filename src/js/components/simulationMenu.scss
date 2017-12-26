@@ -18,10 +18,10 @@
       }
     }
 
-    &.leave {
+    &.exit {
       transform: none;
 
-      &.leave-active {
+      &.exit-active {
         transform: translateY(-100%);
         transition: transform .3s;
       }

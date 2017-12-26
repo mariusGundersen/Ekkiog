@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import pure from './pure';
-import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { CSSTransition } from 'react-transition-group';
 
 import style from './mainMenu.scss';
 import theme from './theme.scss';
@@ -19,12 +19,13 @@ export interface Props {
 
 export default pure((a, b) => a.show === b.show,
   (props : Props) => (
-  <ReactCSSTransitionGroup
-    transitionName={style as any}
-    transitionEnterTimeout={300}
-    transitionLeaveTimeout={300}
-    component="div">
-    {props.show && <div
+  <CSSTransition
+    in={props.show}
+    timeout={300}
+    classNames={style as any}
+    mountOnEnter={true}
+    unmountOnExit={true}>
+    <div
       key="menu"
       className={`${theme.itemList} ${style.mainMenu}`}>
       {user === null
@@ -34,8 +35,8 @@ export default pure((a, b) => a.show === b.show,
         <Push key='push' isBusy={props.isPushing} push={props.push} />
       ]}
       <div className={style.version}>{__BuildDate__}</div>
-    </div>}
-  </ReactCSSTransitionGroup>
+    </div>
+  </CSSTransition>
 ));
 
 const Login = () => (
