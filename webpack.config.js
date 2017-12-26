@@ -120,7 +120,7 @@ module.exports = {
     ],
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
-  devtool: debug ? 'eval-source-map' : 'cheap',
+  devtool: debug && 'eval-source-map',
   module: {
     rules: [
       {

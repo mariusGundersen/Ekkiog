@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "tsc": "tsc",
-    "build": "npm run compile && npm run source-map-explorer",
+    "build": "npm run compile",
     "compile": "NODE_ENV=production webpack --progress --colors",
     "dev": "webpack-dashboard -- webpack-dev-server --content-base dist/ --colors --hot --inline",
     "source-map-explorer": "source-map-explorer dist/index.js --html > dist/index.js.map.html",
