@@ -50,12 +50,14 @@ export default connect((s : State) => s)(
         <NavBar
           dispatch={props.dispatch}
           currentComponentName={props.context.name}
+          currentComponentRepo={props.context.repo}
           tickCount={props.simulation.tickCount}
           tickInterval={props.simulation.tickInterval}
           gateCount={(props.context.forest.buddyTree.usedSize||2) - 2}
           undoCount={props.context.undoStack && props.context.undoStack.count || 0}
           redoCount={props.context.redoStack && props.context.redoStack.count || 0}
           isLoading={props.context.loading !== undefined}
+          isSaving={props.context.saving}
         />
       </div>
     );

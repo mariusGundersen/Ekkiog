@@ -94,6 +94,13 @@ export const popContext = () : PopContextAction => ({
   type: 'pop-context'
 });
 
+export type ForestSavingAction = {
+  readonly type : 'forest-saving'
+}
+export const forestSaving = () : ForestSavingAction => ({
+  type: 'forest-saving'
+});
+
 export type ForestSavedAction = {
   readonly type : 'forest-saved'
   readonly hash : string
@@ -127,5 +134,6 @@ export type ContextActions =
   PushContextLoadingAction |
   PopContextAction |
   ForestSavedAction |
+  ForestSavingAction |
   UndoAction |
   RedoAction;

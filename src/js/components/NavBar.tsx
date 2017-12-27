@@ -28,12 +28,14 @@ import { RepoName } from './SearchResultView';
 export interface Props {
   readonly dispatch : Dispatch<State>;
   readonly currentComponentName : string;
+  readonly currentComponentRepo : string;
   readonly tickCount : number;
   readonly tickInterval : number;
   readonly gateCount : number;
   readonly undoCount : number;
   readonly redoCount : number;
   readonly isLoading : boolean;
+  readonly isSaving : boolean;
 }
 
 export default reax({
@@ -117,9 +119,11 @@ export default reax({
         onClick={events.toggleMainMenu}/>
       <SearchBar
         currentComponentName={props.currentComponentName}
+        currentComponentRepo={props.currentComponentRepo}
         gateCount={props.gateCount}
         showSearch={values.showSearch}
         toggleSearch={events.toggleSearch}
+        isSaving={props.isSaving}
         query={events.query} />
       <SimulationMenuButton
         tick={props.tickCount}

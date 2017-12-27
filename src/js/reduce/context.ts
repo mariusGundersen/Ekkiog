@@ -20,6 +20,7 @@ export interface ContextState {
   readonly undoStack? : Link<Forest>
   readonly redoStack? : Link<Forest>
   readonly loading? : LoadingState
+  readonly saving : boolean
   readonly ease : Easing
 }
 
@@ -59,7 +60,8 @@ const initialContext : ContextState = {
     left: 56,
     right: 72,
     bottom: 72
-  }))
+  })),
+  saving: false
 }
 
 export default function context(state = initialContext, action: Action) : ContextState {
@@ -111,6 +113,17 @@ export default function context(state = initialContext, action: Action) : Contex
           version: action.version,
           scaleInFrom: 1.4
         }
+      };
+    case 'forest-saving':
+      return {
+        ...state,
+        saving: true
+      };
+    case 'forest-saved':
+      return {
+        ...state,
+        repo: '',
+        saving: false
       };
     case 'pop-context':
       return state.previous || state;
