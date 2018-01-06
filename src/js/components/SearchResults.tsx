@@ -1,29 +1,39 @@
 import * as React from 'react';
 import reax from 'reaxjs';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/concat';
-import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/distinct';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/merge';
-import 'rxjs/add/operator/scan';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/withLatestFrom';
+import { of } from 'rxjs/observable/of';
+import { concat } from 'rxjs/observable/concat';
+import { fromPromise } from 'rxjs/observable/fromPromise';
+import {
+  debounceTime,
+  distinct,
+  distinctUntilChanged,
+  map,
+  merge,
+  scan,
+  share,
+  startWith,
+  switchMap,
+  take,
+  withLatestFrom
+} from 'rxjs/operators';
 import { CompiledComponent } from 'ekkiog-editing';
 
-import SearchResultView, { NoExactMatchView, SearchResult, RECENT, POPUPLAR, FAVORITE, NORMAL, RepoName } from './SearchResultView';
+import SearchResultView,
+{
+  NoExactMatchView,
+  SearchResult,
+  RECENT,
+  POPUPLAR,
+  FAVORITE,
+  NORMAL,
+  RepoName
+} from './SearchResultView';
 
 import style from './search.scss';
 
 import * as storage from '../storage';
+import { FavoriteComponent } from '../storage';
 
 export interface Props {
   readonly query : string,
@@ -44,31 +54,33 @@ export default reax<Props>()(({
   toggleFavorite
 }, props) => {
 
-  insertPackage
-    .withLatestFrom(props)
-    .subscribe(([result, props]) => storage.loadPackage(result.repo, result.name, '0').then(props.insertPackage));
+  insertPackage.pipe(
+    withLatestFrom(props)
+  ).subscribe(([result, props]) => storage.loadPackage(result.repo, result.name, '0').then(props.insertPackage));
 
-  openComponent
-    .withLatestFrom(props)
-    .subscribe(([result, props]) => props.openComponent(result));
+  openComponent.pipe(
+    withLatestFrom(props)
+  ).subscribe(([result, props]) => props.openComponent(result));
 
-  const updateList = toggleFavorite
-    .switchMap(result => Observable.fromPromise(storage.toggleFavorite(result.repo, result.name)))
-    .withLatestFrom(props)
-    .map(([_, props]) => props.query);
+  const updateList = toggleFavorite.pipe(
+    switchMap(result => fromPromise(storage.toggleFavorite(result.repo, result.name))),
+    withLatestFrom(props),
+    map(([_, props]) => props.query));
 
-  const searchResults = props
-    .map(p => p.query)
-    .distinctUntilChanged()
-    .merge(updateList)
-    .debounceTime(100)
-    .switchMap(searchDatabase)
-    .startWith([])
-    .share();
+  const searchResults = props.pipe(
+    map(p => p.query),
+    distinctUntilChanged(),
+    merge(updateList),
+    debounceTime(100),
+    switchMap(searchDatabase),
+    startWith([] as SearchResult[]),
+    share()
+  );
 
-  const noExactMatch = searchResults
-    .withLatestFrom(props)
-    .map(([results, props]) => props.query && results.map(r => r.data.name).indexOf(props.query) === -1);
+  const noExactMatch = searchResults.pipe(
+    withLatestFrom(props),
+    map(([results, props]) => props.query && results.map(r => r.data.name).indexOf(props.query) === -1)
+  );
 
   return {
     searchResults,
@@ -93,7 +105,7 @@ function searchDatabase(query : string){
 }
 
 function find(query : string) : Observable<SearchResult[]>{
-  return Observable.fromPromise(
+  return fromPromise(
     storage.searchComponents(query)
     .then(r => r.map(data => ({
       data,
@@ -102,28 +114,31 @@ function find(query : string) : Observable<SearchResult[]>{
 }
 
 function showEmpty(){
-  return Observable.concat(
+  return concat(
     getFavorite(),
     getRecent()
-  )
-  .distinct(t => `${t.data.repo}/${t.data.name}`)
-  .scan((acc, val) => [...acc, val], [])
-  .debounceTime(10);
+  ).pipe(
+    distinct(t => `${t.data.repo}/${t.data.name}`),
+    scan<SearchResult>((acc, val) => [...acc, val], []),
+    debounceTime(10)
+  );
 }
 
-function getRecent() : Observable<SearchResult>{
-  return storage.getRecent()
-    .map(data => ({
-      data,
-      type: RECENT
-    }))
-    .take(5);
+function getRecent() {
+  return storage.getRecent().pipe(
+    map(typed(RECENT)),
+    take(5));
 }
 
-function getFavorite() : Observable<SearchResult>{
-  return storage.getFavorite()
-    .map(data => ({
-      data,
-      type: FAVORITE
-    }));
+function getFavorite() {
+  return storage.getFavorite().pipe(
+    map(typed(FAVORITE))
+  );
+}
+
+function typed<T extends typeof RECENT | typeof FAVORITE>(type : T) : (data : RepoName) => SearchResult {
+  return (data : RepoName) => ({
+    data,
+    type
+  });
 }
