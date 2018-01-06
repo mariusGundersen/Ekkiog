@@ -1,0 +1,31 @@
+.popup-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  z-index: 4;
+  background: rgba(0, 0, 0, 0.5);
+
+  & .popup {
+    flex: 1 0 auto;
+    margin: 20px;
+    background: #424C57;
+    color: white;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    box-shadow: 0 0 10px 0 black;
+    overflow: auto;
+
+    &>h2 {
+      margin: 0 10px;
+    }
+
+    &>p {
+      margin: 1em 10px;
+    }
+  }
+}

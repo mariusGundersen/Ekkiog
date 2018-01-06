@@ -1,0 +1,28 @@
+.is-busy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & h2,
+  & h3,
+  & h5 {
+    margin: 0;
+  }
+
+  & .photo {
+    margin: 10px 0;
+    font-size: 25vw;
+    height: 1em;
+    border-radius: .5em;
+  }
+
+  & p {
+    margin: 10px 0;
+  }
+}
