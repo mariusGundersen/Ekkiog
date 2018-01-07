@@ -105,7 +105,10 @@ export default reax({
     startWith(false)
   );
 
-  const showMainMenu = toggleMainMenu.pipe(
+  const showMainMenu = merge(
+    toggleMainMenu,
+    onProfileClick
+  ).pipe(
     scan(state => !state, false),
     startWith(false)
   );

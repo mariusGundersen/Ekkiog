@@ -31,11 +31,11 @@ export default reax({
 },
 ({toggleList, createNewRepo}, props, initialProps : Props) => {
 
-  createNewRepo.subscribe(x => createRepo(DEFAULT_REPO_NAME).then(name => initialProps.onClick(name)));
+  createNewRepo.subscribe(x => createRepo(DEFAULT_REPO_NAME, initialProps.user.access_token).then(name => initialProps.onClick(name)));
 
   const isCreating = createNewRepo.pipe(startWith(false));
 
-  const repos = fromPromise(getRepos());
+  const repos = fromPromise(getRepos(initialProps.user.access_token));
 
   const isBusy = repos.pipe(
     map(x => false),

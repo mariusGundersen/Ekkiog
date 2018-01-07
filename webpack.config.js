@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const DashboardPlugin = require('webpack-dashboard/plugin');
 const OfflinePlugin = require('offline-plugin');
 const autoprefixer = require('autoprefixer');
@@ -39,31 +38,6 @@ const babelLoader = {
   }
 };
 
-const cssModuleLoader = {
-  loader:'css-loader',
-  options: {
-    modules: true,
-    camelCase: true,
-    localIdentName: '_[local]-[hash:base64:16]'
-  }
-};
-
-const cssLoader = {
-  loader:'css-loader'
-};
-
-const postCssLoader = {
-  loader: 'postcss-loader',
-  options: {
-    plugins: function () {
-      return [
-        autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] }),
-        nesting()
-      ];
-    }
-  }
-};
-
 module.exports = {
   entry: {
     index: './src/js/index.ts'
@@ -75,23 +49,10 @@ module.exports = {
   },
   devServer: {
     host: '0.0.0.0',
-    disableHostCheck: true
+    disableHostCheck: true,
+    hot: true
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      title: 'Ekkiog',
-      chunks: ['index'],
-      template: './src/pages/index.html',
-      favicon: './src/icons/favicon.ico',
-      filename: 'index.html'
-    }),
-    new HtmlWebpackPlugin({
-      title: 'Ekkiog',
-      chunks: ['index'],
-      template: './src/pages/index.html',
-      favicon: './src/icons/favicon.ico',
-      filename: 'demo/index.html'
-    }),
     new webpack.DefinePlugin({
       '__DEV__': debug,
       'process.env.NODE_ENV': debug ? '"development"' : '"production"',
@@ -108,6 +69,9 @@ module.exports = {
       }
     }),
     ...(debug ? [
+      new webpack.NamedModulesPlugin(),
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoEmitOnErrorsPlugin(),
       new DashboardPlugin()
     ] : [
       new BabelMinifyPlugin()
@@ -150,11 +114,33 @@ module.exports = {
         loader: 'url-loader'
       },
       {
+        test: /\.ico$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]'
+        }
+      },
+      {
         test: /\.s?css$/,
         use: [
           'style-loader',
-          cssModuleLoader,
-          postCssLoader
+          {
+            loader:'css-loader',
+            options: {
+              modules: true,
+              camelCase: true,
+              localIdentName: '_[local]-[hash:base64:16]'
+            }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: () =>  [
+                autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] }),
+                nesting()
+              ]
+            }
+          }
         ],
         exclude: /node_modules/
       },
@@ -162,7 +148,7 @@ module.exports = {
         test: /\.css$/,
         use: [
           'style-loader',
-          cssLoader
+          'css-loader'
         ],
         include: /node_modules/
       },

@@ -1,8 +1,7 @@
 import * as React from 'react';
-import Transition from 'react-transition-group/Transition';
+import { CSSTransition } from 'react-transition-group';
 
 import style from './popup.scss';
-import { SyntheticEvent } from 'react';
 
 export interface Props {
   readonly show : boolean
@@ -12,8 +11,9 @@ export interface Props {
 
 export default function Popup(props : Props){
   return (
-    <Transition
+    <CSSTransition
       in={props.show}
+      classNames={style}
       timeout={300}
       mountOnEnter={true}
       unmountOnExit={true}>
@@ -22,6 +22,6 @@ export default function Popup(props : Props){
           {props.children}
         </div>
       </div>
-    </Transition>
+    </CSSTransition>
   );
 }

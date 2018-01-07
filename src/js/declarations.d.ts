@@ -110,7 +110,7 @@ declare module "offline-plugin/runtime" {
 
 interface Window {
   __REDUX_DEVTOOLS_EXTENSION_COMPOSE__? : <R>(a: R) => R,
-  __OAUTH_DATA__? : OauthData,
+  __PRELOADED_STATE__? : OauthData,
   debugStorage : any
 }
 

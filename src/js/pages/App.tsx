@@ -6,14 +6,14 @@ import { fromEvent } from 'rxjs/observable/fromEvent';
 
 import { State } from '../reduce';
 
-import Menu from './Menu';
-import WebGLCanvas from './WebGLCanvas';
-import NavBar from './NavBar';
-import Popup from './Popup';
-import SelectRepo from './popups/SelectRepo';
-import Profile from './popups/Profile';
+import Menu from '../components/Menu';
+import WebGLCanvas from '../components/WebGLCanvas';
+import NavBar from '../components/NavBar';
+import Popup from '../components/Popup';
+import SelectRepo from '../components/popups/SelectRepo';
+import Profile from '../components/popups/Profile';
 
-import style from './main.css';
+import style from '../components/main.css';
 import {
   startWith,
   map
@@ -21,16 +21,20 @@ import {
 import { Route } from 'react-router';
 
 import { user } from '../storage';
-import { hidePopup } from '../actions/index';
+import { hidePopup, loadForest } from '../actions';
+import getRepoFromUrl from '../utils/getRepoFromUrl';
 
 type Props = State & {dispatch: Dispatch<State>};
 
 export default connect((s : State) => s)(
   reax({
   },
-  (_, props, initialProps : Props) => ({
-    size: onResize()
-  }),
+  (_, props, initialProps : Props) => {
+    initialProps.dispatch(getFromUrl());
+    return {
+      size: onResize()
+    }
+  },
   ({
     events,
     props,
@@ -72,11 +76,9 @@ export default connect((s : State) => s)(
           isSaving={props.context.saving}
         />
         <Popup
-          show={props.popup.show}
+          show={props.popup.show && props.popup.popup === 'Profile'}
           onCoverClicked={() => props.dispatch(hidePopup())}>
-          {
-            props.popup.show && props.popup.popup === 'Profile' && <Profile user={user as OauthData} />
-          }
+            <Profile user={user as OauthData} />
         </Popup>
       </div>
     );
@@ -92,4 +94,24 @@ function onResize(){
       pixelWidth: window.document.body.clientWidth*window.devicePixelRatio,
       pixelHeight: window.document.body.clientHeight*window.devicePixelRatio
     })));
+}
+function getFromUrl(){
+
+  const search = new URLSearchParams(document.location.search);
+  if(search.has('repo') && search.has('component')){
+    return loadForest(
+      search.get('repo') || '',
+      search.get('component') || 'WELCOME',
+      search.get('version') || '0');
+  }else{
+    const match = getRepoFromUrl(document.referrer);
+    if(match){
+      return loadForest(
+        match.repo,
+        match.branch,
+        '0');
+    }else{
+      return loadForest('', 'WELCOME', '0');
+    }
+  }
 }

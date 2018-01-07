@@ -6,18 +6,16 @@ import thunk from 'redux-thunk';
 import createHistory from 'history/createBrowserHistory';
 import { routerMiddleware } from 'react-router-redux';
 
-import '../css/main.css';
 import '../manifest.json';
 import tiles from '../img/tiles.png';
+import '../icons/favicon.ico';
 
 import offline from './offline';
 import reduce, { State } from './reduce';
-import { loadForest } from './actions';
 import sagas from './sagas';
 
 import main from './main';
 import { ifOnlyWeHadTopLevelAwaitAndNotSyncModules } from './loadImage';
-import getRepoFromUrl from './utils/getRepoFromUrl';
 
 if('asyncIterator' in Symbol === false){
   (Symbol as any).asyncIterator = Symbol();
@@ -45,22 +43,4 @@ ifOnlyWeHadTopLevelAwaitAndNotSyncModules(tiles).then(() => {
   sagaMiddleware.run(sagas)
 
   main(store, history);
-
-  const search = new URLSearchParams(document.location.search);
-  if(search.has('repo') && search.has('component')){
-    store.dispatch(loadForest(
-      search.get('repo') || '',
-      search.get('component') || 'WELCOME',
-      search.get('version') || '0'));
-  }else{
-    const match = getRepoFromUrl(document.referrer);
-    if(match){
-      store.dispatch(loadForest(
-        match.repo,
-        match.branch,
-        '0'));
-    }else{
-      store.dispatch(loadForest('', 'WELCOME', '0'));
-    }
-  }
 });

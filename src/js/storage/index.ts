@@ -200,11 +200,15 @@ export async function fetch(url : string, component : string) {
   console.log('success', response);
 }
 
-function getUser() : OauthData | null {
+export function getUser() : OauthData | null {
   const user = JSON.parse(localStorage.getItem('ekkiog-user') || 'null');
   if(!user) return null;
   if(!user.repo){
     user.repo = 'ekkiog-workspace';
   }
   return user;
+}
+
+export function setUser(user : OauthData) {
+  localStorage.setItem('ekkiog-user', JSON.stringify(user));
 }

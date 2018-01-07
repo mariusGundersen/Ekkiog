@@ -1,4 +1,3 @@
-const PORT = process.env.PORT || 8080;
 require('babel-polyfill');
 const Koa = require('koa');
 const favicon = require('koa-favicon');
@@ -8,28 +7,14 @@ const morgan = require('koa-morgan');
 const route = require('koa-route');
 const mount = require('koa-mount');
 const Grant = require('grant-koa');
-const request = require('request');
 const proxy = require('@es-git/node-git-proxy').default;
 
-const purest = require('purest')({request, promise: Promise});
-const providers = require('@purest/providers');
-const config = getConfig();
+const config = require('./backend/getConfig');
+const github = require('./backend/github');
+const htmlPage = require('./backend/html');
+
 const app = new Koa();
-
-app.keys = [
-  config["session-key"]
-];
-
-const grant = new Grant(grantConfig(config.grant));
-
-const githubApi = purest({
-  provider: 'github',
-  config: providers,
-  defaults: {
-  headers: {
-    "User-Agent": 'ekkiog'
-  }
-}});
+app.keys = config.keys();
 
 if(process.env.NODE_ENV !== 'production'){
   app.use(require('koa-webpack')());
@@ -38,18 +23,19 @@ if(process.env.NODE_ENV !== 'production'){
 app.use(favicon('./dist/favicon.ico'));
 app.use(morgan('short'));
 app.use(static('./dist'));
-app.use(session(sessionConfig(), app));
-app.use(mount(grant));
+app.use(session(config.sessionConfig(), app));
+app.use(mount(new Grant(config.grantConfig())));
 app.use(route.get('/github/callback', async (ctx, next) => {
   if(ctx.query['error[error]']){
     ctx.body = ctx.query['error[error_description]'];
     return;
   }
 
-  const [response, user] = await githubApi
-    .get('user')
-    .auth(ctx.session.grant.response.access_token)
-    .request();
+  if(!ctx.session){
+    return ctx.redirect('/');
+  }
+
+  const [response, user] = await github.getUser(ctx.session.grant.response.access_token);
 
   if(response.statusCode !== 200){
     return ctx.redirect('/connect/github');
@@ -62,73 +48,25 @@ app.use(route.get('/github/callback', async (ctx, next) => {
     photo: user.avatar_url,
     name: user.name,
     email: user.email,
-    access_token: ctx.session.grant.response.access_token
+    access_token: ctx.session.grant.response.access_token,
+    repo: 'ekkiog-workspace'
   };
 
   ctx.session = null;
 
-  ctx.body = `<!doctype html>
-  <html>
-    <script>
-      localStorage.setItem('ekkiog-user', '${JSON.stringify(data).replace(/</g, '\\u003c')}');
-      document.location = '/';
-    </script>
-  </html>`
-}));
-
-app.use(route.get('/debug', ctx => {
-  ctx.body = ctx.session;
-}));
-
-app.use(route.get('/git', ctx => {
-  ctx.body = `<!doctype html>
-  <html>
-    <script src="/git.js"></script>
-    <h2>git test</h2>
-    <a href="/connect/github">Github</a>
-  </html>`
+  ctx.body = htmlPage(data);
 }));
 
 app.use(mount('/git', ctx => proxy(ctx.req, ctx.res)));
 
+app.use(route.get('/demo', ctx => {
+  ctx.body = htmlPage();
+}));
+
+app.use(route.get('/', ctx => {
+  ctx.body = htmlPage();
+}));
+
+const PORT = process.env.PORT || 8080;
 app.listen(PORT);
-
 console.log(`server started on localhost:${PORT}`);
-
-function sessionConfig(){
-  return {
-    key: 'ekkiog', /** (string) cookie key (default is koa:sess) */
-    /** (number || 'session') maxAge in ms (default is 1 days) */
-    /** 'session' will result in a cookie that expires when session/browser is closed */
-    /** Warning: If a session cookie is stolen, this cookie will never expire */
-    maxAge: 'session',
-    overwrite: true, /** (boolean) can overwrite or not (default true) */
-    httpOnly: true, /** (boolean) httpOnly or not (default true) */
-    signed: true, /** (boolean) signed or not (default true) */
-    rolling: false, /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. default is false **/
-  };
-}
-
-function grantConfig(config){
-  return {
-    "server": {
-      "protocol": config.protocol,
-      "host": config.host,
-      "callback": "/callback",
-      "transport": "session",
-      "state": true
-    },
-    "github": {
-      ...config["github"],
-      "scope": ["public_repo"],
-      "callback": "/github/callback"
-    }
-  };
-}
-
-function getConfig(){
-  if(process.env.SECRET){
-    return JSON.parse(process.env.SECRET);
-  }
-  return require('./config/secrets.json');
-}
