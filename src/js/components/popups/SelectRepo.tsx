@@ -13,9 +13,9 @@ import FaCheck from 'react-icons/fa/check-circle';
 import FaRight from 'react-icons/fa/angle-right';
 import FaDown from 'react-icons/fa/angle-down';
 
-import { getRepos, createRepo } from '../storage/clients';
+import { getRepos, createRepo } from '../../storage/clients';
 
-import theme from './theme.scss';
+import theme from '../theme.scss';
 import style from './selectRepo.scss';
 
 const DEFAULT_REPO_NAME = 'ekkiog-workspace';

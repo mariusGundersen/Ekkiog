@@ -9,6 +9,9 @@ import { State } from '../reduce';
 import Menu from './Menu';
 import WebGLCanvas from './WebGLCanvas';
 import NavBar from './NavBar';
+import Popup from './Popup';
+import SelectRepo from './popups/SelectRepo';
+import Profile from './popups/Profile';
 
 import style from './main.css';
 import {
@@ -16,6 +19,9 @@ import {
   map
 } from 'rxjs/operators';
 import { Route } from 'react-router';
+
+import { user } from '../storage';
+import { hidePopup } from '../actions/index';
 
 type Props = State & {dispatch: Dispatch<State>};
 
@@ -65,6 +71,13 @@ export default connect((s : State) => s)(
           isLoading={props.context.loading !== undefined}
           isSaving={props.context.saving}
         />
+        <Popup
+          show={props.popup.show}
+          onCoverClicked={() => props.dispatch(hidePopup())}>
+          {
+            props.popup.show && props.popup.popup === 'Profile' && <Profile user={user as OauthData} />
+          }
+        </Popup>
       </div>
     );
   }

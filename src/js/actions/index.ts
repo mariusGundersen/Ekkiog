@@ -10,12 +10,14 @@ import { ForestActions } from './forest';
 import { SelectionActions } from './selection';
 import { SimulationActions } from './simulation';
 import { ViewActions } from './view';
+import { PopupActions } from './popup';
 
 export * from './context';
 export * from './contextMenu';
 export * from './editor';
 export * from './editorMenu';
 export * from './forest';
+export * from './popup';
 export * from './router';
 export * from './view';
 export * from './selection';
@@ -27,6 +29,7 @@ export type Action =
   EditorActions |
   EditorMenuActions |
   ForestActions |
+  PopupActions |
   ViewActions |
   SelectionActions |
   SimulationActions;

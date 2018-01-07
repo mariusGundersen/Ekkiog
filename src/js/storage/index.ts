@@ -50,7 +50,7 @@ const _db = idb.open('ekkiog', 12, db => {
 });
 
 const _repo = _db.then(db => new Repo({}, db));
-export const user : OauthData | null = JSON.parse(localStorage.getItem('ekkiog-user') || 'null') as OauthData | null;
+export const user = getUser();
 
 export async function save(name : string, forest : Forest, message : string) : Promise<string> {
   const repo = await _repo;
@@ -182,10 +182,10 @@ function cursorToObservable<TStored, TValue=TStored>(
   });
 }
 
-export async function push(workspace : string, component : string) {
+export async function push(component : string) {
   if(!user) return;
   const repo = await _repo;
-  await repo.push(`/git/${user.server}/${user.username}/${workspace}.git`, `refs/heads/${component}`, {
+  await repo.push(`/git/${user.server}/${user.username}/${user.repo}.git`, `refs/heads/${component}`, {
     username: user.username,
     password: user.access_token
   });
@@ -198,4 +198,13 @@ export async function fetch(url : string, component : string) {
     depth: 1
   });
   console.log('success', response);
+}
+
+function getUser() : OauthData | null {
+  const user = JSON.parse(localStorage.getItem('ekkiog-user') || 'null');
+  if(!user) return null;
+  if(!user.repo){
+    user.repo = 'ekkiog-workspace';
+  }
+  return user;
 }

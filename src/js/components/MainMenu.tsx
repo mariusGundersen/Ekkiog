@@ -13,8 +13,9 @@ import { user } from '../storage';
 
 export interface Props {
   readonly show : boolean
-  readonly push : (x : any) => void
   readonly isPushing : boolean
+  push(x : any) : void
+  showProfile(x : any) : void
 }
 
 export default pure((a, b) => a.show === b.show,
@@ -31,7 +32,7 @@ export default pure((a, b) => a.show === b.show,
       {user === null
       ? <Login />
       : [
-        <Profile key='profile' user={user as OauthData} />,
+        <Profile key='profile' user={user as OauthData} showProfile={props.showProfile} />,
         <Push key='push' isBusy={props.isPushing} push={props.push} />
       ]}
       <div className={style.version}>{__BuildDate__}</div>
@@ -46,16 +47,16 @@ const Login = () => (
   </a>
 );
 
-const Profile = (props : {user : OauthData}) => (
-  <span className={theme.item}>
+const Profile = (props : {user : OauthData, showProfile : (x : any) => void}) => (
+  <button className={theme.item} onClick={props.showProfile}>
     <span className={theme.icon}>
       <img className={style.photo} src={props.user.photo} />
     </span>
     <span className={theme.labelVertical}>
       <span>{props.user.name}</span>
-      <span className={style.userDetails}>{props.user.server}/{props.user.username}/ekkiog-workspace</span>
+      <span className={style.userDetails}>{props.user.server}/{props.user.username}/{props.user.repo}</span>
     </span>
-  </span>
+  </button>
 );
 
 const Push = (props: {isBusy : boolean, push : (x : any) => void}) => (

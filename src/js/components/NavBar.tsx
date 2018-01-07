@@ -24,7 +24,15 @@ import SearchBar from './SearchBar';
 
 import style from './navbar.scss';
 
-import { insertComponentPackage, loadForest, setTickInterval, undo, redo, createForest } from '../actions';
+import {
+  insertComponentPackage,
+  loadForest,
+  setTickInterval,
+  undo,
+  redo,
+  createForest,
+  showPopup
+} from '../actions';
 import { State } from '../reduce';
 import * as storage from '../storage';
 import { RepoName } from './SearchResultView';
@@ -53,7 +61,8 @@ export default reax({
   onUndo: (x : any) => true,
   onRedo: (x : any) => true,
   onSetTickInterval: (value : number) => value,
-  onPush: (X : undefined) => true
+  onPush: (x : undefined) => true,
+  onProfileClick: (x : any) => true
 }, ({
   toggleSearch,
   toggleSimulationMenu,
@@ -65,18 +74,20 @@ export default reax({
   onUndo,
   onRedo,
   onSetTickInterval,
-  onPush
+  onPush,
+  onProfileClick
 }, props, initialProps : Props) => {
-  insertPackage.forEach(r => initialProps.dispatch(insertComponentPackage(r)));
-  openComponent.forEach(r => initialProps.dispatch(loadForest(r.repo, r.name, '0')));
-  createComponent.forEach(r => initialProps.dispatch(createForest(r)));
-  onUndo.forEach(() => initialProps.dispatch(undo()));
-  onRedo.forEach(() => initialProps.dispatch(redo()));
-  onSetTickInterval.forEach(x => initialProps.dispatch(setTickInterval(x)));
+  insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
+  openComponent.subscribe(r => initialProps.dispatch(loadForest(r.repo, r.name, '0')));
+  createComponent.subscribe(r => initialProps.dispatch(createForest(r)));
+  onUndo.subscribe(() => initialProps.dispatch(undo()));
+  onRedo.subscribe(() => initialProps.dispatch(redo()));
+  onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
+  onProfileClick.subscribe(() => initialProps.dispatch(showPopup('Profile')));
 
   const isPushing = onPush.pipe(
     withLatestFrom(props),
-    switchMap(([_, props]) => isBusy(storage.push("ekkiog-workspace", props.currentComponentName))));
+    switchMap(([_, props]) => isBusy(storage.push(props.currentComponentName))));
 
   const showSearch = merge(
       toggleSearch,
@@ -149,7 +160,8 @@ export default reax({
     <MainMenu
       show={values.state === 'main'}
       push={events.onPush}
-      isPushing={values.isPushing}/>
+      isPushing={values.isPushing}
+      showProfile={events.onProfileClick}/>
     { values.state == 'search' &&
     <SearchResults
       query={values.query}

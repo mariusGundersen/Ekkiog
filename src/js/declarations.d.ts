@@ -124,7 +124,8 @@ declare interface OauthData {
   photo : string,
   name : string,
   email : string,
-  access_token : string
+  access_token : string,
+  repo : string
 }
 
 declare module "idb" {
