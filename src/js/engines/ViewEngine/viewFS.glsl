@@ -28,8 +28,8 @@ void main(void) {
       gl_FragColor = vec4(50.0/255.0, 54.0/255.0, 58.0/255.0, 1.0);
     else
       gl_FragColor = vec4(42.0/255.0, 45.0/255.0, 48.0/255.0, 1.0);
-  }else if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
-    vec4 charge = texture2D(chargeMap, tileCoord);
+  }else if(color.r == 1.0 && color.g <= 2.0/255.0 && color.b == 1.0 && color.a >= 253.0/255.0){
+    vec4 charge = texture2D(chargeMap, tileCoord + color.ga - vec2(1.0/255.0, 254.0/255.0));
     gl_FragColor = charge;
   }else{
     gl_FragColor = color;
