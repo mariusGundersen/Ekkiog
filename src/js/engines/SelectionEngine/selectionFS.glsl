@@ -53,8 +53,8 @@ void main(void) {
 
   vec4 color = texture2D(spriteSheet, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);
 
-  if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
-    vec4 charge = texture2D(chargeMap, movedCoord);
+  if(color.r == 1.0 && color.g <= 2.0/255.0 && color.b == 1.0 && color.a >= 253.0/255.0){
+    vec4 charge = texture2D(chargeMap, tileCoord + color.ga - vec2(1.0/255.0, 254.0/255.0));
     gl_FragColor = charge;
   }else{
     gl_FragColor = color;

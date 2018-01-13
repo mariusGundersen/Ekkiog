@@ -24,7 +24,11 @@ export default function textFromItem(item : Item, area : Area) : Quad[] {
 export function* textFromComponent(component : Component, area : Area) : IterableIterator<Quad>{
   if(component.name){
     const characters = [...spritesFlat(component.name)];
-    yield* textPos(area.left+1, area.top+1, area.width-2, area.height-2, characters);
+    if(component.displays.length > 0){
+      yield* textPos(area.left+1, area.top+9/16, area.width-2, 7/16, characters);
+    }else{
+      yield* textPos(area.left+1, area.top+1, area.width-2, area.height-2, characters);
+    }
     for(const input of component.inputs){
       if(input.name){
         const characters = [...spritesThick(input.name)];

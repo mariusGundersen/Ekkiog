@@ -1,7 +1,7 @@
 import { BoxArea } from 'ennea-tree/lib/types';
 import getNetAt from 'ekkiog-editing/lib/query/getNetAt';
 import { getLightNeighbouringNet } from 'ekkiog-editing/lib/query/getNeighbouringNets';
-import { Direction, TreeNode } from 'ekkiog-editing/lib/main';
+import { Direction, TreeNode, ComponentInputPointer, ComponentInputPointerToGate, ComponentInputPointerToSegment } from 'ekkiog-editing/lib/main';
 import { SelectionState, ItemSelectedState } from '../reduce/selection';
 import { createForest, Item, BUTTON, Tool, LIGHT, GATE, Forest, LEFTWARDS, RIGHTWARDS, DOWNWARDS, UPWARDS, Light, Gate, COMPONENT, Component, Area } from 'ekkiog-editing';
 import { get as getTileAt, AreaData } from 'ennea-tree';
@@ -76,16 +76,17 @@ function setInputs(item: Item, enneaTree: TreeNode, box : Area): Item {
         net: getNetAtPos(enneaTree, box.left, box.top, input.x, input.y, getDirection(input.x, box.width), getDirection(input.y, box.height)),
       }));
       const gates = [...item.gates];
+      const displays = [...item.displays.map(({x, y, segments}) => ({x, y, segments: [...segments]}))];
       for(const input of inputs){
-        for(const point of input.pointsTo){
+        for(const point of input.pointsTo.filter(isGatePointer)){
           gates.splice(point.index, 1, {
             ...gates[point.index],
-            ...(point.input === "A" ? {
-              inputA: input.net
-            } : {
-              inputB: input.net
-            })
+            inputA: point.input === 'A' ? input.net : gates[point.index].inputA,
+            inputB: point.input === 'B' ? input.net : gates[point.index].inputB
           });
+        }
+        for(const point of input.pointsTo.filter(isDisplayPointer)){
+          displays[point.display].segments.splice(point.segment, 1, input.net);
         }
       }
       return {
@@ -132,4 +133,12 @@ function getDirection(pos : number, max : number){
   if(pos === 0) return -1;
   if(pos === max) return 1;
   return 0;
+}
+
+function isGatePointer(p : ComponentInputPointer) : p is ComponentInputPointerToGate {
+  return p.input === 'A' || p.input === 'B';
+}
+
+function isDisplayPointer(p : ComponentInputPointer) : p is ComponentInputPointerToSegment {
+  return p.input === 'S';
 }
