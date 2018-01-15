@@ -48,6 +48,7 @@ export interface Props {
   readonly redoCount : number;
   readonly isLoading : boolean;
   readonly isSaving : boolean;
+  readonly isReadOnly : boolean;
 }
 
 export default reax({
@@ -170,7 +171,8 @@ export default reax({
       query={values.query}
       insertPackage={events.insertPackage}
       openComponent={events.openComponent}
-      createComponent={events.createComponent} />}
+      createComponent={events.createComponent}
+      isReadOnly={props.isReadOnly} />}
     <SimulationMenu
       show={values.state == 'simulation'}
       tickInterval={props.tickInterval}

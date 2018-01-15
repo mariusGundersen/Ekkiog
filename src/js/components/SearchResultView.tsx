@@ -41,14 +41,12 @@ export default function SearchResultView({insertPackage, openComponent, toggleFa
         onClick={e => toggleFavorite(result.data)}>
         {getIcon(result)}
       </button>
-        <Route path="/demo" children={props =>
-          <button
-            className={style.insertPackage}
-            onClick={() => props.match ? openComponent(result.data) : insertPackage(result.data)}>
-            <span>{result.data.name}</span>
-            {result.data.repo && result.data.repo.length && <span className={style.repo}>{result.data.repo}</span>}
-          </button>
-        } />
+      <button
+        className={style.insertPackage}
+        onClick={() => insertPackage(result.data)}>
+        <span>{result.data.name}</span>
+        {result.data.repo && result.data.repo.length && <span className={style.repo}>{result.data.repo}</span>}
+      </button>
       <button
         className={style.openComponent}
         onClick={e => openComponent(result.data)}>

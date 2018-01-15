@@ -5,9 +5,9 @@ import { State } from '../reduce';
 import * as storage from '../storage';
 
 export default function* save({message} : SaveForestAction){
-  const {context: {forest, name}, router} : State = yield select();
+  const {context: {forest, name, isReadOnly}} : State = yield select();
 
-  if(router.isReadOnly) return;
+  if(isReadOnly) return;
 
   yield put(forestSaving());
   const hash = yield storage.save(name, forest, message);

@@ -19,7 +19,7 @@ import { tap } from '../reduce/forest';
 import nextFrame from '../utils/nextFrame';
 
 export default function* tapTile({x, y, tool, direction} : TapTileAction) {
-  const {context: {forest}, router} : State = yield select();
+  const {context: {forest, isReadOnly}} : State = yield select();
 
   yield nextFrame();
   const area = getTileAt(forest.enneaTree, y, x);
@@ -27,7 +27,7 @@ export default function* tapTile({x, y, tool, direction} : TapTileAction) {
     const net = area.data.net;
     yield put(toggleButton(net));
   }else{
-    if(router.isReadOnly) return;
+    if(isReadOnly) return;
     yield put(draw(x, y, tool, direction));
 
     const {context, context: {forest: mutatedForest}} : State = yield select();

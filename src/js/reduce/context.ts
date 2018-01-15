@@ -12,6 +12,7 @@ export interface ContextState {
   readonly repo : string
   readonly name : string
   readonly version : string
+  readonly isReadOnly : boolean
   readonly hash : string
   readonly previous? : ParentContextState
   readonly forest : Forest
@@ -47,6 +48,7 @@ const initialContext : ContextState = {
   repo: '',
   name: 'WELCOME',
   version: '0',
+  isReadOnly: false,
   hash: '0000000000000000000000000000000000000000',
   forest: createForest(),
   buttonTree: createButtonTree(256*256),
@@ -89,6 +91,7 @@ export default function context(state = initialContext, action: Action) : Contex
         repo: state.loading.repo,
         name: state.loading.name,
         version: state.loading.version,
+        isReadOnly: state.loading.repo.length > 0,
         forest: action.forest,
         buttonTree: createButtonTree(256*256),
         hash: action.hash,

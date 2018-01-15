@@ -52,7 +52,7 @@ export default connect((s : State) => s)(
           width={values.size.pixelWidth}
           height={values.size.pixelHeight}
         />
-        {props.router.isReadOnly || (
+        {props.context.isReadOnly || (
           <Menu
             contextMenu={props.contextMenu}
             dispatch={props.dispatch}
@@ -74,6 +74,7 @@ export default connect((s : State) => s)(
           redoCount={props.context.redoStack && props.context.redoStack.count || 0}
           isLoading={props.context.loading !== undefined}
           isSaving={props.context.saving}
+          isReadOnly={props.context.isReadOnly}
         />
         <Popup
           show={props.popup.show && props.popup.popup === 'Profile'}

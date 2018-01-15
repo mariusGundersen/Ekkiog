@@ -33,7 +33,7 @@ export default function* doubleTap({x, y} : DoubleTapAction){
       const component = packageComponent(context.forest, context.repo, context.name, context.version, context.hash);
       yield put(popContext());
       yield put(setUrl(context.repo, context.name));
-      if(state.router.isReadOnly) return;
+      if(context.isReadOnly) return;
       const {forest, didntFit} = replaceComponents(previousContext.forest, component);
       if(previousContext.forest !== forest){
         yield put(setForest(forest));

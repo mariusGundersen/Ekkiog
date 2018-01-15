@@ -40,6 +40,7 @@ export interface Props {
   createComponent(name : string) : void;
   openComponent(component : RepoName) : void;
   insertPackage(component : CompiledComponent) : void;
+  isReadOnly : boolean
 }
 
 type ObservableProps = Observable<Props>;
@@ -56,7 +57,10 @@ export default reax<Props>()(({
 
   insertPackage.pipe(
     withLatestFrom(props)
-  ).subscribe(([result, props]) => storage.loadPackage(result.repo, result.name, '0').then(props.insertPackage));
+  ).subscribe(([result, props]) => props.isReadOnly
+    ? props.openComponent(result)
+    : storage.loadPackage(result.repo, result.name, '0').then(props.insertPackage)
+  );
 
   openComponent.pipe(
     withLatestFrom(props)
