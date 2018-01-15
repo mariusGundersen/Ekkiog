@@ -46,6 +46,13 @@ export const newContextLoading = (repo : string, name : string, version : string
   version
 });
 
+export type AbortContextLoadingAction = {
+  readonly type : 'abort-context-loading'
+}
+export const abortContextLoading = () : AbortContextLoadingAction => ({
+  type: 'abort-context-loading'
+});
+
 export type ForestLoadedAction = {
   readonly type : 'forest-loaded',
   readonly forest : Forest,
@@ -129,6 +136,7 @@ export type ContextActions =
   SaveForestAction |
   CreateForestAction |
   NewContextLoadingAction |
+  AbortContextLoadingAction |
   ForestLoadedAction |
   DoubleTapAction |
   PushContextLoadingAction |

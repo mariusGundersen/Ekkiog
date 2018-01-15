@@ -40,11 +40,12 @@ export interface LoadingState {
   readonly name : string
   readonly version : string
   readonly scaleInFrom : number
+  readonly abort : ContextState
 }
 
 const initialContext : ContextState = {
   repo: '',
-  name: '',
+  name: 'WELCOME',
   version: '0',
   hash: '0000000000000000000000000000000000000000',
   forest: createForest(),
@@ -76,7 +77,8 @@ export default function context(state = initialContext, action: Action) : Contex
           repo: action.repo,
           name: action.name,
           version: action.version,
-          scaleInFrom: 1
+          scaleInFrom: 1,
+          abort: state
         },
         ease: state.ease
       };
@@ -111,9 +113,14 @@ export default function context(state = initialContext, action: Action) : Contex
           repo: action.repo,
           name: action.name,
           version: action.version,
-          scaleInFrom: 1.4
+          scaleInFrom: 1.4,
+          abort: state
         }
       };
+    case 'abort-context-loading':
+      return state.loading
+        ? state.loading.abort
+        : state;
     case 'forest-saving':
       return {
         ...state,

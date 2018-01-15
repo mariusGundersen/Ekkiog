@@ -16,11 +16,12 @@ import {
   forestLoaded,
   removeTileAt,
   DoubleTapAction,
+  abortContextLoading,
 } from '../actions';
 import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
 import * as storage from '../storage';
-import { loadOrCreate } from './loadForest';
+import { loadOrPull } from './loadForest';
 import setUrl from '../actions/router';
 
 export default function* doubleTap({x, y} : DoubleTapAction){
@@ -70,9 +71,13 @@ export default function* doubleTap({x, y} : DoubleTapAction){
       const posA = state.view.viewportToTile(0, 0);
       const posB = state.view.viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
       yield put(pushContextLoading(repo, name, version, box(posA, posB), centerX, centerY));
-      const forest = yield* loadOrCreate(repo, name, version);
-      yield put(setUrl(repo, name));
-      yield put(forestLoaded(forest, forest.hash));
+      try{
+        const forest = yield* loadOrPull(repo, name, version);
+        yield put(setUrl(repo, name));
+        yield put(forestLoaded(forest, forest.hash));
+      }catch(e){
+        yield put(abortContextLoading());
+      }
     }
   }
 }
