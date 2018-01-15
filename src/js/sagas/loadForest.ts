@@ -19,7 +19,7 @@ export default function* loadForest({repo, name, version} : LoadForestAction) {
 export function* loadOrCreate(repo : string, name : string, version : string){
   if(repo.length === 0){
     try{
-      yield* loadOrPull(repo, name, version);
+      return yield* loadOrPull(repo, name, version);
     }catch(e){
       return {
         ...createForest(),
@@ -27,7 +27,7 @@ export function* loadOrCreate(repo : string, name : string, version : string){
       };
     }
   }else{
-    yield* loadOrPull(repo, name, version);
+    return yield* loadOrPull(repo, name, version);
   }
 }
 
