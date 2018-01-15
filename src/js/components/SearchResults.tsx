@@ -127,7 +127,7 @@ function showEmpty(){
 function getRecent() {
   return storage.getRecent().pipe(
     map(typed(RECENT)),
-    take(5));
+    take(20));
 }
 
 function getFavorite() {
