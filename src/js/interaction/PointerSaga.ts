@@ -18,11 +18,12 @@ import {
 
 export default class PointerSaga {
   private canInteract : boolean;
+  private changed : number;
   constructor(emitter : EventEmitter){
     this.canInteract = true;
 
     maybeEmit(emitter, () => this.canInteract, POINTER_TAP, TAP);
-    maybeEmit(emitter, () => this.canInteract, POINTER_DOUBLE_TAP, DOUBLE_TAP);
+    maybeEmit(emitter, () => this.canInteract || window.performance.now() - this.changed < 500, POINTER_DOUBLE_TAP, DOUBLE_TAP);
     maybeEmit(emitter, () => this.canInteract, LONG_PRESS, SHOW_CONTEXT_MENU);
     maybeEmit(emitter, () => this.canInteract, POTENTIAL_LONG_PRESS, LOAD_CONTEXT_MENU);
     maybeEmit(emitter, () => this.canInteract, POTENTIAL_LONG_PRESS_CANCEL, ABORT_LOAD_CONTEXT_MENU);
@@ -30,6 +31,7 @@ export default class PointerSaga {
 
   disable(){
     this.canInteract = false;
+    this.changed = window.performance.now();
   }
 
   enable(){

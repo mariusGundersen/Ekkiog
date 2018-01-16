@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { combineReducers, Reducer } from 'redux';
 
 import context, { ContextState } from './context';
 import contextMenu, { ContextMenuState } from './contextMenu';
@@ -22,7 +22,7 @@ export interface State {
   readonly view : ViewState,
 }
 
-export default combineReducers<State>({
+export default abortTapMiddleware(combineReducers<State>({
   context,
   contextMenu,
   editor,
@@ -32,4 +32,24 @@ export default combineReducers<State>({
   selection,
   simulation,
   view
-});
+}));
+
+function abortTapMiddleware(reduce : Reducer<State>) : Reducer<State>{
+  let tempState : State | undefined = undefined;
+  let tappedAt = 0;
+  return (state : State, action : any) => {
+    if(action.type === 'tap-tile'){
+      tempState = state;
+      tappedAt = window.performance.now();
+    }else if(tempState){
+      const now = window.performance.now();
+      if(action.type === 'double-tap' && now - tappedAt < 500){
+        state = tempState
+        tempState = undefined;
+      }else if(now - tappedAt > 500){
+        tempState = undefined
+      }
+    }
+    return reduce(state, action);
+  }
+}
