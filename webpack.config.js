@@ -62,18 +62,18 @@ module.exports = {
       minimize: false,
       debug: debug
     }),
-    new OfflinePlugin({
-      caches: 'all',
-      ServiceWorker: {
-        events: true
-      }
-    }),
     ...(debug ? [
       new webpack.NamedModulesPlugin(),
       new webpack.HotModuleReplacementPlugin(),
       new webpack.NoEmitOnErrorsPlugin(),
       new DashboardPlugin()
     ] : [
+      new OfflinePlugin({
+        caches: 'all',
+        ServiceWorker: {
+          events: true
+        }
+      }),
       new BabelMinifyPlugin()
     ])
   ],
