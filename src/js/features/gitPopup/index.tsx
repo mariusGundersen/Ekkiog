@@ -6,14 +6,14 @@ import Popup from '../../components/Popup';
 export interface Props {
   readonly show : string | false
   readonly state : GitPopupState
-  hidePopup() : void
+  hidePopup(e : React.MouseEvent<HTMLDivElement>) : void
 }
 
 export default function GitPopup(props : Props){
   return (
     <Popup
       show={props.show === 'GitProgress'}
-      onCoverClicked={() => props.state.status === 'busy' ? null : props.hidePopup()}>
+      onCoverClicked={e => props.state.status === 'busy' ? null : props.hidePopup(e)}>
         <GitProgress {...props.state} />
     </Popup>
   );

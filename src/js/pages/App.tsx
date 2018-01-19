@@ -30,9 +30,13 @@ type Props = State & {dispatch: Dispatch<State>};
 
 export default connect((s : State) => s)(
   reax({
+    hidePopup: (e : any) => null
   },
-  (_, props, initialProps : Props) => {
+  (events, props, initialProps : Props) => {
     initialProps.dispatch(getFromUrl());
+
+    events.hidePopup.subscribe(e => initialProps.dispatch(hidePopup()));
+
     return {
       size: onResize()
     }
@@ -80,13 +84,13 @@ export default connect((s : State) => s)(
         />
         <Popup
           show={props.popup.show === 'Profile'}
-          onCoverClicked={() => props.dispatch(hidePopup())}>
+          onCoverClicked={events.hidePopup}>
             <Profile user={user as OauthData} />
         </Popup>
         <GitProgressPopup
           show={props.popup.show}
           state={props.gitPopup}
-          hidePopup={() => props.dispatch(hidePopup())} />
+          hidePopup={events.hidePopup} />
       </div>
     );
   }

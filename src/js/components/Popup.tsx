@@ -6,7 +6,7 @@ import style from './popup.scss';
 export interface Props {
   readonly show : boolean
   readonly children : JSX.Element
-  onCoverClicked() : void
+  onCoverClicked(e : React.MouseEvent<HTMLDivElement>) : void
 }
 
 export default function Popup(props : Props){
@@ -17,7 +17,7 @@ export default function Popup(props : Props){
       timeout={300}
       mountOnEnter={true}
       unmountOnExit={true}>
-      <div className={style.popupCover} onClick={e => e.currentTarget === e.target && props.onCoverClicked()}>
+      <div className={style.popupCover} onClick={e => e.currentTarget === e.target && props.onCoverClicked(e)}>
         <div className={style.popup}>
           {props.children}
         </div>
