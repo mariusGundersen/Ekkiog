@@ -5,7 +5,7 @@ import style from './popup.scss';
 
 export interface Props {
   readonly show : boolean
-  readonly children : JSX.Element | false
+  readonly children : JSX.Element
   onCoverClicked() : void
 }
 

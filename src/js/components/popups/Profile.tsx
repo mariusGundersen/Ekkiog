@@ -22,16 +22,22 @@ export default reax({
     usage
   };
 },
-({events, props, values}) => <>
-  <div className={style.photoContainer}>
-    <img className={style.photo} src={props.user.photo} />
-    <h3>{props.user.name}</h3>
-    <h5>{props.user.server}/{props.user.username}/{props.user.repo}</h5>
-    <pre>
-      Used {formatBytes(values.usage.usage)}
-    </pre>
+({events, props, values}) => (
+  <div className={style.popup}>
+    <div className={style.photoContainer}>
+      <img className={style.photo} src={props.user.photo} />
+      <h3>{props.user.name}</h3>
+      <h5>
+        <a target="_blank" href={`https://${props.user.server}/${props.user.username}/${props.user.repo}`}>
+          {props.user.server}/{props.user.username}/{props.user.repo}
+        </a>
+      </h5>
+      <pre>
+        Used {formatBytes(values.usage.usage)}
+      </pre>
+    </div>
   </div>
-</>);
+));
 
 async function getEstimate() : Promise<{quota : number, usage : number}>{
   return await (navigator as any).storage.estimate();

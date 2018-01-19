@@ -117,7 +117,10 @@ export default function context(state = initialContext, action: Action) : Contex
           name: action.name,
           version: action.version,
           scaleInFrom: 1.4,
-          abort: state
+          abort: {
+            ...state,
+            ease: ease(boxToArray(scaleBox(action.boundingBox, 0.7, action.centerX, action.centerY)), boxToArray(action.boundingBox), easeOut, 1000)
+          }
         }
       };
     case 'abort-context-loading':

@@ -4,6 +4,11 @@
   justify-content: center;
 }
 
+.popup {
+  background: #424C57;
+  box-shadow: 0 0 10px 0 black;
+}
+
 .photo-container{
   display: flex;
   flex-direction: column;
@@ -13,6 +18,10 @@
   & h3,
   & h5 {
     margin: 0;
+  }
+
+  & a {
+    color: inherit;
   }
 
   & .photo {

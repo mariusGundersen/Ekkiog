@@ -58,7 +58,7 @@ export default reax({
     isCreating
   };
 },
-({events, props, values}) => <>
+({events, props, values}) => <div className={style.popup}>
   <div className={style.photoContainer}>
     <h2>Pick Repository</h2>
     <img className={style.photo} src={props.user.photo} />
@@ -103,4 +103,4 @@ export default reax({
       ))}
     </div>
   }
-</>);
+</div>);

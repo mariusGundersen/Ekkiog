@@ -9,6 +9,7 @@ import router, { RouterState } from './router';
 import selection, { SelectionState } from './selection';
 import simulation, { SimulationState } from './simulation';
 import view, { ViewState } from './view';
+import gitPopup, {GitPopupState } from '../features/gitPopup/reduce';
 
 export interface State {
   readonly context : ContextState,
@@ -20,6 +21,7 @@ export interface State {
   readonly selection : SelectionState,
   readonly simulation : SimulationState
   readonly view : ViewState,
+  readonly gitPopup : GitPopupState
 }
 
 export default abortTapMiddleware(combineReducers<State>({
@@ -31,7 +33,8 @@ export default abortTapMiddleware(combineReducers<State>({
   popup,
   selection,
   simulation,
-  view
+  view,
+  gitPopup
 }));
 
 function abortTapMiddleware(reduce : Reducer<State>) : Reducer<State>{

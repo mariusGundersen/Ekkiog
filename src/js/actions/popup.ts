@@ -15,16 +15,6 @@ export const hidePopup = () : HidePopupAction => ({
   type: 'HidePopup'
 });
 
-export type PopupProgressMessage = {
-  readonly type : 'PopupProgressMessage'
-  readonly message : string
-}
-export const progressMessage = (message : string) : PopupProgressMessage => ({
-  type: 'PopupProgressMessage',
-  message
-});
-
 export type PopupActions =
   ShowPopupAction |
-  HidePopupAction |
-  PopupProgressMessage;
+  HidePopupAction;

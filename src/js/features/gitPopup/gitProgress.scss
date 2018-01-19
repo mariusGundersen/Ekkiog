@@ -1,0 +1,25 @@
+.git-progress {
+  font-size: 10px;
+  background: #00000088;
+  box-shadow: 0 0 10px 0 #00000088;
+
+  &.busy {
+
+  }
+
+  &.success {
+    background: #00660088;
+    box-shadow: 0 0 10px 0 #00660088;
+  }
+
+  &.failure {
+    color: pink;
+    background: #66000088;
+    box-shadow: 0 0 10px 0 #66000088;
+  }
+
+  & pre {
+    margin: 0;
+    padding: 10px;
+  }
+}

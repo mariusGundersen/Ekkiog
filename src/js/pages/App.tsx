@@ -12,7 +12,7 @@ import NavBar from '../components/NavBar';
 import Popup from '../components/Popup';
 import SelectRepo from '../components/popups/SelectRepo';
 import Profile from '../components/popups/Profile';
-import GitProgress from '../components/popups/GitProgress';
+import GitProgressPopup from '../features/gitPopup';
 
 import style from '../components/main.css';
 import {
@@ -24,6 +24,7 @@ import { Route } from 'react-router';
 import { user } from '../storage';
 import { hidePopup, loadForest } from '../actions';
 import getRepoFromUrl from '../utils/getRepoFromUrl';
+import { PopupState } from '../reduce/popup';
 
 type Props = State & {dispatch: Dispatch<State>};
 
@@ -78,15 +79,14 @@ export default connect((s : State) => s)(
           isReadOnly={props.context.isReadOnly}
         />
         <Popup
-          show={props.popup.show && props.popup.data.popup === 'Profile'}
+          show={props.popup.show === 'Profile'}
           onCoverClicked={() => props.dispatch(hidePopup())}>
             <Profile user={user as OauthData} />
         </Popup>
-        <Popup
-          show={props.popup.show && props.popup.data.popup === 'GitProgress'}
-          onCoverClicked={() => {}}>
-            <GitProgress message={props.popup.show && props.popup.data.popup === 'GitProgress' ? props.popup.data.message : ''} />
-        </Popup>
+        <GitProgressPopup
+          show={props.popup.show}
+          state={props.gitPopup}
+          hidePopup={() => props.dispatch(hidePopup())} />
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import { put, take, call } from 'redux-saga/effects';
 import Terminal from '@es-git/terminal';
 
-import { forestLoaded, newContextLoading, LoadForestAction, abortContextLoading, progressMessage, showPopup, hidePopup } from '../actions';
+import { forestLoaded, newContextLoading, LoadForestAction, abortContextLoading, showPopup, hidePopup, gitProgressStatus, gitProgressMessage } from '../actions';
 import * as storage from '../storage';
 import { createForest } from 'ekkiog-editing';
 import setUrl from '../actions/router';
@@ -40,32 +40,37 @@ export function* loadOrPull(repo : string, name : string, version : string){
     try{
       return yield storage.load(repo, name, version);
     }catch(e){
+
+      var terminal = new Terminal();
+      yield put(gitProgressStatus('busy'));
+      yield put(gitProgressMessage(terminal.logLine(`Loading ${name}\nfrom ${repo}`)));
       yield put(showPopup('GitProgress'));
-      const result : {name : string}[] = yield call(fetchWithProgress, repo, name);
+      const result : {name : string}[] = yield call(fetchWithProgress, repo, name, terminal);
       if(result.some(r => r.name === name)){
+        yield put(gitProgressStatus('success'));
         yield put(hidePopup());
         return yield storage.load(repo, name, version);
       }else{
-        yield put(progressMessage(`Failed to load ${name}\nfrom ${repo}`))
+        yield put(gitProgressStatus('failure'));
+        yield put(gitProgressMessage(`Failed to load ${name}\nfrom ${repo}`));
+        throw new Error();
       }
     }
   }
 }
 
 
-function* fetchWithProgress(repo : string, name : string){
+function* fetchWithProgress(repo : string, name : string, terminal : Terminal){
   const channel = yield eventChannel(emit => {
     storage.fetch(repo, name, emit).then(emit);
     return () => {};
   });
 
-  var terminal = new Terminal();
-
   while(true){
     const message = yield take(channel);
     if(typeof(message) === 'string'){
       console.log(message);
-      yield put(progressMessage(terminal.log(message)));
+      yield put(gitProgressMessage(terminal.log(message)));
     }else{
       return message;
     }
