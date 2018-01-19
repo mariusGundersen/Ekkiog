@@ -12,6 +12,7 @@ import NavBar from '../components/NavBar';
 import Popup from '../components/Popup';
 import SelectRepo from '../components/popups/SelectRepo';
 import Profile from '../components/popups/Profile';
+import GitProgress from '../components/popups/GitProgress';
 
 import style from '../components/main.css';
 import {
@@ -77,9 +78,14 @@ export default connect((s : State) => s)(
           isReadOnly={props.context.isReadOnly}
         />
         <Popup
-          show={props.popup.show && props.popup.popup === 'Profile'}
+          show={props.popup.show && props.popup.data.popup === 'Profile'}
           onCoverClicked={() => props.dispatch(hidePopup())}>
             <Profile user={user as OauthData} />
+        </Popup>
+        <Popup
+          show={props.popup.show && props.popup.data.popup === 'GitProgress'}
+          onCoverClicked={() => {}}>
+            <GitProgress message={props.popup.show && props.popup.data.popup === 'GitProgress' ? props.popup.data.message : ''} />
         </Popup>
       </div>
     );

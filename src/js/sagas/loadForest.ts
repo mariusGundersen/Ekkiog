@@ -1,9 +1,11 @@
-import { put } from 'redux-saga/effects';
+import { put, take, call } from 'redux-saga/effects';
+import Terminal from '@es-git/terminal';
 
-import { forestLoaded, newContextLoading, LoadForestAction, abortContextLoading } from '../actions';
+import { forestLoaded, newContextLoading, LoadForestAction, abortContextLoading, progressMessage, showPopup, hidePopup } from '../actions';
 import * as storage from '../storage';
 import { createForest } from 'ekkiog-editing';
 import setUrl from '../actions/router';
+import { eventChannel, delay } from 'redux-saga';
 
 export default function* loadForest({repo, name, version} : LoadForestAction) {
   yield put(newContextLoading(repo, name, version));
@@ -38,8 +40,34 @@ export function* loadOrPull(repo : string, name : string, version : string){
     try{
       return yield storage.load(repo, name, version);
     }catch(e){
-      yield storage.fetch(repo, name).catch(e => console.log(e));
-      return yield storage.load(repo, name, version);
+      yield put(showPopup('GitProgress'));
+      const result : {name : string}[] = yield call(fetchWithProgress, repo, name);
+      if(result.some(r => r.name === name)){
+        yield put(hidePopup());
+        return yield storage.load(repo, name, version);
+      }else{
+        yield put(progressMessage(`Failed to load ${name}\nfrom ${repo}`))
+      }
+    }
+  }
+}
+
+
+function* fetchWithProgress(repo : string, name : string){
+  const channel = yield eventChannel(emit => {
+    storage.fetch(repo, name, emit).then(emit);
+    return () => {};
+  });
+
+  var terminal = new Terminal();
+
+  while(true){
+    const message = yield take(channel);
+    if(typeof(message) === 'string'){
+      console.log(message);
+      yield put(progressMessage(terminal.log(message)));
+    }else{
+      return message;
     }
   }
 }

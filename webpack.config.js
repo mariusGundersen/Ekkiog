@@ -40,7 +40,7 @@ const babelLoader = {
 
 module.exports = {
   entry: {
-    index: './src/js/index.ts'
+    index: ['./src/js/index.ts']
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -64,7 +64,6 @@ module.exports = {
     }),
     ...(debug ? [
       new webpack.NamedModulesPlugin(),
-      new webpack.HotModuleReplacementPlugin(),
       new webpack.NoEmitOnErrorsPlugin(),
       new DashboardPlugin()
     ] : [

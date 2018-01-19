@@ -191,13 +191,19 @@ export async function push(component : string) {
   });
 }
 
-export async function fetch(url : string, component : string) {
+export async function fetch(url : string, component : string, progress : (status: string) => void) {
   const repo = await _repo;
   const response = await repo.fetch(`/git/${url}.git`, {
     refspec: `refs/heads/${component}:refs/remotes/${url}/${component}`,
-    depth: 1
+    depth: 1,
+    progress
   });
   console.log('success', response);
+  return response.map(({name, from, to}) => ({
+    name: name.substr(`refs/remotes/${url}/`.length),
+    from,
+    to
+  }));
 }
 
 export function getUser() : OauthData | null {
