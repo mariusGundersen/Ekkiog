@@ -30,7 +30,7 @@ export default function* doubleTap({x, y} : DoubleTapAction){
   if(x < 0 || y < 0 || x > 128 || y > 128){
     const previousContext = context.previous;
     if(previousContext){
-      const component = packageComponent(context.forest, context.repo, context.name, context.version, context.hash);
+      const component = packageComponent(context.forest, context.repo, context.name, context.hash, context.hash);
       yield put(popContext());
       yield put(setUrl(context.repo, context.name));
       if(context.isReadOnly) return;
@@ -65,14 +65,14 @@ export default function* doubleTap({x, y} : DoubleTapAction){
   }else{
     const areaData = getTileAt(state.context.forest.enneaTree, y|0, x|0);
     if(areaData && areaData.data.type === 'component' && areaData.data.name){
-      const {repo, name, version} = locateRepo(areaData.data, context);
+      const {repo, name} = locateRepo(areaData.data, context);
       const centerX = areaData.left + areaData.width/2;
       const centerY = areaData.top + areaData.height/2;
       const posA = state.view.viewportToTile(0, 0);
       const posB = state.view.viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
-      yield put(pushContextLoading(repo, name, version, box(posA, posB), centerX, centerY));
+      yield put(pushContextLoading(repo, name, box(posA, posB), centerX, centerY));
       try{
-        const forest = yield* loadOrPull(repo, name, version);
+        const forest = yield* loadOrPull(repo, name);
         yield put(setUrl(repo, name));
         yield put(forestLoaded(forest, forest.hash));
       }catch(e){
@@ -130,10 +130,9 @@ function box([left, top] : number[], [right, bottom] : number[]){
   return {top, left, right, bottom};
 }
 
-function locateRepo({repo, name, version} : {repo : string, name : string, version : string}, context : ContextState){
+function locateRepo({repo, name} : {repo : string, name : string}, context : ContextState){
   return {
     repo: repo && repo.length > 0 ? repo : context.repo,
-    name,
-    version
+    name
   };
 }

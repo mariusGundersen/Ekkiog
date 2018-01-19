@@ -19,7 +19,7 @@ import {
   startWith,
   map
 } from 'rxjs/operators';
-import { Route } from 'react-router';
+import { Route, matchPath } from 'react-router';
 
 import { user } from '../storage';
 import { hidePopup, loadForest } from '../actions';
@@ -107,22 +107,24 @@ function onResize(){
     })));
 }
 function getFromUrl(){
-
   const search = new URLSearchParams(document.location.search);
-  if(search.has('repo') && search.has('component')){
+  const match = matchPath<{repo? : string, name : string}>(document.location.pathname, {path:'/c/:name/:repo*'});
+  if(match){
     return loadForest(
-      search.get('repo') || '',
-      search.get('component') || 'WELCOME',
-      search.get('version') || '0');
+      match.params.repo || '',
+      match.params.name,
+    search.get('hash') || undefined);
   }else{
     const match = getRepoFromUrl(document.referrer);
     if(match){
       return loadForest(
         match.repo,
-        match.branch,
-        '0');
+        match.branch);
     }else{
-      return loadForest('', 'WELCOME', '0');
+      return loadForest(
+        '',
+        'WELCOME',
+        search.get('hash') || undefined);
     }
   }
 }

@@ -79,7 +79,7 @@ export default reax({
   onProfileClick
 }, props, initialProps : Props) => {
   insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
-  openComponent.subscribe(r => initialProps.dispatch(loadForest(r.repo, r.name, '0')));
+  openComponent.subscribe(r => initialProps.dispatch(loadForest(r.repo, r.name)));
   createComponent.subscribe(r => initialProps.dispatch(createForest(r)));
   onUndo.subscribe(() => initialProps.dispatch(undo()));
   onRedo.subscribe(() => initialProps.dispatch(redo()));

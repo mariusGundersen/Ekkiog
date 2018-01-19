@@ -63,6 +63,10 @@ app.use(route.get('/demo', ctx => {
   ctx.body = htmlPage();
 }));
 
+app.use(route.get('/c/:component*', ctx => {
+  ctx.body = htmlPage();
+}));
+
 app.use(route.get('/', ctx => {
   ctx.body = htmlPage();
 }));

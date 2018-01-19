@@ -7,10 +7,10 @@ import { createForest } from 'ekkiog-editing';
 import setUrl from '../actions/router';
 import { eventChannel, delay } from 'redux-saga';
 
-export default function* loadForest({repo, name, version} : LoadForestAction) {
-  yield put(newContextLoading(repo, name, version));
+export default function* loadForest({repo, name, hash} : LoadForestAction) {
+  yield put(newContextLoading(repo, name));
   try{
-    const component = yield* loadOrCreate(repo, name, version);
+    const component = yield* loadOrCreate(repo, name, hash);
     yield put(setUrl(repo, name));
     yield put(forestLoaded(component, component.hash));
   }catch(e){
@@ -18,10 +18,10 @@ export default function* loadForest({repo, name, version} : LoadForestAction) {
   }
 };
 
-export function* loadOrCreate(repo : string, name : string, version : string){
+export function* loadOrCreate(repo : string, name : string, hash? : string){
   if(repo.length === 0){
     try{
-      return yield* loadOrPull(repo, name, version);
+      return yield* loadOrPull(repo, name, hash);
     }catch(e){
       return {
         ...createForest(),
@@ -29,16 +29,16 @@ export function* loadOrCreate(repo : string, name : string, version : string){
       };
     }
   }else{
-    return yield* loadOrPull(repo, name, version);
+    return yield* loadOrPull(repo, name, hash);
   }
 }
 
-export function* loadOrPull(repo : string, name : string, version : string){
+export function* loadOrPull(repo : string, name : string, hash? : string){
   if(repo.length === 0){
-    return yield storage.load(repo, name, version);
+    return yield storage.load(repo, name, hash);
   }else{
     try{
-      return yield storage.load(repo, name, version);
+      return yield storage.load(repo, name, hash);
     }catch(e){
 
       var terminal = new Terminal();
@@ -49,7 +49,7 @@ export function* loadOrPull(repo : string, name : string, version : string){
       if(result.some(r => r.name === name)){
         yield put(gitProgressStatus('success'));
         yield put(hidePopup());
-        return yield storage.load(repo, name, version);
+        return yield storage.load(repo, name, hash);
       }else{
         yield put(gitProgressStatus('failure'));
         yield put(gitProgressMessage(`Failed to load ${name}\nfrom ${repo}`));

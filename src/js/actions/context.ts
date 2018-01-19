@@ -5,13 +5,13 @@ export type LoadForestAction = {
   readonly type : 'load-forest'
   readonly repo : string
   readonly name : string
-  readonly version : string
+  readonly hash? : string
 }
-export const loadForest = (repo : string, name : string, version : string) : LoadForestAction => ({
+export const loadForest = (repo : string, name : string, hash? : string) : LoadForestAction => ({
   type: 'load-forest',
   repo,
   name,
-  version
+  hash
 });
 
 export type SaveForestAction = {
@@ -37,13 +37,11 @@ export type NewContextLoadingAction = {
   readonly type : 'new-context-loading',
   readonly repo : string
   readonly name : string
-  readonly version : string
 }
-export const newContextLoading = (repo : string, name : string, version : string) : NewContextLoadingAction => ({
+export const newContextLoading = (repo : string, name : string) : NewContextLoadingAction => ({
   type: 'new-context-loading',
   repo,
-  name,
-  version
+  name
 });
 
 export type AbortContextLoadingAction = {
@@ -79,16 +77,14 @@ export type PushContextLoadingAction = {
   readonly type : 'push-context-loading',
   readonly repo : string,
   readonly name : string,
-  readonly version : string,
   readonly boundingBox : Box,
   readonly centerX : number,
   readonly centerY : number
 }
-export const pushContextLoading = (repo : string, name : string, version : string, boundingBox : Box, centerX : number, centerY : number) : PushContextLoadingAction => ({
+export const pushContextLoading = (repo : string, name : string, boundingBox : Box, centerX : number, centerY : number) : PushContextLoadingAction => ({
   type: 'push-context-loading',
   repo,
   name,
-  version,
   boundingBox,
   centerX,
   centerY

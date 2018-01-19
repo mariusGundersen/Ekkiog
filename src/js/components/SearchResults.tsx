@@ -59,7 +59,7 @@ export default reax<Props>()(({
     withLatestFrom(props)
   ).subscribe(([result, props]) => props.isReadOnly
     ? props.openComponent(result)
-    : storage.loadPackage(result.repo, result.name, '0').then(props.insertPackage)
+    : storage.loadPackage(result.repo, result.name).then(props.insertPackage)
   );
 
   openComponent.pipe(

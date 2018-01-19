@@ -57,7 +57,7 @@ export async function save(name : string, forest : Forest, message : string) : P
   return await repo.save(name, forest, message, user);
 }
 
-export async function load(repo : string, name : string, version : string){
+export async function load(repo : string, name : string, hash? : string){
   const db = await _db;
   const transaction = db.transaction([
     'recent',
@@ -72,9 +72,9 @@ export async function load(repo : string, name : string, version : string){
   return await (await _repo).load(repo, name);
 }
 
-export async function loadPackage(repo : string, name : string, version : string) : Promise<CompiledComponent>{
-  const forest = await load(repo, name, version);
-  return packageComponent(forest, repo, name, version, forest.hash);
+export async function loadPackage(repo : string, name : string) : Promise<CompiledComponent>{
+  const forest = await load(repo, name);
+  return packageComponent(forest, repo, name, forest.hash, forest.hash);
 }
 
 export function getRecent() : Observable<RecentComponent> {
