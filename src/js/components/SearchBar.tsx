@@ -22,13 +22,13 @@ export default pure(
     currentComponentRepo : string,
     gateCount : number,
     showSearch : boolean,
-    toggleSearch : EventCallback<React.SyntheticEvent<HTMLButtonElement>>,
+    toggleSearch : EventCallback<React.SyntheticEvent<HTMLElement>>,
     query : EventCallback<string>,
     isSaving : boolean
   }) => (
   <div className={style.searchBar} data-state={props.showSearch ? 'search' : 'name'}>
-    <div className={style.nameBox}>
-      <span>{props.currentComponentName} ({props.gateCount})</span>
+    <div className={style.nameBox} onClick={props.toggleSearch}>
+      <span>{props.currentComponentName} {props.gateCount > 0 && `(${props.gateCount})`}</span>
       {props.currentComponentRepo && <span className={style.repo}>{props.currentComponentRepo}</span>}
     </div>
     <button

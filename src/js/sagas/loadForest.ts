@@ -8,8 +8,8 @@ import setUrl from '../actions/router';
 import { eventChannel, delay } from 'redux-saga';
 
 export default function* loadForest({repo, name, hash} : LoadForestAction) {
-  yield put(newContextLoading(repo, name));
   try{
+    yield put(newContextLoading(repo, name));
     const component = yield* loadOrCreate(repo, name, hash);
     yield put(setUrl(repo, name));
     yield put(forestLoaded(component, component.hash));
@@ -40,39 +40,48 @@ export function* loadOrPull(repo : string, name : string, hash? : string){
     try{
       return yield storage.load(repo, name, hash);
     }catch(e){
-
-      var terminal = new Terminal();
-      yield put(gitProgressStatus('busy'));
-      yield put(gitProgressMessage(terminal.logLine(`Loading ${name}\nfrom ${repo}`)));
-      yield put(showPopup('GitProgress'));
-      const result : {name : string}[] = yield call(fetchWithProgress, repo, name, terminal);
-      if(result.some(r => r.name === name)){
-        yield put(gitProgressStatus('success'));
-        yield put(hidePopup());
-        return yield storage.load(repo, name, hash);
-      }else{
-        yield put(gitProgressStatus('failure'));
-        yield put(gitProgressMessage(`Failed to load ${name}\nfrom ${repo}`));
-        throw new Error();
-      }
+      return yield* pull(repo, name, hash);
     }
   }
 }
 
+function* pull(repo : string, name : string, hash? : string){
+  var terminal = new Terminal();
+  try{
+    yield put(gitProgressStatus('busy'));
+    yield put(gitProgressMessage(terminal.logLine(`Loading ${name}\nfrom ${repo}`)));
+    yield put(showPopup('GitProgress'));
+    yield* fetchWithProgress(repo, name, terminal);
+    yield put(gitProgressStatus('success'));
+    yield put(hidePopup());
+    return yield storage.load(repo, name, hash);
+  }catch(e){
+    terminal.logLine('');
+    yield put(gitProgressStatus('failure'));
+    yield put(gitProgressMessage(terminal.log(e.message)));
+    throw e;
+  }
+}
+
+type StringOrResult = string | {name : string}[];
 
 function* fetchWithProgress(repo : string, name : string, terminal : Terminal){
   const channel = yield eventChannel(emit => {
-    storage.fetch(repo, name, emit).then(emit);
+    storage.fetch(repo, name, emit).then(emit, emit);
     return () => {};
   });
 
   while(true){
-    const message = yield take(channel);
+    const message : StringOrResult = yield take(channel);
     if(typeof(message) === 'string'){
       console.log(message);
       yield put(gitProgressMessage(terminal.log(message)));
     }else{
-      return message;
+      if(message.some(r => r.name === name)){
+        return;
+      }else{
+        throw new Error(`Could not find ${name}\nin ${repo}`);
+      }
     }
   }
 }

@@ -71,8 +71,8 @@ export default connect((s : State) => s)(
         )}
         <NavBar
           dispatch={props.dispatch}
-          currentComponentName={props.context.name}
-          currentComponentRepo={props.context.repo}
+          currentComponentName={props.context.loading ? `${props.context.loading.name}...` : props.context.name}
+          currentComponentRepo={props.context.loading ? props.context.loading.repo : props.context.repo}
           tickCount={props.simulation.tickCount}
           tickInterval={props.simulation.tickInterval}
           gateCount={(props.context.forest.buddyTree.usedSize||2) - 2}

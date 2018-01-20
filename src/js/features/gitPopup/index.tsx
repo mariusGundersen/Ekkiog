@@ -9,12 +9,20 @@ export interface Props {
   hidePopup(e : React.MouseEvent<HTMLDivElement>) : void
 }
 
-export default function GitPopup(props : Props){
-  return (
-    <Popup
-      show={props.show === 'GitProgress'}
-      onCoverClicked={e => props.state.status === 'busy' ? null : props.hidePopup(e)}>
-        <GitProgress {...props.state} />
-    </Popup>
-  );
+export default class GitPopup extends React.PureComponent<Props> {
+  hidePopup = (e : React.MouseEvent<HTMLDivElement>) => {
+     if(this.props.state.status === 'failure'){
+       this.props.hidePopup(e);
+     }
+  }
+
+  render(){
+    return (
+      <Popup
+        show={this.props.show === 'GitProgress'}
+        onCoverClicked={this.hidePopup}>
+          <GitProgress {...this.props.state} hidePopup={this.hidePopup} />
+      </Popup>
+    );
+  }
 }

@@ -168,7 +168,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
     async saveReadme(name : string){
       return await super.saveText(`# ${name}
 
-## [Try it out](https://ekkiog.mariusgundersen.net/demo)
+## [Try it out](https://ekkiog.mariusgundersen.net/)
 
 This is a component made using [Ekkiog](https://ekkiog.mariusgundersen.net), a mobile webapp for building logic circuits`);
     }

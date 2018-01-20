@@ -22,4 +22,11 @@
     margin: 0;
     padding: 10px;
   }
+
+  & .busyIcon,
+  & .successIcon,
+  & .failureIcon {
+    font-size: 75px;
+    margin: 0 auto;
+  }
 }

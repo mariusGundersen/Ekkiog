@@ -52,7 +52,7 @@ export interface Props {
 }
 
 export default reax({
-  toggleSearch: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
+  toggleSearch: (event : React.SyntheticEvent<HTMLElement>) => true,
   toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   toggleMainMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
   query: (value : string) => value,

@@ -43,9 +43,9 @@ export interface LoadingState {
 }
 
 const initialContext : ContextState = {
-  repo: '',
-  name: 'WELCOME',
-  isReadOnly: false,
+  repo: 'to open a component',
+  name: 'Click here',
+  isReadOnly: true,
   hash: '0000000000000000000000000000000000000000',
   forest: createForest(),
   buttonTree: createButtonTree(256*256),
