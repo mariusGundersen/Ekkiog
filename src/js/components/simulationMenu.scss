@@ -29,6 +29,10 @@
 
     & .flex-fill {
       flex: 1 0 auto;
+      height: 32px;
+      margin: 0 2px;
+      border-left: 1px solid #31363c;
+      border-right: 1px solid #31363c;
     }
 
     & button {
@@ -36,8 +40,8 @@
       border: none;
       outline: none;
       color: white;
-      padding: 4px;
-      font-size: 32px;
+      padding: 8px;
+      font-size: 24px;
       line-height: 0;
       font-family: Arial, Helvetica, sans-serif;
 
@@ -50,4 +54,8 @@
       }
     }
   }
+}
+
+[data-main-menu=true] .container{
+  padding-bottom: 0;
 }

@@ -24,7 +24,6 @@ import SearchResultView,
   NoExactMatchView,
   SearchResult,
   RECENT,
-  POPUPLAR,
   FAVORITE,
   NORMAL,
   RepoName
@@ -54,13 +53,9 @@ export default reax<Props>()(({
   openComponent,
   toggleFavorite
 }, props) => {
-
   insertPackage.pipe(
     withLatestFrom(props)
-  ).subscribe(([result, props]) => props.isReadOnly
-    ? props.openComponent(result)
-    : storage.loadPackage(result.repo, result.name).then(props.insertPackage)
-  );
+  ).subscribe(([result, props]) => storage.loadPackage(result.repo, result.name).then(props.insertPackage));
 
   openComponent.pipe(
     withLatestFrom(props)
@@ -97,6 +92,7 @@ export default reax<Props>()(({
       {searchResults.map(r => <SearchResultView
         key={`${r.type}_${r.data.repo}_${r.data.name}`}
         result={r}
+        canInsert={!props.isReadOnly}
         insertPackage={events.insertPackage}
         openComponent={events.openComponent}
         toggleFavorite={events.toggleFavorite} />)}

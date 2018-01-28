@@ -80,6 +80,7 @@ export default connect((s : State) => s)(
           isLoading={props.context.loading !== undefined}
           isSaving={props.context.saving}
           isReadOnly={props.context.isReadOnly}
+          isChildContext={props.context.previous !== undefined}
         />
         <Popup
           show={props.popup.show === 'Profile'}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import MdMenu from 'react-icons/fa/bars';
+import MenuIcon from 'react-icons/fa/sliders';
 
 import style from './navbar.scss';
 
@@ -14,6 +14,6 @@ export default (props : Props) => (
     className={style.navbarButton}
     onClick={props.onClick}
     data-active={props.isActive}>
-    <MdMenu />
+    <MenuIcon />
   </button>
 );

@@ -1,9 +1,10 @@
 import * as React from 'react';
 
-import FaPencil from 'react-icons/fa/pencil';
-import MdAddCircleOutline from 'react-icons/fa/plus-circle';
-import MdAccessTime from 'react-icons/fa/clock-o';
-import MdStar from 'react-icons/fa/star';
+import EditComponentIcon from 'react-icons/fa/edit';
+import InsertComponentIcon from 'react-icons/fa/plus-square';
+import NewComponentIcon from 'react-icons/fa/certificate';
+import CreateComponentIcon from 'react-icons/fa/plus-circle';
+import RecentComponentIcon from 'react-icons/fa/clock-o';
 import MdFavorite from 'react-icons/fa/heart';
 import MdFavoriteBorder from 'react-icons/fa/heart-o';
 
@@ -12,13 +13,12 @@ import { Switch, Route } from 'react-router-dom';
 import { ComponentMetadata } from '../storage/index';
 
 export const RECENT : 'recent' = 'recent';
-export const POPUPLAR : 'popular' = 'popular';
 export const FAVORITE : 'favorite' = 'favorite';
 export const NORMAL : 'normal' = 'normal';
 
 export interface SearchResult {
   readonly data : RepoName
-  readonly type : 'recent' | 'popular' | 'favorite' | 'normal'
+  readonly type : 'recent' | 'favorite' | 'normal'
 }
 
 export interface RepoName {
@@ -31,9 +31,10 @@ export interface SearchResultViewProps {
   openComponent(result : RepoName) : void;
   toggleFavorite(result : RepoName) : void;
   readonly result : SearchResult;
+  readonly canInsert : boolean;
 }
 
-export default function SearchResultView({insertPackage, openComponent, toggleFavorite, result} : SearchResultViewProps){
+export default function SearchResultView({insertPackage, openComponent, toggleFavorite, result, canInsert} : SearchResultViewProps){
   return (
     <div className={style.searchResult}>
       <button
@@ -42,15 +43,22 @@ export default function SearchResultView({insertPackage, openComponent, toggleFa
         {getIcon(result)}
       </button>
       <button
-        className={style.insertPackage}
-        onClick={() => insertPackage(result.data)}>
+        className={style.componentName}
+        onClick={() => canInsert ? insertPackage(result.data) : openComponent(result.data)}>
         <span>{result.data.name}</span>
         {result.data.repo && result.data.repo.length && <span className={style.repo}>{result.data.repo}</span>}
       </button>
+      {canInsert &&
+        <button
+          className={style.insertComponent}
+          onClick={() => insertPackage(result.data)}>
+          <InsertComponentIcon />
+        </button>
+      }
       <button
         className={style.openComponent}
         onClick={e => openComponent(result.data)}>
-        <FaPencil />
+        <EditComponentIcon />
       </button>
     </div>
   );
@@ -59,9 +67,7 @@ export default function SearchResultView({insertPackage, openComponent, toggleFa
 function getIcon(result : SearchResult){
   switch(result.type){
     case 'recent':
-      return <MdAccessTime />
-    case 'popular':
-      return <MdStar />
+      return <RecentComponentIcon />
     case 'favorite':
       return <MdFavorite />
     case 'normal':
@@ -78,14 +84,19 @@ export function NoExactMatchView({query, createComponent} : NoExactMatchViewProp
   return (
     <div className={style.searchResult}>
       <button
-        className={style.openComponent}
+        className={style.toggleFavorite}
         onClick={e => createComponent(query)}>
-        <MdAddCircleOutline />
+        <NewComponentIcon />
       </button>
       <button
         className={style.noExactMatch}
         onClick={e => createComponent(query)}>
         {query}
+      </button>
+      <button
+        className={style.openComponent}
+        onClick={e => createComponent(query)}>
+        <CreateComponentIcon />
       </button>
     </div>
   );

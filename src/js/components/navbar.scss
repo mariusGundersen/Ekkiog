@@ -57,60 +57,58 @@
     & .search-bar {
       display: flex;
       flex: 1 0 auto;
+      overflow: hidden;
 
-      & .name-box {
-        width: 0;
-        text-align: center;
-        overflow: hidden;
+      & .container {
         display: flex;
-        align-items: center;
-        flex-direction: column;
-        justify-content: center;
-        transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
+        flex: 1 0 auto;
+        transition: transform .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
 
-        & span {
+        & .name-box {
+          flex: 1 0 calc(100% - 96px);
           text-align: center;
-          font-size: 16px;
-          font-family: Courier Bold, Courier, monospace;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          justify-content: center;
 
-          &.repo{
-            font-size: .6em;
-            color: #ccc;
+          & span {
+            text-align: center;
+            font-size: 16px;
+            font-family: Courier Bold, Courier, monospace;
+
+            &.repo{
+              font-size: .6em;
+              color: #ccc;
+            }
           }
         }
-      }
 
-      &[data-state=name] .name-box {
-        flex: 1 0 auto;
-      }
+        & .search-box {
+          flex: 1 0 calc(100% - 48px);
+          background: #424C57;
+          display: flex;
 
-      &[data-state=search] .name-box {
-        flex: 0 1 0;
-      }
-
-      & .search-box {
-        width: 0;
-        background: #424C57;
-        transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
-        display: flex;
-
-        & input{
-          flex: 1 0 auto;
-          border: none;
-          transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
-          background: transparent;
-          color: white;
-          font-size: 16px;
-          font-family: Courier Bold, Courier, monospace;
-          outline: none
+          & input{
+            flex: 1 0 auto;
+            border: none;
+            transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
+            background: transparent;
+            color: white;
+            font-size: 16px;
+            font-family: Courier Bold, Courier, monospace;
+            outline: none
+          }
         }
-      }
 
-      &[data-state=name] .search-box {
-        flex: 0 1 0;
-      }
-      &[data-state=search] .search-box {
-        flex: 1 0 auto;
+        &[data-state=name] {
+          transform: translateX(0);
+        }
+
+        &[data-state=search] {
+          transform: translateX(calc(48px - 100%));
+        }
       }
     }
   }

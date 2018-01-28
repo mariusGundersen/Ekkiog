@@ -31,11 +31,13 @@ import {
   undo,
   redo,
   createForest,
-  showPopup
+  showPopup,
+  popContext
 } from '../actions';
 import { State } from '../reduce';
 import * as storage from '../storage';
 import { RepoName } from './SearchResultView';
+import DelayEnterExit from './DelayEnterExit';
 
 export interface Props {
   readonly dispatch : Dispatch<State>;
@@ -48,6 +50,7 @@ export interface Props {
   readonly isLoading : boolean;
   readonly isSaving : boolean;
   readonly isReadOnly : boolean;
+  readonly isChildContext : boolean;
 }
 
 export default reax({
@@ -62,7 +65,8 @@ export default reax({
   onRedo: (x : any) => true,
   onSetTickInterval: (value : number) => value,
   onPush: (x : undefined) => true,
-  onProfileClick: (x : any) => true
+  onProfileClick: (x : any) => true,
+  goBack: (x : any) => true
 }, ({
   toggleSearch,
   toggleSimulationMenu,
@@ -75,7 +79,8 @@ export default reax({
   onRedo,
   onSetTickInterval,
   onPush,
-  onProfileClick
+  onProfileClick,
+  goBack
 }, props, initialProps : Props) => {
   insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
   openComponent.subscribe(r => initialProps.dispatch(loadForest(r.repo, r.name)));
@@ -84,47 +89,35 @@ export default reax({
   onRedo.subscribe(() => initialProps.dispatch(redo()));
   onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
   onProfileClick.subscribe(() => initialProps.dispatch(showPopup('Profile')));
+  goBack.subscribe(() => initialProps.dispatch(popContext()));
 
   const isPushing = onPush.pipe(
     withLatestFrom(props),
     switchMap(([_, props]) => isBusy(storage.push(props.currentComponentName))));
 
   const showSearch = merge(
-      toggleSearch,
-      insertPackage.pipe(map(x => true)),
-      openComponent.pipe(map(x => true)),
-      createComponent.pipe(map(x => true))
-    )
-    .pipe(
-      scan(state => !state, false),
-      startWith(false)
-    );
-
-  const showSimulationMenu = toggleSimulationMenu.pipe(
-    scan(state => !state, false),
-    startWith(false)
+    toggleSearch,
+    insertPackage.pipe(map(x => true)),
+    openComponent.pipe(map(x => true)),
+    createComponent.pipe(map(x => true))
   );
 
   const showMainMenu = merge(
     toggleMainMenu,
     onProfileClick
-  ).pipe(
-    scan(state => !state, false),
-    startWith(false)
   );
 
   const state = merge(
-      showSearch.pipe(map(x => x ? 'search' : '')),
-      showSimulationMenu.pipe(map(x => x ? 'simulation' : '')),
-      showMainMenu.pipe(map(x => x ? 'main' : ''))
-    )
-    .pipe(
-      scan((_, event) => event, ''),
-      share()
-    );
+    showSearch.pipe(map(_ => 'search')),
+    toggleSimulationMenu.pipe(map(_ => 'simulation')),
+    showMainMenu.pipe(map(_ => 'main'))
+  )
+  .pipe(
+    scan((state, event) => state === event ? '' : event, ''),
+    share()
+  );
 
   return {
-    state,
     showSearch: state.pipe(
       is('search')),
     showSimulationMenu: state.pipe(
@@ -153,7 +146,9 @@ export default reax({
         showSearch={values.showSearch}
         toggleSearch={events.toggleSearch}
         isSaving={props.isSaving}
-        query={events.query} />
+        query={events.query}
+        canGoBack={props.isChildContext}
+        goBack={events.goBack}/>
       <SimulationMenuButton
         onClick={events.toggleSimulationMenu}
         isActive={values.showSimulationMenu} />
@@ -163,13 +158,16 @@ export default reax({
       push={events.onPush}
       isPushing={values.isPushing}
       showProfile={events.onProfileClick}/>
-    { values.showSearch &&
-    <SearchResults
-      query={values.query}
-      insertPackage={events.insertPackage}
-      openComponent={events.openComponent}
-      createComponent={events.createComponent}
-      isReadOnly={props.isReadOnly} />}
+    <DelayEnterExit
+      show={values.showSearch}
+      enterDelay={300}>
+      <SearchResults
+        query={values.query}
+        insertPackage={events.insertPackage}
+        openComponent={events.openComponent}
+        createComponent={events.createComponent}
+        isReadOnly={props.isReadOnly} />
+    </DelayEnterExit>
     <SimulationMenu
       show={values.showSimulationMenu}
       tickInterval={props.tickInterval}
