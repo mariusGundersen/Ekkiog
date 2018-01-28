@@ -7,8 +7,7 @@ import style from './main.css';
 
 import {
   resize,
-  panZoom,
-  simulationTick
+  panZoom
 } from '../actions';
 import { State } from '../reduce';
 import { SelectionState } from '../reduce/selection';
@@ -93,7 +92,6 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       },
       tick: tickCount => {
         this.engine.simulate(tickCount);
-        this.props.dispatch(simulationTick(tickCount));
       },
       resize: (pixelWidth, pixelHeight) => {
         this.props.dispatch(resize(pixelWidth, pixelHeight));

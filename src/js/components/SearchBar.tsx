@@ -4,7 +4,7 @@ import pure from './pure';
 
 import style from './navbar.scss';
 import theme from './theme.scss';
-import MdSearch from 'react-icons/md/search';
+import FaSearch from 'react-icons/fa/search';
 import FaBusy from 'react-icons/fa/spinner';
 import { Transition } from 'react-transition-group';
 
@@ -41,7 +41,7 @@ export default pure(
         {(state : string) => <span className={state == 'entered' ? theme.spinningIcon : theme.icon}>
           {state == 'entered'
             ? <FaBusy />
-            :  <MdSearch />}
+            :  <FaSearch />}
         </span>}
       </Transition>
     </button>

@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-import MdEdit from 'react-icons/md/edit';
-import MdAddCircleOutline from 'react-icons/md/add-circle-outline';
-import MdAccessTime from 'react-icons/md/access-time';
-import MdStar from 'react-icons/md/star';
-import MdFavorite from 'react-icons/md/favorite';
-import MdFavoriteBorder from 'react-icons/md/favorite-border';
+import FaPencil from 'react-icons/fa/pencil';
+import MdAddCircleOutline from 'react-icons/fa/plus-circle';
+import MdAccessTime from 'react-icons/fa/clock-o';
+import MdStar from 'react-icons/fa/star';
+import MdFavorite from 'react-icons/fa/heart';
+import MdFavoriteBorder from 'react-icons/fa/heart-o';
 
 import style from './search.scss';
 import { Switch, Route } from 'react-router-dom';
@@ -50,7 +50,7 @@ export default function SearchResultView({insertPackage, openComponent, toggleFa
       <button
         className={style.openComponent}
         onClick={e => openComponent(result.data)}>
-        <MdEdit />
+        <FaPencil />
       </button>
     </div>
   );

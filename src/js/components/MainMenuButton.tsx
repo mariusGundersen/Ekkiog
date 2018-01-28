@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import style from './navbar.scss';
 
-import MdMenu from 'react-icons/md/menu';
+import FaUser from 'react-icons/fa/user';
 
 export interface Props {
   readonly onClick : (event : React.SyntheticEvent<HTMLButtonElement>) => void
@@ -14,6 +14,6 @@ export default (props : Props) => (
     className={style.navbarButton}
     data-active={props.isActive}
     onClick={props.onClick}>
-    <MdMenu />
+    <FaUser />
   </button>
 );

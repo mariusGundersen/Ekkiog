@@ -8,15 +8,5 @@ export const setTickInterval = (tickInterval: number) : SetTickIntervalAction =>
   tickInterval
 });
 
-export type SimulationTickAction = {
-  readonly type : 'simulationTick',
-  readonly tickCount : number
-}
-export const simulationTick = (tickCount: number) : SimulationTickAction => ({
-  type: 'simulationTick',
-  tickCount
-});
-
 export type SimulationActions =
-  SetTickIntervalAction |
-  SimulationTickAction;
+  SetTickIntervalAction;

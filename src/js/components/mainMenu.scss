@@ -2,6 +2,7 @@
   box-shadow: 3px 3px 3px 0 black;
   background: #424C57;
   width: 90%;
+  flex: 1 0 auto;
 
   &.enter {
     transform: translateX(-100%);

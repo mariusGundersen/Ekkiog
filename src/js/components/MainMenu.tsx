@@ -18,7 +18,7 @@ export interface Props {
   showProfile(x : any) : void
 }
 
-export default pure((a, b) => a.show === b.show,
+export default pure((a, b) => a.show !== b.show,
   (props : Props) => (
   <CSSTransition
     in={props.show}

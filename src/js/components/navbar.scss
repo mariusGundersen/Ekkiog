@@ -8,13 +8,16 @@
   max-height: 100%;
   z-index: 3;
 
+  &[data-main-menu=true] {
+    bottom: 0;
+  }
+
   & .bar {
     display: flex;
     background: #31363c;
     color: white;
     font-size: 16px;
     font-family: Arial, Helvetica, sans-serif;
-    flex: 1 0 auto;
     box-shadow: 0 3px 3px 0 black;
 
     &[data-loading=true] {

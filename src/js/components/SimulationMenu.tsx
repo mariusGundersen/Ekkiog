@@ -1,12 +1,10 @@
 import * as React from 'react';
-import MdPlayArrow from 'react-icons/md/play-arrow';
-import MdPause from 'react-icons/md/pause';
-import MdSkipNext from 'react-icons/md/skip-next';
-import MdSlow from 'react-icons/md/skip-next';
-import MdMedium from 'react-icons/md/play-arrow';
-import MdFast from 'react-icons/md/fast-forward';
-import MdUndo from 'react-icons/md/undo';
-import MdRedo from 'react-icons/md/redo';
+import MdPause from 'react-icons/fa/pause';
+import MdSlow from 'react-icons/fa/step-forward';
+import MdMedium from 'react-icons/fa/play';
+import MdFast from 'react-icons/fa/fast-forward';
+import MdUndo from 'react-icons/fa/rotate-left';
+import MdRedo from 'react-icons/fa/repeat';
 import { CSSTransition } from 'react-transition-group';
 
 import pure from './pure';

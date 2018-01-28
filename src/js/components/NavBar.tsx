@@ -41,7 +41,6 @@ export interface Props {
   readonly dispatch : Dispatch<State>;
   readonly currentComponentName : string;
   readonly currentComponentRepo : string;
-  readonly tickCount : number;
   readonly tickInterval : number;
   readonly gateCount : number;
   readonly undoCount : number;
@@ -142,7 +141,7 @@ export default reax({
   values,
   props
 }) => (
-  <div className={style.navbar}>
+  <div className={style.navbar} data-main-menu={values.showMainMenu}>
     <div className={style.bar} data-loading={props.isLoading}>
       <MainMenuButton
         isActive={values.showMainMenu}
@@ -156,17 +155,15 @@ export default reax({
         isSaving={props.isSaving}
         query={events.query} />
       <SimulationMenuButton
-        tick={props.tickCount}
-        tickInterval={props.tickInterval}
         onClick={events.toggleSimulationMenu}
         isActive={values.showSimulationMenu} />
     </div>
     <MainMenu
-      show={values.state === 'main'}
+      show={values.showMainMenu}
       push={events.onPush}
       isPushing={values.isPushing}
       showProfile={events.onProfileClick}/>
-    { values.state == 'search' &&
+    { values.showSearch &&
     <SearchResults
       query={values.query}
       insertPackage={events.insertPackage}
@@ -174,7 +171,7 @@ export default reax({
       createComponent={events.createComponent}
       isReadOnly={props.isReadOnly} />}
     <SimulationMenu
-      show={values.state == 'simulation'}
+      show={values.showSimulationMenu}
       tickInterval={props.tickInterval}
       undoCount={props.undoCount}
       redoCount={props.redoCount}
