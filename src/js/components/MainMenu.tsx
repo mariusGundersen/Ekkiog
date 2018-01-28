@@ -4,7 +4,7 @@ import { CSSTransition } from 'react-transition-group';
 import TimeAgo from 'react-timeago';
 import reax from 'reaxjs';
 import { fromPromise } from 'rxjs/observable/fromPromise';
-import { startWith, map } from 'rxjs/operators';
+import { startWith, map, scan, merge } from 'rxjs/operators';
 
 import style from './mainMenu.scss';
 import theme from './theme.scss';
@@ -13,11 +13,17 @@ import GithubIcon from 'react-icons/fa/github';
 import LogoutIcon from 'react-icons/fa/sign-out';
 import UploadIcon from 'react-icons/fa/cloud-upload';
 import BusyIcon from 'react-icons/fa/spinner';
+import DangerIcon from 'react-icons/fa/exclamation-triangle';
+import SafeIcon from 'react-icons/fa/life-bouy';
+import DeleteIcon from 'react-icons/fa/trash';
+import FaRight from 'react-icons/fa/angle-right';
+import FaDown from 'react-icons/fa/angle-down';
 
 import UserIcon from 'react-icons/fa/user';
 
 import pure from './pure';
-import { getUser, setUser, getOwnedComponents } from '../storage';
+import { getUser, setUser, getOwnedComponents, deleteAllData } from '../storage';
+import { Observable } from 'rxjs/Observable';
 
 export interface Props {
   readonly show : boolean
@@ -52,6 +58,7 @@ const AnonymousMenu = () => <>
   <Statistics />
   <LoginButton />
   <div className={style.flexSpacer} />
+  <DangerZone />
   <Version />
 </>;
 
@@ -63,7 +70,7 @@ const LoggedInMenu = (props : {user : OauthData}) => <>
   </a>
   <Statistics />
   <div className={style.flexSpacer} />
-  <LogoutButton />
+  <DangerZone loggedIn />
   <Version />
 </>;
 
@@ -74,13 +81,6 @@ const LoginButton = () => (
   </a>
 );
 
-const LogoutButton = () => (
-  <button className={theme.item} onClick={() => {setUser(null as any); document.location.reload()}}>
-    <span className={theme.icon}><LogoutIcon /></span>
-    <span className={theme.label}>Logout from GitHub</span>
-  </button>
-);
-
 const Push = (props: {isBusy : boolean, push : (x : any) => void}) => (
   <button className={theme.item} onClick={props.push} disabled={props.isBusy}>
     <span className={props.isBusy ? theme.spinningIcon : theme.icon}>
@@ -89,6 +89,59 @@ const Push = (props: {isBusy : boolean, push : (x : any) => void}) => (
         : <UploadIcon />}
     </span>
     <span className={theme.label}>Push</span>
+  </button>
+);
+
+const DangerZone = reax({
+  toggle: (x : any) => true,
+  deleteAll: (x : any) => true,
+},
+({
+  toggle,
+  deleteAll
+}, props, initialProps : {loggedIn? : boolean}) => {
+
+  deleteAll.subscribe(async () => {
+    await deleteAllData();
+    document.location.reload(true);
+  });
+
+  const isDeleting = deleteAll.pipe(
+    startWith(false)
+  );
+
+  return {
+    isDeleting,
+    show: toggle.pipe(scan((state, action) => !state, false))
+  }
+},
+({events, values, props}) => <>
+  <button className={theme.item} key="toggle" onClick={events.toggle} data-active={values.show}>
+    <span className={theme.icon}>{values.show ? <SafeIcon /> : <DangerIcon />}</span>
+    <span className={theme.label}>{values.show ? "Leave the danger-zone" : "Enter the danger-zone"}</span>
+  </button>
+  <div className={style.dangerZone}>
+    {values.show && props.loggedIn && <LogoutButton />}
+    {values.show && <DeleteButton onClick={events.deleteAll} isBusy={values.isDeleting} />}
+  </div>
+</>);
+
+const LogoutButton = () => (
+  <button className={theme.item+' '+style.dangerButton} onClick={() => {setUser(null as any); document.location.reload()}}>
+    <span className={theme.icon}><LogoutIcon /></span>
+    <span className={theme.label}>Logout from GitHub</span>
+  </button>
+);
+
+
+const DeleteButton = (props : {onClick(x : any) : void, isBusy : boolean}) => (
+  <button className={theme.item+' '+style.dangerButton} onClick={props.onClick}>
+    <span className={props.isBusy ? theme.spinningIcon : theme.icon}>
+      {props.isBusy
+        ? <BusyIcon />
+        : <DeleteIcon />}
+    </span>
+    <span className={theme.label}>Delete all data</span>
   </button>
 );
 

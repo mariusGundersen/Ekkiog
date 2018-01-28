@@ -10,6 +10,7 @@ import { State } from './reduce';
 
 import App from './pages/App';
 import Login from './pages/Login';
+import Sandbox from './pages/Sandbox';
 
 export default function main(store : Store<State>, history : History){
   render(
@@ -17,6 +18,7 @@ export default function main(store : Store<State>, history : History){
       <ConnectedRouter history={history}>
         <Switch>
           <Route path="/github/callback" render={() => <Login user={window.__PRELOADED_STATE__ as OauthData} />} />
+          <Route path="/sandbox" component={Sandbox} />
           <Route path="/" component={App} />
         </Switch>
       </ConnectedRouter>

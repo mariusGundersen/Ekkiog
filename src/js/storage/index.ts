@@ -227,3 +227,10 @@ export function getUser() : OauthData | null {
 export function setUser(user : OauthData) {
   localStorage.setItem('ekkiog-user', JSON.stringify(user));
 }
+
+export async function deleteAllData(){
+  setUser(null as any);
+  const db = await _db;
+  db.close();
+  await idb.delete('ekkiog').then(() => console.log('deleted'), e => console.error(e));
+}
