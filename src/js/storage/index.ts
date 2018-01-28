@@ -12,11 +12,13 @@ import Repo, { IRepo } from './repo';
 
 import upgradeFrom10 from './upgrade/from10';
 import upgradeFrom11 from './upgrade/from11';
+import { all } from 'redux-saga/effects';
 
 export interface ComponentMetadata {
   readonly repo : string
   readonly name : string
   readonly favorite : boolean
+  readonly usedAt : Date
 }
 
 export interface RecentComponent {
@@ -29,6 +31,9 @@ export interface FavoriteComponent {
   readonly repo : string
   readonly name : string
 }
+
+const THE_YEAR_2000 = new Date(2000, 1);
+const THE_YEAR_2100 = new Date(2100, 1);
 
 const _db = idb.open('ekkiog', 12, db => {
   switch(db.oldVersion){
@@ -62,8 +67,8 @@ export async function load(repo : string, name : string, hash? : string){
   const transaction = db.transaction([
     'recent',
   ], 'readwrite');
-  const metadataStore = transaction.objectStore<RecentComponent>('recent');
-  await metadataStore
+  const recents = transaction.objectStore<RecentComponent>('recent');
+  await recents
     .put({
       repo,
       name,
@@ -84,7 +89,7 @@ export function getRecent() : Observable<RecentComponent> {
     (tx, callback) => {
       const store = tx.objectStore<RecentComponent>('recent');
       const index = store.index('usedAt');
-      const range = IDBKeyRange.upperBound(new Date(2100, 1));
+      const range = IDBKeyRange.upperBound(THE_YEAR_2100);
       index.iterateCursor(range, 'prev', callback);
     },
     c => c.value);
@@ -107,27 +112,37 @@ export async function toggleFavorite(repo : string, name : string) {
   const store = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
   const favorite = await store.get([repo, name]).catch(e => undefined);
   if(favorite){
+    const tx = db.transaction('favorite', 'readwrite');
+    const store = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
     await store.delete([repo, name]);
   }else{
+    const tx = db.transaction('favorite', 'readwrite');
+    const store = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
     await store.put({repo, name});
   }
 }
 
-export async function searchComponents(query : string) : Promise<ComponentMetadata[]> {
+export async function getAllComponents() : Promise<ComponentMetadata[]> {
   const repo = await _repo;
   const refs = await repo.listRefs();
   const db = await _db;
-  const tx = db.transaction('favorite', 'readwrite');
-  const store = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
+  const tx = db.transaction(['favorite', 'recent'], 'readonly');
+  const favorites = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
+  const recents = tx.objectStore<RecentComponent, [string, string]>('recent');
   return await Promise.all(refs
     .map(refToRepoAndName)
-    .filter(data => data.name.toUpperCase().indexOf(query) >= 0)
-    .sort(bySimilarityTo(query))
-    .map(async ({name, repo}) => ({
-      name,
-      repo,
-      favorite: await store.get([repo, name]).then(x => x ? true : false, () => false)
-    })));
+    .map(async ({name, repo}) => {
+      const [favorite, usedAt] = await Promise.all([
+        favorites.get([repo, name]).then(x => x ? true : false, () => false),
+        recents.get([repo, name]).then(x => x ? x.usedAt : THE_YEAR_2000, () => THE_YEAR_2000)
+      ]);
+      return {
+        name,
+        repo,
+        favorite,
+        usedAt
+      }
+    }));
 }
 
 export async function getOwnedComponents() : Promise<string[]> {

@@ -15,7 +15,8 @@ import {
   startWith,
   switchMap,
   take,
-  withLatestFrom
+  withLatestFrom,
+  combineLatest
 } from 'rxjs/operators';
 import { CompiledComponent } from 'ekkiog-editing';
 
@@ -32,7 +33,7 @@ import SearchResultView,
 import style from './search.scss';
 
 import * as storage from '../storage';
-import { FavoriteComponent } from '../storage';
+import { FavoriteComponent, getAllComponents, ComponentMetadata } from '../storage';
 
 export interface Props {
   readonly query : string,
@@ -42,9 +43,9 @@ export interface Props {
   isReadOnly : boolean
 }
 
-type ObservableProps = Observable<Props>;
+const THE_YEAR_2010 = new Date(2010, 1);
 
-export default reax<Props>()(({
+export default reax(({
   insertPackage: (result : RepoName) => result,
   openComponent: (result : RepoName) => result,
   toggleFavorite: (result : RepoName) => result
@@ -52,33 +53,34 @@ export default reax<Props>()(({
   insertPackage,
   openComponent,
   toggleFavorite
-}, props) => {
-  insertPackage.pipe(
-    withLatestFrom(props)
-  ).subscribe(([component, props]) => storage.loadPackage(component.repo, component.name).then(props.insertPackage));
-
-  openComponent.pipe(
-    withLatestFrom(props)
-  ).subscribe(([component, props]) => props.openComponent(component));
+}, props, initialProps : Props) => {
+  insertPackage.subscribe(component => storage.loadPackage(component.repo, component.name).then(initialProps.insertPackage));
+  openComponent.subscribe(component => initialProps.openComponent(component));
 
   const updateList = toggleFavorite.pipe(
     switchMap(component => fromPromise(storage.toggleFavorite(component.repo, component.name))),
-    withLatestFrom(props),
-    map(([_, props]) => props.query));
+    switchMap(() => fromPromise(getAllComponents()))
+  );
 
-  const searchResults = props.pipe(
+  const allComponents = fromPromise(getAllComponents())
+    .pipe(merge(updateList));
+
+  const query = props.pipe(
     map(p => p.query),
     distinctUntilChanged(),
-    merge(updateList),
-    debounceTime(100),
-    switchMap(searchDatabase),
+    debounceTime(100)
+  );
+
+  const searchResults = query.pipe(
+    combineLatest(allComponents),
+    map(filterAndSort),
     startWith([] as SearchResult[]),
     share()
   );
 
   const noExactMatch = searchResults.pipe(
-    withLatestFrom(props),
-    map(([results, props]) => props.query && results.map(r => r.data.name).indexOf(props.query) === -1)
+    withLatestFrom(query),
+    map(([results, query]) => query && results.map(r => r.data.name).indexOf(query) === -1)
   );
 
   return {
@@ -100,45 +102,63 @@ export default reax<Props>()(({
   </div>
 ));
 
-function searchDatabase(query : string){
-  return query.length > 0 ? find(query) : showEmpty()
+function filterAndSort([query, allComponents] : [string, ComponentMetadata[]]){
+  console.log(query, query.length);
+  return query.length > 0 ? find(query, allComponents) : showEmpty(allComponents)
 }
 
-function find(query : string) : Observable<SearchResult[]>{
-  return fromPromise(
-    storage.searchComponents(query)
-    .then(r => r.map(data => ({
+function find(query : string, allComponents : ComponentMetadata[]) : SearchResult[] {
+  return allComponents
+    .filter(byName(query))
+    .sort(bySimilarityTo(query))
+    .map(data => ({
       data,
       type: data.favorite ? FAVORITE : NORMAL
-    }))));
+    }));
 }
 
-function showEmpty(){
-  return concat(
-    getFavorite(),
-    getRecent()
-  ).pipe(
-    distinct(t => `${t.data.repo}/${t.data.name}`),
-    scan<SearchResult>((acc, val) => [...acc, val], []),
-    debounceTime(10)
-  );
+function showEmpty(allComponents : ComponentMetadata[]){
+  return allComponents
+    .sort(byType)
+    .map(toType);
 }
 
-function getRecent() {
-  return storage.getRecent().pipe(
-    map(typed(RECENT)),
-    take(20));
+function byName(query : string){
+  return (data : {name : string}) => data.name.toUpperCase().indexOf(query) >= 0;
 }
 
-function getFavorite() {
-  return storage.getFavorite().pipe(
-    map(typed(FAVORITE))
-  );
+function bySimilarityTo(query : string){
+  return (a : ComponentMetadata, b : ComponentMetadata) => (
+    (a.repo > b.repo ? 1 : a.repo < b.repo ? -1 : 0)
+    || (a.name.indexOf(query) - b.name.indexOf(query))
+    || (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
 }
 
-function typed<T extends typeof RECENT | typeof FAVORITE>(type : T) : (data : RepoName) => SearchResult {
-  return (data : RepoName) => ({
+function byType(a : ComponentMetadata, b : ComponentMetadata){
+  if(a.favorite){
+    return (!b.favorite ? -1 : 0)
+    || (a.name > b.name ? 1 : a.name < b.name ? -1 : 0);
+  }else{
+    return (b.favorite ? 1 : 0)
+    || (a.usedAt < b.usedAt ? 1 : a.usedAt > b.usedAt ? -1 : 0)
+    || (a.repo > b.repo ? 1 : a.repo < b.repo ? -1 : 0)
+    || (a.name > b.name ? 1 : a.name < b.name ? -1 : 0);
+  }
+}
+
+function toType(data : ComponentMetadata){
+  if(data.favorite){
+    return typed(FAVORITE, data);
+  }else if(data.usedAt > THE_YEAR_2010){
+    return typed(RECENT, data);
+  }else{
+    return typed(NORMAL, data);
+  }
+}
+
+function typed<T extends typeof RECENT | typeof FAVORITE | typeof NORMAL>(type : T, data : RepoName) {
+  return {
     data,
     type
-  });
+  };
 }
