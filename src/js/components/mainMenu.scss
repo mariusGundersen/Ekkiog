@@ -3,6 +3,7 @@
   background: #424C57;
   width: 90%;
   flex: 1 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
 
   &.enter {
     transform: translateX(-100%);
@@ -22,14 +23,42 @@
     }
   }
 
-  & .photo {
+  & .user-photo {
+    font-size: 25vw;
     height: 1em;
-    border-radius: 16px;
+    width: 1em;
+    margin: 10px auto;
+    overflow: hidden;
+    border-radius: .5em;
+    color: white;
+    background: #31363c;
   }
 
-  & .user-details {
-    font-family: Courier Bold, Courier, monospace;
-    font-size: 10px;
+  & .user-name {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  & .user-link {
+    font-size: 0.75em;
+    margin: 0.5em 0;
+  }
+
+  & .statistics {
+    border-bottom: 1px solid #31363c;
+    padding-bottom: 0.5em;
+  }
+
+  & .statistics,
+  & .user-name,
+  & .user-link {
+    color: white;
+    text-align: center;
+  }
+
+  & .flex-spacer {
+    flex: 1 0 auto;
+    border-bottom: 1px solid #31363c;
   }
 
   & .version {

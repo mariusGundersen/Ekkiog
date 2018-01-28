@@ -130,6 +130,15 @@ export async function searchComponents(query : string) : Promise<ComponentMetada
     })));
 }
 
+export async function getOwnedComponents() : Promise<string[]> {
+  const repo = await _repo;
+  const refs = await repo.listRefs();
+  return refs
+    .map(refToRepoAndName)
+    .filter(data => data.repo === '')
+    .map(data => data.name);
+}
+
 function bySimilarityTo(query : string){
   return (a : {name : string, repo : string}, b : {name : string, repo : string}) => (
     (a.repo > b.repo ? 1 : a.repo < b.repo ? -1 : 0)

@@ -41,12 +41,16 @@
         & .repo{
           font-size: .6em;
           color: #ccc;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
       }
 
       & .noExactMatch,
       & .componentName{
-        flex: 1 0 auto;
+        flex: 1 1 auto;
+        overflow: hidden;
       }
 
       & .openComponent,

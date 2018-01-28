@@ -65,7 +65,6 @@ export default reax({
   onRedo: (x : any) => true,
   onSetTickInterval: (value : number) => value,
   onPush: (x : undefined) => true,
-  onProfileClick: (x : any) => true,
   goBack: (x : any) => true
 }, ({
   toggleSearch,
@@ -79,7 +78,6 @@ export default reax({
   onRedo,
   onSetTickInterval,
   onPush,
-  onProfileClick,
   goBack
 }, props, initialProps : Props) => {
   insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
@@ -88,7 +86,6 @@ export default reax({
   onUndo.subscribe(() => initialProps.dispatch(undo()));
   onRedo.subscribe(() => initialProps.dispatch(redo()));
   onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
-  onProfileClick.subscribe(() => initialProps.dispatch(showPopup('Profile')));
   goBack.subscribe(() => initialProps.dispatch(popContext()));
 
   const isPushing = onPush.pipe(
@@ -102,15 +99,10 @@ export default reax({
     createComponent.pipe(map(x => true))
   );
 
-  const showMainMenu = merge(
-    toggleMainMenu,
-    onProfileClick
-  );
-
   const state = merge(
     showSearch.pipe(map(_ => 'search')),
     toggleSimulationMenu.pipe(map(_ => 'simulation')),
-    showMainMenu.pipe(map(_ => 'main'))
+    toggleMainMenu.pipe(map(_ => 'main'))
   )
   .pipe(
     scan((state, event) => state === event ? '' : event, ''),
@@ -156,8 +148,7 @@ export default reax({
     <MainMenu
       show={values.showMainMenu}
       push={events.onPush}
-      isPushing={values.isPushing}
-      showProfile={events.onProfileClick}/>
+      isPushing={values.isPushing}/>
     <DelayEnterExit
       show={values.showSearch}
       enterDelay={300}>

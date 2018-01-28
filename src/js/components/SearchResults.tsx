@@ -55,14 +55,14 @@ export default reax<Props>()(({
 }, props) => {
   insertPackage.pipe(
     withLatestFrom(props)
-  ).subscribe(([result, props]) => storage.loadPackage(result.repo, result.name).then(props.insertPackage));
+  ).subscribe(([component, props]) => storage.loadPackage(component.repo, component.name).then(props.insertPackage));
 
   openComponent.pipe(
     withLatestFrom(props)
-  ).subscribe(([result, props]) => props.openComponent(result));
+  ).subscribe(([component, props]) => props.openComponent(component));
 
   const updateList = toggleFavorite.pipe(
-    switchMap(result => fromPromise(storage.toggleFavorite(result.repo, result.name))),
+    switchMap(component => fromPromise(storage.toggleFavorite(component.repo, component.name))),
     withLatestFrom(props),
     map(([_, props]) => props.query));
 

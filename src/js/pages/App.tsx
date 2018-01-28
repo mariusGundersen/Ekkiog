@@ -11,7 +11,6 @@ import WebGLCanvas from '../components/WebGLCanvas';
 import NavBar from '../components/NavBar';
 import Popup from '../components/Popup';
 import SelectRepo from '../components/popups/SelectRepo';
-import Profile from '../components/popups/Profile';
 import GitProgressPopup from '../features/gitPopup';
 
 import style from '../components/main.css';
@@ -82,11 +81,6 @@ export default connect((s : State) => s)(
           isReadOnly={props.context.isReadOnly}
           isChildContext={props.context.previous !== undefined}
         />
-        <Popup
-          show={props.popup.show === 'Profile'}
-          onCoverClicked={events.hidePopup}>
-            <Profile user={user as OauthData} />
-        </Popup>
         <GitProgressPopup
           show={props.popup.show}
           state={props.gitPopup}

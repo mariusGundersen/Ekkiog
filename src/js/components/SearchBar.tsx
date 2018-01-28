@@ -49,7 +49,7 @@ export default pure((prev, next) => (
           </button>
         }
       <div className={style.nameBox} onClick={props.toggleSearch}>
-        <span>{props.currentComponentName} {props.gateCount > 0 && `(${props.gateCount})`}</span>
+        <span className={style.name}>{props.currentComponentName} {props.gateCount > 0 && `(${props.gateCount})`}</span>
         {props.currentComponentRepo && <span className={style.repo}>{props.currentComponentRepo}</span>}
       </div>
       <SearchButton

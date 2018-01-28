@@ -63,7 +63,7 @@ export default reax({
     <h2>Pick Repository</h2>
     <img className={style.photo} src={props.user.photo} />
     <h3>{props.user.name}</h3>
-    <h5>{props.user.server}</h5>
+    <h5>{props.user.server}/{props.user.username}</h5>
     <p>
       Pick a git repo to store your components in.
     </p>
