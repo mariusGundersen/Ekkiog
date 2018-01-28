@@ -82,7 +82,7 @@ export default connect((s : State) => s)(
           isChildContext={props.context.previous !== undefined}
         />
         <GitProgressPopup
-          show={props.popup.show}
+          show={props.popup.show === 'GitProgress'}
           state={props.gitPopup}
           hidePopup={events.hidePopup} />
       </div>

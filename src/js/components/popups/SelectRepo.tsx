@@ -4,7 +4,10 @@ import { fromPromise } from 'rxjs/observable/fromPromise';
 import {
   map,
   startWith,
-  scan
+  scan,
+  throttleTime,
+  share,
+  mapTo
 } from 'rxjs/operators';
 
 import FaBusy from 'react-icons/fa/spinner';
@@ -14,31 +17,60 @@ import FaRight from 'react-icons/fa/angle-right';
 import FaDown from 'react-icons/fa/angle-down';
 
 import { getRepos, createRepo } from '../../storage/clients';
+import * as storage from '../../storage';
 
 import theme from '../theme.scss';
 import style from './selectRepo.scss';
+import { merge } from 'rxjs/observable/merge';
+import { Observable } from 'rxjs/Observable';
+import Terminal from '@es-git/terminal';
 
 const DEFAULT_REPO_NAME = 'ekkiog-workspace';
 
 export interface Props {
   readonly user : OauthData
-  onClick(repo : string) : void
+  setRepo(repo : string) : void
+  onComplete(x?: any) : void
 }
 
 export default reax({
-  toggleList: (e: any) => true,
-  createNewRepo: (e: any) => true
+  toggleList: (e : any) => true,
+  createNewRepo: (e : any) => true,
+  selectRepo: (name : string) => name
 },
-({toggleList, createNewRepo}, props, initialProps : Props) => {
-
-  createNewRepo.subscribe(x => createRepo(DEFAULT_REPO_NAME, initialProps.user.access_token).then(name => initialProps.onClick(name)));
-
-  const isCreating = createNewRepo.pipe(startWith(false));
+({toggleList, createNewRepo, selectRepo}, props, initialProps : Props) => {
 
   const repos = fromPromise(getRepos(initialProps.user.access_token));
 
-  const isBusy = repos.pipe(
-    map(x => false),
+  const creatingRepo = fromPromise(createNewRepo.toPromise().then(() => createRepo(DEFAULT_REPO_NAME, initialProps.user.access_token)));
+
+  const progress = new Observable<string>(s => {
+    merge(
+      creatingRepo.pipe(map(createEvent(false))),
+      selectRepo.pipe(map(createEvent(true)))
+    ).subscribe(async ({repo, clone}) => {
+      initialProps.setRepo(repo);
+
+      if(clone) {
+        var terminal = new Terminal();
+        await storage.clone(`${initialProps.user.server}/${initialProps.user.username}/${repo}`, m => s.next(terminal.log(m)));
+        s.next(terminal.content);
+        s.complete();
+      }
+
+      initialProps.onComplete();
+    });
+    return () => {};
+  }).pipe(
+    throttleTime(200),
+    share()
+  );
+
+  const isBusy = merge(
+    repos.pipe(mapTo(false)),
+    createNewRepo,
+    selectRepo.pipe(mapTo(true))
+  ).pipe(
     startWith(true)
   );
 
@@ -55,7 +87,7 @@ export default reax({
     isBusy,
     hasEkkiogWorkspace,
     showOthers,
-    isCreating
+    progress
   };
 },
 ({events, props, values}) => <div className={style.popup}>
@@ -71,20 +103,21 @@ export default reax({
 
   {values.isBusy ?
     <div className={style.isBusy}>
-      <span className={theme.spinningIcon}>
+      <div className={theme.spinningIcon}>
         <FaBusy />
-      </span>
+      </div>
+      <pre>{values.progress}</pre>
     </div>
   :
     <div className={theme.itemList}>
       {values.hasEkkiogWorkspace ?
-        <button className={theme.item} key="use" onClick={() => props.onClick(DEFAULT_REPO_NAME)}>
+        <button className={theme.item} key="use" onClick={() => events.selectRepo(DEFAULT_REPO_NAME)}>
           <span className={theme.icon}><FaCheck /></span>
           <span className={theme.label}>{DEFAULT_REPO_NAME}</span>
         </button>
       :
         <button className={theme.item} key="create" onClick={events.createNewRepo}>
-          <span className={values.isCreating ? theme.spinningIcon : theme.icon}>{values.isCreating ? <FaBusy /> : <FaAdd />}</span>
+          <span className={theme.icon}><FaAdd /></span>
           <span className={theme.labelVertical}>
             <span>Create a new repo</span>
             <span className={theme.sub}>{DEFAULT_REPO_NAME}</span>
@@ -95,12 +128,19 @@ export default reax({
         <span className={theme.icon}>{values.showOthers ? <FaDown /> : <FaRight />}</span>
         <span className={theme.label}>{values.hasEkkiogWorkspace ? "Pick another repo" : "Pick an existing repo"}</span>
       </button>
-      {values.showOthers && values.repos.map((name, i) => (
-        <button className={theme.item} key={i} onClick={() => props.onClick(name)}>
+      {values.showOthers && values.repos.map((repo, i) => (
+        <button className={theme.item} key={i} onClick={() => events.selectRepo(repo)}>
           <span className={theme.icon}><FaCheck /></span>
-          <span className={theme.label}>{name}</span>
+          <span className={theme.label}>{repo}</span>
         </button>
       ))}
     </div>
   }
 </div>);
+
+function createEvent(clone : boolean){
+  return (repo : string) => ({
+    clone,
+    repo
+  });
+}

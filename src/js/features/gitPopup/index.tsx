@@ -4,7 +4,7 @@ import { GitPopupState } from './reduce';
 import Popup from '../../components/Popup';
 
 export interface Props {
-  readonly show : string | false
+  readonly show : boolean
   readonly state : GitPopupState
   hidePopup(e : React.MouseEvent<HTMLDivElement>) : void
 }
@@ -19,7 +19,7 @@ export default class GitPopup extends React.PureComponent<Props> {
   render(){
     return (
       <Popup
-        show={this.props.show === 'GitProgress'}
+        show={this.props.show}
         onCoverClicked={this.hidePopup}>
           <GitProgress {...this.props.state} hidePopup={this.hidePopup} />
       </Popup>

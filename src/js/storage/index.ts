@@ -215,6 +215,15 @@ export async function fetch(url : string, component : string, progress : (status
   }));
 }
 
+export async function clone(url : string, progress : (status: string) => void) {
+  const repo = await _repo;
+  const response = await repo.fetch(`/git/${url}.git`, {
+    refspec: `refs/heads/*:refs/heads/*`,
+    progress
+  });
+  console.log('success', response);
+}
+
 export function getUser() : OauthData | null {
   const user = JSON.parse(localStorage.getItem('ekkiog-user') || 'null');
   if(!user) return null;
