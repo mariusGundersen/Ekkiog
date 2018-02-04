@@ -233,25 +233,29 @@ export async function push(component : string) {
 
 export async function fetch(url : string, component : string, progress : (status: string) => void) {
   const repo = await _repo;
-  const response = await repo.fetch(`/git/${url}.git`, {
-    refspec: `refs/heads/${component}:refs/remotes/${url}/${component}`,
-    depth: 1,
-    progress
-  });
+  const response = await repo.fetch(
+    `/git/${url}.git`,
+    `refs/heads/${component}:refs/remotes/${url}/${component}`,
+    {
+      depth: 1,
+      progress
+    });
   console.log('success', response);
-  return response.map(({name, from, to}) => ({
+  return response.map(({name, oldHash, hash}) => ({
     name: name.substr(`refs/remotes/${url}/`.length),
-    from,
-    to
+    oldHash,
+    hash
   }));
 }
 
 export async function clone(url : string, progress : (status: string) => void) {
   const repo = await _repo;
-  const response = await repo.fetch(`/git/${url}.git`, {
-    refspec: `refs/heads/*:refs/heads/*`,
-    progress
-  });
+  const response = await repo.fetch(
+    `/git/${url}.git`,
+    `refs/heads/*:refs/heads/*`,
+    {
+      progress
+    });
   console.log('success', response);
 }
 
