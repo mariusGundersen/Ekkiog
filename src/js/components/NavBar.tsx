@@ -19,7 +19,7 @@ import MainMenuButton from './MainMenuButton';
 import SearchResults from './SearchResults';
 import SimulationMenuButton from './SimulationMenuButton';
 import SimulationMenu from './SimulationMenu';
-import MainMenu from './MainMenu';
+import MainMenu from '../features/mainMenu';
 import SearchBar from './SearchBar';
 
 import style from './navbar.scss';
@@ -64,7 +64,6 @@ export default reax({
   onUndo: (x : any) => true,
   onRedo: (x : any) => true,
   onSetTickInterval: (value : number) => value,
-  onPush: (x : undefined) => true,
   goBack: (x : any) => true
 }, ({
   toggleSearch,
@@ -77,7 +76,6 @@ export default reax({
   onUndo,
   onRedo,
   onSetTickInterval,
-  onPush,
   goBack
 }, props, initialProps : Props) => {
   insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
@@ -87,10 +85,6 @@ export default reax({
   onRedo.subscribe(() => initialProps.dispatch(redo()));
   onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
   goBack.subscribe(() => initialProps.dispatch(zoomOutOf()));
-
-  const isPushing = onPush.pipe(
-    withLatestFrom(props),
-    switchMap(([_, props]) => isBusy(storage.push(props.currentComponentName))));
 
   const showSearch = merge(
     toggleSearch,
@@ -118,8 +112,7 @@ export default reax({
       is('main')),
     query: state.pipe(
       is('search'),
-      switchMap(ifElse(query.pipe(startWith('')), ''))),
-    isPushing
+      switchMap(ifElse(query.pipe(startWith('')), '')))
   };
 } , ({
   events,
@@ -146,9 +139,7 @@ export default reax({
         isActive={values.showSimulationMenu} />
     </div>
     <MainMenu
-      show={values.showMainMenu}
-      push={events.onPush}
-      isPushing={values.isPushing}/>
+      show={values.showMainMenu}/>
     <DelayEnterExit
       show={values.showSearch}
       enterDelay={300}>

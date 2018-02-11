@@ -147,6 +147,7 @@ export async function getAllComponents() : Promise<ComponentMetadata[]> {
   const recents = tx.objectStore<RecentComponent, [string, string]>('recent');
   return await Promise.all(refs
     .map(refToRepoAndName)
+    .filter(data => data.repo !== 'origin')
     .map(async ({name, repo}) => {
       const [favorite, usedAt] = await Promise.all([
         favorites.get([repo, name]).then(x => x ? true : false, () => false),
@@ -166,15 +167,9 @@ export async function getOwnedComponents() : Promise<string[]> {
   const refs = await repo.listRefs();
   return refs
     .map(refToRepoAndName)
+    .filter(data => data.repo !== 'origin')
     .filter(data => data.repo === '')
     .map(data => data.name);
-}
-
-function bySimilarityTo(query : string){
-  return (a : {name : string, repo : string}, b : {name : string, repo : string}) => (
-    (a.repo > b.repo ? 1 : a.repo < b.repo ? -1 : 0)
-    || (a.name.indexOf(query) - b.name.indexOf(query))
-    || (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
 }
 
 function refToRepoAndName(ref : string){
@@ -222,13 +217,18 @@ function cursorToObservable<TStored, TValue=TStored>(
   });
 }
 
-export async function push(component : string) {
-  if(!user) return;
+export async function push(user : OauthData, components : string[], progress : (status: string) => void) {
   const repo = await _repo;
-  await repo.push(`/git/${user.server}/${user.username}/${user.repo}.git`, `refs/heads/${component}`, {
-    username: user.username,
-    password: user.access_token
-  });
+  await repo.push(
+    `/git/${user.server}/${user.username}/${user.repo}.git`,
+    components.map(c => `refs/heads/${c}`),
+    {
+      username: user.username,
+      password: user.access_token
+    },
+    {
+      progress
+    });
 }
 
 export async function fetch(url : string, component : string, progress : (status: string) => void) {
@@ -245,6 +245,23 @@ export async function fetch(url : string, component : string, progress : (status
     name: name.substr(`refs/remotes/${url}/`.length),
     oldHash,
     hash
+  }));
+}
+
+export async function sync(user : OauthData) {
+  const repo = await _repo;
+  const remoteRefs = await repo.lsRemote(`/git/${user.server}/${user.username}/${user.repo}.git`);
+  console.log('success', remoteRefs);
+  const remoteMap = new Map<string, string>(remoteRefs.map(r => [r.name, r.hash] as [string, string]));
+  const localRefs = await repo.listRefs();
+  const refsToPush = await Promise.all(localRefs.filter(ref => ref.startsWith('refs/heads/')).map(async name => ({
+    name,
+    hash: await repo.getRef(name),
+    remoteHash: remoteMap.get(name)
+  }))).then(list => list.filter(ref => ref.hash !== ref.remoteHash));
+  return refsToPush.map(ref => ({
+    name: ref.name.substr(`refs/heads/`.length),
+    status: ref.remoteHash ? 'update' : 'new'
   }));
 }
 
