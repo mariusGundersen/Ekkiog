@@ -9,6 +9,7 @@ import moveItemAt from './moveItemAt';
 import { Action } from '../actions';
 import save from './save';
 import createForest from './createForest';
+import sync from '../features/sync/saga';
 
 export default function* rootSaga() {
   yield all([
@@ -19,7 +20,8 @@ export default function* rootSaga() {
     watchLatest('tap-tile', tapTile),
     watchLatest('save-forest', save),
     watchLatest('zoom-into', zoomInto),
-    watchLatest('zoom-out-of', zoomOutOf)
+    watchLatest('zoom-out-of', zoomOutOf),
+    watchLatest('start-sync', sync)
   ]);
 }
 

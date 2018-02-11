@@ -2,8 +2,9 @@
   box-shadow: 3px 3px 3px 0 black;
   background: #424C57;
   width: 90%;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   font-family: Arial, Helvetica, sans-serif;
+  overflow-y: auto;
 
   &.enter {
     transform: translateX(-100%);
@@ -27,6 +28,7 @@
     font-size: 25vw;
     height: 1em;
     width: 1em;
+    min-height: 1em;
     margin: 10px auto;
     overflow: hidden;
     border-radius: .5em;

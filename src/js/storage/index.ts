@@ -57,6 +57,8 @@ const _db = idb.open('ekkiog', 12, db => {
 const _repo = _db.then(db => new Repo({}, db));
 export const user = getUser();
 
+export { _repo as repo, Repo };
+
 export async function save(name : string, forest : Forest, message : string) : Promise<string> {
   const repo = await _repo;
   const hash = await repo.save(name, forest, message, user);
@@ -231,7 +233,7 @@ export async function push(user : OauthData, components : string[], progress : (
     });
 }
 
-export async function fetch(url : string, component : string, progress : (status: string) => void) {
+export async function fetchComponent(url : string, component : string, progress : (status: string) => void) {
   const repo = await _repo;
   const response = await repo.fetch(
     `/git/${url}.git`,
@@ -246,6 +248,18 @@ export async function fetch(url : string, component : string, progress : (status
     oldHash,
     hash
   }));
+}
+
+export async function fetch(progress : (status: string) => void){
+  if(user == null) return [];
+  const repo = await _repo;
+  console.log('start fetch');
+  const response = await repo.fetch(
+    `/git/${user.server}/${user.username}/${user.repo}.git`,
+    `refs/heads/*:refs/remotes/origin/*`,
+    {progress});
+  console.log('fetch done');
+  return response;
 }
 
 export async function sync(user : OauthData) {
@@ -267,12 +281,7 @@ export async function sync(user : OauthData) {
 
 export async function clone(url : string, progress : (status: string) => void) {
   const repo = await _repo;
-  const response = await repo.fetch(
-    `/git/${url}.git`,
-    `refs/heads/*:refs/heads/*`,
-    {
-      progress
-    });
+  const response = await repo.clone(`/git/${url}.git`, progress);
   console.log('success', response);
 }
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { connect, Dispatch } from 'react-redux';
+import { Dispatch } from 'redux';
 import { TileType } from 'ekkiog-editing';
 
 import { State } from '../reduce';

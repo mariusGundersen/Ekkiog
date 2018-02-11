@@ -60,7 +60,7 @@ function* pull(repo : string, name : string, hash? : string){
     yield put(hidePopup());
     return yield storage.load(repo, name, hash);
   }catch(e){
-    terminal.logLine('');
+    terminal.logLine();
     yield put(gitProgressStatus('failure'));
     yield put(gitProgressMessage(terminal.log(e.message)));
     throw e;
@@ -71,7 +71,7 @@ type StringOrResult = string | {name : string}[];
 
 function* fetchWithProgress(repo : string, name : string, terminal : Terminal){
   const channel = yield eventChannel(emit => {
-    storage.fetch(repo, name, emit).then(emit, emit);
+    storage.fetchComponent(repo, name, emit).then(emit, emit);
     return () => {};
   });
 

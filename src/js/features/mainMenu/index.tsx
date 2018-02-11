@@ -12,6 +12,7 @@ import { getUser } from '../../storage';
 import DangerZone from './DangerZone';
 import style from './mainMenu.scss';
 import Statistics from './Statistics';
+import Sync from '../sync';
 
 export interface Props {
   readonly show : boolean
@@ -55,7 +56,7 @@ const LoggedInMenu = (props : {user : OauthData}) => <>
     {props.user.server}/{props.user.username}/{props.user.repo}
   </a>
   <Statistics />
-  <div className={style.flexSpacer} />
+  <Sync />
   <DangerZone loggedIn />
   <Version />
 </>;
