@@ -10,7 +10,8 @@
     color: inherit;
   }
 
-  & .item {
+  & .item,
+  & .sub-item {
     display: flex;
     flex-direction: row;
     border: none;
@@ -38,20 +39,31 @@
       }
     }
   }
+
+  & .sub-item {
+    background: #00000033;
+    padding-left: 40px;
+  }
 }
 
 .icon,
-.spinning-icon {
+.spinning-icon,
+.icon-down {
   width: 1em;
   height: 1em;
   flex: 0 0 auto;
   display: flex;
   font-size: 32px;
   padding: 4px;
+  transition: transform .5s;
 }
 
 .spinning-icon {
   animation: spin 1s infinite steps(8, end);
+}
+
+.icon-down {
+  transform: rotate(90deg);
 }
 
 @keyframes spin {

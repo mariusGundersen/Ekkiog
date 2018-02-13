@@ -63,14 +63,9 @@
     border-bottom: 1px solid #31363c;
   }
 
-  & .danger-zone {
-    display: flex;
-    flex-direction: column;
-
-    & .danger-button {
-      & span {
-        color: #f63;
-      }
+  & .danger-button {
+    & span {
+      color: #d66;
     }
   }
 

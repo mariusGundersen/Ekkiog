@@ -1,5 +1,5 @@
 import { delay } from 'redux-saga';
-import { all, takeLatest } from 'redux-saga/effects';
+import { all, takeLatest, take } from 'redux-saga/effects';
 import insertComponentPackage from './insertComponentPackage';
 import zoomOutOf from './zoomOutOf';
 import zoomInto from './zoomInto';
@@ -21,10 +21,15 @@ export default function* rootSaga() {
     watchLatest('save-forest', save),
     watchLatest('zoom-into', zoomInto),
     watchLatest('zoom-out-of', zoomOutOf),
-    watchLatest('start-sync', sync)
+    watch('start-sync', sync)
   ]);
 }
 
+function* watch<TAction extends Action>(name : TAction['type'], saga : (action : TAction) => any){
+  while(true){
+    yield* saga(yield take(name));
+  }
+}
 
 function* watchLatest<TAction extends Action>(name : TAction['type'], saga : (action : TAction) => any){
   yield takeLatest(name, saga);

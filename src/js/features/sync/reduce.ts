@@ -2,52 +2,79 @@ import {
   Action
 } from '../../actions';
 
-export interface SyncState {
-  readonly loading : boolean
-  readonly progress : string
-  readonly components : ComponentStatus[]
+export type SyncState = SyncReady | SyncBusy | SyncDone;
+
+export interface SyncReady {
+  readonly state : 'ready'
 }
 
-export interface ComponentStatus {
+export interface SyncBusy {
+  readonly state : 'busy'
+  readonly progress : string
+}
+
+export interface SyncDone {
+  readonly state : 'done'
+  readonly ok : string[]
+  readonly behind : SyncItem[]
+  readonly infront : SyncItem[]
+  readonly diverged : SyncItem[]
+}
+
+export interface SyncItem {
   readonly name : string
-  readonly status : 'loading' | 'ok' | 'pull' | 'push' | 'pull-push'
+  readonly action : 'none' | 'push' | 'pull'
 }
 
 const initialState : SyncState = {
-  loading: false,
-  progress: '',
-  components: []
+  state: 'ready'
 };
 
 export default function sync(state = initialState, action : Action) : SyncState {
   switch(action.type){
     case 'start-sync':
       return {
-        loading: true,
-        progress: '',
-        components: []
+        state: 'busy',
+        progress: ''
       };
     case 'sync-progress':
       return {
-        ...state,
+        state: 'busy',
         progress: action.message
       };
-    case 'sync-list':
+    case 'sync-done':
       return {
-        loading: false,
-        progress: '',
-        components: action.names.map(name => ({
-          name,
-          status: 'loading' as 'loading'
-        }))
+        state: 'done',
+        ok: action.ok,
+        behind: action.behind.map<SyncItem>(name => ({name, action: 'pull'})),
+        infront: action.infront.map<SyncItem>(name => ({name, action: 'push'})),
+        diverged: action.diverged.map<SyncItem>(name => ({name, action: 'none'}))
       };
-    case 'sync-status':
-      console.log('sync-status', action.name, action.status);
-      return {
+    case 'toggle-upload':
+      return state.state === 'done' ? {
         ...state,
-        components: state.components.map(c => c.name === action.name ? action : c)
+        infront: state.infront.map(toggle(action.names, 'push')),
+        diverged: state.diverged.map(toggle(action.names, 'push'))
+      } : state;
+    case 'toggle-download':
+      return state.state === 'done' ? {
+        ...state,
+        behind: state.behind.map(toggle(action.names, 'pull')),
+        diverged: state.diverged.map(toggle(action.names, 'pull'))
+      } : state;
+    case 'sync-complete':
+      return {
+        state: 'ready'
       };
     default:
       return state;
   }
+}
+
+function toggle(names : string[], action : 'pull' | 'push') {
+  return (item : SyncItem) : SyncItem => names.includes(item.name)
+    ? {
+      name: item.name,
+      action: item.action !== action ? action : 'none'
+    } : item;
 }

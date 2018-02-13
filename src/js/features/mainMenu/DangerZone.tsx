@@ -4,6 +4,7 @@ import SafeIcon from 'react-icons/fa/life-bouy';
 import LogoutIcon from 'react-icons/fa/sign-out';
 import BusyIcon from 'react-icons/fa/spinner';
 import DeleteIcon from 'react-icons/fa/trash';
+import ChevronIcon from 'react-icons/fa/angle-right';
 import reax from 'reaxjs';
 import { scan, startWith } from 'rxjs/operators';
 
@@ -36,24 +37,22 @@ export default reax({
 },
 ({events, values, props}) => <>
   <button className={theme.item} key="toggle" onClick={events.toggle} data-active={values.show}>
-    <span className={theme.icon}>{values.show ? <SafeIcon /> : <DangerIcon />}</span>
-    <span className={theme.label}>{values.show ? "Leave the danger-zone" : "Enter the danger-zone"}</span>
+    <span className={values.show ? theme.iconDown : theme.icon}>{<ChevronIcon />}</span>
+    <span className={theme.label}>Danger-zone</span>
   </button>
-  <div className={style.dangerZone}>
-    {values.show && props.loggedIn && <LogoutButton />}
-    {values.show && <DeleteButton onClick={events.deleteAll} isBusy={values.isDeleting} />}
-  </div>
+  {values.show && props.loggedIn && <LogoutButton />}
+  {values.show && <DeleteButton onClick={events.deleteAll} isBusy={values.isDeleting} />}
 </>);
 
 const LogoutButton = () => (
-  <button className={theme.item+' '+style.dangerButton} onClick={() => {setUser(null as any); document.location.reload()}}>
+  <button className={theme.subItem+' '+style.dangerButton} onClick={() => {setUser(null as any); document.location.reload()}}>
     <span className={theme.icon}><LogoutIcon /></span>
     <span className={theme.label}>Logout from GitHub</span>
   </button>
 );
 
 const DeleteButton = (props : {onClick(x : any) : void, isBusy : boolean}) => (
-  <button className={theme.item+' '+style.dangerButton} onClick={props.onClick}>
+  <button className={theme.subItem+' '+style.dangerButton} onClick={props.onClick}>
     <span className={props.isBusy ? theme.spinningIcon : theme.icon}>
       {props.isBusy
         ? <BusyIcon />

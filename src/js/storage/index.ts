@@ -221,9 +221,12 @@ function cursorToObservable<TStored, TValue=TStored>(
 
 export async function push(user : OauthData, components : string[], progress : (status: string) => void) {
   const repo = await _repo;
-  await repo.push(
+  const result = await repo.push(
     `/git/${user.server}/${user.username}/${user.repo}.git`,
-    components.map(c => `refs/heads/${c}`),
+    components.map(c => ({
+      local: `refs/heads/${c}`,
+      tracking: `refs/remotes/origin/${c}`
+    })),
     {
       username: user.username,
       password: user.access_token
@@ -231,6 +234,9 @@ export async function push(user : OauthData, components : string[], progress : (
     {
       progress
     });
+  return result.map(ref => ({
+    name: ref.local.substr('refs/heads/'.length)
+  }));
 }
 
 export async function fetchComponent(url : string, component : string, progress : (status: string) => void) {
