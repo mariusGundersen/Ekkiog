@@ -43,43 +43,33 @@ export function toggleButton(tree : ButtonLeaf | ButtonNode, net : number) : But
 
 export function* diff(before : ButtonLeaf | ButtonNode | undefined, after : ButtonLeaf | ButtonNode | undefined, address = 0) : IterableIterator<ButtonState> {
   if(before === after) return;
-  if(before === undefined && after !== undefined){
-    if(isLeaf(after)){
-      if(after.state){
-        yield {
-          net: address,
-          state: after.state
-        };
+  if(after){
+    if(before){
+      if(isLeaf(before) && isLeaf(after)) {
+        if(before.state !== after.state){
+          yield {
+            net: address,
+            state: after.state
+          };
+        }
+      }else if(!isLeaf(before) && !isLeaf(after)){
+        yield* diff(before.left, after.left, address);
+        yield* diff(before.right, after.right, address + before.halfSize);
+      }else{
+        //this never happens if before and after are the same size
       }
     }else{
-      yield* diff(before, after && after.left, address);
-      yield* diff(before, after && after.right, address + after.halfSize);
-    }
-  }else if (after === undefined && before !== undefined){
-    if(isLeaf(before)){
-      if(before.state){
-        yield {
-          net: address,
-          state: false
-        };
+      if(isLeaf(after)){
+        if(after.state){
+          yield {
+            net: address,
+            state: after.state
+          };
+        }
+      }else{
+        yield* diff(before, after && after.left, address);
+        yield* diff(before, after && after.right, address + after.halfSize);
       }
-    }else{
-      yield* diff(before && before.left, after, address);
-      yield* diff(before && before.right, after, address + before.halfSize);
-    }
-  }else if(after !== undefined && before !== undefined){
-    if(isLeaf(before) && isLeaf(after)) {
-      if(before.state !== after.state){
-        yield {
-          net: address,
-          state: after.state
-        };
-      }
-    }else if(!isLeaf(before) && !isLeaf(after)){
-      yield* diff(before.left, after.left, address);
-      yield* diff(before.right, after.right, address + before.halfSize);
-    }else{
-      //this never happens if before and after are the same size
     }
   }
 }
