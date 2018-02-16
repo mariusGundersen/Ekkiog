@@ -52,10 +52,10 @@ export default class QuadList implements VertexBuffer {
   }
 
   remove(start : number, count : number){
-    this.maybeDownsize(this.count - count);
-
     this.vertices.copyWithin(start*16, (start+count)*16, this.count*16);
     this.count -= count;
+
+    this.maybeDownsize(this.count);
   }
 
   bind(){
