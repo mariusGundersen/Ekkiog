@@ -20,66 +20,76 @@ import {
 } from '../actions';
 import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
+import { ViewState } from '../reduce/view';
 import * as storage from '../storage';
 import { loadOrPull } from './loadForest';
 import setUrl from '../actions/router';
 
 export default function* doubleTap({x, y} : DoubleTapAction){
   const state : State = yield select();
-  const context = state.context;
+
   if(x < 0 || y < 0 || x > 128 || y > 128){
-    const previousContext = context.previous;
-    if(previousContext){
-      const component = packageComponent(context.forest, context.repo, context.name, context.hash, context.hash);
-      yield put(popContext());
-      yield put(setUrl(context.repo, context.name));
-      if(context.isReadOnly) return;
-      const {forest, didntFit} = replaceComponents(previousContext.forest, component);
-      if(previousContext.forest !== forest){
-        yield put(setForest(forest));
-      }
-
-      for(const position of didntFit) {
-        yield put(showOkCancelMenu(false));
-        yield put(removeTileAt(position.x, position.y))
-        yield put(selectComponent(state.context, component, position));
-
-        const {ok} = yield take('okCancel');
-        if(ok) {
-          const {selection} : State = yield select();
-          if(selection.selection == false) return;
-          yield put(insertComponent(component, {
-            x: selection.x + selection.dx,
-            y: selection.y + selection.dy
-          }));
-          yield put(stopSelection());
-          yield put(resetEditorMenu());
-        } else {
-          yield put(stopSelection());
-          yield put(resetEditorMenu());
-        }
-      };
-
-      yield put(saveForest(`Updated ${component.name}`));
-    }
+    yield* popOut(state.context)
   }else{
-    const areaData = getTileAt(state.context.forest.enneaTree, y|0, x|0);
-    if(areaData && areaData.data.type === 'component' && areaData.data.name){
-      const {repo, name} = locateRepo(areaData.data, context);
-      const centerX = areaData.left + areaData.width/2;
-      const centerY = areaData.top + areaData.height/2;
-      const posA = state.view.viewportToTile(0, 0);
-      const posB = state.view.viewportToTile(state.view.pixelWidth, state.view.pixelHeight);
-      yield put(pushContextLoading(repo, name, box(posA, posB), centerX, centerY));
-      try{
-        const forest = yield* loadOrPull(repo, name);
-        yield put(setUrl(repo, name));
-        yield put(forestLoaded(forest, forest.hash));
-      }catch(e){
-        yield put(abortContextLoading());
-      }
-    }
+    yield* goInto(state.context, state.view, x, y);
   }
+}
+
+function* goInto(context : ContextState, view : ViewState, x : number, y : number){
+  const areaData = getTileAt(context.forest.enneaTree, y|0, x|0);
+  if(!areaData || areaData.data.type !== 'component' || !areaData.data.name) return;
+
+  const {repo, name} = locateRepo(areaData.data, context);
+  const centerX = areaData.left + areaData.width/2;
+  const centerY = areaData.top + areaData.height/2;
+  const posA = view.viewportToTile(0, 0);
+  const posB = view.viewportToTile(view.pixelWidth, view.pixelHeight);
+  yield put(pushContextLoading(repo, name, box(posA, posB), centerX, centerY));
+  try{
+    const forest = yield* loadOrPull(repo, name);
+    yield put(setUrl(repo, name));
+    yield put(forestLoaded(forest, forest.hash));
+  }catch(e){
+    yield put(abortContextLoading());
+  }
+}
+
+function* popOut(context : ContextState){
+  const previousContext = context.previous;
+  if(!previousContext) return;
+
+  yield put(popContext());
+  yield put(setUrl(context.repo, context.name));
+  if(context.isReadOnly) return;
+
+  const component = packageComponent(context.forest, context.repo, context.name, context.hash, context.hash);
+  const {forest, didntFit} = replaceComponents(previousContext.forest, component);
+  if(previousContext.forest !== forest){
+    yield put(setForest(forest));
+  }
+
+  for(const position of didntFit) {
+    yield put(showOkCancelMenu(false));
+    yield put(removeTileAt(position.x, position.y))
+    yield put(selectComponent(context, component, position));
+
+    const {ok} = yield take('okCancel');
+    if(ok) {
+      const {selection} : State = yield select();
+      if(selection.selection == false) return;
+      yield put(insertComponent(component, {
+        x: selection.x + selection.dx,
+        y: selection.y + selection.dy
+      }));
+      yield put(stopSelection());
+      yield put(resetEditorMenu());
+    } else {
+      yield put(stopSelection());
+      yield put(resetEditorMenu());
+    }
+  };
+
+  yield put(saveForest(`Updated ${component.name}`));
 }
 
 function replaceComponents(forest : Forest, newComponent : CompiledComponent){

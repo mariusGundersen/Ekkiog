@@ -59,22 +59,34 @@ export const user = getUser();
 
 export async function save(name : string, forest : Forest, message : string) : Promise<string> {
   const repo = await _repo;
-  return await repo.save(name, forest, message, user);
+  const hash = await repo.save(name, forest, message, user);
+  await updateRecent('', name);
+  return hash;
 }
 
 export async function load(repo : string, name : string, hash? : string){
-  const db = await _db;
-  const transaction = db.transaction([
-    'recent',
-  ], 'readwrite');
-  const recents = transaction.objectStore<RecentComponent>('recent');
-  await recents
-    .put({
-      repo,
-      name,
-      usedAt: new Date()
-    });
-  return await (await _repo).load(repo, name);
+
+  const result = await (await _repo).load(repo, name);
+  await updateRecent(repo, name);
+  return result;
+}
+
+async function updateRecent(repo : string, name : string){
+  try{
+    const db = await _db;
+    const transaction = db.transaction([
+      'recent',
+    ], 'readwrite');
+    const recents = transaction.objectStore<RecentComponent>('recent');
+    await recents
+      .put({
+        repo,
+        name,
+        usedAt: new Date()
+      });
+  }catch(e){
+    console.error(e);
+  }
 }
 
 export async function loadPackage(repo : string, name : string) : Promise<CompiledComponent>{
