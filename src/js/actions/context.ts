@@ -62,15 +62,22 @@ export const forestLoaded = (forest : Forest, hash : string) : ForestLoadedActio
   hash
 });
 
-export type DoubleTapAction = {
-  readonly type : 'double-tap',
+export type ZoomIntoAction = {
+  readonly type : 'zoom-into',
   readonly x : number,
   readonly y : number
 }
-export const doubleTap = (x : number, y : number) : DoubleTapAction => ({
-  type: 'double-tap',
+export const zoomInto = (x : number, y : number) : ZoomIntoAction => ({
+  type: 'zoom-into',
   x,
   y
+});
+
+export type ZoomOutOfAction = {
+  readonly type : 'zoom-out-of'
+}
+export const zoomOutOf = () : ZoomOutOfAction => ({
+  type: 'zoom-out-of'
 });
 
 export type PushContextLoadingAction = {
@@ -134,7 +141,8 @@ export type ContextActions =
   NewContextLoadingAction |
   AbortContextLoadingAction |
   ForestLoadedAction |
-  DoubleTapAction |
+  ZoomIntoAction |
+  ZoomOutOfAction |
   PushContextLoadingAction |
   PopContextAction |
   ForestSavedAction |

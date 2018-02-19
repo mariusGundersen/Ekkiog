@@ -36,7 +36,8 @@ import {
   forestLoaded,
   pushContextLoading,
   popContext,
-  doubleTap
+  zoomInto,
+  zoomOutOf
 } from './actions';
 import { State } from './reduce';
 import {
@@ -91,7 +92,11 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
   return ({x, y} : {x : number, y : number}) =>
     (dispatch : Dispatch<State>) => {
       const [tx, ty] = viewportToTile(x, y);
-      dispatch(doubleTap(tx, ty));
+      if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
+        dispatch(zoomOutOf());
+      }else{
+        dispatch(zoomInto(tx, ty));
+      }
   };
 }
 

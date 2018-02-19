@@ -130,7 +130,8 @@ export default function context(state = initialContext, action: Action) : Contex
       return {
         ...state,
         repo: '',
-        saving: false
+        saving: false,
+        hash: action.hash
       };
     case 'pop-context':
       return state.previous || state;

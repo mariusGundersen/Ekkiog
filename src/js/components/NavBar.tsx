@@ -32,7 +32,7 @@ import {
   redo,
   createForest,
   showPopup,
-  popContext
+  zoomOutOf
 } from '../actions';
 import { State } from '../reduce';
 import * as storage from '../storage';
@@ -86,7 +86,7 @@ export default reax({
   onUndo.subscribe(() => initialProps.dispatch(undo()));
   onRedo.subscribe(() => initialProps.dispatch(redo()));
   onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
-  goBack.subscribe(() => initialProps.dispatch(popContext()));
+  goBack.subscribe(() => initialProps.dispatch(zoomOutOf()));
 
   const isPushing = onPush.pipe(
     withLatestFrom(props),

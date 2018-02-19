@@ -46,7 +46,7 @@ function abortTapMiddleware(reduce : Reducer<State>) : Reducer<State>{
       tappedAt = window.performance.now();
     }else if(tempState){
       const now = window.performance.now();
-      if(action.type === 'double-tap' && now - tappedAt < 500){
+      if(action.type === 'zoom-into' && now - tappedAt < 500){
         state = tempState
         tempState = undefined;
       }else if(now - tappedAt > 500){

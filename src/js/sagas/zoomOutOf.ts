@@ -1,66 +1,42 @@
-import { get as getTileAt, AreaData, getIterator } from 'ennea-tree';
-import { CompiledComponent, createForest, drawComponent, IHavePosition, isEmpty, packageComponent, clear, Forest, Component, COMPONENT } from 'ekkiog-editing';
+import {
+  clear,
+  CompiledComponent,
+  COMPONENT,
+  Component,
+  createForest,
+  drawComponent,
+  Forest,
+  IHavePosition,
+  packageComponent,
+} from 'ekkiog-editing';
+import { AreaData, getIterator } from 'ennea-tree';
 import { put, select, take } from 'redux-saga/effects';
 
 import {
   insertComponent,
-  InsertComponentPackageAction,
+  popContext,
+  removeTileAt,
   resetEditorMenu,
   saveForest,
   selectItem,
+  setForest,
   showOkCancelMenu,
   stopSelection,
-  popContext,
-  setForest,
-  pushContextLoading,
-  forestLoaded,
-  removeTileAt,
-  DoubleTapAction,
-  abortContextLoading,
+  ZoomOutOfAction,
 } from '../actions';
+import setUrl from '../actions/router';
 import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
-import { ViewState } from '../reduce/view';
-import * as storage from '../storage';
-import { loadOrPull } from './loadForest';
-import setUrl from '../actions/router';
 
-export default function* doubleTap({x, y} : DoubleTapAction){
-  const state : State = yield select();
+export default function* zomOutOf({} : ZoomOutOfAction){
+  const { context } : State = yield select();
 
-  if(x < 0 || y < 0 || x > 128 || y > 128){
-    yield* popOut(state.context)
-  }else{
-    yield* goInto(state.context, state.view, x, y);
-  }
-}
-
-function* goInto(context : ContextState, view : ViewState, x : number, y : number){
-  const areaData = getTileAt(context.forest.enneaTree, y|0, x|0);
-  if(!areaData || areaData.data.type !== 'component' || !areaData.data.name) return;
-
-  const {repo, name} = locateRepo(areaData.data, context);
-  const centerX = areaData.left + areaData.width/2;
-  const centerY = areaData.top + areaData.height/2;
-  const posA = view.viewportToTile(0, 0);
-  const posB = view.viewportToTile(view.pixelWidth, view.pixelHeight);
-  yield put(pushContextLoading(repo, name, box(posA, posB), centerX, centerY));
-  try{
-    const forest = yield* loadOrPull(repo, name);
-    yield put(setUrl(repo, name));
-    yield put(forestLoaded(forest, forest.hash));
-  }catch(e){
-    yield put(abortContextLoading());
-  }
-}
-
-function* popOut(context : ContextState){
   const previousContext = context.previous;
   if(!previousContext) return;
 
   yield put(popContext());
   yield put(setUrl(context.repo, context.name));
-  if(context.isReadOnly) return;
+  if(context.isReadOnly || previousContext.isReadOnly) return;
 
   const component = packageComponent(context.forest, context.repo, context.name, context.hash, context.hash);
   const {forest, didntFit} = replaceComponents(previousContext.forest, component);
@@ -138,11 +114,4 @@ function *getComponents(forest : Forest, name : string) : IterableIterator<AreaD
 
 function box([left, top] : number[], [right, bottom] : number[]){
   return {top, left, right, bottom};
-}
-
-function locateRepo({repo, name} : {repo : string, name : string}, context : ContextState){
-  return {
-    repo: repo && repo.length > 0 ? repo : context.repo,
-    name
-  };
 }

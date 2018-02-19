@@ -1,7 +1,8 @@
 import { delay } from 'redux-saga';
 import { all, takeLatest } from 'redux-saga/effects';
 import insertComponentPackage from './insertComponentPackage';
-import doubleTap from './doubleTap';
+import zoomOutOf from './zoomOutOf';
+import zoomInto from './zoomInto';
 import tapTile from './tapTile';
 import loadForest from './loadForest';
 import moveItemAt from './moveItemAt';
@@ -17,7 +18,8 @@ export default function* rootSaga() {
     watchLatest('move-item-at', moveItemAt),
     watchLatest('tap-tile', tapTile),
     watchLatest('save-forest', save),
-    watchLatest('double-tap', doubleTap)
+    watchLatest('zoom-into', zoomInto),
+    watchLatest('zoom-out-of', zoomOutOf)
   ]);
 }
 

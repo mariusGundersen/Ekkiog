@@ -15,7 +15,7 @@ export const POTENTIAL_LONG_PRESS_CANCEL : 'potentialLongPressCancel' = 'potenti
 export const POINTER_DOUBLE_TAP : 'pointer-double-tap' = 'pointer-double-tap';
 
 export const TAP : 'tap' = 'tap';
-export const DOUBLE_TAP : 'double-tap' = 'double-tap';
+export const DOUBLE_TAP : 'zoom-into' = 'zoom-into';
 export const SHOW_CONTEXT_MENU : 'showContextMenu' = 'showContextMenu';
 export const LOAD_CONTEXT_MENU : 'loadContextMenu' = 'loadContextMenu';
 export const ABORT_LOAD_CONTEXT_MENU : 'abortLoadContextMenu' = 'abortLoadContextMenu';
