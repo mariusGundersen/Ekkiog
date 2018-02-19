@@ -66,7 +66,7 @@ export async function save(name : string, forest : Forest, message : string) : P
 
 export async function load(repo : string, name : string, hash? : string){
 
-  const result = await (await _repo).load(repo, name);
+  const result = await _repo.then(r => hash ? r.load(hash) : r.load(repo, name));
   await updateRecent(repo, name);
   return result;
 }
@@ -92,6 +92,10 @@ async function updateRecent(repo : string, name : string){
 export async function loadPackage(repo : string, name : string) : Promise<CompiledComponent>{
   const forest = await load(repo, name);
   return packageComponent(forest, repo, name, forest.hash, forest.hash);
+}
+
+export async function getHash(repo : string, name : string) : Promise<string | undefined> {
+  return _repo.then(r => r.getHash(repo, name));
 }
 
 export function getRecent() : Observable<RecentComponent> {

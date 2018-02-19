@@ -55,11 +55,13 @@ export type ForestLoadedAction = {
   readonly type : 'forest-loaded',
   readonly forest : Forest,
   readonly hash : string
+  readonly isReadOnly : boolean
 }
-export const forestLoaded = (forest : Forest, hash : string) : ForestLoadedAction => ({
+export const forestLoaded = (forest : Forest, hash : string, isReadOnly : boolean) : ForestLoadedAction => ({
   type: 'forest-loaded',
   forest,
-  hash
+  hash,
+  isReadOnly
 });
 
 export type ZoomIntoAction = {

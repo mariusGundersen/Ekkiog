@@ -7,7 +7,8 @@ import setUrl from '../actions/router';
 
 export default function* create({name} : CreateForestAction) {
   yield put(newContextLoading('', name));
-  const hash = yield storage.save(name, createForest(), `Created ${name}`);
-  yield put(forestLoaded(createForest(), hash));
+  const forest = createForest();
+  const hash = yield storage.save(name, forest, `Created ${name}`);
+  yield put(forestLoaded(createForest(), hash, false));
   yield put(setUrl('', name));
 };

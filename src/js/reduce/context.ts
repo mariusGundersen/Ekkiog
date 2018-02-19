@@ -86,7 +86,7 @@ export default function context(state = initialContext, action: Action) : Contex
         ...state,
         repo: state.loading.repo,
         name: state.loading.name,
-        isReadOnly: state.loading.repo.length > 0,
+        isReadOnly: action.isReadOnly,
         forest: action.forest,
         buttonTree: createButtonTree(256*256),
         hash: action.hash,

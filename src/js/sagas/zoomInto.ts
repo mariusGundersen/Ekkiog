@@ -6,6 +6,7 @@ import setUrl from '../actions/router';
 import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
 import { loadOrPull } from './loadForest';
+import * as storage from '../storage';
 
 export default function* zoomInto({x, y} : ZoomIntoAction){
   const { context, view } : State = yield select();
@@ -20,9 +21,10 @@ export default function* zoomInto({x, y} : ZoomIntoAction){
   const posB = view.viewportToTile(view.pixelWidth, view.pixelHeight);
   yield put(pushContextLoading(repo, name, box(posA, posB), centerX, centerY));
   try{
-    const forest = yield* loadOrPull(repo, name);
+    const forest = yield* loadOrPull(repo, name, areaData.data.hash);
+    const hash = yield storage.getHash(repo, name);
     yield put(setUrl(repo, name));
-    yield put(forestLoaded(forest, forest.hash));
+    yield put(forestLoaded(forest, forest.hash, repo.length > 0 || hash != forest.hash));
   }catch(e){
     yield put(abortContextLoading());
   }

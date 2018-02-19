@@ -7,6 +7,7 @@ import { ILoadAsRepo } from '@es-git/load-as-mixin';
 
 export interface ILoadForestRepo {
    checkout(branch : string) : Promise<ForestWithHash>
+   checkoutCommit(hash : string) : Promise<ForestWithHash>
 }
 
 export interface ForestWithHash extends Forest {
@@ -24,6 +25,10 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
     async checkout(branch : string){
       const hash = await super.getRef(branch);
       if(!hash) throw new Error();
+      return await this.checkoutCommit(hash);
+    }
+
+    async checkoutCommit(hash : string){
       const commit = await super.loadCommit(hash);
 
       const tree = await super.loadTree(commit.tree);

@@ -12,7 +12,7 @@ export default function* loadForest({repo, name, hash} : LoadForestAction) {
     yield put(newContextLoading(repo, name));
     const component = yield* loadOrCreate(repo, name, hash);
     yield put(setUrl(repo, name));
-    yield put(forestLoaded(component, component.hash));
+    yield put(forestLoaded(component, component.hash, repo.length > 0));
   }catch(e){
     yield put(abortContextLoading());
   }
@@ -23,9 +23,11 @@ export function* loadOrCreate(repo : string, name : string, hash? : string){
     try{
       return yield* loadOrPull(repo, name, hash);
     }catch(e){
+      const forest = createForest();
+      const hash = yield storage.save(name, forest, `Created ${name}`);
       return {
-        ...createForest(),
-        hash: '0000000000000000000000000000000000000000'
+        ...forest,
+        hash
       };
     }
   }else{

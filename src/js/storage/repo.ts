@@ -15,6 +15,8 @@ import loadForestMixin, { ForestWithHash } from './loadForest';
 export interface IRepo {
   save(name : string, forest : Forest, message : string, user : User | null) : Promise<string>
   load(repo : string, name : string) : Promise<ForestWithHash>
+  load(hash : string) : Promise<ForestWithHash>
+  getHash(repo : string, name : string) : Promise<string | undefined>
 }
 
 const defaultUser = {
@@ -37,11 +39,21 @@ export default class Repo extends mix(IdbRepo)
       return await super.commit(`refs/heads/${name}`, user || defaultUser, forest, message, name);
     }
 
-    async load(repo : string, name : string){
-      if(repo.length === 0){
-        return await super.checkout(`refs/heads/${name}`);
+    async load(hash : string) : Promise<ForestWithHash>
+    async load(repo : string, name : string) : Promise<ForestWithHash>
+    async load(repoOrHash : string, name? : string){
+      if(!name){
+        return await super.checkoutCommit(repoOrHash);
       }else{
-        return await super.checkout(`refs/remotes/${repo}/${name}`);
+        return await super.checkout(getRef(repoOrHash, name));
       }
     }
+
+    async getHash(repo : string, name : string) : Promise<string | undefined> {
+      return await super.getRef(getRef(repo, name));
+    }
 };
+
+const getRef = (repo : string, name : string) => repo.length === 0 ? getLocalRef(name) : getRemoteRef(repo, name);
+const getLocalRef = (name: string) => `refs/heads/${name}`;
+const getRemoteRef = (repo: string, name: string) => `refs/remotes/${repo}/${name}`;

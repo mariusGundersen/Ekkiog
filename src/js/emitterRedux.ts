@@ -33,7 +33,6 @@ import {
   setOkCancelMenuValid,
   moveSelection,
   setForest,
-  forestLoaded,
   pushContextLoading,
   popContext,
   zoomInto,
