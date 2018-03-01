@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import Popup from '../components/Popup';
-import SelectRepo from '../components/popups/SelectRepo';
+import SelectRepo from '../features/selectRepo';
 import GitProgressPopup from '../features/gitPopup';
 import * as storage from '../storage';
 import reax from 'reaxjs';

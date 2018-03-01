@@ -5,15 +5,6 @@ export const startSync = () : StartSync => ({
   type: 'start-sync'
 });
 
-export interface SyncProgress {
-  readonly type : 'sync-progress'
-  readonly message : string
-}
-export const syncProgress = (message : string) : SyncProgress => ({
-  type: 'sync-progress',
-  message
-});
-
 export interface SyncDone {
   readonly type : 'sync-done'
   readonly ok : string[]
@@ -54,18 +45,9 @@ export const syncGo = () : SyncGo => ({
   type: 'sync-go'
 });
 
-export interface SyncComplete {
-  readonly type : 'sync-complete'
-}
-export const syncComplete = () : SyncComplete => ({
-  type: 'sync-complete'
-});
-
 
 export type SyncActions = StartSync |
-  SyncProgress |
   SyncDone |
   ToggleUpload |
   ToggleDownload |
-  SyncGo |
-  SyncComplete;
+  SyncGo;

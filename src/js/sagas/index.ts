@@ -21,7 +21,7 @@ export default function* rootSaga() {
     watchLatest('save-forest', save),
     watchLatest('zoom-into', zoomInto),
     watchLatest('zoom-out-of', zoomOutOf),
-    watch('start-sync', sync)
+    watchLatest('start-sync', sync)
   ]);
 }
 

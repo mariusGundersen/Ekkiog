@@ -19,44 +19,38 @@ import style from './style.scss';
 import reax from 'reaxjs';
 import { scan, switchMap, map } from 'rxjs/operators';
 import { withLatestFrom } from 'rxjs/operators/withLatestFrom';
-import { syncGo } from '../../actions/index';
+import { syncGo, hidePopup } from '../../actions/index';
 
 type Props = SyncState & {dispatch: Dispatch<State>};
 
 export default connect((state : State) => state.sync)((props : Props) => {
-  switch(props.state){
-    case 'ready':
-      return <>
-        <button className={theme.item} onClick={() => props.dispatch(startSync())}>
-          <span className={theme.icon}><SyncIcon /></span>
-          <span className={theme.label}>Sync</span>
-        </button>
-        <div className={style.flexer} />
-      </>;
-    case 'busy':
-      return <>
+  return <div className={style.popup+' '+theme.itemList}>
+    {props.isUpToDate ?
+      <>
         <div className={theme.item}>
-          <span className={theme.spinningIcon}><BusyIcon /></span>
-          <span className={theme.label}>Syncing...</span>
+            <span className={theme.label+' '+style.header}>Nothing to synchronize</span>
         </div>
-        <div className={classnames(theme.subItem, style.progress)}>
-          <pre>{props.progress}</pre>
+        <div className={theme.item} >
+          <button className={theme.nestedButton} onClick={() => props.dispatch(hidePopup())}>
+            <span className={theme.icon}><OkIcon /></span>
+            <span className={theme.label}>Ok</span>
+          </button>
         </div>
-        <div className={style.flexer} />
-      </>;
-    case 'done':
-      return <>
-        <button className={theme.item} onClick={() => props.dispatch(syncGo())}>
-          <span className={theme.icon}><OkIcon /></span>
-          <span className={theme.label}>Go!</span>
-        </button>
+      </> : <>
+        <div className={theme.item}>
+            <span className={theme.label+' '+style.header}>Synchronize</span>
+        </div>
         <DropdownList key='push' title='Upload' list={props.diverged.concat(props.infront)} action='push' onItemClick={(...name) => props.dispatch(toggleUpload(name))}/>
         <DropdownList key='pull' title='Download' list={props.diverged.concat(props.behind)} action='pull' onItemClick={(...name) => props.dispatch(toggleDownload(name))}/>
-        <div className={style.flexer} />
-      </>;
-    default:
-      return null;
-  }
+        <div className={theme.item} >
+          <button className={theme.nestedButton} onClick={() => props.dispatch(syncGo())}>
+            <span className={theme.icon}><OkIcon /></span>
+            <span className={theme.label}>Go!</span>
+          </button>
+        </div>
+      </>
+    }
+  </div>;
 });
 
 interface DropdownProps {

@@ -3,19 +3,21 @@ import UploadIcon from 'react-icons/fa/cloud-upload';
 import GithubIcon from 'react-icons/fa/github';
 import BusyIcon from 'react-icons/fa/spinner';
 import UserIcon from 'react-icons/fa/user';
+import SyncIcon from 'react-icons/fa/refresh';
+
 import TimeAgo from 'react-timeago';
 import { CSSTransition } from 'react-transition-group';
 
 import pure from '../../components/pure';
 import theme from '../../components/theme.scss';
-import { getUser } from '../../storage';
 import DangerZone from './DangerZone';
 import style from './mainMenu.scss';
 import Statistics from './Statistics';
-import Sync from '../sync';
 
 export interface Props {
   readonly show : boolean
+  readonly user : OauthData | null
+  startSync(e : any) : void
 }
 
 export default pure((a, b) => a.show !== b.show,
@@ -27,16 +29,10 @@ export default pure((a, b) => a.show !== b.show,
     mountOnEnter={true}
     unmountOnExit={true}>
     <div className={`${theme.itemList} ${style.mainMenu}`}>
-      {ifLoggedIn(user => <LoggedInMenu user={user} />, () => <AnonymousMenu />)}
+      {(props.user ? <LoggedInMenu user={props.user} startSync={props.startSync} /> : <AnonymousMenu />)}
     </div>
   </CSSTransition>
 ));
-
-function ifLoggedIn(loggedIn : (user : OauthData) => JSX.Element, notLoggedIn : () => JSX.Element){
-  const user = getUser();
-  if(user) return loggedIn(user);
-  return notLoggedIn();
-}
 
 const AnonymousMenu = () => <>
   <div className={style.userPhoto}>
@@ -49,14 +45,15 @@ const AnonymousMenu = () => <>
   <Version />
 </>;
 
-const LoggedInMenu = (props : {user : OauthData}) => <>
+const LoggedInMenu = (props : {user : OauthData, startSync : (e : any) => void}) => <>
   <img className={style.userPhoto} src={props.user.photo} />
   <div className={style.userName}>{props.user.name}</div>
   <a className={style.userLink} target="_blank" href={`https://${props.user.server}/${props.user.username}/${props.user.repo}`}>
     {props.user.server}/{props.user.username}/{props.user.repo}
   </a>
   <Statistics />
-  <Sync />
+  <SyncButton startSync={props.startSync} />
+  <div className={style.flexSpacer} />
   <DangerZone loggedIn />
   <Version />
 </>;
@@ -68,14 +65,10 @@ const LoginButton = () => (
   </a>
 );
 
-const Push = (props: {isBusy : boolean, push : (x : any) => void}) => (
-  <button className={theme.item} onClick={props.push} disabled={props.isBusy}>
-    <span className={props.isBusy ? theme.spinningIcon : theme.icon}>
-      {props.isBusy
-        ? <BusyIcon />
-        : <UploadIcon />}
-    </span>
-    <span className={theme.label}>Push</span>
+const SyncButton = (props : {startSync : (e : any) => void}) => (
+  <button className={theme.item} onClick={props.startSync}>
+    <span className={theme.icon}><SyncIcon /></span>
+    <span className={theme.label}>Synchronize</span>
   </button>
 );
 

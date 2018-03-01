@@ -55,7 +55,7 @@ const _db = idb.open('ekkiog', 12, db => {
 });
 
 const _repo = _db.then(db => new Repo({}, db));
-export const user = getUser();
+const user = getUser();
 
 export { _repo as repo, Repo };
 

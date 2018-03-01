@@ -2,14 +2,17 @@ import * as storage from '../../storage';
 import { Repo } from '../../storage';
 import findCommonCommits, { HashAndCommit, CommitWithParents } from '@es-git/push-mixin/es/findCommonCommits';
 import { put, take, fork, select } from 'redux-saga/effects';
-import { syncDone, syncComplete } from './actions';
+import { syncDone } from './actions';
 import Terminal from '@es-git/terminal';
-import { syncProgress, SyncComplete } from '../../actions/index';
+import { gitProgressStatus, gitProgressMessage, showPopup, hidePopup } from '../../actions/index';
 import { eventChannel } from 'redux-saga';
 import { State } from '../../reduce/index';
+import withProgress from '../../sagas/utils/withProgress';
 
 export default function* syncSaga(){
-  const user = storage.user as OauthData;
+  const { user } : State = yield select();
+  if(!user) return;
+
   const repo : Repo = yield storage.repo;
   yield* fetch();
   const allRefs : string[] = yield repo.listRefs();
@@ -25,6 +28,8 @@ export default function* syncSaga(){
             await walk(ref.local, ref.remote, repo)
   })));
 
+  yield put(showPopup('Sync'));
+
   yield put(syncDone(
     list.filter(r => r.type === 'ok').map(r => r.name),
     list.filter(r => r.type === 'behind').map(r => r.name),
@@ -37,9 +42,6 @@ export default function* syncSaga(){
 
   const state : State = yield select();
   console.log(state.sync);
-  if(state.sync.state !== 'done') return;
-
-  yield put(syncProgress(''));
 
   const toPull = state.sync.behind
     .concat(state.sync.diverged)
@@ -61,8 +63,6 @@ export default function* syncSaga(){
   yield* push(user, toPush);
 
   console.log('done');
-
-  yield put(syncComplete());
 }
 
 async function walk(local : string, remote : string, repo : Repo){
@@ -107,42 +107,34 @@ function getRef(repo : Repo, key : 'local' | 'remote', trim : number){
 function* fetch(){
   var terminal = new Terminal();
   try{
-    yield put(syncProgress(terminal.logLine(`Fetching...`)));
+    yield put(gitProgressStatus('busy'));
+    yield put(gitProgressMessage(terminal.logLine(`Fetching...`)));
+    yield put(showPopup('GitProgress'));
     yield* withProgress(terminal, emit => storage.fetch(emit));
+    yield put(gitProgressStatus('success'));
+    yield put(hidePopup());
   }catch(e){
     terminal.logLine();
-    yield put(syncProgress(terminal.log(e.message)));
-    throw e;
+    yield put(gitProgressStatus('failure'));
+    yield put(gitProgressMessage(terminal.log(e.message)));
+    console.error(e);
   }
 }
 
 function* push(user : OauthData, components : string[]){
   var terminal = new Terminal();
   try{
-    yield put(syncProgress(terminal.logLine(`Pushing...`)));
+    yield put(gitProgressStatus('busy'));
+    yield put(gitProgressMessage(terminal.logLine(`Pushing...`)));
+    yield put(showPopup('GitProgress'));
     yield* withProgress(terminal, emit => storage.push(user, components, emit));
+    yield put(gitProgressStatus('success'));
+    yield put(hidePopup());
   }catch(e){
     terminal.logLine();
-    yield put(syncProgress(terminal.log(e.message)));
-    throw e;
-  }
-}
-
-type StringOrResult = string | {name : string}[];
-
-function* withProgress(terminal : Terminal, start : (emit : (v : any) => void) => Promise<any>){
-  const channel = yield eventChannel(emit => {
-    start(emit).then(emit, emit);
-    return () => {};
-  });
-
-  while(true){
-    const message : StringOrResult = yield take(channel);
-    if(typeof(message) === 'string'){
-      yield put(syncProgress(terminal.log(message)));
-    }else{
-      return;
-    }
+    yield put(gitProgressStatus('failure'));
+    yield put(gitProgressMessage(terminal.log(e.message)));
+    console.error(e);
   }
 }
 

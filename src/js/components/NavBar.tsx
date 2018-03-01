@@ -32,7 +32,8 @@ import {
   redo,
   createForest,
   showPopup,
-  zoomOutOf
+  zoomOutOf,
+  startSync
 } from '../actions';
 import { State } from '../reduce';
 import * as storage from '../storage';
@@ -51,6 +52,7 @@ export interface Props {
   readonly isSaving : boolean;
   readonly isReadOnly : boolean;
   readonly isChildContext : boolean;
+  readonly user : OauthData | null;
 }
 
 export default reax({
@@ -64,7 +66,8 @@ export default reax({
   onUndo: (x : any) => true,
   onRedo: (x : any) => true,
   onSetTickInterval: (value : number) => value,
-  goBack: (x : any) => true
+  goBack: (x : any) => true,
+  sync: (x : any) => true
 }, ({
   toggleSearch,
   toggleSimulationMenu,
@@ -76,7 +79,8 @@ export default reax({
   onUndo,
   onRedo,
   onSetTickInterval,
-  goBack
+  goBack,
+  sync
 }, props, initialProps : Props) => {
   insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
   openComponent.subscribe(r => initialProps.dispatch(loadForest(r.repo, r.name)));
@@ -85,6 +89,7 @@ export default reax({
   onRedo.subscribe(() => initialProps.dispatch(redo()));
   onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
   goBack.subscribe(() => initialProps.dispatch(zoomOutOf()));
+  sync.subscribe(() => initialProps.dispatch(startSync()))
 
   const showSearch = merge(
     toggleSearch,
@@ -139,7 +144,9 @@ export default reax({
         isActive={values.showSimulationMenu} />
     </div>
     <MainMenu
-      show={values.showMainMenu}/>
+      show={values.showMainMenu}
+      user={props.user}
+      startSync={events.sync} />
     <DelayEnterExit
       show={values.showSearch}
       enterDelay={300}>

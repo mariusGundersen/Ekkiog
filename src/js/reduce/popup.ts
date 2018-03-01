@@ -9,7 +9,7 @@ export interface NoPopup {
 }
 
 export interface ShowPopup {
-  readonly show : 'Profile' | 'GitProgress'
+  readonly show : 'Profile' | 'GitProgress' | 'Sync'
 }
 
 const defaultState : PopupState = {
