@@ -57,7 +57,7 @@ export default class Repo extends mix(IdbRepo)
       const response = await super.fetch(url, `refs/heads/*:refs/heads/*`, {progress});
 
       await Promise.all(response.map(ref => ({
-        name: ref.name.replace(/^refs\/heads\//, 'refs/remotes/origin'),
+        name: ref.name.replace(/^refs\/heads\//, 'refs/remotes/origin/'),
         hash: ref.hash
       })).map(ref => super.setRef(ref.name, ref.hash)));
 
