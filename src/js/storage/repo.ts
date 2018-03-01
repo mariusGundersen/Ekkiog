@@ -52,6 +52,17 @@ export default class Repo extends mix(IdbRepo)
     async getHash(repo : string, name : string) : Promise<string | undefined> {
       return await super.getRef(getRef(repo, name));
     }
+
+    async clone(url : string, progress : (status: string) => void){
+      const response = await super.fetch(url, `refs/heads/*:refs/heads/*`, {progress});
+
+      await Promise.all(response.map(ref => ({
+        name: ref.name.replace(/^refs\/heads\//, 'refs/remotes/origin/'),
+        hash: ref.hash
+      })).map(ref => super.setRef(ref.name, ref.hash)));
+
+      return response;
+    }
 };
 
 const getRef = (repo : string, name : string) => repo.length === 0 ? getLocalRef(name) : getRemoteRef(repo, name);

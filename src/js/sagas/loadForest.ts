@@ -6,6 +6,7 @@ import * as storage from '../storage';
 import { createForest } from 'ekkiog-editing';
 import setUrl from '../actions/router';
 import { eventChannel, delay } from 'redux-saga';
+import withProgress from './utils/withProgress';
 
 export default function* loadForest({repo, name, hash} : LoadForestAction) {
   try{
@@ -60,32 +61,19 @@ function* pull(repo : string, name : string, hash? : string){
     yield put(hidePopup());
     return yield storage.load(repo, name, hash);
   }catch(e){
-    terminal.logLine('');
+    terminal.logLine();
     yield put(gitProgressStatus('failure'));
     yield put(gitProgressMessage(terminal.log(e.message)));
     throw e;
   }
 }
 
-type StringOrResult = string | {name : string}[];
-
 function* fetchWithProgress(repo : string, name : string, terminal : Terminal){
-  const channel = yield eventChannel(emit => {
-    storage.fetch(repo, name, emit).then(emit, emit);
-    return () => {};
-  });
+  const result : {name : string}[] = yield* withProgress(terminal, emit => storage.fetchComponent(repo, name, emit));
 
-  while(true){
-    const message : StringOrResult = yield take(channel);
-    if(typeof(message) === 'string'){
-      console.log(message);
-      yield put(gitProgressMessage(terminal.log(message)));
-    }else{
-      if(message.some(r => r.name === name)){
-        return;
-      }else{
-        throw new Error(`Could not find ${name}\nin ${repo}`);
-      }
-    }
+  if(result.some(r => r.name === name)){
+    return;
+  }else{
+    throw new Error(`Could not find ${name}\nin ${repo}`);
   }
 }

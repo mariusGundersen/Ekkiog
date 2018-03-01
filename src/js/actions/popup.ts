@@ -1,9 +1,9 @@
 
 export type ShowPopupAction = {
   readonly type : 'ShowPopup'
-  readonly popup : 'Profile' | 'GitProgress'
+  readonly popup : 'Profile' | 'GitProgress' | 'Sync'
 }
-export const showPopup = (popup : 'Profile' | 'GitProgress') : ShowPopupAction => ({
+export const showPopup = (popup : 'Profile' | 'GitProgress' | 'Sync') : ShowPopupAction => ({
   type: 'ShowPopup',
   popup
 });

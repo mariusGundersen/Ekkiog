@@ -10,16 +10,15 @@ import {
   mapTo
 } from 'rxjs/operators';
 
-import FaBusy from 'react-icons/fa/spinner';
-import FaAdd from 'react-icons/fa/plus-circle';
-import FaCheck from 'react-icons/fa/check-circle';
-import FaRight from 'react-icons/fa/angle-right';
-import FaDown from 'react-icons/fa/angle-down';
+import BusyIcon from 'react-icons/fa/spinner';
+import AddIcon from 'react-icons/fa/plus-circle';
+import CheckIcon from 'react-icons/fa/check-circle';
+import ChevronIcon from 'react-icons/fa/angle-right';
 
 import { getRepos, createRepo } from '../../storage/clients';
 import * as storage from '../../storage';
 
-import theme from '../theme.scss';
+import theme from '../../components/theme.scss';
 import style from './selectRepo.scss';
 import { merge } from 'rxjs/observable/merge';
 import { Observable } from 'rxjs/Observable';
@@ -104,7 +103,7 @@ export default reax({
   {values.isBusy ?
     <div className={style.isBusy}>
       <div className={theme.spinningIcon}>
-        <FaBusy />
+        <BusyIcon />
       </div>
       <pre>{values.progress}</pre>
     </div>
@@ -112,12 +111,12 @@ export default reax({
     <div className={theme.itemList}>
       {values.hasEkkiogWorkspace ?
         <button className={theme.item} key="use" onClick={() => events.selectRepo(DEFAULT_REPO_NAME)}>
-          <span className={theme.icon}><FaCheck /></span>
+          <span className={theme.icon}><CheckIcon /></span>
           <span className={theme.label}>{DEFAULT_REPO_NAME}</span>
         </button>
       :
         <button className={theme.item} key="create" onClick={events.createNewRepo}>
-          <span className={theme.icon}><FaAdd /></span>
+          <span className={theme.icon}><AddIcon /></span>
           <span className={theme.labelVertical}>
             <span>Create a new repo</span>
             <span className={theme.sub}>{DEFAULT_REPO_NAME}</span>
@@ -125,12 +124,12 @@ export default reax({
         </button>
       }
       <button className={theme.item} key="toggle" onClick={events.toggleList}>
-        <span className={theme.icon}>{values.showOthers ? <FaDown /> : <FaRight />}</span>
+        <span className={values.showOthers ? theme.iconDown : theme.icon}><ChevronIcon /></span>
         <span className={theme.label}>{values.hasEkkiogWorkspace ? "Pick another repo" : "Pick an existing repo"}</span>
       </button>
       {values.showOthers && values.repos.map((repo, i) => (
-        <button className={theme.item} key={i} onClick={() => events.selectRepo(repo)}>
-          <span className={theme.icon}><FaCheck /></span>
+        <button className={theme.subItem} key={i} onClick={() => events.selectRepo(repo)}>
+          <span className={theme.icon}><CheckIcon /></span>
           <span className={theme.label}>{repo}</span>
         </button>
       ))}

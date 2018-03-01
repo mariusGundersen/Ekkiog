@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-import MainMenu from '../components/MainMenu';
+import MainMenu from '../features/mainMenu';
 
 export default class Sandobx extends React.Component {
   render(){
-    return <MainMenu isPushing={false} push={() => {}} show={true} />;
+    return <MainMenu show={true} startSync={() => {}} user={null} />;
   }
 }

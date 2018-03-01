@@ -1,10 +1,9 @@
 .git-progress {
   font-size: 10px;
-  background: #00000088;
-  box-shadow: 0 0 10px 0 #00000088;
 
   &.busy {
-
+    background: #00000088;
+    box-shadow: 0 0 10px 0 #00000088;
   }
 
   &.success {

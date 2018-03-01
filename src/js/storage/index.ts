@@ -55,7 +55,9 @@ const _db = idb.open('ekkiog', 12, db => {
 });
 
 const _repo = _db.then(db => new Repo({}, db));
-export const user = getUser();
+const user = getUser();
+
+export { _repo as repo, Repo };
 
 export async function save(name : string, forest : Forest, message : string) : Promise<string> {
   const repo = await _repo;
@@ -147,6 +149,7 @@ export async function getAllComponents() : Promise<ComponentMetadata[]> {
   const recents = tx.objectStore<RecentComponent, [string, string]>('recent');
   return await Promise.all(refs
     .map(refToRepoAndName)
+    .filter(data => data.repo !== 'origin')
     .map(async ({name, repo}) => {
       const [favorite, usedAt] = await Promise.all([
         favorites.get([repo, name]).then(x => x ? true : false, () => false),
@@ -166,15 +169,9 @@ export async function getOwnedComponents() : Promise<string[]> {
   const refs = await repo.listRefs();
   return refs
     .map(refToRepoAndName)
+    .filter(data => data.repo !== 'origin')
     .filter(data => data.repo === '')
     .map(data => data.name);
-}
-
-function bySimilarityTo(query : string){
-  return (a : {name : string, repo : string}, b : {name : string, repo : string}) => (
-    (a.repo > b.repo ? 1 : a.repo < b.repo ? -1 : 0)
-    || (a.name.indexOf(query) - b.name.indexOf(query))
-    || (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
 }
 
 function refToRepoAndName(ref : string){
@@ -222,36 +219,75 @@ function cursorToObservable<TStored, TValue=TStored>(
   });
 }
 
-export async function push(component : string) {
-  if(!user) return;
+export async function push(user : OauthData, components : string[], progress : (status: string) => void) {
   const repo = await _repo;
-  await repo.push(`/git/${user.server}/${user.username}/${user.repo}.git`, `refs/heads/${component}`, {
-    username: user.username,
-    password: user.access_token
-  });
+  const result = await repo.push(
+    `/git/${user.server}/${user.username}/${user.repo}.git`,
+    components.map(c => ({
+      local: `refs/heads/${c}`,
+      tracking: `refs/remotes/origin/${c}`
+    })),
+    {
+      username: user.username,
+      password: user.access_token
+    },
+    {
+      progress
+    });
+  return result.map(ref => ({
+    name: ref.local.substr('refs/heads/'.length)
+  }));
 }
 
-export async function fetch(url : string, component : string, progress : (status: string) => void) {
+export async function fetchComponent(url : string, component : string, progress : (status: string) => void) {
   const repo = await _repo;
-  const response = await repo.fetch(`/git/${url}.git`, {
-    refspec: `refs/heads/${component}:refs/remotes/${url}/${component}`,
-    depth: 1,
-    progress
-  });
+  const response = await repo.fetch(
+    `/git/${url}.git`,
+    `refs/heads/${component}:refs/remotes/${url}/${component}`,
+    {
+      depth: 1,
+      progress
+    });
   console.log('success', response);
-  return response.map(({name, from, to}) => ({
+  return response.map(({name, oldHash, hash}) => ({
     name: name.substr(`refs/remotes/${url}/`.length),
-    from,
-    to
+    oldHash,
+    hash
+  }));
+}
+
+export async function fetch(progress : (status: string) => void){
+  if(user == null) return [];
+  const repo = await _repo;
+  console.log('start fetch');
+  const response = await repo.fetch(
+    `/git/${user.server}/${user.username}/${user.repo}.git`,
+    `refs/heads/*:refs/remotes/origin/*`,
+    {progress});
+  console.log('fetch done');
+  return response;
+}
+
+export async function sync(user : OauthData) {
+  const repo = await _repo;
+  const remoteRefs = await repo.lsRemote(`/git/${user.server}/${user.username}/${user.repo}.git`);
+  console.log('success', remoteRefs);
+  const remoteMap = new Map<string, string>(remoteRefs.map(r => [r.name, r.hash] as [string, string]));
+  const localRefs = await repo.listRefs();
+  const refsToPush = await Promise.all(localRefs.filter(ref => ref.startsWith('refs/heads/')).map(async name => ({
+    name,
+    hash: await repo.getRef(name),
+    remoteHash: remoteMap.get(name)
+  }))).then(list => list.filter(ref => ref.hash !== ref.remoteHash));
+  return refsToPush.map(ref => ({
+    name: ref.name.substr(`refs/heads/`.length),
+    status: ref.remoteHash ? 'update' : 'new'
   }));
 }
 
 export async function clone(url : string, progress : (status: string) => void) {
   const repo = await _repo;
-  const response = await repo.fetch(`/git/${url}.git`, {
-    refspec: `refs/heads/*:refs/heads/*`,
-    progress
-  });
+  const response = await repo.clone(`/git/${url}.git`, progress);
   console.log('success', response);
 }
 

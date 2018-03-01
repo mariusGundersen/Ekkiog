@@ -10,7 +10,8 @@
     color: inherit;
   }
 
-  & .item {
+  & .item,
+  & .sub-item {
     display: flex;
     flex-direction: row;
     border: none;
@@ -37,21 +38,46 @@
         font-size: 10px;
       }
     }
+
+    & .nested-button {
+      display: flex;
+      background: #353d46;
+      margin: 10px auto;
+      padding: 0 30px;
+      border-radius: 5px;
+      border-bottom: 5px solid #31363c;
+
+      &:active {
+        background: #586472;
+        border-bottom: 5px solid #757d87
+      }
+    }
+  }
+
+  & .sub-item {
+    background: #353d46;
+    padding-left: 40px;
   }
 }
 
 .icon,
-.spinning-icon {
+.spinning-icon,
+.icon-down {
   width: 1em;
   height: 1em;
   flex: 0 0 auto;
   display: flex;
   font-size: 32px;
   padding: 4px;
+  transition: transform .5s;
 }
 
 .spinning-icon {
   animation: spin 1s infinite steps(8, end);
+}
+
+.icon-down {
+  transform: rotate(90deg);
 }
 
 @keyframes spin {

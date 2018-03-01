@@ -10,8 +10,8 @@ import Menu from '../components/Menu';
 import WebGLCanvas from '../components/WebGLCanvas';
 import NavBar from '../components/NavBar';
 import Popup from '../components/Popup';
-import SelectRepo from '../components/popups/SelectRepo';
 import GitProgressPopup from '../features/gitPopup';
+import Sync from '../features/sync';
 
 import style from '../components/main.css';
 import {
@@ -20,7 +20,6 @@ import {
 } from 'rxjs/operators';
 import { Route, matchPath } from 'react-router';
 
-import { user } from '../storage';
 import { hidePopup, loadForest } from '../actions';
 import getRepoFromUrl from '../utils/getRepoFromUrl';
 import { PopupState } from '../reduce/popup';
@@ -80,11 +79,17 @@ export default connect((s : State) => s)(
           isSaving={props.context.saving}
           isReadOnly={props.context.isReadOnly}
           isChildContext={props.context.previous !== undefined}
+          user={props.user}
         />
         <GitProgressPopup
           show={props.popup.show === 'GitProgress'}
           state={props.gitPopup}
           hidePopup={events.hidePopup} />
+        <Popup
+          show={props.popup.show === 'Sync'}
+          onCoverClicked={events.hidePopup}>
+          <Sync />
+        </Popup>
       </div>
     );
   }
