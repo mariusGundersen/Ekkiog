@@ -77,9 +77,9 @@ const DropdownList = reax({
 ({props, events, values}) => {
   if(props.list.length === 0) return null;
   return <>
-    <div key={props.action} className={theme.item} onClick={events.toggle}>
-      <span className={values.open ? theme.iconDown : theme.icon}><ChevronIcon /></span>
-      <span className={theme.label}>{props.title} ({props.list.filter(x => x.action === props.action).length} of {props.list.length})</span>
+    <div key={props.action} className={theme.item}>
+      <span className={values.open ? theme.iconDown : theme.icon} onClick={events.toggle}><ChevronIcon /></span>
+      <span className={theme.label} onClick={events.toggle}>{props.title} ({props.list.filter(x => x.action === props.action).length} of {props.list.length})</span>
       <span className={theme.icon} onClick={events.toggleAll}>{props.action === 'pull' ? <PullIcon /> : <PushIcon />}</span>
     </div>
     {values.open && props.list.map(({name, action}) => (
