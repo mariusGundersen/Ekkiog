@@ -29,13 +29,15 @@ import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
 
 export default function* zomOutOf({} : ZoomOutOfAction){
-  const { context } : State = yield select();
+  const { context: currentContext } : State = yield select();
 
-  const previousContext = context.previous;
+  const previousContext = currentContext.previous;
   if(!previousContext) return;
 
+  const context : ContextState = yield* waitUntilSaved(currentContext);
+
   yield put(popContext());
-  yield put(setUrl(context.repo, context.name));
+  yield put(setUrl(previousContext.repo, previousContext.name));
   if(context.isReadOnly || previousContext.isReadOnly) return;
 
   const component = packageComponent(context.forest, context.repo, context.name, context.hash, context.hash);
@@ -66,6 +68,15 @@ export default function* zomOutOf({} : ZoomOutOfAction){
   };
 
   yield put(saveForest(`Updated ${component.name}`));
+}
+
+function* waitUntilSaved(context : ContextState){
+  if(context.saving) {
+    yield take('forest-saved');
+    return (yield select()).context;
+  }else{
+    return context;
+  }
 }
 
 function replaceComponents(forest : Forest, newComponent : CompiledComponent){

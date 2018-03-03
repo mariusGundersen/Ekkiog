@@ -72,7 +72,7 @@ export default connect((s : State) => s)(
           currentComponentName={props.context.loading ? `${props.context.loading.name}...` : props.context.name}
           currentComponentRepo={props.context.loading ? props.context.loading.repo : props.context.repo}
           tickInterval={props.simulation.tickInterval}
-          gateCount={(props.context.forest.buddyTree.usedSize||2) - 2}
+          gateCount={props.context.loading ? 0 : (props.context.forest.buddyTree.usedSize||2) - 2}
           undoCount={props.context.undoStack && props.context.undoStack.count || 0}
           redoCount={props.context.redoStack && props.context.redoStack.count || 0}
           isLoading={props.context.loading !== undefined}

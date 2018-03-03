@@ -24,7 +24,7 @@ export default function* zoomInto({x, y} : ZoomIntoAction){
     const forest = yield* loadOrPull(repo, name, areaData.data.hash);
     const hash = yield storage.getHash(repo, name);
     yield put(setUrl(repo, name));
-    yield put(forestLoaded(forest, forest.hash, repo.length > 0 || hash != forest.hash));
+    yield put(forestLoaded(forest, forest.hash, repo.length > 0 || hash != forest.hash || context.isReadOnly));
   }catch(e){
     yield put(abortContextLoading());
   }
