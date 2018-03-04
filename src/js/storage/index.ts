@@ -13,6 +13,7 @@ import Repo, { IRepo } from './repo';
 import upgradeFrom10 from './upgrade/from10';
 import upgradeFrom11 from './upgrade/from11';
 import { all } from 'redux-saga/effects';
+import findCommonCommits, { HashAndCommit, CommitWithParents } from '@es-git/push-mixin/es/findCommonCommits';
 
 export interface ComponentMetadata {
   readonly repo : string
@@ -56,8 +57,6 @@ const _db = idb.open('ekkiog', 12, db => {
 
 const _repo = _db.then(db => new Repo({}, db));
 const user = getUser();
-
-export { _repo as repo, Repo };
 
 export async function save(name : string, forest : Forest, message : string) : Promise<string> {
   const repo = await _repo;
@@ -268,27 +267,93 @@ export async function fetch(progress : (status: string) => void){
   return response;
 }
 
-export async function sync(user : OauthData) {
-  const repo = await _repo;
-  const remoteRefs = await repo.lsRemote(`/git/${user.server}/${user.username}/${user.repo}.git`);
-  console.log('success', remoteRefs);
-  const remoteMap = new Map<string, string>(remoteRefs.map(r => [r.name, r.hash] as [string, string]));
-  const localRefs = await repo.listRefs();
-  const refsToPush = await Promise.all(localRefs.filter(ref => ref.startsWith('refs/heads/')).map(async name => ({
-    name,
-    hash: await repo.getRef(name),
-    remoteHash: remoteMap.get(name)
-  }))).then(list => list.filter(ref => ref.hash !== ref.remoteHash));
-  return refsToPush.map(ref => ({
-    name: ref.name.substr(`refs/heads/`.length),
-    status: ref.remoteHash ? 'update' : 'new'
-  }));
-}
-
 export async function clone(url : string, progress : (status: string) => void) {
   const repo = await _repo;
   const response = await repo.clone(`/git/${url}.git`, progress);
   console.log('success', response);
+}
+
+export async function pull(refs : string[]){
+  const repo = await _repo;
+  for(const ref of refs){
+    const hash = await repo.getRef(`refs/remotes/origin/${ref}`);
+    await repo.setRef(`refs/heads/${ref}`, hash);
+  }
+}
+
+export async function status(...refs : string[]){
+  const repo = await _repo;
+  const allRefs = await repo.listRefs();
+  const localRefs = await Promise.all(allRefs.filter(r => r.startsWith('refs/heads/')).map(getRef(repo, 'local', 11)));
+  const remoteRefs = await Promise.all(allRefs.filter(r => r.startsWith('refs/remotes/origin/')).map(getRef(repo, 'remote', 20)));
+
+  const list = await Promise.all(
+    join(localRefs, remoteRefs)
+    .filter(ref => refs.length === 0 || refs.includes(ref.name))
+    .map(async ref => ({
+      name: ref.name,
+      type: ref.local === ref.remote ? 'ok' :
+            !ref.local ? 'behind' :
+            !ref.remote ? 'infront' :
+            await walk(ref.local, ref.remote, repo)
+  })));
+
+  return {
+    ok: list.filter(r => r.type === 'ok').map(r => r.name),
+    behind: list.filter(r => r.type === 'behind').map(r => r.name),
+    infront: list.filter(r => r.type === 'infront').map(r => r.name),
+    diverged: list.filter(r => r.type === 'diverged').map(r => r.name)
+  };
+}
+
+async function walk(local : string, remote : string, repo : Repo){
+  const localWalk = repo.walkCommits(local);
+  const remoteWalk = repo.walkCommits(remote);
+  const common : HashAndCommit<CommitWithParents>[] = await findCommonCommits(localWalk, remoteWalk);
+  if(common.length){
+    if(common[0].hash === local){
+      return 'behind';
+    }else if(common[0].hash === remote){
+      return 'infront';
+    }
+  }
+
+  return 'diverged';
+}
+
+interface RefStatus {
+  readonly name : string
+  local? : string
+  remote? : string
+}
+
+interface NameAndType {
+  readonly name : string
+  readonly type : 'ok' | 'infront' | 'behind' | 'diverged'
+}
+
+function join(localRefs: RefStatus[], remoteRefs: RefStatus[]) {
+  const refMap = new Map(localRefs.map(r => [r.name, r] as [string, RefStatus]));
+  for (const remoteRef of remoteRefs) {
+    const localRef = refMap.get(remoteRef.name);
+    if (localRef) {
+      localRef.remote = remoteRef.remote;
+    }else{
+      refMap.set(remoteRef.name, remoteRef);
+    }
+  }
+
+  return [...refMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function getRef(repo : Repo, key : 'local' | 'remote', trim : number){
+  return async (ref : string) : Promise<RefStatus> => {
+    const hash = await repo.getRef(ref);
+    return {
+      name: ref.substr(trim),
+      [key]: hash
+    }
+  }
 }
 
 export function getUser() : OauthData | null {

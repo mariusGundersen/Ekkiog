@@ -1,9 +1,10 @@
 import * as React from 'react';
 
-import MainMenu from '../features/mainMenu';
+import * as storage from '../storage';
+import Share from '../features/share';
 
 export default class Sandobx extends React.Component {
   render(){
-    return <MainMenu show={true} startSync={() => {}} user={null} />;
+    return <Share name="WELCOME" user={storage.getUser() as OauthData} hidePopup={() => {}} startSync={() => {}} />;
   }
 }

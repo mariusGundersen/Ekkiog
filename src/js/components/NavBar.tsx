@@ -69,7 +69,8 @@ export default reax({
   onSetTickInterval: (value : number) => value,
   onStepForward: (e : any) => true,
   goBack: (x : any) => true,
-  sync: (x : any) => true
+  sync: (x : any) => true,
+  onShare: (e : any) => true
 }, ({
   toggleSearch,
   toggleSimulationMenu,
@@ -83,7 +84,8 @@ export default reax({
   onSetTickInterval,
   onStepForward,
   goBack,
-  sync
+  sync,
+  onShare
 }, props, initialProps : Props) => {
   insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
   openComponent.subscribe(r => initialProps.dispatch(loadForest(r.repo, r.name)));
@@ -93,7 +95,8 @@ export default reax({
   onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
   onStepForward.subscribe(x => initialProps.dispatch(stepForward()));
   goBack.subscribe(() => initialProps.dispatch(zoomOutOf()));
-  sync.subscribe(() => initialProps.dispatch(startSync()))
+  sync.subscribe(() => initialProps.dispatch(startSync()));
+  onShare.pipe(withLatestFrom(props)).subscribe(([_, props]) => initialProps.dispatch(showPopup('Share')));
 
   const showSearch = merge(
     toggleSearch,
@@ -166,10 +169,12 @@ export default reax({
       tickInterval={props.tickInterval}
       undoCount={props.undoCount}
       redoCount={props.redoCount}
+      canShare={props.currentComponentRepo == '' && props.user != null}
       setTickInterval={events.onSetTickInterval}
       stepForward={events.onStepForward}
       undo={events.onUndo}
-      redo={events.onRedo}/>
+      redo={events.onRedo}
+      share={events.onShare}/>
   </div>
 ));
 

@@ -17,15 +17,22 @@
     border: none;
     border-bottom: 1px solid #31363c;
     color: white;
+    font-family: Arial, Helvetica, sans-serif;
     text-decoration: none;
 
+    & .header {
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    & .header,
     & .label,
     & .label-vertical {
       padding: 4px;
       display: flex;
       flex: 1 0 auto;
       align-self: center;
-      font-family: Arial, Helvetica, sans-serif;
       font-size: 16px;
     }
 
@@ -39,10 +46,14 @@
       }
     }
 
+    &.centered{
+      justify-content: center;
+    }
+
     & .nested-button {
       display: flex;
       background: #353d46;
-      margin: 10px auto;
+      margin: 10px;
       padding: 0 30px;
       border-radius: 5px;
       border-bottom: 5px solid #31363c;
@@ -58,6 +69,11 @@
     background: #353d46;
     padding-left: 40px;
   }
+}
+
+.popup {
+  background: #424C57;
+  box-shadow: 0 0 10px 0 black;
 }
 
 .icon,

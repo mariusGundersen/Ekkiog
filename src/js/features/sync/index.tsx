@@ -15,22 +15,22 @@ import CheckIcon from 'react-icons/fa/toggle-on';
 import UnCheckIcon from 'react-icons/fa/toggle-off';
 
 import theme from '../../components/theme.scss';
-import style from './style.scss';
 import reax from 'reaxjs';
 import { scan, switchMap, map } from 'rxjs/operators';
 import { withLatestFrom } from 'rxjs/operators/withLatestFrom';
 import { syncGo, hidePopup } from '../../actions/index';
+import classes from '../../components/classes';
 
 type Props = SyncState & {dispatch: Dispatch<State>};
 
 export default connect((state : State) => state.sync)((props : Props) => {
-  return <div className={style.popup+' '+theme.itemList}>
+  return <div className={classes(theme.popup, theme.itemList)}>
     {props.isUpToDate ?
       <>
         <div className={theme.item}>
-            <span className={theme.label+' '+style.header}>Nothing to synchronize</span>
+            <span className={theme.header}>Nothing to synchronize</span>
         </div>
-        <div className={theme.item} >
+        <div className={classes(theme.item, theme.centered)} >
           <button className={theme.nestedButton} onClick={() => props.dispatch(hidePopup())}>
             <span className={theme.icon}><OkIcon /></span>
             <span className={theme.label}>Ok</span>
@@ -38,11 +38,11 @@ export default connect((state : State) => state.sync)((props : Props) => {
         </div>
       </> : <>
         <div className={theme.item}>
-            <span className={theme.label+' '+style.header}>Synchronize</span>
+            <span className={theme.header}>Synchronize</span>
         </div>
         <DropdownList key='push' title='Upload' list={props.diverged.concat(props.infront)} action='push' onItemClick={(...name) => props.dispatch(toggleUpload(name))}/>
         <DropdownList key='pull' title='Download' list={props.diverged.concat(props.behind)} action='pull' onItemClick={(...name) => props.dispatch(toggleDownload(name))}/>
-        <div className={theme.item} >
+        <div className={classes(theme.item, theme.centered)} >
           <button className={theme.nestedButton} onClick={() => props.dispatch(syncGo())}>
             <span className={theme.icon}><OkIcon /></span>
             <span className={theme.label}>Go!</span>
@@ -90,7 +90,3 @@ const DropdownList = reax({
     ))}
   </>;
 });
-
-function classnames(...names : string[]){
-  return names.join(' ');
-}

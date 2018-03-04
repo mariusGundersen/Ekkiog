@@ -8,7 +8,7 @@ type StringOrResult = string | {name : string}[];
 
 export default function* withProgress(terminal : Terminal, start : (emit : (v : any) => void) => Promise<any>){
   const channel = yield eventChannel(emit => {
-    start(emit).then(emit, emit);
+    start(throttle(200, emit)).then(emit, emit);
     return () => {};
   });
 
@@ -18,6 +18,17 @@ export default function* withProgress(terminal : Terminal, start : (emit : (v : 
       yield put(gitProgressMessage(terminal.log(message)));
     }else{
       return message;
+    }
+  }
+}
+
+function throttle<T>(time : number, func : (value : T) => void) : (value : T) => void {
+  let previous = window.performance.now();
+  return (value : T) => {
+    const now = window.performance.now();
+    if(now - previous > time){
+      previous = now;
+      func(value);
     }
   }
 }

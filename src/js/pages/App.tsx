@@ -12,6 +12,7 @@ import NavBar from '../components/NavBar';
 import Popup from '../components/Popup';
 import GitProgressPopup from '../features/gitPopup';
 import Sync from '../features/sync';
+import Share from '../features/share';
 
 import style from '../components/main.css';
 import {
@@ -20,7 +21,7 @@ import {
 } from 'rxjs/operators';
 import { Route, matchPath } from 'react-router';
 
-import { hidePopup, loadForest } from '../actions';
+import { hidePopup, loadForest, startSync } from '../actions';
 import getRepoFromUrl from '../utils/getRepoFromUrl';
 import { PopupState } from '../reduce/popup';
 
@@ -28,12 +29,14 @@ type Props = State & {dispatch: Dispatch<State>};
 
 export default connect((s : State) => s)(
   reax({
+    sync: (e : any) => true,
     hidePopup: (e : any) => null
   },
   (events, props, initialProps : Props) => {
     initialProps.dispatch(getFromUrl());
 
     events.hidePopup.subscribe(e => initialProps.dispatch(hidePopup()));
+    events.sync.subscribe(e => initialProps.dispatch(startSync()));
 
     return {
       size: onResize()
@@ -90,6 +93,15 @@ export default connect((s : State) => s)(
           show={props.popup.show === 'Sync'}
           onCoverClicked={events.hidePopup}>
           <Sync />
+        </Popup>
+        <Popup
+          show={props.popup.show === 'Share'}
+          onCoverClicked={events.hidePopup}>
+          <Share
+            name={props.context.name}
+            user={props.user}
+            hidePopup={events.hidePopup}
+            startSync={events.sync} />
         </Popup>
       </div>
     );

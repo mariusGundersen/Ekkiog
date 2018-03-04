@@ -17,10 +17,12 @@ export interface Props {
   readonly tickInterval : number
   readonly undoCount : number
   readonly redoCount : number
+  readonly canShare : boolean
   setTickInterval(tickInterval : number) : void
   stepForward(e : any) : void
   undo(e : any) : void
   redo(e : any) : void
+  share(e : any) : void
 }
 
 export default pure(
@@ -42,6 +44,8 @@ export default pure(
           <button className={props.undoCount === 0 ? style.disabled : ''} onClick={props.undo}><IconUndo /></button>
           <button className={props.redoCount === 0 ? style.disabled : ''} onClick={props.redo}><IconRedo /></button>
           <div className={style.flexFill} />
+          {props.canShare && <button onClick={props.share}><IconShare /></button>}
+          <div className={style.divider} />
           {props.tickInterval == Infinity
             ? <>
               <button className={style.selected} onClick={() => props.setTickInterval(2**8)}><IconPause /></button>
