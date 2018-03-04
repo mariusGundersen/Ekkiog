@@ -9,6 +9,7 @@ export interface Options{
 
 export interface Config{
   setTickInterval(tickInterval : number) : void;
+  tick(delta : number) : void;
 }
 
 export default function startShell(options : Options) : Config{
@@ -58,6 +59,10 @@ export default function startShell(options : Options) : Config{
       tick.interval = tickInterval;
       clearTimeout(tick.timeout);
       time(tick, onTickRequest);
+    },
+    tick(delta : number){
+      tick.count += delta;
+      options.tick(tick.count);
     }
   };
 };

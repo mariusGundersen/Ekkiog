@@ -53,6 +53,7 @@ export default connect((s : State) => s)(
           previousContext={props.context.previous}
           selection={props.selection}
           tickInterval={props.simulation.tickInterval}
+          step={props.simulation.step}
           width={values.size.pixelWidth}
           height={values.size.pixelHeight}
         />

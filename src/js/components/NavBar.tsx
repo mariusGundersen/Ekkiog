@@ -28,6 +28,7 @@ import {
   insertComponentPackage,
   loadForest,
   setTickInterval,
+  stepForward,
   undo,
   redo,
   createForest,
@@ -66,6 +67,7 @@ export default reax({
   onUndo: (x : any) => true,
   onRedo: (x : any) => true,
   onSetTickInterval: (value : number) => value,
+  onStepForward: (e : any) => true,
   goBack: (x : any) => true,
   sync: (x : any) => true
 }, ({
@@ -79,6 +81,7 @@ export default reax({
   onUndo,
   onRedo,
   onSetTickInterval,
+  onStepForward,
   goBack,
   sync
 }, props, initialProps : Props) => {
@@ -88,6 +91,7 @@ export default reax({
   onUndo.subscribe(() => initialProps.dispatch(undo()));
   onRedo.subscribe(() => initialProps.dispatch(redo()));
   onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
+  onStepForward.subscribe(x => initialProps.dispatch(stepForward()));
   goBack.subscribe(() => initialProps.dispatch(zoomOutOf()));
   sync.subscribe(() => initialProps.dispatch(startSync()))
 
@@ -163,6 +167,7 @@ export default reax({
       undoCount={props.undoCount}
       redoCount={props.redoCount}
       setTickInterval={events.onSetTickInterval}
+      stepForward={events.onStepForward}
       undo={events.onUndo}
       redo={events.onRedo}/>
   </div>

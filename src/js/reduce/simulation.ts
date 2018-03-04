@@ -6,10 +6,12 @@ import {
 
 export interface SimulationState {
   readonly tickInterval : number
+  readonly step : number
 }
 
 const initialState : SimulationState = {
-  tickInterval: 2**8
+  tickInterval: 2**8,
+  step: 0
 };
 
 export default function view(state = initialState, action : Action) : SimulationState {
@@ -19,6 +21,11 @@ export default function view(state = initialState, action : Action) : Simulation
         ...state,
         tickInterval: action.tickInterval
       };
+    case 'stepForward':
+      return {
+        ...state,
+        step: state.step+1
+      }
     default:
       return state;
   }

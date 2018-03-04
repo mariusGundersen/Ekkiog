@@ -1,10 +1,11 @@
 import * as React from 'react';
-import MdPause from 'react-icons/fa/pause';
-import MdSlow from 'react-icons/fa/step-forward';
-import MdMedium from 'react-icons/fa/play';
-import MdFast from 'react-icons/fa/fast-forward';
-import MdUndo from 'react-icons/fa/rotate-left';
-import MdRedo from 'react-icons/fa/repeat';
+import IconPause from 'react-icons/fa/pause';
+import IconStepForward from 'react-icons/fa/step-forward';
+import IconPlay from 'react-icons/fa/play';
+import IconFast from 'react-icons/fa/forward';
+import IconUndo from 'react-icons/fa/rotate-left';
+import IconRedo from 'react-icons/fa/repeat';
+import IconShare from 'react-icons/fa/paper-plane';
 import { CSSTransition } from 'react-transition-group';
 
 import pure from './pure';
@@ -17,8 +18,9 @@ export interface Props {
   readonly undoCount : number
   readonly redoCount : number
   setTickInterval(tickInterval : number) : void
-  undo(x : any) : void
-  redo(x : any) : void
+  stepForward(e : any) : void
+  undo(e : any) : void
+  redo(e : any) : void
 }
 
 export default pure(
@@ -37,13 +39,19 @@ export default pure(
       <div
         key="menu"
         className={style.simulationMenu}>
-          <button className={props.undoCount === 0 ? style.disabled : ''} onClick={props.undo}><MdUndo /></button>
-          <button className={props.redoCount === 0 ? style.disabled : ''} onClick={props.redo}><MdRedo /></button>
+          <button className={props.undoCount === 0 ? style.disabled : ''} onClick={props.undo}><IconUndo /></button>
+          <button className={props.redoCount === 0 ? style.disabled : ''} onClick={props.redo}><IconRedo /></button>
           <div className={style.flexFill} />
-          <button className={props.tickInterval == Infinity ? style.selected : ''} onClick={() => props.setTickInterval(Infinity)}><MdPause /></button>
-          <button className={props.tickInterval == 2**11 ? style.selected : ''} onClick={() => props.setTickInterval(2**11)}><MdSlow /></button>
-          <button className={props.tickInterval == 2**8 ? style.selected : ''} onClick={() => props.setTickInterval(2**8)}><MdMedium /></button>
-          <button className={props.tickInterval == 2**1 ? style.selected : ''} onClick={() => props.setTickInterval(2**1)}><MdFast /></button>
+          {props.tickInterval == Infinity
+            ? <>
+              <button className={style.selected} onClick={() => props.setTickInterval(2**8)}><IconPause /></button>
+              <button onClick={props.stepForward}><IconStepForward /></button>
+            </> : <>
+              <button onClick={() => props.setTickInterval(Infinity)}><IconPause /></button>
+              <button className={style.selected} onClick={() => props.setTickInterval(props.tickInterval == 2**8 ? 2**1 : 2**8)}>{
+                props.tickInterval == 2**8 ? <IconPlay /> : <IconFast />
+              }</button>
+            </>}
       </div>
     </CSSTransition>
   </div>

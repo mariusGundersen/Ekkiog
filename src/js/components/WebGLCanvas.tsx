@@ -31,6 +31,7 @@ import buttonHandler from '../editing/buttonHandler';
 
 export interface Props{
   readonly tickInterval : number,
+  readonly step : number,
   readonly width : number,
   readonly height : number,
   readonly selection : SelectionState,
@@ -147,6 +148,10 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       }else{
         this.touchControls.pointerSaga.enable();
       }
+    }
+
+    if(nextProps.step !== this.props.step){
+      this.shellConfig.tick(nextProps.step - this.props.step);
     }
   }
 

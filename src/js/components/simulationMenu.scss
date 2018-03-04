@@ -45,11 +45,13 @@
       line-height: 0;
       font-family: Arial, Helvetica, sans-serif;
 
-      &.disabled {
+      &.disabled,
+      &.disabled:active {
         color: #aaa;
       }
 
-      &.selected {
+      &.selected,
+      &:active {
         color: #03d3ff;
       }
     }

@@ -8,5 +8,13 @@ export const setTickInterval = (tickInterval: number) : SetTickIntervalAction =>
   tickInterval
 });
 
+export type StepForwardAction = {
+  readonly type : 'stepForward'
+}
+export const stepForward = () : StepForwardAction => ({
+  type: 'stepForward'
+});
+
 export type SimulationActions =
-  SetTickIntervalAction;
+  SetTickIntervalAction |
+  StepForwardAction;
