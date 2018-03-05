@@ -8,7 +8,7 @@ export function* spritesFlat(text : string){
 
 export function* spritesThick(text : string){
   for(const char of text){
-    yield fontThick.get(char.toUpperCase()) || {x: 0, y: 0, w: 0, h: 0, s:0};
+    yield fontThick.get(char.toUpperCase()) || {x: 0, y: 0, w: 0, h: 0, s:4};
   }
 }
 
@@ -32,7 +32,7 @@ const fontThick = new Map(createCharacteMap(0, 240, 8, -1, [
   ['Q', 8],
   ['R', 7],
   ['S', 7],
-  ['T', 6],
+  ['T', 8],
   ['U', 7],
   ['V', 7],
   ['W', 9],
@@ -49,7 +49,7 @@ const fontThick = new Map(createCharacteMap(0, 240, 8, -1, [
   ['7', 7],
   ['8', 7],
   ['9', 7],
-  ['-', 5]
+  ['-', 3]
 ]));
 
 const fontFlat = new Map(createCharacteMap(0, 248, 8, 1, [

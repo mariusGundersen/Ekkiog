@@ -23,11 +23,11 @@ import {
 import copyTo from '../editing/copyTo';
 import { State } from '../reduce';
 
-export default function* moveItemAt({tx, ty} : MoveItemAtAction){
+export default function* moveItemAt({x, y} : MoveItemAtAction){
   const state : State = yield select();
 
-  const item = getTileAt(state.context.forest.enneaTree, ty, tx);
-  yield put(removeTileAt(tx, ty));
+  const item = getTileAt(state.context.forest.enneaTree, y, x);
+  yield put(removeTileAt(x, y));
   yield put(selectItem(copyTo(createForest(), item.data, item), item));
 
   yield put(showOkCancelMenu(true));

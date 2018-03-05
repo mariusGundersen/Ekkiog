@@ -12,10 +12,12 @@ import {
   toWire,
   moveItemAt,
   saveAfter,
-  resetEditorMenu
+  resetEditorMenu,
+  setItemName
 } from '../../actions';
 import { State } from '../../reduce';
 
+import IconEdit from 'react-icons/fa/edit';
 import IconWire from '../icons/IconWire';
 import IconButton from '../icons/IconButton';
 import IconGate from '../icons/IconGate';
@@ -65,6 +67,10 @@ export function acceptMenuItem(dispatch : Dispatch<State>){
 
 export function moveMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
   return menuItem('move', <IconMove />, () => dispatch(hideContextMenuAfter(moveItemAt(tx, ty))));
+}
+
+export function setNameMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
+  return menuItem('name', <IconEdit />, () => dispatch(hideContextMenuAfter(setItemName(tx, ty, 'PUSH ME'))));
 }
 
 export function toolMenuItem(tool : Tool, icon : JSX.Element, selectedTool : Tool, dispatch : Dispatch<State>){

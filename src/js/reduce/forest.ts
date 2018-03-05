@@ -26,6 +26,8 @@ import {
   clear
 } from 'ekkiog-editing';
 
+import setName from '../editing/setName';
+
 import {
   Action
 } from '../actions';
@@ -48,6 +50,8 @@ export default function editing(forest=createForest(), action : Action) : Forest
       return drawComponent(forest, action.position.x+(action.component.width>>1), action.position.y+(action.component.height>>1), action.component);
     case 'insert-item':
       return insertItem(forest, action.buddyTree, action.item, action.position);
+    case 'set-item-name':
+      return setName(forest, action.x, action.y, action.name);
     default:
       return forest;
   }

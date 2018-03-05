@@ -40,10 +40,10 @@ export type DrawAction = {
   readonly tool : Tool,
   readonly direction : Direction
 }
-export const draw = (tx : number, ty : number, tool : Tool, direction : Direction) : DrawAction => ({
+export const draw = (x : number, y : number, tool : Tool, direction : Direction) : DrawAction => ({
   type: 'draw',
-  x: tx,
-  y: ty,
+  x,
+  y,
   tool,
   direction
 });
@@ -53,10 +53,10 @@ export type RemoveTileAtAction = {
   readonly x : number,
   readonly y : number
 }
-export const removeTileAt = (tx : number, ty : number) : RemoveTileAtAction => ({
+export const removeTileAt = (x : number, y : number) : RemoveTileAtAction => ({
   type: 'remove-tile-at',
-  x: tx,
-  y: ty
+  x,
+  y
 });
 
 export type ToUnderpassAction = {
@@ -64,10 +64,10 @@ export type ToUnderpassAction = {
   readonly x : number,
   readonly y : number
 }
-export const toUnderpass = (tx : number, ty : number) : ToUnderpassAction => ({
+export const toUnderpass = (x : number, y : number) : ToUnderpassAction => ({
   type: 'convert-wire-to-underpass',
-  x: tx,
-  y: ty
+  x,
+  y
 });
 
 export type ToWireAction = {
@@ -75,10 +75,10 @@ export type ToWireAction = {
   readonly x : number,
   readonly y : number
 }
-export const toWire = (tx : number, ty : number) : ToWireAction => ({
+export const toWire = (x : number, y : number) : ToWireAction => ({
   type: 'convert-underpass-to-wire',
-  x: tx,
-  y: ty
+  x,
+  y
 });
 
 export type InsertComponentAction = {
@@ -119,13 +119,13 @@ export const insertComponentPackage = (componentPackage : CompiledComponent) : I
 
 export type MoveItemAtAction = {
   readonly type : 'move-item-at'
-  readonly tx : number
-  readonly ty : number
+  readonly x : number
+  readonly y : number
 }
-export const moveItemAt = (tx : number, ty : number) : MoveItemAtAction => ({
+export const moveItemAt = (x : number, y : number) : MoveItemAtAction => ({
   type: 'move-item-at',
-  tx,
-  ty
+  x,
+  y
 });
 
 export type ToggleButtonAction = {
@@ -137,6 +137,18 @@ export const toggleButton = (net : number) : ToggleButtonAction => ({
   net
 });
 
+export type SetItemNameAction = {
+  readonly type : 'set-item-name'
+  readonly x : number
+  readonly y : number
+  readonly name : string
+}
+export const setItemName = (x : number, y : number, name : string) : SetItemNameAction => ({
+  type: 'set-item-name',
+  x,
+  y,
+  name
+});
 
 export type ForestActions =
   SetForestAction |
@@ -149,4 +161,5 @@ export type ForestActions =
   InsertItemAction |
   InsertComponentPackageAction |
   MoveItemAtAction |
-  ToggleButtonAction;
+  ToggleButtonAction |
+  SetItemNameAction;

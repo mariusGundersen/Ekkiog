@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Dispatch } from 'redux';
-import { TileType } from 'ekkiog-editing';
+import { TileType, WIRE, EMPTY, UNDERPASS, GATE, BUTTON, COMPONENT, LIGHT } from 'ekkiog-editing';
 
 import { State } from '../reduce';
 import { ContextMenuState, ContextMenuShowState } from '../reduce/contextMenu';
@@ -20,7 +20,8 @@ import {
   toUnderpassMenuItem,
   toWireMenuItem,
   moveMenuItem,
-  MenuItem
+  MenuItem,
+  setNameMenuItem
 } from './radialMenu/menuItems';
 
 export type Props = {
@@ -87,16 +88,19 @@ function createRing(radius : number, width : number, items : MenuItem[]) : PieRi
 }
 
 function *tileMenuItems(tile : TileType, tx : number, ty : number, dispatch : Dispatch<State>){
-  if(tile == 'wire' || tile == 'empty'){
+  if(tile === WIRE || tile === EMPTY){
     yield toUnderpassMenuItem(dispatch, tx, ty);
   }
-  if(tile == 'underpass' || tile == 'empty'){
+  if(tile === UNDERPASS || tile === EMPTY){
     yield toWireMenuItem(dispatch, tx, ty);
   }
-  if(tile == 'gate' || tile == 'component' || tile == 'light' || tile == 'button'){
+  if(tile === GATE || tile === COMPONENT || tile === LIGHT || tile === BUTTON){
     yield moveMenuItem(dispatch, tx, ty);
   }
-  if(tile != 'empty'){
+  if(tile === LIGHT || tile === BUTTON){
+    yield setNameMenuItem(dispatch, tx, ty);
+  }
+  if(tile !== EMPTY){
     yield removeMenuItem(dispatch, tx, ty);
   }
 }

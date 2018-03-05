@@ -2,7 +2,11 @@ import {
   Item,
   Area,
   Component,
-  COMPONENT
+  COMPONENT,
+  BUTTON,
+  Button,
+  Light,
+  LIGHT
 } from 'ekkiog-editing';
 
 import { Quad, CharacterSprite, Sprite } from './types';
@@ -16,12 +20,15 @@ export default function textFromItem(item : Item, area : Area) : Quad[] {
   switch(item.type){
     case COMPONENT:
       return [...textFromComponent(item, area)];
+    case LIGHT:
+    case BUTTON:
+      return [...textFromButtonLight(item, area)];
     default:
       return [];
   }
 }
 
-export function* textFromComponent(component : Component, area : Area) : IterableIterator<Quad>{
+export function* textFromComponent(component : Component, area : Area) : IterableIterator<Quad> {
   if(component.name){
     const characters = [...spritesFlat(component.name)];
     yield* textPos(area.left+1, area.top+1, area.width-2, area.height-2, characters);
@@ -39,6 +46,13 @@ export function* textFromComponent(component : Component, area : Area) : Iterabl
     }
   }else{
     return;
+  }
+}
+
+export function* textFromButtonLight(item : Button | Light, area : Area) : IterableIterator<Quad> {
+  if(item.name){
+    const characters = [...spritesThick(item.name)];
+    yield* textPos(area.left+0.75, area.top+0.75, 1.5, 1.5, characters);
   }
 }
 
