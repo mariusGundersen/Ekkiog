@@ -13,7 +13,8 @@ import {
   moveItemAt,
   saveAfter,
   resetEditorMenu,
-  setItemName
+  setItemName,
+  showSetNamePopup
 } from '../../actions';
 import { State } from '../../reduce';
 
@@ -70,7 +71,7 @@ export function moveMenuItem(dispatch : Dispatch<State>, tx : number, ty : numbe
 }
 
 export function setNameMenuItem(dispatch : Dispatch<State>, tx : number, ty : number){
-  return menuItem('name', <IconEdit />, () => dispatch(hideContextMenuAfter(setItemName(tx, ty, 'PUSH ME'))));
+  return menuItem('name', <IconEdit />, () => dispatch(hideContextMenuAfter(showSetNamePopup(tx, ty))));
 }
 
 export function toolMenuItem(tool : Tool, icon : JSX.Element, selectedTool : Tool, dispatch : Dispatch<State>){

@@ -11,8 +11,9 @@ import { SelectionActions } from './selection';
 import { SimulationActions } from './simulation';
 import { ViewActions } from './view';
 import { PopupActions } from './popup';
-import { GitPopupActions } from '../features/gitPopup/actions'
-import { SyncActions } from '../features/sync/actions'
+import { GitPopupActions } from '../features/gitPopup/actions';
+import { SyncActions } from '../features/sync/actions';
+import { NameActions } from '../features/name/actions';
 
 export * from './context';
 export * from './contextMenu';
@@ -26,6 +27,7 @@ export * from './selection';
 export * from './simulation';
 export * from '../features/gitPopup/actions'
 export * from '../features/sync/actions';
+export * from '../features/name/actions';
 
 export type Action =
   ContextActions |
@@ -38,7 +40,8 @@ export type Action =
   SelectionActions |
   SimulationActions |
   GitPopupActions |
-  SyncActions;
+  SyncActions |
+  NameActions;
 
 export const hideContextMenuAfter = (action : ThunkAction<any, State, any> | Action) => (dispatch : Dispatch<State>) => {
   dispatch(resetEditorMenu());

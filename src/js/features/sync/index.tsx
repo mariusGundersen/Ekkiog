@@ -23,8 +23,8 @@ import classes from '../../components/classes';
 
 type Props = SyncState & {dispatch: Dispatch<State>};
 
-export default connect((state : State) => state.sync)((props : Props) => {
-  return <div className={classes(theme.popup, theme.itemList)}>
+export default connect((state : State) => state.sync)((props : Props) => (
+  <div className={classes(theme.popup, theme.itemList)}>
     {props.isUpToDate ?
       <>
         <div className={theme.item}>
@@ -50,8 +50,8 @@ export default connect((state : State) => state.sync)((props : Props) => {
         </div>
       </>
     }
-  </div>;
-});
+  </div>
+));
 
 interface DropdownProps {
   readonly title : string

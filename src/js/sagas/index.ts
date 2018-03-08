@@ -10,6 +10,7 @@ import { Action } from '../actions';
 import save from './save';
 import createForest from './createForest';
 import sync from '../features/sync/saga';
+import setName from '../features/name/saga';
 
 export default function* rootSaga() {
   yield all([
@@ -21,7 +22,8 @@ export default function* rootSaga() {
     watchLatest('save-forest', save),
     watchLatest('zoom-into', zoomInto),
     watchLatest('zoom-out-of', zoomOutOf),
-    watchLatest('start-sync', sync)
+    watchLatest('start-sync', sync),
+    watchLatest('ShowSetNamePopup', setName)
   ]);
 }
 

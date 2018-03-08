@@ -63,6 +63,17 @@
         border-bottom: 5px solid #757d87
       }
     }
+
+    & input[type=text] {
+      font-size: 16px;
+      font-family: Courier Bold, Courier, monospace;
+      outline: none;
+      color: white;
+      background: #353d46;
+      border: none;
+      flex: 1 0 auto;
+      padding: 0.5em;
+    }
   }
 
   & .sub-item {

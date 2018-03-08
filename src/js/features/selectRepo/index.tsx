@@ -89,7 +89,7 @@ export default reax({
     progress
   };
 },
-({events, props, values}) => <div className={style.popup}>
+({events, props, values}) => <div className={theme.popup}>
   <div className={style.photoContainer}>
     <h2>Pick Repository</h2>
     <img className={style.photo} src={props.user.photo} />

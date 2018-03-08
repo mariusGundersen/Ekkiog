@@ -11,6 +11,7 @@ import simulation, { SimulationState } from './simulation';
 import view, { ViewState } from './view';
 import gitPopup, { GitPopupState } from '../features/gitPopup/reduce';
 import sync, { SyncState } from '../features/sync/reduce';
+import setName, { SetNameState } from '../features/name/reduce';
 import user from './user';
 
 export interface State {
@@ -25,6 +26,7 @@ export interface State {
   readonly view : ViewState,
   readonly gitPopup : GitPopupState,
   readonly sync : SyncState
+  readonly setName : SetNameState
   readonly user : OauthData | null
 }
 
@@ -40,6 +42,7 @@ export default abortTapMiddleware(combineReducers<State>({
   view,
   gitPopup,
   sync,
+  setName,
   user
 }));
 
