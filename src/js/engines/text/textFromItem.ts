@@ -82,7 +82,7 @@ export function* centerText(cx : number, cy : number, scale : number, length : n
 }
 
 export function calculateScale(w : number, h : number, characters : CharacterSprite[]){
-  const length = characters.reduce((sum, l) => sum+(l.w+l.s), 0)/TILE;
+  const length = characters.reduce((sum, l) => sum+(l.w+l.s), -characters[0].s)/TILE;
   const scaleX = w/length;
   return {
     scale: Math.min(scaleX, h*2),

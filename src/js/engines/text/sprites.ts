@@ -41,7 +41,7 @@ const fontThick = new Map(createCharacteMap(0, 240, 8, -1, [
   ['Z', 6],
   ['0', 7],
   ['1', 5],
-  ['2', 7],
+  ['2', 6],
   ['3', 7],
   ['4', 7],
   ['5', 6],
@@ -49,7 +49,7 @@ const fontThick = new Map(createCharacteMap(0, 240, 8, -1, [
   ['7', 7],
   ['8', 7],
   ['9', 7],
-  ['-', 3]
+  ['-', 4]
 ]));
 
 const fontFlat = new Map(createCharacteMap(0, 248, 8, 1, [
