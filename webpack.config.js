@@ -45,7 +45,7 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: '[name].js',
-    chunkFilename: '[name].bundle.js',
+    chunkFilename: '[name].[hash].bundle.js',
   },
   devServer: {
     host: '0.0.0.0',

@@ -43,13 +43,13 @@ class Async<P> extends React.Component<{
   componentDidMount () {
     this.props.load()
       .then(component => {
-        this.setState(() => ({
+        this.setState({
           component: component.default
-        }))
+        })
       })
   }
   render() {
     const Component = this.state.component;
-    return Component == null ? null : new Component(this.props.props)
+    return Component == null ? null : <Component {...this.props.props} />
   }
 }
