@@ -1,10 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
-const DashboardPlugin = require('webpack-dashboard/plugin');
 const OfflinePlugin = require('offline-plugin');
 const autoprefixer = require('autoprefixer');
 const nesting = require('postcss-nesting');
 const BabelMinifyPlugin = require("babel-minify-webpack-plugin");
+const Visualizer = require('webpack-visualizer-plugin');
+const rxPaths = require('rxjs/_esm5/path-mapping');
 
 const debug = process.env.NODE_ENV !== 'production';
 
@@ -52,36 +53,38 @@ module.exports = {
     disableHostCheck: true,
     hot: true
   },
+  mode: debug ? 'development' : 'production',
   plugins: [
     new webpack.DefinePlugin({
       '__DEV__': debug,
       'process.env.NODE_ENV': debug ? '"development"' : '"production"',
       '__BuildDate__': JSON.stringify(new Date().toISOString())
     }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: false,
-      debug: debug
-    }),
+    new Visualizer(),
     ...(debug ? [
-      new webpack.NamedModulesPlugin(),
-      new webpack.NoEmitOnErrorsPlugin(),
-      new DashboardPlugin()
     ] : [
       new OfflinePlugin({
         caches: 'all',
         ServiceWorker: {
           events: true
-        }
+        },
+        minify: false
       }),
       new BabelMinifyPlugin()
     ])
   ],
+  optimization: {
+    namedModules: debug,
+    noEmitOnErrors: debug,
+    minimize: false
+  },
   resolve: {
     modules: [
       'src',
       'node_modules'
     ],
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    alias: rxPaths()
   },
   devtool: debug && 'eval-source-map',
   module: {
@@ -154,9 +157,10 @@ module.exports = {
       {
         test: /manifest\.json$/,
         loader: 'w3c-manifest-loader',
+        type: "javascript/auto",
         options: {
           name: '[name].[hash].[ext]',
-          icon: 'icons/[name].[hash].[ext]',
+          icon: '/icons/[name].[hash].[ext]',
           legacyAppleSupport: true
         }
       }
