@@ -8,21 +8,48 @@ import { History } from 'history';
 
 import { State } from './reduce';
 
-import App from './pages/App';
-import Login from './pages/Login';
-import Sandbox from './pages/Sandbox';
+const Sandbox = async(() => import(/* webpackChunkName: "sandbox" */ './pages/Sandbox'), {});
+const Login = async(() => import(/* webpackChunkName: "login" */ './pages/Login'), {user: window.__PRELOADED_STATE__ as OauthData});
+const App = async(() => import(/* webpackChunkName: "app" */ './pages/App'), {});
 
 export default function main(store : Store<State>, history : History){
   render(
     <Provider store={store}>
       <ConnectedRouter history={history}>
         <Switch>
-          <Route path="/github/callback" render={() => <Login user={window.__PRELOADED_STATE__ as OauthData} />} />
-          <Route path="/sandbox" component={Sandbox} />
-          <Route path="/" component={App} />
+          <Route path="/github/callback" render={Login} />
+          <Route path="/sandbox" render={Sandbox} />
+          <Route path="/" render={App} />
         </Switch>
       </ConnectedRouter>
     </Provider>,
     document.querySelector('.react-app')
   );
+}
+
+function async<T extends React.ComponentClass<P>, P>(load : () => Promise<{default: T}>, props : P){
+  return () => <Async load={load} props={props} />;
+}
+
+class Async<P> extends React.Component<{
+  load() : Promise<{default: React.ComponentClass<P>}>,
+  props : P
+}, {
+  component : null | React.ComponentClass<P>
+}> {
+  state = {
+    component: null as (null | React.ComponentClass<P>)
+  }
+  componentDidMount () {
+    this.props.load()
+      .then(component => {
+        this.setState(() => ({
+          component: component.default
+        }))
+      })
+  }
+  render() {
+    const Component = this.state.component;
+    return Component == null ? null : new Component(this.props.props)
+  }
 }

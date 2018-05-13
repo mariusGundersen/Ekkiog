@@ -18,13 +18,11 @@ const babelLoader = {
         spec: true,
         modules: false,
         targets : {
-          ios: 10,
-          chrome: 58,
-          firefox: 53
+          "ios": 11,
+          "chrome": 65,
+          "firefox": 59
         }
       }],
-      "es2016",
-      "es2017",
       "react"
     ],
     plugins: [
@@ -33,7 +31,8 @@ const babelLoader = {
         regenerator: false
       }],
       "transform-class-properties",
-      "transform-object-rest-spread"
+      "transform-object-rest-spread",
+      "syntax-dynamic-import"
     ]
   }
 };
@@ -45,7 +44,8 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
-    filename: '[name].js'
+    filename: '[name].js',
+    chunkFilename: '[name].bundle.js',
   },
   devServer: {
     host: '0.0.0.0',

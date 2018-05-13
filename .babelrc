@@ -4,13 +4,11 @@
       "spec": true,
       "modules": "commonjs",
       "targets" : {
-        "ios": 10,
-        "chrome": 58,
-        "firefox": 53
+        "ios": 11,
+        "chrome": 65,
+        "firefox": 59
       }
     }],
-    "es2016",
-    "es2017",
     "react"
   ],
   "plugins": [
@@ -19,6 +17,7 @@
       "regenerator": false
     }],
     "transform-class-properties",
-    "transform-object-rest-spread"
+    "transform-object-rest-spread",
+    "syntax-dynamic-import"
   ]
 }
