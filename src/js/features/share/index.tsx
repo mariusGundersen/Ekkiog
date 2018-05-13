@@ -8,9 +8,8 @@ import { hidePopup } from '../../actions';
 import classes from '../../components/classes';
 import theme from '../../components/theme.scss';
 import style from './style.scss';
-import { fromPromise } from 'rxjs/observable/fromPromise';
-import { map } from 'rxjs/operators';
-import { share } from 'rxjs/operators/share';
+import { from as fromPromise } from 'rxjs';
+import { map, share } from 'rxjs/operators';
 
 export interface Props {
   readonly name : string

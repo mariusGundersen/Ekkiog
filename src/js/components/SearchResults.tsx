@@ -1,9 +1,6 @@
 import * as React from 'react';
 import reax from 'reaxjs';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
-import { concat } from 'rxjs/observable/concat';
-import { fromPromise } from 'rxjs/observable/fromPromise';
+import { Observable, of, concat, from as fromPromise } from 'rxjs';
 import {
   debounceTime,
   distinct,

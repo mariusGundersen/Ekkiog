@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import reax from 'reaxjs';
 
-import { fromEvent } from 'rxjs/observable/fromEvent';
+import { fromEvent } from 'rxjs';
 
 import { State } from '../reduce';
 
@@ -110,7 +110,7 @@ export default connect((s : State) => s)(
 
 function onResize(){
   return fromEvent(window, 'resize').pipe(
-    startWith({}),
+    startWith({} as Event),
     map(e => ({
       svgWidth: window.document.body.clientWidth,
       svgHeight: window.document.body.clientHeight,

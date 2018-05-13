@@ -1,6 +1,6 @@
 import * as React from 'react';
 import reax from 'reaxjs';
-import { fromPromise } from 'rxjs/observable/fromPromise';
+import { from as fromPromise } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 import { getOwnedComponents } from '../../storage';

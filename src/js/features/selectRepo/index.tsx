@@ -1,6 +1,6 @@
 import * as React from 'react';
 import reax from 'reaxjs';
-import { fromPromise } from 'rxjs/observable/fromPromise';
+import { Observable, from as fromPromise, merge } from 'rxjs';
 import {
   map,
   startWith,
@@ -20,8 +20,6 @@ import * as storage from '../../storage';
 
 import theme from '../../components/theme.scss';
 import style from './selectRepo.scss';
-import { merge } from 'rxjs/observable/merge';
-import { Observable } from 'rxjs/Observable';
 import Terminal from '@es-git/terminal';
 
 const DEFAULT_REPO_NAME = 'ekkiog-workspace';

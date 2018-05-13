@@ -1,10 +1,7 @@
 import * as React from 'react';
 import reax from 'reaxjs';
 import { Dispatch } from 'redux';
-import { Observable } from 'rxjs/Observable';
-import { merge } from 'rxjs/observable/merge';
-import { of } from 'rxjs/observable/of';
-import { fromPromise } from 'rxjs/observable/fromPromise';
+import { Observable, merge, of, from as fromPromise } from 'rxjs';
 import {
   map,
   scan,

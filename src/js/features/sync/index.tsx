@@ -16,8 +16,7 @@ import UnCheckIcon from 'react-icons/fa/toggle-off';
 
 import theme from '../../components/theme.scss';
 import reax from 'reaxjs';
-import { scan, switchMap, map } from 'rxjs/operators';
-import { withLatestFrom } from 'rxjs/operators/withLatestFrom';
+import { scan, switchMap, map, withLatestFrom } from 'rxjs/operators';
 import { syncGo, hidePopup } from '../../actions/index';
 import classes from '../../components/classes';
 

@@ -5,7 +5,6 @@ const autoprefixer = require('autoprefixer');
 const nesting = require('postcss-nesting');
 const BabelMinifyPlugin = require("babel-minify-webpack-plugin");
 const Visualizer = require('webpack-visualizer-plugin');
-const rxPaths = require('rxjs/_esm5/path-mapping');
 
 const debug = process.env.NODE_ENV !== 'production';
 
@@ -83,8 +82,7 @@ module.exports = {
       'src',
       'node_modules'
     ],
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    alias: rxPaths()
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   devtool: debug && 'eval-source-map',
   module: {

@@ -1,5 +1,5 @@
 import idb, {DB, Transaction, ObjectStore, Cursor} from 'idb';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import {
   packageComponent,

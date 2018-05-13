@@ -6,9 +6,8 @@ import GitProgressPopup from '../features/gitPopup';
 import * as storage from '../storage';
 import reax from 'reaxjs';
 import { map, startWith, switchMap, share, throttleTime } from 'rxjs/operators';
-import { fromEvent } from 'rxjs/observable/fromEvent';
+import { fromEvent } from 'rxjs';
 import Terminal from '@es-git/terminal';
-import { Observable } from 'rxjs/Observable';
 import { GitPopupState } from '../features/gitPopup/reduce';
 
 export interface Props {
