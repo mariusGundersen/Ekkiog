@@ -56,7 +56,7 @@ function* pull(repo : string, name : string, hash? : string){
     yield put(gitProgressStatus('busy'));
     yield put(gitProgressMessage(terminal.logLine(`Loading ${name}\nfrom ${repo}`)));
     yield put(showPopup('GitProgress'));
-    yield* fetchWithProgress(repo, name, terminal);
+    yield* fetchWithProgress(repo, name, hash, terminal);
     yield put(gitProgressStatus('success'));
     yield put(hidePopup());
     return yield storage.load(repo, name, hash);
@@ -68,10 +68,10 @@ function* pull(repo : string, name : string, hash? : string){
   }
 }
 
-function* fetchWithProgress(repo : string, name : string, terminal : Terminal){
-  const result : {name : string}[] = yield* withProgress(terminal, emit => storage.fetchComponent(repo, name, emit));
+function* fetchWithProgress(repo : string, name : string, hash : string | undefined, terminal : Terminal){
+  const result : boolean = yield* withProgress(terminal, emit => storage.fetchComponent(repo, name, hash, emit));
 
-  if(result.some(r => r.name === name)){
+  if(result){
     return;
   }else{
     throw new Error(`Could not find ${name}\nin ${repo}`);

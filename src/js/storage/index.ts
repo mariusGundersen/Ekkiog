@@ -238,21 +238,32 @@ export async function push(user : OauthData, components : string[], progress : (
   }));
 }
 
-export async function fetchComponent(url : string, component : string, progress : (status: string) => void) {
+export async function fetchComponent(url : string, component : string, hash : string | undefined, progress : (status: string) => void) {
   const repo = await _repo;
-  const response = await repo.fetch(
-    `/git/${url}.git`,
-    `refs/heads/${component}:refs/remotes/${url}/${component}`,
-    {
-      depth: 1,
-      progress
-    });
-  console.log('success', response);
-  return response.map(({name, oldHash, hash}) => ({
-    name: name.substr(`refs/remotes/${url}/`.length),
-    oldHash,
-    hash
-  }));
+
+  const remoteRefs = await repo.lsRemote(`/git/${url}.git`);
+
+  if(remoteRefs.some(ref => ref.name === `refs/heads/${component}` && (!hash || ref.hash === hash))){
+    const response = await repo.fetch(
+      `/git/${url}.git`,
+      `refs/heads/${component}:refs/remotes/${url}/${component}`,
+      {
+        depth: 1,
+        progress
+      });
+    return response.length > 0;
+  }else if(hash){
+    const response = await repo.fetch(
+      `/git/${url}.git`,
+      hash,
+      {
+        depth: 1,
+        progress
+      });
+    return await repo.hasObject(hash);
+  }else{
+    return false;
+  }
 }
 
 export async function fetch(progress : (status: string) => void){

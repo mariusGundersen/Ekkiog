@@ -6,7 +6,7 @@ import {gitProgressMessage } from '../../actions';
 
 type StringOrResult = string | {name : string}[];
 
-export default function* withProgress(terminal : Terminal, start : (emit : (v : any) => void) => Promise<any>){
+export default function* withProgress<T>(terminal : Terminal, start : (emit : (v : string) => void) => Promise<T>){
   const channel = yield eventChannel(emit => {
     start(throttle(200, emit)).then(emit, emit);
     return () => {};

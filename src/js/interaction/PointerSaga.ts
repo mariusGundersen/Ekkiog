@@ -21,6 +21,7 @@ export default class PointerSaga {
   private changed : number;
   constructor(emitter : EventEmitter){
     this.canInteract = true;
+    this.changed = 0;
 
     maybeEmit(emitter, () => this.canInteract, POINTER_TAP, TAP);
     maybeEmit(emitter, () => this.canInteract || window.performance.now() - this.changed < 500, POINTER_DOUBLE_TAP, DOUBLE_TAP);

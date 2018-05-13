@@ -28,6 +28,7 @@ import forestHandler from '../editing/forestHandler';
 import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reduce/contextMenu';
 import buttonHandler from '../editing/buttonHandler';
+import createRef, { Ref } from './createRef';
 
 export interface Props{
   readonly tickInterval : number,
@@ -42,25 +43,25 @@ export interface Props{
 }
 
 export default class WebGLCanvas extends React.Component<Props, any> {
-  private canvas : HTMLCanvasElement | null;
-  private engine : Engine;
-  private perspective : Perspective;
-  private touchControls : TouchControls;
-  private shellConfig : Config
+  private canvas = createRef<HTMLCanvasElement>();
+  private engine! : Engine;
+  private perspective! : Perspective;
+  private touchControls! : TouchControls;
+  private shellConfig! : Config
   private ease? : IterableIterator<number[]>
 
   componentDidMount(){
-    if(!this.canvas) return
-    const gl = getContext(this.canvas);
+    if(!this.canvas.current) return
+    const gl = getContext(this.canvas.current);
     const emitter = new EventEmitter();
     this.perspective = new Perspective();
     this.touchControls = new TouchControls(emitter, this.perspective);
     this.engine = new Engine(gl, this.props.width, this.props.height);
 
     // The react event system is too slow, so using the native events
-    this.canvas.addEventListener('touchstart', emit(emitter, TOUCH_START), false)
-    this.canvas.addEventListener('touchmove', emit(emitter, TOUCH_MOVE), false);
-    this.canvas.addEventListener('touchend', emit(emitter, TOUCH_END), false);
+    this.canvas.current.addEventListener('touchstart', emit(emitter, TOUCH_START), false)
+    this.canvas.current.addEventListener('touchmove', emit(emitter, TOUCH_MOVE), false);
+    this.canvas.current.addEventListener('touchend', emit(emitter, TOUCH_END), false);
 
     fromEmitter(emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch, this.engine);
     forestHandler(undefined, this.props.currentContext.forest, this.engine);
@@ -168,7 +169,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     return (
       <canvas
         className={style.canvas}
-        ref={c => this.canvas = c}
+        ref={this.canvas}
         width={this.props.width}
         height={this.props.height} />
     );
