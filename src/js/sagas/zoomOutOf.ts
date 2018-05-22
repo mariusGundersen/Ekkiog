@@ -31,25 +31,25 @@ import { ContextState } from '../reduce/context';
 export default function* zomOutOf({} : ZoomOutOfAction){
   const { context: currentContext } : State = yield select();
 
-  const previousContext = currentContext.previous;
-  if(!previousContext) return;
+  const outerContext = currentContext.previous;
+  if(!outerContext) return;
 
-  const context : ContextState = yield* waitUntilSaved(currentContext);
+  const innerContext : ContextState = yield* waitUntilSaved(currentContext);
 
   yield put(popContext());
-  yield put(setUrl(previousContext.repo, previousContext.name));
-  if(context.isReadOnly || previousContext.isReadOnly) return;
+  yield put(setUrl(outerContext.repo, outerContext.name));
+  if(innerContext.isReadOnly || outerContext.isReadOnly) return;
 
-  const component = packageComponent(context.forest, context.repo, context.name, context.hash, context.hash);
-  const {forest, didntFit} = replaceComponents(previousContext.forest, component);
-  if(previousContext.forest !== forest){
+  const component = packageComponent(innerContext.forest, innerContext.repo, innerContext.name, innerContext.hash, innerContext.hash);
+  const {forest, didntFit} = replaceComponents(outerContext.forest, component);
+  if(outerContext.forest !== forest){
     yield put(setForest(forest));
   }
 
   for(const position of didntFit) {
     yield put(showOkCancelMenu(false));
     yield put(removeTileAt(position.x, position.y))
-    yield put(selectComponent(context, component, position));
+    yield put(selectComponent(innerContext, component, position));
 
     const {ok} = yield take('okCancel');
     if(ok) {
@@ -67,7 +67,10 @@ export default function* zomOutOf({} : ZoomOutOfAction){
     }
   };
 
-  yield put(saveForest(`Updated ${component.name}`));
+  const { context: newContext } : State = yield select();
+  if(outerContext.forest !== newContext.forest){
+    yield put(saveForest(`Updated ${component.name}`));
+  }
 }
 
 function* waitUntilSaved(context : ContextState){
