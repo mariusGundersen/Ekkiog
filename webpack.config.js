@@ -67,7 +67,10 @@ module.exports = {
         ServiceWorker: {
           events: true
         },
-        minify: false
+        minify: false,
+        externals: [
+          '/'
+        ]
       }),
       new BabelMinifyPlugin()
     ])
