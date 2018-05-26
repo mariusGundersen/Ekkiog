@@ -8,7 +8,7 @@ import {
   CompiledComponent
 } from 'ekkiog-editing';
 
-import Repo, { IRepo } from './repo';
+import Repo from './repo';
 
 import upgradeFrom10 from './upgrade/from10';
 import upgradeFrom11 from './upgrade/from11';
@@ -57,6 +57,13 @@ const _db = idb.open('ekkiog', 12, db => {
 
 const _repo = _db.then(db => new Repo({}, db));
 const user = getUser();
+
+export async function create(name : string, forest : Forest) : Promise<string> {
+  const repo = await _repo;
+  const hash = await repo.save(name, forest, `Created ${name}`, user);
+  await updateRecent('', name);
+  return hash;
+}
 
 export async function save(name : string, forest : Forest, message : string) : Promise<string> {
   const repo = await _repo;

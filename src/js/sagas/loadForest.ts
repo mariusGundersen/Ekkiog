@@ -27,7 +27,7 @@ export function* loadOrCreate(repo : string, name : string, hash? : string){
     }catch(e){
       console.log(e);
       const forest = createForest();
-      const hash = yield storage.save(name, forest, `Created ${name}`);
+      const hash = yield storage.create(name, forest);
       return {
         ...forest,
         hash

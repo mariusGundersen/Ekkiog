@@ -12,13 +12,6 @@ import fetchMixin, { IFetchRepo } from '@es-git/fetch-mixin';
 import saveForestMixin, { User } from './saveForest';
 import loadForestMixin, { ForestWithHash } from './loadForest';
 
-export interface IRepo {
-  save(name : string, forest : Forest, message : string, user : User | null) : Promise<string>
-  load(repo : string, name : string) : Promise<ForestWithHash>
-  load(hash : string) : Promise<ForestWithHash>
-  getHash(repo : string, name : string) : Promise<string | undefined>
-}
-
 const defaultUser = {
   name : 'anonymous',
   email : 'anon@example.com'
@@ -33,8 +26,7 @@ export default class Repo extends mix(IdbRepo)
   .with(saveForestMixin)
   .with(walkersMixin)
   .with<IPushRepo, Fetch>(pushMixin, fetch)
-  .with<IFetchRepo, Fetch>(fetchMixin, fetch)
-  implements IRepo {
+  .with<IFetchRepo, Fetch>(fetchMixin, fetch) {
     async save(name : string, forest : Forest, message : string, user : User | null){
       return await super.commit(`refs/heads/${name}`, user || defaultUser, forest, message, name);
     }
@@ -65,6 +57,18 @@ export default class Repo extends mix(IdbRepo)
       await Promise.all(refs.map(ref => super.setRef(ref.name, ref.hash)));
 
       return response;
+    }
+
+    async* getHistory(repo : string, name : string) {
+      let hash = await this.getHash(repo, name);
+
+      while(true){
+        if(!hash) return;
+        yield hash;
+        let commit = await super.loadCommit(hash).catch(e => undefined);
+        if(!commit) return;
+        hash = commit.parents[0];
+      }
     }
 };
 
