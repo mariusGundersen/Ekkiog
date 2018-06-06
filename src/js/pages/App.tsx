@@ -19,24 +19,23 @@ import {
   startWith,
   map
 } from 'rxjs/operators';
-import { Route, matchPath } from 'react-router';
+import { matchPath } from 'react-router';
 
-import { hidePopup, loadForest, startSync } from '../actions';
+import { hidePopup, loadForest, startSync, Action } from '../actions';
 import getRepoFromUrl from '../utils/getRepoFromUrl';
-import { PopupState } from '../reduce/popup';
 
-type Props = State & {dispatch: Dispatch<State>};
+type Props = State & {dispatch: Dispatch<Action>};
 
 export default connect((s : State) => s)(
   reax({
-    sync: (e : any) => true,
-    hidePopup: (e : any) => null
+    sync: () => true,
+    hidePopup: () => null
   },
-  (events, props, initialProps : Props) => {
+  (events, _, initialProps : Props) => {
     initialProps.dispatch(getFromUrl());
 
-    events.hidePopup.subscribe(e => initialProps.dispatch(hidePopup()));
-    events.sync.subscribe(e => initialProps.dispatch(startSync()));
+    events.hidePopup.subscribe(() => initialProps.dispatch(hidePopup()));
+    events.sync.subscribe(() => initialProps.dispatch(startSync()));
 
     return {
       size: onResize()
@@ -111,11 +110,11 @@ export default connect((s : State) => s)(
 function onResize(){
   return fromEvent(window, 'resize').pipe(
     startWith({} as Event),
-    map(e => ({
+    map(() => ({
       svgWidth: window.document.body.clientWidth,
       svgHeight: window.document.body.clientHeight,
-      pixelWidth: window.document.body.clientWidth*window.devicePixelRatio,
-      pixelHeight: window.document.body.clientHeight*window.devicePixelRatio
+      pixelWidth: window.document.body.clientWidth * window.devicePixelRatio,
+      pixelHeight: window.document.body.clientHeight * window.devicePixelRatio
     })));
 }
 function getFromUrl(){

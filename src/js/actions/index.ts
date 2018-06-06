@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux';
-import { ThunkAction } from 'redux-thunk';
+import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 
 import { State } from '../reduce';
 import { ContextActions, saveForest } from './context';
@@ -40,19 +40,21 @@ export type Action =
   GitPopupActions |
   SyncActions;
 
-export const hideContextMenuAfter = (action : ThunkAction<any, State, any> | Action) => (dispatch : Dispatch<State>) => {
+export type ThunkAction = ThunkAction<void, State, any, Action>;
+
+export const hideContextMenuAfter = (action : ThunkAction<void, State, any, Action> | Action) => (dispatch : ThunkDispatch<State, any, Action>) => {
   dispatch(resetEditorMenu());
   dispatch(action as any);
   dispatch(hideContextMenu());
 };
 
 
-export const saveAfter = (action : Action, mesage : string) => async (dispatch : Dispatch<State>, getState : () => State) => {
+export const saveAfter = (action : Action, mesage : string) => async (dispatch : Dispatch<Action>, getState : () => State) => {
   const context = getState().context;
 
   const oldForest = context.forest;
   dispatch(action);
-  const newForest = (getState().context as any).forest;
+  const newForest = getState().context.forest;
   if(oldForest !== newForest){
     await dispatch(saveForest(mesage));
   }

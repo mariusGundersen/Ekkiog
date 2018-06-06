@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { State } from '../../reduce/index';
-import { startSync, toggleUpload, toggleDownload } from './actions';
+import { toggleUpload, toggleDownload } from './actions';
 import { SyncState, SyncItem } from './reduce';
 import { Dispatch } from 'redux';
 
-import SyncIcon from 'react-icons/fa/refresh';
-import BusyIcon from 'react-icons/fa/spinner';
 import OkIcon from 'react-icons/fa/check';
 import PullIcon from 'react-icons/fa/cloud-download';
 import PushIcon from 'react-icons/fa/cloud-upload';
@@ -16,11 +14,11 @@ import UnCheckIcon from 'react-icons/fa/toggle-off';
 
 import theme from '../../components/theme.scss';
 import reax from 'reaxjs';
-import { scan, switchMap, map, withLatestFrom } from 'rxjs/operators';
-import { syncGo, hidePopup } from '../../actions/index';
+import { scan, map, withLatestFrom } from 'rxjs/operators';
+import { syncGo, hidePopup, Action } from '../../actions/index';
 import classes from '../../components/classes';
 
-type Props = SyncState & {dispatch: Dispatch<State>};
+type Props = SyncState & {dispatch: Dispatch<Action>};
 
 export default connect((state : State) => state.sync)((props : Props) => {
   return <div className={classes(theme.popup, theme.itemList)}>
@@ -60,13 +58,13 @@ interface DropdownProps {
 }
 
 const DropdownList = reax({
-  toggle: (e : any) => true,
-  toggleAll: (e : any) => true
+  toggle: () => true,
+  toggleAll: () => true
 },
 (events, props, initialProps : DropdownProps) => {
   events.toggleAll.pipe(
     withLatestFrom(props),
-    map(([e, p]) => p)
+    map(([, p]) => p)
   ).subscribe(p => p.onItemClick(...p.list.map(i => i.name)))
 
   return {

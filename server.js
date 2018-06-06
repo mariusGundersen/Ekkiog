@@ -17,7 +17,9 @@ const app = new Koa();
 app.keys = config.keys();
 
 if(process.env.NODE_ENV !== 'production'){
-  app.use(require('koa-webpack')());
+  require('koa-webpack')({
+    config: require('./webpack.config.js')
+  }).then(middleware => app.use(middleware));
 }
 
 app.use(favicon('./dist/favicon.ico'));

@@ -8,6 +8,7 @@ import { ifOnlyWeHadTopLevelAwaitAndNotSyncModules } from './loadImage';
 import main from './main';
 import reduce, { State } from './reduce';
 import sagas from './sagas';
+import { Action } from './actions';
 
 
 ifOnlyWeHadTopLevelAwaitAndNotSyncModules(tiles).then(() => {
@@ -15,7 +16,7 @@ ifOnlyWeHadTopLevelAwaitAndNotSyncModules(tiles).then(() => {
 
   const sagaMiddleware = createSagaMiddleware();
 
-  const store = createStore<State>(
+  const store = createStore<State, Action, any, any>(
     reduce,
     (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
       applyMiddleware(

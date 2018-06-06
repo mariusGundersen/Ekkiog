@@ -1,29 +1,11 @@
 import { EventEmitter } from 'events';
-import {
-  get as getTileAt,
-  getIterator,
-  AreaData
-} from 'ennea-tree';
 
 import {
   getTypeAt,
-  isEmpty,
-  Forest,
-  BUTTON,
-  GATE,
-  LIGHT,
-  COMPONENT,
-  Component,
-  clear,
-  packageComponent,
-  drawComponent,
-  CompiledComponent
+  isEmpty
 } from 'ekkiog-editing';
 
-import {
-  Dispatch,
-  Store
-} from 'react-redux';
+import { Dispatch } from 'react-redux';
 
 import {
   tapTile,
@@ -32,11 +14,9 @@ import {
   showContextMenu,
   setOkCancelMenuValid,
   moveSelection,
-  setForest,
-  pushContextLoading,
-  popContext,
   zoomInto,
-  zoomOutOf
+  zoomOutOf,
+  Action
 } from './actions';
 import { State } from './reduce';
 import {
@@ -48,7 +28,6 @@ import {
   MOVE_SELECTION
 } from './events';
 
-import * as storage from './storage';
 import Engine from './engines/Engine';
 
 type ViewportToTile = (x : number, y : number) => [number, number];
@@ -56,10 +35,9 @@ type ViewportToTile = (x : number, y : number) => [number, number];
 export default function fromEmitter(
   emitter : EventEmitter,
   viewportToTile : ViewportToTile,
-  dispatch : Dispatch<State>,
-  engine : Engine){
+  dispatch : Dispatch<Action>){
   dispatchOn(emitter, dispatch, {
-    [TAP]: handleTap(viewportToTile, engine),
+    [TAP]: handleTap(viewportToTile),
     [DOUBLE_TAP]: handleDoubleTap(viewportToTile),
     [SHOW_CONTEXT_MENU]: handleShowContextMenu(viewportToTile),
     [LOAD_CONTEXT_MENU]: handleLoadContextMenu(viewportToTile),
@@ -68,7 +46,7 @@ export default function fromEmitter(
   });
 }
 
-export function dispatchOn(emitter : EventEmitter, dispatch : Dispatch<State>, eventMap : {
+export function dispatchOn(emitter : EventEmitter, dispatch : Dispatch<Action>, eventMap : {
   [event : string] : (event : any) => any
 }){
   for(let event in eventMap){
@@ -77,9 +55,9 @@ export function dispatchOn(emitter : EventEmitter, dispatch : Dispatch<State>, e
   }
 }
 
-export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
+export function handleTap(viewportToTile : ViewportToTile){
   return ({x, y} : {x : number, y : number}) =>
-    (dispatch : Dispatch<State>, getState : () => State) => {
+    (dispatch : Dispatch<Action>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y).map(Math.floor);
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128) return;
       const {editor : {selectedTool, toolDirection}} = getState();
@@ -89,7 +67,7 @@ export function handleTap(viewportToTile : ViewportToTile, engine : Engine){
 
 export function handleDoubleTap(viewportToTile : ViewportToTile){
   return ({x, y} : {x : number, y : number}) =>
-    (dispatch : Dispatch<State>) => {
+    (dispatch : Dispatch<Action>) => {
       const [tx, ty] = viewportToTile(x, y);
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
         dispatch(zoomOutOf());
@@ -101,7 +79,7 @@ export function handleDoubleTap(viewportToTile : ViewportToTile){
 
 export function handleShowContextMenu(viewportToTile : ViewportToTile){
   return ({x, y} : {x : number, y : number}) =>
-    (dispatch : Dispatch<State>, getState : () => State) => {
+    (dispatch : Dispatch<Action>, getState : () => State) => {
       const [tx, ty] = viewportToTile(x, y);
       if(tx < 0 || ty < 0 || tx > 128 || ty > 128){
         dispatch(abortLoadContextMenu());
@@ -129,12 +107,12 @@ export function handleLoadContextMenu(viewportToTile : ViewportToTile){
   };
 }
 
-export function handleAbortContextMenu({x, y} : {x : number, y : number}){
+export function handleAbortContextMenu(){
   return abortLoadContextMenu();
 }
 
 export function handleMoveSelection({dx, dy} : {dx : number, dy : number}){
-  return (dispatch : Dispatch<State>, getState : () => State) => {
+  return (dispatch : Dispatch<Action>, getState : () => State) => {
     dispatch(moveSelection(dx, dy));
     const state = getState();
 

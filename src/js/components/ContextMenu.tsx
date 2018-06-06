@@ -2,17 +2,10 @@ import * as React from 'react';
 import { Dispatch } from 'redux';
 import { TileType } from 'ekkiog-editing';
 
-import { State } from '../reduce';
-import { ContextMenuState, ContextMenuShowState } from '../reduce/contextMenu';
+import { ContextMenuShowState } from '../reduce/contextMenu';
 import { ViewState } from '../reduce/view';
-import Loading from './radialMenu/Loading';
-import RadialMenu, { PieCenterProps, PieRingProps } from './radialMenu';
+import RadialMenu, { PieRingProps } from './radialMenu';
 
-import IconWire from './icons/IconWire';
-import IconUnderpass from './icons/IconUnderpass';
-import IconButton from './icons/IconButton';
-import IconGate from './icons/IconGate';
-import IconReturn from './icons/IconReturn';
 
 import {
   acceptMenuItem,
@@ -22,13 +15,14 @@ import {
   moveMenuItem,
   MenuItem
 } from './radialMenu/menuItems';
+import { Action } from '../actions';
 
 export type Props = {
   readonly contextMenu : ContextMenuShowState;
   readonly view : ViewState;
   readonly radius : number;
   readonly width : number;
-  readonly dispatch : Dispatch<State>
+  readonly dispatch : Dispatch<Action>
 }
 
 export default class ContextMenu extends React.Component<Props, any>{
@@ -86,7 +80,7 @@ function createRing(radius : number, width : number, items : MenuItem[]) : PieRi
   };
 }
 
-function *tileMenuItems(tile : TileType, tx : number, ty : number, dispatch : Dispatch<State>){
+function *tileMenuItems(tile : TileType, tx : number, ty : number, dispatch : Dispatch<Action>){
   if(tile == 'wire' || tile == 'empty'){
     yield toUnderpassMenuItem(dispatch, tx, ty);
   }

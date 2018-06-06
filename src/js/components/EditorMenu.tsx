@@ -11,7 +11,6 @@ import IconGate from './icons/IconGate';
 import IconLight from './icons/IconLight';
 import IconReturn from './icons/IconReturn';
 import IconAccept from './icons/IconAccept';
-import IconRemove from './icons/IconRemove';
 import IconCancel from './icons/IconCancel';
 
 import {
@@ -23,10 +22,9 @@ import {
   menuItem
 } from './radialMenu/menuItems';
 
-import { toggleEditorMenu, setToolDirection, okCancel } from '../actions';
-import { State } from '../reduce';
+import { toggleEditorMenu, setToolDirection, okCancel, Action } from '../actions';
 import { EditorState } from '../reduce/editor';
-import { EditorMenuState, OkCancelMenuState, ToolsMenuState, ContextMenuState } from '../reduce/editorMenu';
+import { EditorMenuState, OkCancelMenuState } from '../reduce/editorMenu';
 
 export interface Props {
   cx : number,
@@ -36,7 +34,7 @@ export interface Props {
   width : number,
   editor : EditorState,
   editorMenu : EditorMenuState,
-  dispatch : Dispatch<State>
+  dispatch : Dispatch<Action>
 }
 
 export default class EditorMenu extends React.Component<Props, any> {
@@ -72,7 +70,7 @@ export default class EditorMenu extends React.Component<Props, any> {
   };
 }
 
-function getMenuTree(radius : number, width : number, editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<State>){
+function getMenuTree(radius : number, width : number, editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<Action>){
   return createMenuTree(
     editor,
     editorMenu,
@@ -88,7 +86,7 @@ function getMenuTree(radius : number, width : number, editor : EditorState, edit
   }));
 }
 
-function createMenuTree(editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<State>){
+function createMenuTree(editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<Action>){
   switch(editorMenu.menuType){
     case 'tools':
       return [...createToolsMenuTree(editor, dispatch)];
@@ -99,7 +97,7 @@ function createMenuTree(editor : EditorState, editorMenu : EditorMenuState, disp
   }
 }
 
-function* createToolsMenuTree(editor : EditorState, dispatch : Dispatch<State>){
+function* createToolsMenuTree(editor : EditorState, dispatch : Dispatch<Action>){
   yield {
     menuItems: [
       menuItem('return', <IconReturn />, () => dispatch(toggleEditorMenu()))
@@ -137,7 +135,7 @@ function* createToolsMenuTree(editor : EditorState, dispatch : Dispatch<State>){
   }
 }
 
-function createOkCancelMenuTree(editorMenu : OkCancelMenuState, dispatch : Dispatch<State>){
+function createOkCancelMenuTree(editorMenu : OkCancelMenuState, dispatch : Dispatch<Action>){
   return [
     {
       menuItems: [
@@ -148,7 +146,7 @@ function createOkCancelMenuTree(editorMenu : OkCancelMenuState, dispatch : Dispa
   ];
 }
 
-function createCenter(radius : number, editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<State>){
+function createCenter(radius : number, editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<Action>){
   switch(editorMenu.menuType){
     case 'tools':
       return createToolsCenter(radius, editor.selectedTool, editor.toolDirection, editorMenu.open, dispatch);
@@ -157,7 +155,7 @@ function createCenter(radius : number, editor : EditorState, editorMenu : Editor
   }
 }
 
-function createToolsCenter(radius : number, selectedTool : Tool, direction : Direction, open : boolean, dispatch : Dispatch<State>){
+function createToolsCenter(radius : number, selectedTool : Tool, direction : Direction, open : boolean, dispatch : Dispatch<Action>){
   return {
     radius: radius,
     cx: open ? radius : -radius*1.5,

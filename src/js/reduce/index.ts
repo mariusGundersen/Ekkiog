@@ -12,6 +12,7 @@ import view, { ViewState } from './view';
 import gitPopup, { GitPopupState } from '../features/gitPopup/reduce';
 import sync, { SyncState } from '../features/sync/reduce';
 import user from './user';
+import { Action } from '../actions';
 
 export interface State {
   readonly context : ContextState,
@@ -43,10 +44,10 @@ export default abortTapMiddleware(combineReducers<State>({
   user
 }));
 
-function abortTapMiddleware(reduce : Reducer<State>) : Reducer<State>{
+function abortTapMiddleware(reduce : Reducer<State, Action>) : Reducer<State, Action>{
   let tempState : State | undefined = undefined;
   let tappedAt = 0;
-  return (state : State, action : any) => {
+  return (state : State | undefined, action : Action) => {
     if(action.type === 'tap-tile'){
       tempState = state;
       tappedAt = window.performance.now();
@@ -56,7 +57,7 @@ function abortTapMiddleware(reduce : Reducer<State>) : Reducer<State>{
         state = tempState
         tempState = undefined;
       }else if(now - tappedAt > 500){
-        tempState = undefined
+        tempState = undefined;
       }
     }
     return reduce(state, action);

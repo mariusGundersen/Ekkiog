@@ -3,7 +3,6 @@ import { Dispatch } from 'redux';
 
 import style from './main.css';
 
-import { State } from '../reduce';
 import { ContextMenuState } from '../reduce/contextMenu';
 import { EditorState } from '../reduce/editor';
 import { EditorMenuState } from '../reduce/editorMenu';
@@ -11,9 +10,10 @@ import { ViewState } from '../reduce/view';
 import EditorMenu from './EditorMenu';
 import ContextMenu from './ContextMenu';
 import ContextMenuLoading from './ContextMenuLoading';
+import { Action } from '../actions';
 
 export interface Props {
-  readonly dispatch : Dispatch<State>,
+  readonly dispatch : Dispatch<Action>,
   readonly width : number,
   readonly height : number,
   readonly contextMenu : ContextMenuState,

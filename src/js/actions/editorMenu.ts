@@ -36,12 +36,13 @@ export const setOkCancelMenuValid = (isValid : boolean) : SetOkCancelMenuValidAc
 export type ResetEditorMenuAction = {
   type  : 'resetEditorMenu'
 }
-export const resetEditorMenu = () => ({
+export const resetEditorMenu = () : ResetEditorMenuAction => ({
   type: 'resetEditorMenu'
 });
 
 export type EditorMenuActions =
   ToggleEditorMenuAction |
   ShowOkCancelMenuAction |
+  OkCancelAction |
   SetOkCancelMenuValidAction |
   ResetEditorMenuAction;

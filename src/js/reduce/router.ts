@@ -4,6 +4,6 @@ import { matchPath } from 'react-router';
 export interface RouterState extends ReactRouterState {
 }
 
-export default function router(state : RouterState, action : any) : RouterState {
+export default function router(state : RouterState | undefined, action : any) : RouterState {
   return routerReducer(state, action);
 }

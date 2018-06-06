@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { Dispatch } from 'redux';
-import { Forest, Box } from 'ekkiog-editing';
 import { EventEmitter } from 'events';
 
 import style from './main.css';
 
 import {
   resize,
-  panZoom
+  panZoom,
+  Action
 } from '../actions';
-import { State } from '../reduce';
 import { SelectionState } from '../reduce/selection';
 import { ContextState, ParentContextState } from '../reduce/context';
 import {
@@ -28,7 +27,7 @@ import forestHandler from '../editing/forestHandler';
 import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reduce/contextMenu';
 import buttonHandler from '../editing/buttonHandler';
-import createRef, { Ref } from './createRef';
+import createRef from './createRef';
 
 export interface Props{
   readonly tickInterval : number,
@@ -39,7 +38,7 @@ export interface Props{
   readonly contextMenu : ContextMenuState,
   readonly currentContext : ContextState,
   readonly previousContext? : ParentContextState
-  readonly dispatch : Dispatch<State>
+  readonly dispatch : Dispatch<Action>
 }
 
 export default class WebGLCanvas extends React.Component<Props, any> {
@@ -48,7 +47,6 @@ export default class WebGLCanvas extends React.Component<Props, any> {
   private perspective! : Perspective;
   private touchControls! : TouchControls;
   private shellConfig! : Config
-  private ease? : IterableIterator<number[]>
 
   componentDidMount(){
     if(!this.canvas.current) return
@@ -63,7 +61,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     this.canvas.current.addEventListener('touchmove', emit(emitter, TOUCH_MOVE), false);
     this.canvas.current.addEventListener('touchend', emit(emitter, TOUCH_END), false);
 
-    fromEmitter(emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch, this.engine);
+    fromEmitter(emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch);
     forestHandler(undefined, this.props.currentContext.forest, this.engine);
 
     this.shellConfig = startShell({
@@ -119,7 +117,6 @@ export default class WebGLCanvas extends React.Component<Props, any> {
   }
 
   componentWillReceiveProps(nextProps : Props){
-    const previousContext = this.props.previousContext;
     const currentContext = this.props.currentContext;
     const nextContext = nextProps.currentContext;
 
@@ -197,23 +194,8 @@ function emit(emiter : EventEmitter, type : TouchType){
   }
 }
 
-function boxToArray({top, left, right, bottom} : Box){
-  return [top, left, right, bottom];
-}
 
 function arrayToBox([top, left, right, bottom] : number[]){
   return {top, left, right, bottom};
 }
 
-function scaleBox({top, left, right, bottom} : Box, scale : number, x = (left+right)/2, y = ((top+bottom)/2)){
-  const halfWidth = (right - left)/2;
-  const halfHeight = (bottom - top)/2;
-  const scaleX = halfHeight <= halfWidth ? scale : halfWidth/halfHeight*scale;
-  const scaleY = halfHeight >= halfWidth ? scale : halfHeight/halfWidth*scale;
-  return {
-    top: y - halfHeight**scaleY,
-    left: x - halfWidth**scaleX,
-    right: x + halfWidth**scaleX,
-    bottom: y + halfHeight**scaleY
-  };
-}

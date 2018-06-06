@@ -1,7 +1,7 @@
 import * as React from 'react';
 import reax from 'reaxjs';
 import { Dispatch } from 'redux';
-import { Observable, merge, of, from as fromPromise } from 'rxjs';
+import { Observable, merge, of } from 'rxjs';
 import {
   map,
   scan,
@@ -31,15 +31,14 @@ import {
   createForest,
   showPopup,
   zoomOutOf,
-  startSync
+  startSync,
+  Action
 } from '../actions';
-import { State } from '../reduce';
-import * as storage from '../storage';
 import { RepoName } from './SearchResultView';
 import DelayEnterExit from './DelayEnterExit';
 
 export interface Props {
-  readonly dispatch : Dispatch<State>;
+  readonly dispatch : Dispatch<Action>;
   readonly currentComponentName : string;
   readonly currentComponentRepo : string;
   readonly tickInterval : number;
@@ -54,20 +53,20 @@ export interface Props {
 }
 
 export default reax({
-  toggleSearch: (event : React.SyntheticEvent<HTMLElement>) => true,
-  toggleSimulationMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
-  toggleMainMenu: (event : React.SyntheticEvent<HTMLButtonElement>) => true,
+  toggleSearch: () => true,
+  toggleSimulationMenu: () => true,
+  toggleMainMenu: () => true,
   query: (value : string) => value,
   insertPackage: (result : CompiledComponent) => result,
   openComponent: (result : RepoName) => result,
   createComponent: (result : string) => result,
-  onUndo: (x : any) => true,
-  onRedo: (x : any) => true,
+  onUndo: () => true,
+  onRedo: () => true,
   onSetTickInterval: (value : number) => value,
-  onStepForward: (e : any) => true,
-  goBack: (x : any) => true,
-  sync: (x : any) => true,
-  onShare: (e : any) => true
+  onStepForward: () => true,
+  goBack: () => true,
+  sync: () => true,
+  onShare: () => true
 }, ({
   toggleSearch,
   toggleSimulationMenu,
@@ -90,16 +89,16 @@ export default reax({
   onUndo.subscribe(() => initialProps.dispatch(undo()));
   onRedo.subscribe(() => initialProps.dispatch(redo()));
   onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
-  onStepForward.subscribe(x => initialProps.dispatch(stepForward()));
+  onStepForward.subscribe(() => initialProps.dispatch(stepForward()));
   goBack.subscribe(() => initialProps.dispatch(zoomOutOf()));
   sync.subscribe(() => initialProps.dispatch(startSync()));
-  onShare.pipe(withLatestFrom(props)).subscribe(([_, props]) => initialProps.dispatch(showPopup('Share')));
+  onShare.pipe(withLatestFrom(props)).subscribe(([_,]) => initialProps.dispatch(showPopup('Share')));
 
   const showSearch = merge(
     toggleSearch,
-    insertPackage.pipe(map(x => true)),
-    openComponent.pipe(map(x => true)),
-    createComponent.pipe(map(x => true))
+    insertPackage.pipe(map(() => true)),
+    openComponent.pipe(map(() => true)),
+    createComponent.pipe(map(() => true))
   );
 
   const state = merge(
@@ -183,8 +182,3 @@ function ifElse<T>(observable : Observable<T>, fallback : T){
   return (condition : boolean) => condition ? observable : of(fallback);
 }
 
-function isBusy(p : Promise<any>){
-  return merge(
-    of(true),
-    fromPromise(p.then(x => false, x => (console.error(x), false))));
-}
