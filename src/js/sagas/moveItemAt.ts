@@ -44,7 +44,7 @@ export default function* moveItemAt({tx, ty} : MoveItemAtAction){
   yield put(showOkCancelMenu(true));
   const {ok} = yield take('okCancel');
   if(ok) {
-    const {selection} : State = yield select();
+    const {selection, context} : State = yield select();
     if(selection.selection == false) return;
     const box = {
       left: selection.x + selection.dx,
@@ -52,7 +52,7 @@ export default function* moveItemAt({tx, ty} : MoveItemAtAction){
       width: item.width,
       height: item.height
     };
-    yield put(insertItem(setInputs(item.data, state.context.forest.enneaTree, box), box, state.context.forest.buddyTree));
+    yield put(insertItem(setInputs(item.data, context.forest.enneaTree, box), box, state.context.forest.buddyTree));
     yield put(saveForest(`Moved ${item.data.type}`));
     yield put(stopSelection());
     yield put(resetEditorMenu());
