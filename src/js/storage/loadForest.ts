@@ -62,7 +62,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
         body['2'] ? super.loadTree(body['2'].hash).then(t => this.loadList(t)) : [],
         body['3'] ? super.loadTree(body['3'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
         body['4'] ? super.loadTree(body['4'].hash).then(t => this.loadList(t)) : [],
-        body['5'] ? super.loadText(body['5'].hash).then(JSON.parse) : undefined,
+        body['5'] ? super.loadText(body['5'].hash).then(JSON.parse).then(upgradeAreaItem) : undefined,
         body['6'] ? super.loadTree(body['6'].hash).then(t => this.loadList(t)) : [],
         body['7'] ? super.loadTree(body['7'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
         body['8'] ? super.loadTree(body['8'].hash).then(t => this.loadList(t)) : [],

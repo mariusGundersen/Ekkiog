@@ -72,12 +72,14 @@ export class MutableContext implements IMutableContext {
   private mapChanged : boolean;
   private netChanged : boolean;
   private gateChanged : boolean;
+  private setGates : Set<number>;
   constructor(context : Context) {
     this.context = context;
     this.textChanged = false;
     this.mapChanged = false;
     this.netChanged = false;
     this.gateChanged = false;
+    this.setGates = new Set<number>();
   }
 
   get changed(){
@@ -99,6 +101,12 @@ export class MutableContext implements IMutableContext {
   setGate(v : number, a : number, b : number){
     this.context.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
     this.gateChanged = true;
+    this.setGates.add(v);
+  }
+
+  clearGate(v : number){
+    if(this.setGates.has(v)) return;
+    this.setGate(v, 0, 0);
   }
 
   toggleGate(v : number){
