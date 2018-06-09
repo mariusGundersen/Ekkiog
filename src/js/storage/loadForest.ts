@@ -1,8 +1,8 @@
-import { Item, TreeNode as EnneaNode, Forest, Box, BuddyNode, upgradeItem } from 'ekkiog-editing';
+import { Item, EnneaTree, Forest, BuddyTree, upgradeItem } from 'ekkiog-editing';
 import { BoxedData } from 'ennea-tree';
 
-import { Constructor, IRawRepo, Type, Mode, Hash } from '@es-git/core';
-import { IObjectRepo, Person, ModeHash, TreeBody, CommitBody, textToBlob } from '@es-git/object-mixin';
+import { Constructor, IRawRepo, Hash } from '@es-git/core';
+import { IObjectRepo, TreeBody } from '@es-git/object-mixin';
 import { ILoadAsRepo } from '@es-git/load-as-mixin';
 
 export interface ILoadForestRepo {
@@ -44,7 +44,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
       }
     }
 
-    async loadEnnea(body : TreeBody, size = 128) : Promise<EnneaNode> {
+    async loadEnnea(body : TreeBody, size = 128) : Promise<EnneaTree> {
       const [
         data,
         topLeft,
@@ -83,7 +83,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
       };
     }
 
-    async loadBuddy(body : TreeBody) : Promise<BuddyNode> {
+    async loadBuddy(body : TreeBody) : Promise<BuddyTree> {
       const [
         data,
         left,

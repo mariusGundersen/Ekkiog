@@ -86,7 +86,7 @@
     "base64-arraybuffer": "^0.1.5",
     "buddy-tree": "^2.3.1",
     "classnames": "^2.2.5",
-    "ekkiog-editing": "^5.2.0",
+    "ekkiog-editing": "^6.0.0",
     "ennea-tree": "^2.2.0",
     "event-saga": "^3.0.0",
     "gl-matrix": "^2.6.1",

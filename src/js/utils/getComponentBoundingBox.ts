@@ -1,7 +1,7 @@
-import { Forest, TreeNode, Box } from 'ekkiog-editing';
+import { EnneaTree, Box } from 'ekkiog-editing';
 import { getIterator } from 'ennea-tree';
 
-export default function getComponentBoundingBox(tree : TreeNode) : Box {
+export default function getComponentBoundingBox(tree : EnneaTree) : Box {
   const box = {
     top: tree.size,
     left: tree.size,

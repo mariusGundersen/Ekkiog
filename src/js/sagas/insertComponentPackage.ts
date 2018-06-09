@@ -54,7 +54,7 @@ export default function* insertComponentPackage({componentPackage} : InsertCompo
 const selectComponent = (context : ContextState, component : CompiledComponent, position : IHavePosition) => {
   const buddyTree = context.forest.buddyTree;
   const forest = drawComponent(createForest(buddyTree), position.x|0, position.y|0, component);
-  return selectItem(forest,
+  return selectItem(forest.enneaTree,
     {
       top : (position.y|0) - (component.height>>1),
       left: (position.x|0) - (component.width>>1),

@@ -1,8 +1,8 @@
-import { Item, TreeNode as EnneaNode, Forest, Box, BuddyNode } from 'ekkiog-editing';
+import { Item, EnneaTree, Forest, BuddyTree } from 'ekkiog-editing';
 import { BoxedData } from 'ennea-tree';
 
-import { Constructor, IRawRepo, Type, Mode, Hash } from '@es-git/core';
-import { IObjectRepo, Person, ModeHash, TreeBody, CommitBody, textToBlob } from '@es-git/object-mixin';
+import { Constructor, IRawRepo, Mode, Hash } from '@es-git/core';
+import { IObjectRepo, Person, ModeHash } from '@es-git/object-mixin';
 import { ISaveAsRepo } from '@es-git/save-as-mixin';
 
 
@@ -19,10 +19,10 @@ type EnneaLeaf = BoxedData<Item>;
 
 export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISaveAsRepo>>(repo : T) : Constructor<ISaveForestRepo> & T {
   return class SaveForestRepo extends repo implements ISaveForestRepo {
-    private readonly hashCache : WeakMap<BuddyNode | EnneaNode | EnneaLeaf[] | EnneaLeaf | Item, Hash>
+    private readonly hashCache : WeakMap<BuddyTree | EnneaTree | EnneaLeaf[] | EnneaLeaf | Item, Hash>
     constructor(...args : any[]){
       super(...args);
-      this.hashCache = new WeakMap<BuddyNode | EnneaNode | EnneaLeaf[] | EnneaLeaf | Item, Hash>();
+      this.hashCache = new WeakMap<BuddyTree | EnneaTree | EnneaLeaf[] | EnneaLeaf | Item, Hash>();
     }
 
     async commit(branch : string, person : User, forest : Forest, message : string, name : string){
@@ -67,7 +67,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
       return {hash, mode : Mode.tree};
     }
 
-    async saveEnnea(node : EnneaNode){
+    async saveEnnea(node : EnneaTree){
       const cached = this.hashCache.get(node);
       if(cached) return cached;
 
@@ -102,7 +102,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
       return hash;
     }
 
-    async saveBuddy(node : BuddyNode){
+    async saveBuddy(node : BuddyTree){
       const cached = this.hashCache.get(node);
       if(cached) return cached;
 
@@ -160,7 +160,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ISa
       return hash;
     }
 
-    async saveBuddyLeaf({address, size, usedSize, used, level} : BuddyNode){
+    async saveBuddyLeaf({address, size, usedSize, used, level} : BuddyTree){
       const body = JSON.stringify({address, size, usedSize, used, level});
       return await super.saveText(body);
     }

@@ -1,7 +1,7 @@
 import {
   Direction,
-  TreeNode,
-  createForest,
+  EnneaTree,
+  createEnneaTree,
   Item,
   LIGHT,
   GATE,
@@ -17,7 +17,7 @@ import {
 } from 'ekkiog-editing';
 import getNetAt from 'ekkiog-editing/es/query/getNetAt';
 import { getLightNeighbouringNet } from 'ekkiog-editing/es/query/getNeighbouringNets';
-import { get as getTileAt } from 'ennea-tree';
+import { get as getTileAt, set } from 'ennea-tree';
 import { put, select, take } from 'redux-saga/effects';
 
 import {
@@ -31,7 +31,6 @@ import {
   showOkCancelMenu,
   stopSelection,
 } from '../actions';
-import copyTo from '../editing/copyTo';
 import { State } from '../reduce';
 
 export default function* moveItemAt({tx, ty} : MoveItemAtAction){
@@ -39,7 +38,7 @@ export default function* moveItemAt({tx, ty} : MoveItemAtAction){
 
   const item = getTileAt(state.context.forest.enneaTree, ty, tx);
   yield put(removeTileAt(tx, ty));
-  yield put(selectItem(copyTo(createForest(), item.data, item), item));
+  yield put(selectItem(set(createEnneaTree(), item.data, item), item));
 
   yield put(showOkCancelMenu(true));
   const {ok} = yield take('okCancel');
@@ -63,7 +62,7 @@ export default function* moveItemAt({tx, ty} : MoveItemAtAction){
   }
 };
 
-function setInputs(item: Item, enneaTree: TreeNode, box : Area): Item {
+function setInputs(item: Item, enneaTree: EnneaTree, box : Area): Item {
   switch(item.type){
     case LIGHT:
       return {
@@ -89,14 +88,10 @@ function setInputs(item: Item, enneaTree: TreeNode, box : Area): Item {
       const gates = [...item.gates];
       for(const input of inputs){
         for(const point of input.pointsTo){
-          gates.splice(point.index, 1, {
-            ...gates[point.index],
-            ...(point.input === "A" ? {
-              inputA: input.net
-            } : {
-              inputB: input.net
-            })
-          });
+          gates.splice(point.index, 1, [
+            point.input === "A" ? input.net : gates[point.index][0],
+            point.input === "B" ? input.net : gates[point.index][1]
+          ]);
         }
       }
       return {
@@ -109,7 +104,7 @@ function setInputs(item: Item, enneaTree: TreeNode, box : Area): Item {
   }
 }
 
-function getNetAtPos(tree : TreeNode, sx : number, sy : number, x : number, y : number, dx : number, dy : number){
+function getNetAtPos(tree : EnneaTree, sx : number, sy : number, x : number, y : number, dx : number, dy : number){
   return getNetAt(tree, sx+x+dx, sy+y+dy, dx, dy);
 }
 

@@ -44,10 +44,9 @@ export default function* tapTile({x, y, tool, direction} : TapTileAction) {
 }
 
 function* insertMovableItem(context : ContextState, tool : Tool, direction : Direction, x : number, y : number){
-  const buddyTree = context.forest.buddyTree;
-  const forest = tap(createForest(buddyTree), tool, direction, x, y);
+  const forest = tap(createForest(context.forest.buddyTree), tool, direction, x, y);
   const item = getTileAt(forest.enneaTree, y, x);
-  yield put(selectItem(forest, item));
+  yield put(selectItem(forest.enneaTree, item));
   yield put(showOkCancelMenu(false));
   const {ok} = yield take('okCancel');
   if(ok) {

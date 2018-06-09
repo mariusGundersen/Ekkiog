@@ -1,16 +1,16 @@
 import {
-  Forest,
+  EnneaTree,
   Area
 } from 'ekkiog-editing';
 
 export type SelectItemAction = {
   readonly type : 'selectItem',
-  readonly forest : Forest,
+  readonly enneaTree : EnneaTree,
   readonly area : Area
 }
-export const selectItem = (forest : Forest, area : Area) : SelectItemAction => ({
+export const selectItem = (enneaTree : EnneaTree, area : Area) : SelectItemAction => ({
   type: 'selectItem',
-  forest,
+  enneaTree,
   area
 });
 

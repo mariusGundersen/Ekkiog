@@ -128,7 +128,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
 
     if(nextProps.selection.selection){
       if(!this.props.selection.selection
-      || nextProps.selection.forest !== this.props.selection.forest){
+      || nextProps.selection.enneaTree !== this.props.selection.enneaTree){
         this.touchControls.selectionSaga.startSelection(nextProps.selection);
       }
     }

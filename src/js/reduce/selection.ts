@@ -1,4 +1,4 @@
-import { Forest } from 'ekkiog-editing';
+import { EnneaTree } from 'ekkiog-editing';
 
 import {
   Action
@@ -6,7 +6,7 @@ import {
 
 export interface ItemSelectedState {
   readonly selection : true,
-  readonly forest : Forest,
+  readonly enneaTree : EnneaTree,
   readonly top : number,
   readonly left : number,
   readonly right : number,
@@ -31,7 +31,7 @@ export default function reduce(state = initialState, action : Action) : Selectio
   switch(action.type){
     case 'selectItem':
       return {
-        forest: action.forest,
+        enneaTree: action.enneaTree,
         top: (action.area.top|0),
         left: (action.area.left|0),
         right: (action.area.left|0) + (action.area.width|0),
