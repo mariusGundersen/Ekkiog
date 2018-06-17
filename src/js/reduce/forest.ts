@@ -2,15 +2,11 @@ import {
   Forest,
   Direction,
   Tool,
-  Item,
-
   WIRE,
   GATE,
   UNDERPASS,
   BUTTON,
   LIGHT,
-  COMPONENT,
-
   createForest,
 
   getTypeAt,
@@ -21,8 +17,6 @@ import {
   drawButton,
   drawComponent,
   drawLight,
-  insertItem,
-
   clear
 } from 'ekkiog-editing';
 

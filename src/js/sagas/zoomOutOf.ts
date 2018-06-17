@@ -6,30 +6,33 @@ import {
   createForest,
   drawComponent,
   Forest,
-  IHavePosition,
   packageComponent,
+  getTileAt,
 } from 'ekkiog-editing';
 import { AreaData, getIterator } from 'ennea-tree';
 import { put, select, take } from 'redux-saga/effects';
 
 import {
-  insertComponent,
   popContext,
   removeTileAt,
-  resetEditorMenu,
   saveForest,
-  selectItem,
   setForest,
-  showOkCancelMenu,
-  stopSelection,
   ZoomOutOfAction,
+  stopSelection,
+  resetEditorMenu,
 } from '../actions';
 import setUrl from '../actions/router';
 import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
+import selection from './selection';
 
 export default function* zomOutOf({} : ZoomOutOfAction){
-  const { context: currentContext } : State = yield select();
+  const { context: currentContext, selection: {selection: isSelection}} : State = yield select();
+
+  if(isSelection){
+    yield put(stopSelection());
+    yield put(resetEditorMenu());
+  }
 
   const outerContext = currentContext.previous;
   if(!outerContext) return;
@@ -40,36 +43,25 @@ export default function* zomOutOf({} : ZoomOutOfAction){
   yield put(setUrl(outerContext.repo, outerContext.name));
   if(innerContext.isReadOnly || outerContext.isReadOnly) return;
 
-  const component = packageComponent(innerContext.forest, innerContext.repo, innerContext.name, innerContext.hash, innerContext.hash);
-  const {forest, didntFit} = replaceComponents(outerContext.forest, component);
+  const pkg = packageComponent(innerContext.forest, innerContext.repo, innerContext.name, innerContext.hash, innerContext.hash);
+  const {forest, didntFit} = replaceComponents(outerContext.forest, pkg);
   if(outerContext.forest !== forest){
     yield put(setForest(forest));
   }
 
   for(const position of didntFit) {
-    yield put(showOkCancelMenu(false));
-    yield put(removeTileAt(position.x, position.y))
-    yield put(selectComponent(innerContext, component, position));
+    yield put(removeTileAt(position.x, position.y));
+    const {context: {forest: newForest}} : State = yield select();
 
-    const {ok} = yield take('okCancel');
-    if(ok) {
-      const {selection} : State = yield select();
-      if(selection.selection == false) return;
-      yield put(insertComponent(component, {
-        x: selection.x + selection.dx,
-        y: selection.y + selection.dy
-      }));
-      yield put(stopSelection());
-      yield put(resetEditorMenu());
-    } else {
-      yield put(stopSelection());
-      yield put(resetEditorMenu());
-    }
+    const forest = drawComponent(createForest(newForest.buddyTree), position.x, position.y, pkg);
+
+    const item = getTileAt(forest, position.x, position.y);
+    yield* selection(item);
   };
 
   const { context: newContext } : State = yield select();
   if(outerContext.forest !== newContext.forest){
-    yield put(saveForest(`Updated ${component.name}`));
+    yield put(saveForest(`Updated ${pkg.name}`));
   }
 }
 
@@ -98,20 +90,6 @@ function replaceComponents(forest : Forest, newComponent : Package){
   }
   return {forest, didntFit};
 }
-
-const selectComponent = (context : ContextState, component : Package, position : IHavePosition) => {
-  const buddyTree = context.forest.buddyTree;
-  const forest = drawComponent(createForest(buddyTree), position.x|0, position.y|0, component);
-  return selectItem(forest.enneaTree,
-    {
-      top : (position.y|0) - (component.height>>1),
-      left: (position.x|0) - (component.width>>1),
-      width: component.width|0,
-      height: component.height|0
-    }
-  );
-}
-
 
 function *getComponents(forest : Forest, name : string) : IterableIterator<AreaData<Component>>{
   const size = forest.enneaTree.size;

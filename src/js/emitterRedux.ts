@@ -112,18 +112,5 @@ export function handleAbortContextMenu(){
 }
 
 export function handleMoveSelection({dx, dy} : {dx : number, dy : number}){
-  return (dispatch : Dispatch<Action>, getState : () => State) => {
-    dispatch(moveSelection(dx, dy));
-    const state = getState();
-
-    const selection = state.selection;
-    if(!selection.selection) return;
-    const isValid = isEmpty(
-      state.context.forest.enneaTree,
-      selection.top + selection.dy,
-      selection.left + selection.dx,
-      selection.right + selection.dx,
-      selection.bottom + selection.dy);
-    dispatch(setOkCancelMenuValid(isValid));
-  };
+  return moveSelection(dx, dy);
 }
