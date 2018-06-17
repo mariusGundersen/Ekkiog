@@ -57,12 +57,12 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
         bottom,
         bottomRight
       ] = await Promise.all([
-        body['0'] ? super.loadText(body['0'].hash).then(JSON.parse).then(upgradeItem) : undefined,
+        body['0'] ? super.loadText(body['0'].hash).then(JSON.parse).then(upgradeUnitItem) : undefined,
         body['1'] ? super.loadTree(body['1'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
         body['2'] ? super.loadTree(body['2'].hash).then(t => this.loadList(t)) : [],
         body['3'] ? super.loadTree(body['3'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
         body['4'] ? super.loadTree(body['4'].hash).then(t => this.loadList(t)) : [],
-        body['5'] ? super.loadText(body['5'].hash).then(JSON.parse).then(upgradeAreaItem) : undefined,
+        body['5'] ? super.loadText(body['5'].hash).then(JSON.parse).then(upgradeBoxItem) : undefined,
         body['6'] ? super.loadTree(body['6'].hash).then(t => this.loadList(t)) : [],
         body['7'] ? super.loadTree(body['7'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
         body['8'] ? super.loadTree(body['8'].hash).then(t => this.loadList(t)) : [],
@@ -102,7 +102,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
 
     async loadList(items : TreeBody) : Promise<EnneaLeaf[]> {
       const result = [] as EnneaLeaf[];
-      for(const {index, item} of await Promise.all(Object.keys(items).map(async item => ({index: parseInt(item), item: upgradeAreaItem(JSON.parse(await super.loadText(items[item].hash)))})))){
+      for(const {index, item} of await Promise.all(Object.keys(items).map(async item => ({index: parseInt(item), item: upgradeBoxItem(JSON.parse(await super.loadText(items[item].hash)))})))){
         result[index] = item;
       }
       return result;
@@ -110,9 +110,13 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
   }
 }
 
-function upgradeAreaItem(area : EnneaLeaf){
+function upgradeUnitItem(item : Item){
+  return upgradeItem(item, {width: 1, height: 1});
+}
+
+function upgradeBoxItem(box : EnneaLeaf){
   return {
-    ...area,
-    data: upgradeItem(area.data)
+    ...box,
+    data: upgradeItem(box.data, {width: box.right-box.left, height: box.bottom - box.top})
   }
 }

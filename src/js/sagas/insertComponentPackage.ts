@@ -1,4 +1,4 @@
-import { CompiledComponent, createForest, drawComponent, IHavePosition, isEmpty } from 'ekkiog-editing';
+import { Package, createForest, drawComponent, IHavePosition, isEmpty } from 'ekkiog-editing';
 import { put, select, take } from 'redux-saga/effects';
 
 import {
@@ -51,7 +51,7 @@ export default function* insertComponentPackage({componentPackage} : InsertCompo
   }
 }
 
-const selectComponent = (context : ContextState, component : CompiledComponent, position : IHavePosition) => {
+const selectComponent = (context : ContextState, component : Package, position : IHavePosition) => {
   const buddyTree = context.forest.buddyTree;
   const forest = drawComponent(createForest(buddyTree), position.x|0, position.y|0, component);
   return selectItem(forest.enneaTree,

@@ -12,16 +12,16 @@ export default function* zoomInto({x, y} : ZoomIntoAction){
   const { context, view } : State = yield select();
 
   const areaData = getTileAt(context.forest.enneaTree, y|0, x|0);
-  if(!areaData || areaData.data.type !== 'component' || !areaData.data.name) return;
+  if(!areaData || areaData.data.type !== 'component' || !areaData.data.package.name) return;
 
-  const {repo, name} = locateRepo(areaData.data, context);
+  const {repo, name} = locateRepo(areaData.data.package, context);
   const centerX = areaData.left + areaData.width/2;
   const centerY = areaData.top + areaData.height/2;
   const posA = view.viewportToTile(0, 0);
   const posB = view.viewportToTile(view.pixelWidth, view.pixelHeight);
   yield put(pushContextLoading(repo, name, box(posA, posB), centerX, centerY));
   try{
-    const forest = yield* loadOrPull(repo, name, areaData.data.hash);
+    const forest = yield* loadOrPull(repo, name, areaData.data.package.hash);
     const hash = yield storage.getHash(repo, name);
     yield put(setUrl(repo, name));
     yield put(forestLoaded(forest, forest.hash, repo.length > 0 || hash != forest.hash || context.isReadOnly));

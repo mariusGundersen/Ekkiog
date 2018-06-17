@@ -88,6 +88,7 @@ export class MutableContext implements IMutableContext {
         || this.netChanged
         || this.gateChanged;
   }
+
   setMap(x : number, y : number, tile : number) {
     this.context.mapTexture.set(x, y, tile);
     this.mapChanged = true;
@@ -100,6 +101,24 @@ export class MutableContext implements IMutableContext {
 
   setGate(v : number, a : number, b : number){
     this.context.gatesTexture.set((v>>0)&0xff, (v>>8)&0xff, (a<<16) | (b<<0));
+    this.gateChanged = true;
+    this.setGates.add(v);
+  }
+
+  setGateA(v : number, a : number){
+    const x = (v >> 0) & 0xff;
+    const y = (v >> 8) & 0xff;
+    const e = this.context.gatesTexture.get(x, y);
+    this.context.gatesTexture.set(x, y, (a<<16) | (e&0xffff));
+    this.gateChanged = true;
+    this.setGates.add(v);
+  }
+
+  setGateB(v : number, b : number){
+    const x = (v >> 0) & 0xff;
+    const y = (v >> 8) & 0xff;
+    const e = this.context.gatesTexture.get(x, y);
+    this.context.gatesTexture.set(x, y, b | (e&0xffff0000));
     this.gateChanged = true;
     this.setGates.add(v);
   }

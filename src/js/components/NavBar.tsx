@@ -10,7 +10,7 @@ import {
   switchMap,
   withLatestFrom
 } from 'rxjs/operators';
-import { CompiledComponent } from 'ekkiog-editing';
+import { Package } from 'ekkiog-editing';
 
 import MainMenuButton from './MainMenuButton';
 import SearchResults from './SearchResults';
@@ -57,7 +57,7 @@ export default reax({
   toggleSimulationMenu: () => true,
   toggleMainMenu: () => true,
   query: (value : string) => value,
-  insertPackage: (result : CompiledComponent) => result,
+  insertPackage: (result : Package) => result,
   openComponent: (result : RepoName) => result,
   createComponent: (result : string) => result,
   onUndo: () => true,

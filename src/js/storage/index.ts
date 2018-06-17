@@ -1,18 +1,16 @@
-import idb, {DB, Transaction, ObjectStore, Cursor} from 'idb';
+import idb, {DB, Transaction, Cursor} from 'idb';
 import { Observable } from 'rxjs';
 
 import {
   packageComponent,
-  createForest,
   Forest,
-  CompiledComponent
+  Package
 } from 'ekkiog-editing';
 
 import Repo from './repo';
 
 import upgradeFrom10 from './upgrade/from10';
 import upgradeFrom11 from './upgrade/from11';
-import { all } from 'redux-saga/effects';
 import findCommonCommits, { HashAndCommit, CommitWithParents } from '@es-git/push-mixin/es/findCommonCommits';
 
 export interface ComponentMetadata {
@@ -97,7 +95,7 @@ async function updateRecent(repo : string, name : string){
   }
 }
 
-export async function loadPackage(repo : string, name : string) : Promise<CompiledComponent>{
+export async function loadPackage(repo : string, name : string) : Promise<Package>{
   const forest = await load(repo, name);
   return packageComponent(forest, repo, name, forest.hash, forest.hash);
 }
@@ -134,7 +132,7 @@ export async function toggleFavorite(repo : string, name : string) {
   const db = await _db;
   const tx = db.transaction('favorite', 'readwrite');
   const store = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
-  const favorite = await store.get([repo, name]).catch(e => undefined);
+  const favorite = await store.get([repo, name]).catch(() => undefined);
   if(favorite){
     const tx = db.transaction('favorite', 'readwrite');
     const store = tx.objectStore<FavoriteComponent, [string, string]>('favorite');
@@ -181,7 +179,7 @@ export async function getOwnedComponents() : Promise<string[]> {
 }
 
 function refToRepoAndName(ref : string){
-  const [_, type, ...repoAndName] = ref.split('/');
+  const [, type, ...repoAndName] = ref.split('/');
   if(type === 'heads'){
     return {
       repo: '',
@@ -260,13 +258,6 @@ export async function fetchComponent(url : string, component : string, hash : st
       });
     return response.length > 0;
   }else if(hash){
-    const response = await repo.fetch(
-      `/git/${url}.git`,
-      hash,
-      {
-        depth: 1,
-        progress
-      });
     return await repo.hasObject(hash);
   }else{
     return false;
@@ -345,10 +336,6 @@ interface RefStatus {
   remote? : string
 }
 
-interface NameAndType {
-  readonly name : string
-  readonly type : 'ok' | 'infront' | 'behind' | 'diverged'
-}
 
 function join(localRefs: RefStatus[], remoteRefs: RefStatus[]) {
   const refMap = new Map(localRefs.map(r => [r.name, r] as [string, RefStatus]));

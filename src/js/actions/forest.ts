@@ -2,7 +2,7 @@ import {
   Forest,
   Tool,
   Direction,
-  CompiledComponent,
+  Package,
   Item,
   BoxArea,
   BuddyTree
@@ -83,36 +83,23 @@ export const toWire = (tx : number, ty : number) : ToWireAction => ({
 
 export type InsertComponentAction = {
   readonly type : 'insert-component',
-  readonly component : CompiledComponent,
+  readonly component : Package,
   readonly position : {
     readonly x : number,
     readonly y : number
   }
 }
-export const insertComponent = (component : CompiledComponent, position : {x : number, y : number}) : InsertComponentAction => ({
+export const insertComponent = (component : Package, position : {x : number, y : number}) : InsertComponentAction => ({
   type: 'insert-component',
   component,
   position
 });
 
-export type InsertItemAction = {
-  readonly type : 'insert-item',
-  readonly item : Item,
-  readonly position : BoxArea,
-  readonly buddyTree : BuddyTree
-}
-export const insertItem = (item : Item, position : BoxArea, buddyTree : BuddyTree) : InsertItemAction => ({
-  type: 'insert-item',
-  item,
-  position,
-  buddyTree
-});
-
 export type InsertComponentPackageAction = {
   readonly type : 'insert-component-package'
-  readonly componentPackage : CompiledComponent
+  readonly componentPackage : Package
 }
-export const insertComponentPackage = (componentPackage : CompiledComponent) : InsertComponentPackageAction => ({
+export const insertComponentPackage = (componentPackage : Package) : InsertComponentPackageAction => ({
   type: 'insert-component-package',
   componentPackage
 });
@@ -146,7 +133,6 @@ export type ForestActions =
   ToUnderpassAction |
   ToWireAction |
   InsertComponentAction |
-  InsertItemAction |
   InsertComponentPackageAction |
   MoveItemAtAction |
   ToggleButtonAction;

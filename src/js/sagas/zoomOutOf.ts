@@ -1,6 +1,6 @@
 import {
   clear,
-  CompiledComponent,
+  Package,
   COMPONENT,
   Component,
   createForest,
@@ -82,10 +82,10 @@ function* waitUntilSaved(context : ContextState){
   }
 }
 
-function replaceComponents(forest : Forest, newComponent : CompiledComponent){
+function replaceComponents(forest : Forest, newComponent : Package){
   const didntFit = [] as {x : number, y : number}[];
   for(const item of getComponents(forest, newComponent.name)){
-    if(item.data.hash === newComponent.hash) continue;
+    if(item.data.package.hash === newComponent.hash) continue;
     const x = item.left + (item.width>>1);
     const y = item.top + (item.height>>1);
     const clearedForest = clear(forest, x, y);
@@ -99,7 +99,7 @@ function replaceComponents(forest : Forest, newComponent : CompiledComponent){
   return {forest, didntFit};
 }
 
-const selectComponent = (context : ContextState, component : CompiledComponent, position : IHavePosition) => {
+const selectComponent = (context : ContextState, component : Package, position : IHavePosition) => {
   const buddyTree = context.forest.buddyTree;
   const forest = drawComponent(createForest(buddyTree), position.x|0, position.y|0, component);
   return selectItem(forest.enneaTree,
@@ -117,7 +117,7 @@ function *getComponents(forest : Forest, name : string) : IterableIterator<AreaD
   const size = forest.enneaTree.size;
   for(const item of getIterator(forest.enneaTree, box([0,0], [size, size]))){
     if(item.data.type === COMPONENT
-    && item.data.name === name){
+    && item.data.package.name === name){
       yield {
         ...item,
         data: item.data

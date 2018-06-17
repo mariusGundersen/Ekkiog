@@ -46,8 +46,6 @@ export default function editing(forest=createForest(), action : Action) : Forest
       return underpassToWire(forest, action.x, action.y);
     case 'insert-component':
       return drawComponent(forest, action.position.x+(action.component.width>>1), action.position.y+(action.component.height>>1), action.component);
-    case 'insert-item':
-      return insertItem(forest, action.buddyTree, action.item, action.position);
     default:
       return forest;
   }

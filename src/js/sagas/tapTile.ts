@@ -4,7 +4,6 @@ import { put, select, take } from 'redux-saga/effects';
 
 import {
   draw,
-  insertItem,
   resetEditorMenu,
   saveForest,
   selectItem,

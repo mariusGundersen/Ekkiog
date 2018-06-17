@@ -1,21 +1,18 @@
 import * as React from 'react';
 import reax from 'reaxjs';
-import { Observable, of, concat, from as fromPromise } from 'rxjs';
+import { from as fromPromise } from 'rxjs';
 import {
   debounceTime,
-  distinct,
   distinctUntilChanged,
   map,
   merge,
-  scan,
   share,
   startWith,
   switchMap,
-  take,
   withLatestFrom,
   combineLatest
 } from 'rxjs/operators';
-import { CompiledComponent } from 'ekkiog-editing';
+import { Package } from 'ekkiog-editing';
 
 import SearchResultView,
 {
@@ -30,13 +27,13 @@ import SearchResultView,
 import style from './search.scss';
 
 import * as storage from '../storage';
-import { FavoriteComponent, getAllComponents, ComponentMetadata } from '../storage';
+import { getAllComponents, ComponentMetadata } from '../storage';
 
 export interface Props {
   readonly query : string,
   createComponent(name : string) : void;
   openComponent(component : RepoName) : void;
-  insertPackage(component : CompiledComponent) : void;
+  insertPackage(component : Package) : void;
   isReadOnly : boolean
 }
 
