@@ -8,35 +8,30 @@ import {
 } from '../events';
 
 import {
-  Pos,
   PointerDownEvent,
   PointerMoveEvent,
   PointerUpEvent,
   CancelPanZoomEvent
 } from './types';
 
-import Perspective, { MapPos, SquarePos } from '../Perspective';
-
 interface Pointer {
   x : number,
   y : number,
-  mapPos : MapPos
+  tilePos : [number, number]
 }
 
 export default class PanZoomSaga {
   private readonly pointers : Map<number, Pointer>;
-  private readonly perspective : Perspective;
   private changed : boolean;
-  constructor(eventEmitter : EventEmitter, perspective : Perspective){
+  constructor(eventEmitter : EventEmitter){
     this.pointers = new Map<number, Pointer>();
-    this.perspective = perspective;
     this.changed = false;
 
     eventEmitter.on(POINTER_DOWN, (data : PointerDownEvent) => {
       this.pointers.set(data.id, {
         x: data.x,
         y: data.y,
-        mapPos: perspective.viewportToMap(data.x, data.y)
+        tilePos: [data.tx, data.ty]
       });
     });
 
@@ -63,19 +58,11 @@ export default class PanZoomSaga {
 
   process(){
     if(this.changed === false) return false;
+
     this.changed = false;
-    const current = [...this.pointers.values()];
 
-    if(current.length === 0) return false;
+    if(this.pointers.size === 0) return false;
 
-    const squarePos = current.map(p => [p.mapPos, this.perspective.viewportToSquare(p.x, p.y)] as [MapPos, SquarePos]);
-
-    this.perspective.transformMapToSquare(...squarePos);
-
-    for(const pos of current){
-      pos.mapPos = this.perspective.viewportToMap(pos.x, pos.y);
-    }
-
-    return true;
+    return [...this.pointers.values()];
   }
 }

@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import EventSaga from 'event-saga';
 
 import {
   POINTER_TAP,
@@ -10,14 +9,9 @@ import {
   Pos
 } from './types';
 
-const DOUBLE_TAP_TOO_SLOW_TIMEOUT = 'tapTooSlowTimeout';
-
 const MAX_UNMOVED_DISTANCE = 50;
 const MAX_HOLD_TIME = 500;
 
-interface DoubleTapData extends Pos {
-  doubleTap : boolean
-}
 
 export default class TouchSaga {
   constructor(eventEmitter : EventEmitter){
@@ -32,7 +26,7 @@ export default class TouchSaga {
       if(now - data.now < MAX_HOLD_TIME
         && Math.abs(data.x - event.x) < MAX_UNMOVED_DISTANCE
         && Math.abs(data.y - event.y) < MAX_UNMOVED_DISTANCE){
-          eventEmitter.emit(POINTER_DOUBLE_TAP, {x: event.x, y: event.y});
+          eventEmitter.emit(POINTER_DOUBLE_TAP, {tx: event.tx, ty: event.ty});
       }
 
       data.now = now;

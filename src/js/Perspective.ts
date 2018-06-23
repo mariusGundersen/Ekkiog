@@ -2,8 +2,10 @@ import {vec2, vec3, mat3, mat2d} from 'gl-matrix';
 import { Box } from 'ekkiog-editing';
 
 export type PosXY = [ number, number ];
-export type SquarePos = PosXY;
-export type MapPos = PosXY;
+export type TileViewPair = {
+  readonly tilePos: PosXY,
+  readonly viewPos: PosXY
+}
 
 /*
                                             mapToTile
@@ -42,31 +44,20 @@ viewportPos = viewportFromClip * verticalFlip * clipFromMap * verticalFlip *   m
 */
 
 export default class Perspective{
-  readonly mapToViewportMatrix : mat3;
-  private readonly viewportToSquareMatrix : mat2d;
-  private readonly viewportFromSquareMatrix : mat2d;
-  private readonly verticalFlipMatrix : mat2d;
-  private readonly mapToTileMatrix : mat2d;
-  private readonly mapFromTileMatrix : mat2d;
-  private readonly squareToMapMatrix : mat2d;
-  private readonly squareFromMapMatrix : mat2d;
-  private readonly clipToSquareMatrix : mat2d;
-  private readonly clipFromSquareMatrix : mat2d;
-  private readonly viewportToClipMatrix : mat2d;
+  readonly mapToViewportMatrix = mat3.create();
+  private readonly viewportToSquareMatrix = mat2d.create();
+  private readonly viewportFromSquareMatrix = mat2d.create();
+  private readonly verticalFlipMatrix = mat2d.create();
+  private readonly mapToTileMatrix = mat2d.create();
+  private readonly mapFromTileMatrix = mat2d.create();
+  private readonly squareToMapMatrix = mat2d.create();
+  private readonly squareFromMapMatrix = mat2d.create();
+  private readonly clipToSquareMatrix = mat2d.create();
+  private readonly clipFromSquareMatrix = mat2d.create();
+  private readonly viewportToClipMatrix = mat2d.create();
+  private width!: number;
+  private height!: number;
   constructor(){
-    this.verticalFlipMatrix = mat2d.create();
-    this.viewportToSquareMatrix = mat2d.create();
-    this.viewportFromSquareMatrix = mat2d.create();
-    this.mapToTileMatrix = mat2d.create();
-    this.mapFromTileMatrix = mat2d.create();
-    this.squareToMapMatrix = mat2d.create();
-    this.squareFromMapMatrix = mat2d.create();
-    this.clipToSquareMatrix = mat2d.create();
-    this.clipFromSquareMatrix = mat2d.create();
-    this.viewportToClipMatrix = mat2d.create();
-
-    this.mapToViewportMatrix = mat3.create();
-
     mat2d.fromScaling(this.verticalFlipMatrix, [1, -1]);
     mat2d.fromScaling(this.squareToMapMatrix, [1, 1]);
     mat2d.invert(this.squareFromMapMatrix, this.squareToMapMatrix);
@@ -78,11 +69,9 @@ export default class Perspective{
   reset({top, left, bottom, right} : Box){
     const topLeft = [left, top] as PosXY;
     const bottomRight = [right, bottom] as PosXY;
-    vec2.transformMat2d(topLeft as any, topLeft, this.mapFromTileMatrix);
-    vec2.transformMat2d(bottomRight as any, bottomRight, this.mapFromTileMatrix);
-    this.transformMapToSquare(
-      [topLeft, [-1,1]],
-      [bottomRight, [ 1,-1]]
+    this.transformTileToView(
+      {tilePos: topLeft, viewPos: [0,0]},
+      {tilePos: bottomRight, viewPos: [this.width, this.height]}
     );
   }
 
@@ -91,6 +80,8 @@ export default class Perspective{
    * squarePos = (clipToSquare * viewportToClip * verticalFlip) * viewportPos
    */
   setViewport(width : number, height : number){
+    this.width = width;
+    this.height = height;
     /*
       viewportToClip:
       [ 2/w    0  -1 ]   [x]   [x]
@@ -136,11 +127,13 @@ export default class Perspective{
     this.recalculate();
   }
 
-  transformMapToSquare(...pos : [MapPos, SquarePos][]){
-    if(pos.length === 0) return;
-    if(pos.length === 1){
+  transformTileToView(...posPairs : TileViewPair[]){
+    if(posPairs.length === 0) return;
+    if(posPairs.length === 1){
       /*
 
+      squareToMap * viewportToSquare * viewportPos = tileToMap * tilePos
+      squareToMap * squarePos = tileToMap * tilePos
       squareToMap * squarePos = mapPos
       [ s 0 x ]   [s_x]   [m_x]
       [ 0 s y ] x [s_y] = [m_y]
@@ -156,9 +149,16 @@ export default class Perspective{
       1 > y > -1
 
       */
+      const {tilePos, viewPos} = posPairs[0];
+      const mapPos = vec2.create();
+      const squarePos = vec2.create();
+
+      vec2.transformMat2d(mapPos, tilePos, this.mapFromTileMatrix);
+      vec2.transformMat2d(squarePos, viewPos, this.viewportToSquareMatrix);
+
       const s = this.squareToMapMatrix[0] //reuse existing scale
-      const x = pos[0][0][0] - s*pos[0][1][0];
-      const y = pos[0][0][1] - s*pos[0][1][1];
+      const x = mapPos[0] - s*squarePos[0];
+      const y = mapPos[1] - s*squarePos[1];
       mat2d.set(this.squareToMapMatrix, s, 0, 0, s, minmax(-1, x, 1), minmax(-1, y, 1));
       mat2d.invert(this.squareFromMapMatrix, this.squareToMapMatrix);
 
@@ -168,7 +168,8 @@ export default class Perspective{
 
     /*
     Calculate squareToMap by solving the equation
-    mapPos = squareToMap * squarePos
+    squareToMap * squarePos = tileToMap * tilePos
+    squareToMap * squarePos = mapPos
     [ s 0 x ]   [s_x_a  s_x_b  s_x_c]   [m_x_a  m_x_b  m_x_c]
     [ 0 s y ] x [s_y_a  s_y_b  s_y_c] = [m_y_a  m_y_b  m_y_c]
     [ 0 0 1 ]   [    1      1      1]   [    1      1      1]
@@ -197,16 +198,20 @@ export default class Perspective{
 
     */
 
-    const len = pos.length;
-    let m00=0, m01=0, m02=0, m11=0,m12=0,m22=0;
+    const mapPos = vec2.create();
+    const squarePos = vec2.create();
+    const len = posPairs.length;
+    let m00=0, m01=0, m02=0;
     let v0=0, v1=0, v2=0;
-    for(let i=0; i<len; i++){
-      m00 += pos[i][1][0]*pos[i][1][0] + pos[i][1][1]*pos[i][1][1];
-      m01 += pos[i][1][0];
-      m02 += pos[i][1][1];
-      v0 += pos[i][0][0]*pos[i][1][0] + pos[i][0][1]*pos[i][1][1];
-      v1 += pos[i][0][0];
-      v2 += pos[i][0][1];
+    for(const {viewPos, tilePos} of posPairs){
+      vec2.transformMat2d(squarePos, viewPos, this.viewportToSquareMatrix);
+      m00 += squarePos[0]*squarePos[0] + squarePos[1]*squarePos[1];
+      m01 += squarePos[0];
+      m02 += squarePos[1];
+      vec2.transformMat2d(mapPos, tilePos, this.mapFromTileMatrix);
+      v0 += mapPos[0]*squarePos[0] + mapPos[1]*squarePos[1];
+      v1 += mapPos[0];
+      v2 += mapPos[1];
     }
     const mat = mat3.fromValues(
       m00, m01, m02,
@@ -238,43 +243,15 @@ export default class Perspective{
   }
 
   /**
-   * squarePos = viewportToSquare * viewportPos
-   * squarePos = (clipToSquare * viewportToClip * verticalFlip) * viewportPos
-   */
-  viewportToSquare(x: number, y: number) : SquarePos {
-    let vec = [x, y] as any as vec2;
-    vec2.transformMat2d(vec, vec, this.viewportToSquareMatrix);
-    return vec as any as PosXY;
-  }
-
-  /**
-   * mapPos = squareToMap * viewportToSquare * viewportPos
-   * mapPos = squareToMap * (clipToSquare * viewportToClip * verticalFlip) * viewportPos
-   */
-  viewportToMap(x: number, y: number) : MapPos {
-    let vec = [x, y] as any as vec2;
-    vec2.transformMat2d(vec, vec, this.viewportToSquareMatrix);
-    vec2.transformMat2d(vec, vec, this.squareToMapMatrix);
-    return vec as any as PosXY;
-  }
-
-  /**
    * tilePos = mapToTile * squareToMap * viewportToSquare * viewportPos
    * tilePos = (mapToTile * verticalFlip) * squareToMap * (clipToSquare * verticalFlip * viewportToClip) * viewportPos
    */
-  viewportToTile(x: number, y: number) : PosXY{
+  viewportToTile(x: number, y: number) : PosXY {
     let vec = [x, y] as any as vec2;
     vec2.transformMat2d(vec, vec, this.viewportToSquareMatrix);
     vec2.transformMat2d(vec, vec, this.squareToMapMatrix);
     vec2.transformMat2d(vec, vec, this.mapToTileMatrix);
     return vec as any as PosXY;
-  }
-
-  viewportToTileFloored(x: number, y: number) : PosXY{
-    let pos = this.viewportToTile(x, y);
-    pos[0] = pos[0]|0;
-    pos[1] = pos[1]|0;
-    return pos;
   }
 
   /**

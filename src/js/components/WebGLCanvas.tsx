@@ -44,15 +44,14 @@ export interface Props{
 export default class WebGLCanvas extends React.Component<Props, any> {
   private canvas = createRef<HTMLCanvasElement>();
   private engine! : Engine;
-  private perspective! : Perspective;
   private touchControls! : TouchControls;
   private shellConfig! : Config
 
   componentDidMount(){
     if(!this.canvas.current) return
     const gl = getContext(this.canvas.current);
-    this.perspective = new Perspective();
-    this.touchControls = new TouchControls(this.perspective);
+    const perspective = new Perspective();
+    this.touchControls = new TouchControls((x,y) => perspective.viewportToTile(x, y));
     this.engine = new Engine(gl, this.props.width, this.props.height);
 
     // The react event system is too slow, so using the native events
@@ -60,7 +59,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     this.canvas.current.addEventListener('touchmove', emit((e, v) => this.touchControls.emit(e, v), TOUCH_MOVE), false);
     this.canvas.current.addEventListener('touchend', emit((e, v) => this.touchControls.emit(e, v), TOUCH_END), false);
 
-    fromEmitter(this.touchControls.emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch);
+    fromEmitter(this.touchControls.emitter, this.props.dispatch);
     forestHandler(undefined, this.props.currentContext.forest, this.engine);
 
     this.shellConfig = startShell({
@@ -70,20 +69,25 @@ export default class WebGLCanvas extends React.Component<Props, any> {
         if(ease.done){
           const changed = this.touchControls.panZoomSaga.process();
           if(changed){
+            const posPairs = changed.map(({x, y, tilePos}) => ({
+              tilePos,
+              viewPos: [x, y] as [number, number]
+            }));
+            perspective.transformTileToView(...posPairs);
             this.props.dispatch(panZoom(
-              this.perspective.tileToViewport.bind(this.perspective),
-              this.perspective.viewportToTile.bind(this.perspective)
+              perspective.tileToViewport.bind(perspective),
+              perspective.viewportToTile.bind(perspective)
             ));
           }
         }else{
-          this.perspective.reset(arrayToBox(ease.value));
+          perspective.reset(arrayToBox(ease.value));
         }
 
-        this.engine.render(this.perspective.mapToViewportMatrix);
+        this.engine.render(perspective.mapToViewportMatrix);
 
         if(this.props.selection.selection){
           this.engine.renderMove(
-            this.perspective.mapToViewportMatrix,
+            perspective.mapToViewportMatrix,
             this.props.selection,
             this.props.selection.dx,
             this.props.selection.dy);
@@ -92,27 +96,25 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       tick: tickCount => {
         this.engine.simulate(tickCount);
       },
-      resize: (pixelWidth, pixelHeight) => {
-        this.props.dispatch(resize(pixelWidth, pixelHeight));
+      resize: (width, height) => {
+        this.props.dispatch(resize(width, height));
         const prevWidth = this.props.width;
-        const mapPosA = this.perspective.viewportToMap(0, 0);
-        const mapPosB = this.perspective.viewportToMap(prevWidth, 0);
-        this.perspective.setViewport(pixelWidth, pixelHeight);
-        const squarePosA = this.perspective.viewportToSquare(0, 0);
-        const squarePosB = this.perspective.viewportToSquare(pixelWidth, 0);
+        const tilePosA = perspective.viewportToTile(0, 0);
+        const tilePosB = perspective.viewportToTile(prevWidth, 0);
+        perspective.setViewport(width, height);
 
-        this.perspective.transformMapToSquare(
-          [mapPosA, squarePosA],
-          [mapPosB, squarePosB]);
+        perspective.transformTileToView(
+          {tilePos: tilePosA, viewPos: [0, 0]},
+          {tilePos: tilePosB, viewPos: [width, 0]});
 
         this.props.dispatch(panZoom(
-          this.perspective.tileToViewport.bind(this.perspective),
-          this.perspective.viewportToTile.bind(this.perspective)
+          perspective.tileToViewport.bind(perspective),
+          perspective.viewportToTile.bind(perspective)
         ));
       }
     });
 
-    this.perspective.reset(this.props.currentContext.boundingBox);
+    perspective.reset(this.props.currentContext.boundingBox);
   }
 
   componentWillReceiveProps(nextProps : Props){

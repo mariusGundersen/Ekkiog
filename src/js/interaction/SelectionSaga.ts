@@ -12,43 +12,24 @@ import {
 import {
   PointerDownEvent,
   PointerMoveEvent,
-  PointerUpEvent,
-  StartSelectionEvent
-} from './types';
+  PointerUpEvent} from './types';
 import { SelectionState } from '../reduce/selection';
 
-type State = StateSelection | StateNoSelection;
-
-interface StateNoSelection {
-  selection : false
-}
-
-interface StateSelection {
-  selection : true;
-  top : number;
-  left : number;
-  right : number;
-  bottom : number;
-  dx : number;
-  dy : number;
-}
-
-interface Data {
+interface State {
   dx: number,
   dy: number
 }
 
-export default class SelectionSaga extends EventSaga<Data, any> {
+export default class SelectionSaga extends EventSaga<State, any> {
   private state : SelectionState;
-  constructor(eventEmitter : EventEmitter, viewportToTile : (x : number, y : number) => [number, number]){
+  constructor(eventEmitter : EventEmitter){
     super(eventEmitter, saga => {
-      saga.createOn<PointerDownEvent>(POINTER_DOWN, (data, actor) => {
+      saga.createOn<PointerDownEvent>(POINTER_DOWN, ({id, tx, ty}, actor) => {
         if(!this.state.selection) {
           actor.done();
           return;
         }
 
-        const [tx, ty] = viewportToTile(data.x, data.y);
         if(this.state.top <= Math.floor(ty - this.state.dy)
         && this.state.left <= Math.floor(tx - this.state.dx)
         && this.state.right >= Math.floor(tx - this.state.dx)
@@ -58,21 +39,18 @@ export default class SelectionSaga extends EventSaga<Data, any> {
             dy: this.state.dy - ty
           };
 
-          actor.emit(CANCEL_PAN_ZOOM, {
-            id: data.id
-          });
+          actor.emit(CANCEL_PAN_ZOOM, {id});
         }else{
           actor.done();
         }
       });
 
-      saga.on<PointerMoveEvent>(POINTER_MOVE, (data, actor) => {
+      saga.on<PointerMoveEvent>(POINTER_MOVE, ({tx, ty}, actor) => {
         if(!this.state.selection) {
           actor.done();
           return;
         }
 
-        const [tx, ty] = viewportToTile(data.x, data.y);
         const dx = Math.round(tx + actor.data.dx);
         const dy = Math.round(ty + actor.data.dy);
         if(dx != this.state.dx || dy != this.state.dy){

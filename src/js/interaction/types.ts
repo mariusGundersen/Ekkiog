@@ -1,10 +1,12 @@
 export interface Identifiable {
-  id : number
+  readonly id: number
 }
 
 export interface Pos {
-  x : number,
-  y : number
+  readonly x: number,
+  readonly y: number,
+  readonly tx: number,
+  readonly ty: number
 }
 
 export interface PointerDownEvent extends Pos, Identifiable {
@@ -15,17 +17,10 @@ export interface PointerMoveEvent extends Pos, Identifiable {
 
 }
 
-export interface PointerUpEvent extends Pos, Identifiable {
+export interface PointerUpEvent extends Identifiable {
 
 }
 
 export interface CancelPanZoomEvent extends Identifiable {
 
-}
-
-export interface StartSelectionEvent {
-  top : number,
-  left : number,
-  right : number,
-  bottom : number
 }
