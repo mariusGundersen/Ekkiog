@@ -95,7 +95,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       },
       resize: (pixelWidth, pixelHeight) => {
         this.props.dispatch(resize(pixelWidth, pixelHeight));
-        const prevWidth = this.props.height;
+        const prevWidth = this.props.width;
         const mapPosA = this.perspective.viewportToMap(0, 0);
         const mapPosB = this.perspective.viewportToMap(prevWidth, 0);
         this.perspective.setViewport(pixelWidth, pixelHeight);
