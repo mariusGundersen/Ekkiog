@@ -26,9 +26,6 @@ import {
 } from './events';
 import { Pos } from './interaction/types';
 
-
-type ViewportToTile = (x : number, y : number) => [number, number];
-
 export default function fromEmitter(
   emitter : EventEmitter,
   dispatch : Dispatch<Action>){
@@ -80,10 +77,7 @@ export function handleShowContextMenu({tx, ty} : Pos) {
 
       const enneaTree = context.forest.enneaTree;
       const tile = getTypeAt(enneaTree, Math.floor(tx), Math.floor(ty));
-      dispatch(showContextMenu(
-        tile,
-        tx,
-        ty));
+      dispatch(showContextMenu(tile, tx, ty));
     }
   };
 }

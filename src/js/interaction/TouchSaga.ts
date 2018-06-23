@@ -39,10 +39,9 @@ interface TouchEvent extends Pos {
 }
 
 export default class TouchSaga extends EventSaga<TouchData, number> {
-  constructor(eventEmitter: EventEmitter, viewportToTile: (x: number, y: number) => [number, number]){
+  constructor(eventEmitter: EventEmitter){
     super(eventEmitter, saga => {
-      saga.createOn<TouchEvent>(TOUCH_START, ({x, y}, actor) => {
-        const [tx, ty] = viewportToTile(x, y);
+      saga.createOn<TouchEvent>(TOUCH_START, ({x, y, tx, ty}, actor) => {
         actor.data = {
           state: 'fresh',
           start: {
@@ -66,10 +65,9 @@ export default class TouchSaga extends EventSaga<TouchData, number> {
 
       });
 
-      saga.on<TouchEvent>(TOUCH_MOVE, ({x, y}, actor) => {
+      saga.on<TouchEvent>(TOUCH_MOVE, ({x, y, tx, ty}, actor) => {
         if(actor.data.state === 'fresh') return;
 
-        const [tx, ty] = viewportToTile(x, y);
         actor.emit<PointerMoveEvent>(POINTER_MOVE, {
           id: actor.id,
           x,
@@ -120,8 +118,7 @@ export default class TouchSaga extends EventSaga<TouchData, number> {
         });
       });
 
-      saga.on<TouchEvent>(TOUCH_END, ({x, y}, actor) => {
-        const [tx, ty] = viewportToTile(x, y);
+      saga.on<TouchEvent>(TOUCH_END, ({x, y, tx, ty}, actor) => {
         if(actor.data.state === 'fresh'){
           actor.emit(POINTER_TAP, {
             x,
