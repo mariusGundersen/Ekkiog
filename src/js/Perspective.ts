@@ -241,8 +241,8 @@ export default class Perspective{
    * squarePos = viewportToSquare * viewportPos
    * squarePos = (clipToSquare * viewportToClip * verticalFlip) * viewportPos
    */
-  viewportToSquare(...pos : number[]) : SquarePos {
-    let vec = pos as any as vec2;
+  viewportToSquare(x: number, y: number) : SquarePos {
+    let vec = [x, y] as any as vec2;
     vec2.transformMat2d(vec, vec, this.viewportToSquareMatrix);
     return vec as any as PosXY;
   }
@@ -251,8 +251,8 @@ export default class Perspective{
    * mapPos = squareToMap * viewportToSquare * viewportPos
    * mapPos = squareToMap * (clipToSquare * viewportToClip * verticalFlip) * viewportPos
    */
-  viewportToMap(...pos : number[]) : MapPos {
-    let vec = pos as any as vec2;
+  viewportToMap(x: number, y: number) : MapPos {
+    let vec = [x, y] as any as vec2;
     vec2.transformMat2d(vec, vec, this.viewportToSquareMatrix);
     vec2.transformMat2d(vec, vec, this.squareToMapMatrix);
     return vec as any as PosXY;
@@ -262,25 +262,27 @@ export default class Perspective{
    * tilePos = mapToTile * squareToMap * viewportToSquare * viewportPos
    * tilePos = (mapToTile * verticalFlip) * squareToMap * (clipToSquare * verticalFlip * viewportToClip) * viewportPos
    */
-  viewportToTile(...pos : number[]) : PosXY{
-    let vec = pos as any as vec2;
+  viewportToTile(x: number, y: number) : PosXY{
+    let vec = [x, y] as any as vec2;
     vec2.transformMat2d(vec, vec, this.viewportToSquareMatrix);
     vec2.transformMat2d(vec, vec, this.squareToMapMatrix);
     vec2.transformMat2d(vec, vec, this.mapToTileMatrix);
     return vec as any as PosXY;
   }
 
-  viewportToTileFloored(...pos : number[]) : PosXY{
-    pos = this.viewportToTile(...pos);
-    return [pos[0]|0, pos[1]|0];
+  viewportToTileFloored(x: number, y: number) : PosXY{
+    let pos = this.viewportToTile(x, y);
+    pos[0] = pos[0]|0;
+    pos[1] = pos[1]|0;
+    return pos;
   }
 
   /**
    * viewportPos = viewportFromSquare * squareFromMap * mapFromTile * tilePos
    * viewportPos = (viewportFromClip * verticalFlip * clipFromSquare) * squareFromMap * (verticalFlip * mapFromTile) * tilePos
    */
-  tileToViewport(...pos : number[]) : PosXY{
-    let vec = pos as any as vec2;
+  tileToViewport(x: number, y: number) : PosXY{
+    let vec = [x, y] as any as vec2;
     vec2.transformMat2d(vec, vec, this.mapFromTileMatrix);
     vec2.transformMat2d(vec, vec, this.squareFromMapMatrix);
     vec2.transformMat2d(vec, vec, this.viewportFromSquareMatrix);

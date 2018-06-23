@@ -10,16 +10,22 @@ import SelectionSaga from './SelectionSaga';
 import Perspective from '../Perspective';
 
 export default class TouchControls {
-  readonly touchSaga : TouchSaga;
-  readonly pointerSaga : PointerSaga;
-  readonly doubleTapSaga : DoubleTapSaga;
-  readonly panZoomSaga : PanZoomSaga;
-  readonly selectionSaga : SelectionSaga;
-  constructor(emitter : EventEmitter, perspective : Perspective){
-    this.touchSaga = new TouchSaga(emitter);
-    this.pointerSaga = new PointerSaga(emitter);
-    this.doubleTapSaga = new DoubleTapSaga(emitter);
-    this.panZoomSaga = new PanZoomSaga(emitter, perspective);
-    this.selectionSaga = new SelectionSaga(emitter, (x, y) => perspective.viewportToTile(x, y));
+  readonly touchSaga: TouchSaga;
+  readonly pointerSaga: PointerSaga;
+  readonly doubleTapSaga: DoubleTapSaga;
+  readonly panZoomSaga: PanZoomSaga;
+  readonly selectionSaga: SelectionSaga;
+  readonly emitter: EventEmitter;
+  constructor(perspective: Perspective){
+    this.emitter = new EventEmitter();
+    this.touchSaga = new TouchSaga(this.emitter);
+    this.pointerSaga = new PointerSaga(this.emitter);
+    this.doubleTapSaga = new DoubleTapSaga(this.emitter);
+    this.panZoomSaga = new PanZoomSaga(this.emitter, perspective);
+    this.selectionSaga = new SelectionSaga(this.emitter, (x, y) => perspective.viewportToTile(x, y));
+  }
+
+  emit(event: string, data: any){
+    this.emitter.emit(event, data);
   }
 }

@@ -21,8 +21,6 @@ export const LOAD_CONTEXT_MENU : 'loadContextMenu' = 'loadContextMenu';
 export const ABORT_LOAD_CONTEXT_MENU : 'abortLoadContextMenu' = 'abortLoadContextMenu';
 export const HIDE_CONTEXT_MENU : 'hideContextMenu' = 'hideContextMenu';
 
-export const START_SELECTION : 'startSelection' = 'startSelection';
-export const STOP_SELECTION : 'stopSelection' = 'stopSelection';
 export const MOVE_SELECTION : 'moveSelection' = 'moveSelection';
 
 export const CANCEL_PAN_ZOOM : 'cancelPanZoom' = 'cancelPanZoom';

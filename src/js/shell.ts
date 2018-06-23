@@ -61,8 +61,10 @@ export default function startShell(options : Options) : Config{
       time(tick, onTickRequest);
     },
     tick(delta : number){
-      tick.count += delta;
-      options.tick(tick.count);
+      if(delta > 0){
+        tick.count += delta;
+        options.tick(tick.count);
+      }
     }
   };
 };

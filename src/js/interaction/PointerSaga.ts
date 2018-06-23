@@ -1,8 +1,6 @@
 import { EventEmitter } from 'events';
 
 import {
-  START_SELECTION,
-  STOP_SELECTION,
   POINTER_TAP,
   POINTER_DOUBLE_TAP,
   TAP,
@@ -12,9 +10,7 @@ import {
   POTENTIAL_LONG_PRESS,
   LOAD_CONTEXT_MENU,
   POTENTIAL_LONG_PRESS_CANCEL,
-  ABORT_LOAD_CONTEXT_MENU,
-  HIDE_CONTEXT_MENU
-} from '../events';
+  ABORT_LOAD_CONTEXT_MENU} from '../events';
 
 export default class PointerSaga {
   private canInteract : boolean;
@@ -31,8 +27,10 @@ export default class PointerSaga {
   }
 
   disable(){
-    this.canInteract = false;
-    this.changed = window.performance.now();
+    if(this.canInteract){
+      this.canInteract = false;
+      this.changed = window.performance.now();
+    }
   }
 
   enable(){

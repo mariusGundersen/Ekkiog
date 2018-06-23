@@ -1,9 +1,7 @@
 import { EventEmitter } from 'events';
 
 import {
-  getTypeAt,
-  isEmpty
-} from 'ekkiog-editing';
+  getTypeAt} from 'ekkiog-editing';
 
 import { Dispatch } from 'react-redux';
 
@@ -12,7 +10,6 @@ import {
   loadContextMenu,
   abortLoadContextMenu,
   showContextMenu,
-  setOkCancelMenuValid,
   moveSelection,
   zoomInto,
   zoomOutOf,
@@ -28,7 +25,6 @@ import {
   MOVE_SELECTION
 } from './events';
 
-import Engine from './engines/Engine';
 
 type ViewportToTile = (x : number, y : number) => [number, number];
 

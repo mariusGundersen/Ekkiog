@@ -19,6 +19,5 @@ export default function* ease(start : number[], end : number[], ease : Ease, dur
   yield fromTo.map(x => x.from + x.distance);
 }
 
-export function* noEase(end : number[]) : IterableIterator<number[]> {
-  yield end;
+export function* noEase() : IterableIterator<number[]> {
 }

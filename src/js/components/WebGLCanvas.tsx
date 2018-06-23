@@ -51,17 +51,16 @@ export default class WebGLCanvas extends React.Component<Props, any> {
   componentDidMount(){
     if(!this.canvas.current) return
     const gl = getContext(this.canvas.current);
-    const emitter = new EventEmitter();
     this.perspective = new Perspective();
-    this.touchControls = new TouchControls(emitter, this.perspective);
+    this.touchControls = new TouchControls(this.perspective);
     this.engine = new Engine(gl, this.props.width, this.props.height);
 
     // The react event system is too slow, so using the native events
-    this.canvas.current.addEventListener('touchstart', emit(emitter, TOUCH_START), false)
-    this.canvas.current.addEventListener('touchmove', emit(emitter, TOUCH_MOVE), false);
-    this.canvas.current.addEventListener('touchend', emit(emitter, TOUCH_END), false);
+    this.canvas.current.addEventListener('touchstart', emit((e, v) => this.touchControls.emit(e, v), TOUCH_START), false)
+    this.canvas.current.addEventListener('touchmove', emit((e, v) => this.touchControls.emit(e, v), TOUCH_MOVE), false);
+    this.canvas.current.addEventListener('touchend', emit((e, v) => this.touchControls.emit(e, v), TOUCH_END), false);
 
-    fromEmitter(emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch);
+    fromEmitter(this.touchControls.emitter, (x, y) => this.perspective.viewportToTile(x, y), this.props.dispatch);
     forestHandler(undefined, this.props.currentContext.forest, this.engine);
 
     this.shellConfig = startShell({
@@ -126,31 +125,15 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     moveHandler(this.props.selection, nextProps.selection, this.engine);
     buttonHandler(currentContext.buttonTree, nextContext.buttonTree, this.engine);
 
-    if(nextProps.selection.selection){
-      if(!this.props.selection.selection
-      || nextProps.selection.enneaTree !== this.props.selection.enneaTree){
-        this.touchControls.selectionSaga.startSelection(nextProps.selection);
-      }
+    this.touchControls.selectionSaga.setSelection(nextProps.selection);
+
+    if(nextProps.contextMenu.show || nextProps.selection.selection){
+      this.touchControls.pointerSaga.disable();
+    }else{
+      this.touchControls.pointerSaga.enable();
     }
 
-    if(!nextProps.selection.selection){
-      if(this.props.selection.selection){
-        this.touchControls.selectionSaga.stopSelection();
-      }
-    }
-
-    if(nextProps.contextMenu.show !== this.props.contextMenu.show
-    || nextProps.selection.selection !== this.props.selection.selection){
-      if(nextProps.contextMenu.show || nextProps.selection.selection){
-        this.touchControls.pointerSaga.disable();
-      }else{
-        this.touchControls.pointerSaga.enable();
-      }
-    }
-
-    if(nextProps.step !== this.props.step){
-      this.shellConfig.tick(nextProps.step - this.props.step);
-    }
+    this.shellConfig.tick(nextProps.step - this.props.step);
   }
 
   shouldComponentUpdate(nextProps : Props){
@@ -179,11 +162,11 @@ function getContext(canvas : HTMLCanvasElement) {
       || (() => {throw new Error("no webgle here")})();
 }
 
-function emit(emiter : EventEmitter, type : TouchType){
+function emit(emit : (event : string, value: any) => void, type : TouchType){
   return (event : TouchEvent) => {
     for(let i=0; i < event.changedTouches.length; i++){
       let touch = event.changedTouches[i];
-      emiter.emit(type, {
+      emit(type, {
         id: touch.identifier,
         x: touch.pageX*window.devicePixelRatio,
         y: touch.pageY*window.devicePixelRatio

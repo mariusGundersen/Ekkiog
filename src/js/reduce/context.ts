@@ -55,12 +55,7 @@ const initialContext : ContextState = {
     right: 72,
     bottom: 72
   },
-  ease: noEase(boxToArray({
-    top: 56,
-    left: 56,
-    right: 72,
-    bottom: 72
-  })),
+  ease: noEase(),
   saving: false
 }
 
@@ -192,10 +187,6 @@ function combine(
 
 function boxToArray({top, left, right, bottom} : Box){
   return [top, left, right, bottom];
-}
-
-function arrayToBox([top, left, right, bottom] : number[]){
-  return {top, left, right, bottom};
 }
 
 function scaleBox({top, left, right, bottom} : Box, scale : number, x = (left+right)/2, y = ((top+bottom)/2)){
