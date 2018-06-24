@@ -10,24 +10,17 @@ import {
 } from '../actions';
 import { SelectionState } from '../reduce/selection';
 import { ContextState, ParentContextState } from '../reduce/context';
-import {
-  TOUCH_START,
-  TOUCH_MOVE,
-  TOUCH_END,
-  TouchType
-} from '../events';
 
 import Perspective from '../Perspective';
 import startShell, { Config } from '../shell';
 import Engine from '../engines/Engine';
-import TouchControls from '../interaction/TouchControls';
+import TouchControls from '../interaction';
 import moveHandler from '../editing/moveHandler';
 import forestHandler from '../editing/forestHandler';
-import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reduce/contextMenu';
 import buttonHandler from '../editing/buttonHandler';
 import createRef from './createRef';
-import { fromEvent, Observable, of, merge } from 'rxjs';
+import { fromEvent, of, merge } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
 export interface Props{
@@ -59,9 +52,8 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       (x, y) => perspective.viewportToTile(x, y)
     );
 
-    this.touchControls = new TouchControls(touches);
+    this.touchControls = new TouchControls(touches, this.props.dispatch);
 
-    fromEmitter(this.touchControls.emitter, this.props.dispatch);
     forestHandler(undefined, this.props.currentContext.forest, this.engine);
 
     this.shellConfig = startShell({
@@ -69,8 +61,8 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       render: (delta: number) => {
         const ease = this.props.currentContext.ease.next(delta);
         if(ease.done){
-          const changed = this.touchControls.panZoomSaga.process();
-          if(changed){
+          const changed = this.touchControls.getChangedTouches();
+          if(changed.length){
             perspective.transformTileToView(...changed);
             this.props.dispatch(panZoom(
               perspective.tileToViewport.bind(perspective),
@@ -118,12 +110,12 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     moveHandler(this.props.selection, nextProps.selection, this.engine);
     buttonHandler(currentContext.buttonTree, nextContext.buttonTree, this.engine);
 
-    this.touchControls.selectionSaga.setSelection(nextProps.selection);
+    this.touchControls.setSelection(nextProps.selection);
 
     if(nextProps.contextMenu.type === 'show' || nextProps.selection.selection){
-      this.touchControls.pointerSaga.disable();
+      this.touchControls.disable();
     }else{
-      this.touchControls.pointerSaga.enable();
+      this.touchControls.enable();
     }
 
     this.shellConfig.tick(nextProps.step - this.props.step);

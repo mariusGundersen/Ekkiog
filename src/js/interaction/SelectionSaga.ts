@@ -2,7 +2,6 @@ import { EventEmitter } from 'events';
 import EventSaga from 'event-saga';
 
 import {
-  MOVE_SELECTION,
   POINTER_DOWN,
   POINTER_MOVE,
   POINTER_UP,
@@ -14,6 +13,8 @@ import {
   PointerMoveEvent,
   PointerUpEvent} from './types';
 import { SelectionState } from '../reduce/selection';
+import { Dispatch } from 'redux';
+import { moveSelection } from '../actions';
 
 interface State {
   dx: number,
@@ -22,7 +23,7 @@ interface State {
 
 export default class SelectionSaga extends EventSaga<State, any> {
   private state : SelectionState;
-  constructor(eventEmitter : EventEmitter){
+  constructor(eventEmitter : EventEmitter, dispatch: Dispatch){
     super(eventEmitter, saga => {
       saga.createOn<PointerDownEvent>(POINTER_DOWN, ({id, tx, ty}, actor) => {
         if(!this.state.selection) {
@@ -54,10 +55,7 @@ export default class SelectionSaga extends EventSaga<State, any> {
         const dx = Math.round(tx + actor.data.dx);
         const dy = Math.round(ty + actor.data.dy);
         if(dx != this.state.dx || dy != this.state.dy){
-          eventEmitter.emit(MOVE_SELECTION, {
-            dx,
-            dy
-          });
+          dispatch(moveSelection(dx, dy));
         }
       });
 

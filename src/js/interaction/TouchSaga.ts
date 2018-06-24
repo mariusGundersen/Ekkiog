@@ -8,11 +8,7 @@ import {
   POINTER_DOWN,
   POINTER_MOVE,
   POINTER_UP,
-  CANCEL_PAN_ZOOM,
-  POINTER_TAP,
-  LONG_PRESS,
-  POTENTIAL_LONG_PRESS,
-  POTENTIAL_LONG_PRESS_CANCEL
+  POINTER_TAP
 } from '../events';
 
 import {
@@ -21,6 +17,8 @@ import {
   PointerMoveEvent,
   PointerUpEvent
 } from './types';
+import { Dispatch } from 'redux';
+import { loadContextMenu, showContextMenu, abortLoadContextMenu, tapTile } from '../actions';
 
 const TAP_TOO_SLOW_TIMEOUT = 'tapTooSlowTimeout';
 const LONG_PRESS_TIMEOUT = 'longPressTimeout';
@@ -30,8 +28,8 @@ const MAX_TAP_TIME = 100;
 const MIN_LONG_TOUCH_TIME = 1000;
 
 interface TouchData {
-  state: 'fresh' | 'hold' | 'move' | 'longpress'
-  start: Pos
+  state: 'fresh' | 'hold' | 'move'
+  readonly start: Pos
 }
 
 export interface TouchEvent extends Pos {
@@ -40,26 +38,16 @@ export interface TouchEvent extends Pos {
 }
 
 export default class TouchSaga extends EventSaga<TouchData, number> {
-  constructor(eventEmitter: EventEmitter){
+  private canInteract = false;
+  constructor(eventEmitter: EventEmitter, dispatch: Dispatch){
     super(eventEmitter, saga => {
       saga.createOn<TouchEvent>(TOUCH_START, ({x, y, tx, ty}, actor) => {
         actor.data = {
           state: 'fresh',
-          start: {
-            x,
-            y,
-            tx,
-            ty
-          }
+          start: {x, y, tx, ty}
         };
 
-        actor.emit<PointerDownEvent>(POINTER_DOWN, {
-          id: actor.id,
-          x,
-          y,
-          tx,
-          ty
-        });
+        actor.emit<PointerDownEvent>(POINTER_DOWN, {id: actor.id, x, y, tx, ty});
 
         actor.setTimeout(TAP_TOO_SLOW_TIMEOUT, MAX_TAP_TIME);
         actor.setTimeout(LONG_PRESS_TIMEOUT, MIN_LONG_TOUCH_TIME);
@@ -69,13 +57,7 @@ export default class TouchSaga extends EventSaga<TouchData, number> {
       saga.on<TouchEvent>(TOUCH_MOVE, ({x, y, tx, ty}, actor) => {
         if(actor.data.state === 'fresh') return;
 
-        actor.emit<PointerMoveEvent>(POINTER_MOVE, {
-          id: actor.id,
-          x,
-          y,
-          tx,
-          ty
-        });
+        actor.emit<PointerMoveEvent>(POINTER_MOVE, {id: actor.id, x, y, tx, ty});
 
         if(actor.data.state === 'hold'){
           const moved = Math.abs(x - actor.data.start.x) > MAX_UNMOVED_DISTANCE
@@ -83,62 +65,53 @@ export default class TouchSaga extends EventSaga<TouchData, number> {
           if(moved){
             actor.data.state = 'move';
             actor.clearTimeout(LONG_PRESS_TIMEOUT);
-            actor.emit(POTENTIAL_LONG_PRESS_CANCEL, {
-              id: actor.id,
-              x,
-              y
-            });
+
+            if(this.canInteract){
+              dispatch(abortLoadContextMenu());
+            }
           }
         }
       });
 
       saga.on(TAP_TOO_SLOW_TIMEOUT, (_, actor) => {
         actor.data.state = 'hold';
-        actor.emit(POTENTIAL_LONG_PRESS, {
-          id: actor.id,
-          x: actor.data.start.x,
-          y: actor.data.start.y,
-          tx: actor.data.start.tx,
-          ty: actor.data.start.ty,
-          time: MIN_LONG_TOUCH_TIME - MAX_TAP_TIME
-        });
+        if(this.canInteract){
+          dispatch(loadContextMenu(actor.data.start.tx, actor.data.start.ty));
+        }
       });
 
       saga.on<Pos>(LONG_PRESS_TIMEOUT, (_, actor) => {
-        actor.data.state = 'longpress';
-        actor.emit(CANCEL_PAN_ZOOM, {
-          id: actor.id
-        });
-
-        actor.emit(LONG_PRESS, {
-          pointer: actor.id,
-          x: actor.data.start.x,
-          y: actor.data.start.y,
-          tx: actor.data.start.tx,
-          ty: actor.data.start.ty
-        });
+        if(this.canInteract){
+          dispatch(showContextMenu());
+          actor.emit<PointerUpEvent>(POINTER_UP, {id: actor.id});
+          actor.done();
+        }
       });
 
       saga.on<TouchEvent>(TOUCH_END, ({x, y, tx, ty}, actor) => {
         if(actor.data.state === 'fresh'){
-          actor.emit(POINTER_TAP, {
-            x,
-            y,
-            tx,
-            ty
-          });
+          if(this.canInteract){
+            dispatch(tapTile(actor.data.start.tx, actor.data.start.ty));
+          }
+
+          actor.emit(POINTER_TAP, {x, y, tx, ty});
         }
 
-        if(actor.data.state === 'hold'){
-          actor.emit(POTENTIAL_LONG_PRESS_CANCEL, {});
+        if(actor.data.state === 'hold' && this.canInteract){
+          dispatch(abortLoadContextMenu());
         }
 
-        actor.emit<PointerUpEvent>(POINTER_UP, {
-          id: actor.id
-        });
-
+        actor.emit<PointerUpEvent>(POINTER_UP, {id: actor.id});
         actor.done();
       });
     });
+  }
+
+  disable(){
+    this.canInteract = false;
+  }
+
+  enable(){
+    this.canInteract = true;
   }
 }

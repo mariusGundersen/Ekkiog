@@ -13,35 +13,27 @@ import {
   PointerUpEvent,
   CancelPanZoomEvent
 } from './types';
+import { TileViewPair } from '../Perspective';
 
-interface Pointer {
-  x: number,
-  y: number,
-  readonly tx: number,
-  readonly ty: number
-}
+const empty: TileViewPair[] = [];
 
 export default class PanZoomSaga {
-  private readonly pointers = new Map<number, Pointer>();
+  private readonly pointers = new Map<number, TileViewPair>();
   private changed = false;
   constructor(eventEmitter: EventEmitter){
-    eventEmitter.on(POINTER_DOWN, (data: PointerDownEvent) => {
-      this.pointers.set(data.id, {
-        x: data.x,
-        y: data.y,
-        tx: data.tx,
-        ty: data.ty,
+    eventEmitter.on(POINTER_DOWN, ({id, tx, ty, x, y}: PointerDownEvent) => {
+      this.pointers.set(id, {
+        tilePos: [tx, ty] as [number, number],
+        viewPos: [x, y] as [number, number]
       });
     });
 
-    eventEmitter.on(POINTER_MOVE, (data: PointerMoveEvent) => {
-      if(!this.pointers.has(data.id)) return;
-
-      const pointer = this.pointers.get(data.id);
-      if(pointer === undefined) return;
+    eventEmitter.on(POINTER_MOVE, ({id, x, y}: PointerMoveEvent) => {
+      const pointer = this.pointers.get(id);
+      if(!pointer) return;
       this.changed = true;
-      pointer.x = data.x;
-      pointer.y = data.y;
+      pointer.viewPos[0] = x;
+      pointer.viewPos[1] = y;
     });
 
     eventEmitter.on(CANCEL_PAN_ZOOM, (data: CancelPanZoomEvent) => {
@@ -56,17 +48,10 @@ export default class PanZoomSaga {
   }
 
   process(){
-    if(this.changed === false) return false;
+    if(this.changed === false) return empty;
 
     this.changed = false;
 
-    if(this.pointers.size === 0) return false;
-
-    return [...this.pointers.values()].map(toPair);
+    return [...this.pointers.values()];
   }
 }
-
-const toPair = ({ x, y, tx, ty } : Pointer) => ({
-  tilePos: [tx, ty] as [number, number],
-  viewPos: [x, y] as [number, number]
-});

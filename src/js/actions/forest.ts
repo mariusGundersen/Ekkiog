@@ -17,20 +17,26 @@ export const setForest = (forest : Forest) : SetForestAction => ({
   forest
 });
 
+export type DoubleTapTileAction = {
+  readonly type : 'double-tap-tile',
+  readonly x : number,
+  readonly y : number
+}
+export const doubleTapTile = (x : number, y : number) : DoubleTapTileAction => ({
+  type: 'double-tap-tile',
+  x,
+  y
+});
 
 export type TapTileAction = {
   readonly type : 'tap-tile',
   readonly x : number,
-  readonly y : number,
-  readonly tool : Tool,
-  readonly direction : Direction
+  readonly y : number
 }
-export const tapTile = (x : number, y : number, tool : Tool, direction : Direction) : TapTileAction => ({
+export const tapTile = (x : number, y : number) : TapTileAction => ({
   type: 'tap-tile',
   x,
-  y,
-  tool,
-  direction
+  y
 });
 
 export type DrawAction = {
@@ -129,6 +135,7 @@ export type ForestActions =
   SetForestAction |
   DrawAction |
   TapTileAction |
+  DoubleTapTileAction |
   RemoveTileAtAction |
   ToUnderpassAction |
   ToWireAction |
