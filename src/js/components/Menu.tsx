@@ -11,20 +11,23 @@ import EditorMenu from './EditorMenu';
 import ContextMenu from './ContextMenu';
 import ContextMenuLoading from './ContextMenuLoading';
 import { Action } from '../actions';
+import { Forest } from 'ekkiog-editing';
+
+const radius = 40;
+const gap = 10;
 
 export interface Props {
-  readonly dispatch : Dispatch<Action>,
-  readonly width : number,
-  readonly height : number,
-  readonly contextMenu : ContextMenuState,
-  readonly view : ViewState,
-  readonly editor : EditorState,
-  readonly editorMenu : EditorMenuState
+  readonly dispatch: Dispatch<Action>,
+  readonly width: number,
+  readonly height: number,
+  readonly contextMenu: ContextMenuState,
+  readonly view: ViewState,
+  readonly editor: EditorState,
+  readonly editorMenu: EditorMenuState
+  readonly forest: Forest
 }
 
-export default ({dispatch, ...props} : Props) => {
-  const radius = 40;
-  const gap = 10;
+export default (props: Props) => {
   const cx = props.width;
   const cy = props.height;
 
@@ -42,9 +45,33 @@ export default ({dispatch, ...props} : Props) => {
           <feMergeNode in="SourceGraphic"/>
         </feMerge>
       </filter>
-      <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} editor={props.editor} editorMenu={props.editorMenu} dispatch={dispatch} />
-      {props.contextMenu.loading && <ContextMenuLoading contextMenu={props.contextMenu} width={radius+gap} radius={radius+gap} />}
-      {props.contextMenu.show && <ContextMenu radius={radius+gap} width={radius+gap} dispatch={dispatch} contextMenu={props.contextMenu} view={props.view} />}
+      <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius+gap} editor={props.editor} editorMenu={props.editorMenu} dispatch={props.dispatch} />
+      <ContextMenuPos {...props} />
     </svg>
   )
 };
+
+const ContextMenuPos = (props: Props) => {
+  if(props.contextMenu.type === 'load'){
+    const { tx, ty } = props.contextMenu;
+    const [x, y] = props.view.tileToViewport(tx, ty);
+    return <ContextMenuLoading
+      x={x/window.devicePixelRatio}
+      y={y/window.devicePixelRatio}
+      width={radius+gap}
+      radius={radius+gap} />;
+  }else if(props.contextMenu.type === 'show'){
+    const { tx, ty } = props.contextMenu;
+    const [x, y] = props.view.tileToViewport(tx, ty);
+    return <ContextMenu
+      radius={radius+gap}
+      width={radius+gap}
+      dispatch={props.dispatch}
+      contextMenu={props.contextMenu}
+      forest={props.forest}
+      x={x/window.devicePixelRatio}
+      y={y/window.devicePixelRatio} />;
+  }else{
+    return null;
+  }
+}

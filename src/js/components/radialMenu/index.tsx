@@ -1,32 +1,19 @@
 import * as React from 'react';
 
-import PieRing, { Props as PieRingProps } from './PieRing';
-import PieCenter, { Props as PieCenterProps } from './PieCenter';
-
 export interface Props {
   cx : number;
   cy : number;
-  showMenu : boolean;
-  center? : PieCenterProps,
-  menuTree : PieRingProps[]
+  children : React.ReactNode[]
 }
-
-export { PieRingProps, PieCenterProps };
 
 export default ({
   cx,
   cy,
-  showMenu,
-  center,
-  menuTree
+  children
 } : Props) => {
   return (
     <g transform={`translate(${cx}, ${cy})`}>
-
-      {center != undefined ? <PieCenter {...center} /> : null}
-
-      {menuTree.map(ring => <PieRing key={ring.ringKey} {...ring} />)}
-
+      {...children}
     </g>
   );
 }

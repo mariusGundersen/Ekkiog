@@ -2,13 +2,13 @@ import { Tool } from 'ekkiog-editing';
 
 export type LoadContextMenuAction = {
   readonly type : 'loadContextMenu',
-  readonly x : number,
-  readonly y : number
+  readonly tx : number,
+  readonly ty : number
 }
-export const loadContextMenu = (x : number, y : number) : LoadContextMenuAction => ({
+export const loadContextMenu = (tx : number, ty : number) : LoadContextMenuAction => ({
   type: 'loadContextMenu',
-  x,
-  y
+  tx,
+  ty
 });
 
 export type AbortLoadContextMenuAction = {
@@ -19,16 +19,10 @@ export const abortLoadContextMenu = () : AbortLoadContextMenuAction => ({
 });
 
 export type ShowContextMenuAction = {
-  readonly type : 'showContextMenu',
-  readonly tile : Tool | 'empty',
-  readonly tx : number,
-  readonly ty : number
+  readonly type : 'showContextMenu'
 }
-export const showContextMenu = (tile : Tool | 'empty', tx : number, ty : number) : ShowContextMenuAction => ({
-  type: 'showContextMenu',
-  tile,
-  tx,
-  ty
+export const showContextMenu = () : ShowContextMenuAction => ({
+  type: 'showContextMenu'
 });
 
 export type HideContextMenuAction = {

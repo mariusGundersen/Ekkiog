@@ -25,6 +25,8 @@ import {
 import { toggleEditorMenu, setToolDirection, okCancel, Action } from '../actions';
 import { EditorState } from '../reduce/editor';
 import { EditorMenuState, OkCancelMenuState } from '../reduce/editorMenu';
+import PieCenter from './radialMenu/PieCenter';
+import PieRing from './radialMenu/PieRing';
 
 export interface Props {
   cx : number,
@@ -62,10 +64,10 @@ export default class EditorMenu extends React.Component<Props, any> {
     return (
       <RadialMenu
         cx={cx}
-        cy={cy}
-        showMenu={editorMenu.menuType != null && editorMenu.open}
-        center={createCenter(radius, editor, editorMenu, dispatch)}
-        menuTree={getMenuTree(radius+gap, width, editor, editorMenu, dispatch)} />
+        cy={cy}>
+        {createCenter(radius, editor, editorMenu, dispatch)}
+        {getMenuTree(radius+gap, width, editor, editorMenu, dispatch)}
+      </RadialMenu>
     );
   };
 }
@@ -75,15 +77,15 @@ function getMenuTree(radius : number, width : number, editor : EditorState, edit
     editor,
     editorMenu,
     dispatch
-  ).map((ring, index) => ({
-    show: editorMenu.menuType != null && editorMenu.open,
-    radius: radius + (width+20)*index,
-    width,
-    fromTurnFraction: 1/2,
-    toTurnFraction: 3/4,
-    ringKey: index,
-    ...ring
-  }));
+  ).map((ring, index) => <PieRing
+    show={editorMenu.menuType != null && editorMenu.open}
+    radius={radius + (width+20)*index}
+    width={width}
+    fromTurnFraction={1/2}
+    toTurnFraction={3/4}
+    key={index}
+    {...ring}
+  />);
 }
 
 function createMenuTree(editor : EditorState, editorMenu : EditorMenuState, dispatch : Dispatch<Action>){
@@ -156,18 +158,18 @@ function createCenter(radius : number, editor : EditorState, editorMenu : Editor
 }
 
 function createToolsCenter(radius : number, selectedTool : Tool, direction : Direction, open : boolean, dispatch : Dispatch<Action>){
-  return {
-    radius: radius,
-    cx: open ? radius : -radius*1.5,
-    cy: open ? radius : -radius*1.5,
-    onClick: () => dispatch(toggleEditorMenu()),
-    icon:
+  return <PieCenter
+    radius={radius}
+    cx={open ? radius : -radius*1.5}
+    cy={open ? radius : -radius*1.5}
+    onClick={() => dispatch(toggleEditorMenu())}
+    icon={
       selectedTool == 'wire' ? <IconWire /> :
       selectedTool == 'button' ? <IconButton rotate={degree(direction)} /> :
       selectedTool == 'gate' ? <IconGate /> :
       selectedTool == 'underpass' ? <IconUnderpass /> :
       selectedTool == 'light' ? <IconLight rotate={degree(direction)} /> : <g />
-  };
+    } />;
 }
 
 function degree(direction : Direction){

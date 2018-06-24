@@ -27,6 +27,8 @@ import fromEmitter from '../emitterRedux';
 import { ContextMenuState } from '../reduce/contextMenu';
 import buttonHandler from '../editing/buttonHandler';
 import createRef from './createRef';
+import { fromEvent, Observable, of, merge } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 
 export interface Props{
   readonly tickInterval: number,
@@ -50,14 +52,14 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     if(!this.canvas.current) return
     const gl = getContext(this.canvas.current);
     const perspective = new Perspective();
-    this.touchControls = new TouchControls();
     this.engine = new Engine(gl, this.props.width, this.props.height);
 
-    emitEvents(
+    const touches = getTouchEvents(
       this.canvas.current,
-      (e, v) => this.touchControls.emit(e, v),
       (x, y) => perspective.viewportToTile(x, y)
     );
+
+    this.touchControls = new TouchControls(touches);
 
     fromEmitter(this.touchControls.emitter, this.props.dispatch);
     forestHandler(undefined, this.props.currentContext.forest, this.engine);
@@ -94,14 +96,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       },
       resize: (width, height) => {
         this.props.dispatch(resize(width, height));
-        const prevWidth = this.props.width;
-        const tilePosA = perspective.viewportToTile(0, 0);
-        const tilePosB = perspective.viewportToTile(prevWidth, 0);
         perspective.setViewport(width, height);
-
-        perspective.transformTileToView(
-          {tilePos: tilePosA, viewPos: [0, 0]},
-          {tilePos: tilePosB, viewPos: [width, 0]});
 
         this.props.dispatch(panZoom(
           perspective.tileToViewport.bind(perspective),
@@ -125,7 +120,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
 
     this.touchControls.selectionSaga.setSelection(nextProps.selection);
 
-    if(nextProps.contextMenu.show || nextProps.selection.selection){
+    if(nextProps.contextMenu.type === 'show' || nextProps.selection.selection){
       this.touchControls.pointerSaga.disable();
     }else{
       this.touchControls.pointerSaga.enable();
@@ -160,33 +155,33 @@ function getContext(canvas: HTMLCanvasElement) {
       || (() => {throw new Error("no webgle here")})();
 }
 
-function emitEvents(canvas: HTMLCanvasElement, emit: (event: string, value: any) => void, viewportToTile: (x: number, y: number) => [number, number]){
-  // The react event system is too slow, so using the native events
-  canvas.addEventListener('touchstart', handle(emit, viewportToTile, TOUCH_START), false)
-  canvas.addEventListener('touchmove', handle(emit, viewportToTile, TOUCH_MOVE), false);
-  canvas.addEventListener('touchend', handle(emit, viewportToTile, TOUCH_END), false);
+function getTouchEvents(canvas: HTMLCanvasElement, viewportToTile: (x: number, y: number) => [number, number]){
+  return merge(
+    fromEvent<TouchEvent>(canvas, 'touchstart'),
+    fromEvent<TouchEvent>(canvas, 'touchmove'),
+    fromEvent<TouchEvent>(canvas, 'touchend')
+  ).pipe(
+    tap(e => e.preventDefault()),
+    switchMap(handle(viewportToTile))
+  );
 }
 
-function handle(emit: (event: string, value: any) => void, viewportToTile: (x: number, y: number) => [number, number], type: TouchType){
-  return (event: TouchEvent) => {
-    for(let i=0; i < event.changedTouches.length; i++){
-      const touch = event.changedTouches[i];
+function handle(viewportToTile: (x: number, y: number) => [number, number]){
+  return (event: TouchEvent) => of(...Array.from(event.changedTouches)
+    .map(touch => {
       const x = touch.pageX * window.devicePixelRatio;
       const y = touch.pageY * window.devicePixelRatio;
       const [tx, ty] = viewportToTile(x, y);
-      emit(type, {
+      return {
+        type: event.type,
         id: touch.identifier,
         x,
         y,
         tx,
         ty
-      });
-    }
-
-    event.preventDefault();
-  }
+      };
+    }))
 }
-
 
 function arrayToBox([top, left, right, bottom]: number[]){
   return {top, left, right, bottom};

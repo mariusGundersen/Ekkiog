@@ -63,6 +63,7 @@ export default connect((s : State) => s)(
           <Menu
             contextMenu={props.contextMenu}
             dispatch={props.dispatch}
+            forest={props.context.forest}
             editor={props.editor}
             editorMenu={props.editorMenu}
             width={values.size.svgWidth}

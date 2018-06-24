@@ -11,7 +11,6 @@ export interface Props {
   width : number;
   show : boolean;
   menuItems : MenuItem[];
-  ringKey : number;
 }
 
 export default ({
@@ -20,12 +19,11 @@ export default ({
   radius,
   width,
   show,
-  menuItems,
-  ringKey
+  menuItems
 } : Props) => {
   const sectionTurnFraction = (toTurnFraction-fromTurnFraction)/menuItems.length;
   return (
-    <g key={ringKey}>
+    <g>
       {menuItems.map((item, index) => (
         <PieSector
           key={item.itemKey}

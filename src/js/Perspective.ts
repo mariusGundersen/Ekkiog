@@ -80,6 +80,10 @@ export default class Perspective{
    * squarePos = (clipToSquare * viewportToClip * verticalFlip) * viewportPos
    */
   setViewport(width : number, height : number){
+
+    const upperLeft = this.viewportToTile(0, 0);
+    const upperRight = this.viewportToTile(this.width, 0);
+
     this.width = width;
     this.height = height;
     /*
@@ -105,7 +109,10 @@ export default class Perspective{
     mat2d.mul(this.viewportToSquareMatrix, this.clipToSquareMatrix, this.viewportToSquareMatrix);
     mat2d.invert(this.viewportFromSquareMatrix, this.viewportToSquareMatrix);
 
-    this.recalculate();
+    this.transformTileToView(
+      {tilePos: upperLeft, viewPos: [0, 0]},
+      {tilePos: upperRight, viewPos: [width, 0]}
+    );
   }
 
   /*

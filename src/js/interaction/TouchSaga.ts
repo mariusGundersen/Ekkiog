@@ -34,8 +34,9 @@ interface TouchData {
   start: Pos
 }
 
-interface TouchEvent extends Pos {
-  id: number
+export interface TouchEvent extends Pos {
+  readonly id: number
+  readonly type: string
 }
 
 export default class TouchSaga extends EventSaga<TouchData, number> {

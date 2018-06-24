@@ -1,68 +1,55 @@
-import { vec2, mat3 } from 'gl-matrix';
-
 import { TileType } from 'ekkiog-editing';
 
 import {
-  Action
+  Action, LoadContextMenuAction
 } from '../actions';
 
 export interface ContextMenuHideState {
-  readonly loading : false,
-  readonly show : false
+  readonly type: 'hide'
 }
 
 export interface ContextMenuLoadingState {
-  readonly loading : true,
-  readonly show : false,
-  readonly x : number,
-  readonly y : number
+  readonly type: 'load'
+  readonly tx: number,
+  readonly ty: number
 }
 
 export interface ContextMenuShowState {
-  readonly loading : false,
-  readonly show : true,
-  readonly tile : TileType,
-  readonly tx : number,
-  readonly ty : number
+  readonly type: 'show'
+  readonly tx: number,
+  readonly ty: number
 }
 
 export type ContextMenuState = ContextMenuHideState | ContextMenuLoadingState | ContextMenuShowState;
 
-const initialState : ContextMenuState = {
-  loading: false,
-  show: false,
+const initialState: ContextMenuState = {
+  type: 'hide',
 };
 
 export default function contextMenu(state = initialState, action : Action) : ContextMenuState {
   switch(action.type){
     case 'loadContextMenu':
-      return state.show == false ? {
-        x: action.x,
-        y: action.y,
-        loading: true,
-        show: false,
-      } : state;
-    case 'showContextMenu':
-      return state.loading ? {
-        ...state,
-        loading: false,
-        show: true,
-        tile: action.tile,
+      return state.type === 'hide' && isInside(action) ? {
+        type: 'load',
         tx: action.tx,
         ty: action.ty
       } : state;
-    case 'abortLoadContextMenu':
-      return state.loading ? {
+    case 'showContextMenu':
+      return state.type === 'load' ? {
         ...state,
-        loading: false,
-        show: false
+        type: 'show',
+      } : state;
+    case 'abortLoadContextMenu':
+      return state.type === 'load' ? {
+        type: 'hide'
       } : state;
     case 'hideContextMenu':
       return {
-        loading: false,
-        show: false
+        type: 'hide'
       };
     default:
       return state;
   }
 }
+
+const isInside = ({tx, ty} : LoadContextMenuAction) => tx >= 0 && ty >= 0 && tx < 128 && ty < 128;

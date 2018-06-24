@@ -1,8 +1,8 @@
-export const TOUCH_START : 'touchStart' = 'touchStart';
-export const TOUCH_MOVE : 'touchMove' = 'touchMove';
-export const TOUCH_END : 'touchEnd' = 'touchEnd';
+export const TOUCH_START : 'touchstart' = 'touchstart';
+export const TOUCH_MOVE : 'touchmove' = 'touchmove';
+export const TOUCH_END : 'touchend' = 'touchend';
 
-export type TouchType = 'touchStart' | 'touchMove' | 'touchEnd';
+export type TouchType = 'touchstart' | 'touchmove' | 'touchend';
 
 export const POINTER_DOWN : 'pointerDown' = 'pointerDown';
 export const POINTER_MOVE : 'pointerMove' = 'pointerMove';
