@@ -17,11 +17,12 @@ import Share from '../features/share';
 import style from '../components/main.css';
 import {
   startWith,
-  map
+  map,
+  tap
 } from 'rxjs/operators';
 import { matchPath } from 'react-router';
 
-import { hidePopup, loadForest, startSync, Action } from '../actions';
+import { hidePopup, loadForest, startSync, Action, resize } from '../actions';
 import getRepoFromUrl from '../utils/getRepoFromUrl';
 
 type Props = State & {dispatch: Dispatch<Action>};
@@ -36,10 +37,9 @@ export default connect((s : State) => s)(
 
     events.hidePopup.subscribe(() => initialProps.dispatch(hidePopup()));
     events.sync.subscribe(() => initialProps.dispatch(startSync()));
+    onResize().subscribe(({pixelWidth, pixelHeight}) => initialProps.dispatch(resize(pixelWidth, pixelHeight)));
 
-    return {
-      size: onResize()
-    }
+    return {}
   },
   ({
     events,
@@ -52,12 +52,10 @@ export default connect((s : State) => s)(
           contextMenu={props.contextMenu}
           currentContext={props.context}
           dispatch={props.dispatch}
-          previousContext={props.context.previous}
           selection={props.selection}
           tickInterval={props.simulation.tickInterval}
           step={props.simulation.step}
-          width={values.size.pixelWidth}
-          height={values.size.pixelHeight}
+          view={props.view}
         />
         {props.context.isReadOnly || (
           <Menu
@@ -66,8 +64,8 @@ export default connect((s : State) => s)(
             forest={props.context.forest}
             editor={props.editor}
             editorMenu={props.editorMenu}
-            width={values.size.svgWidth}
-            height={values.size.svgHeight}
+            width={props.view.pixelWidth/window.devicePixelRatio}
+            height={props.view.pixelHeight/window.devicePixelRatio}
             view={props.view}
           />
         )}
@@ -112,12 +110,11 @@ function onResize(){
   return fromEvent(window, 'resize').pipe(
     startWith({} as Event),
     map(() => ({
-      svgWidth: window.document.body.clientWidth,
-      svgHeight: window.document.body.clientHeight,
       pixelWidth: window.document.body.clientWidth * window.devicePixelRatio,
       pixelHeight: window.document.body.clientHeight * window.devicePixelRatio
     })));
 }
+
 function getFromUrl(){
   const search = new URLSearchParams(document.location.search);
   const match = matchPath<{repo? : string, name : string}>(document.location.pathname, {path:'/c/:name/:repo*'});

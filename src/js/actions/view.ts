@@ -1,29 +1,41 @@
+import { TileViewPair } from "../reduce/perspective";
 
-export type ResizeAction = {
-  readonly type : 'resize',
-  readonly pixelWidth : number,
-  readonly pixelHeight : number
+export interface ResizeAction {
+  readonly type: 'resize',
+  readonly pixelWidth: number,
+  readonly pixelHeight: number
 }
-export const resize = (pixelWidth : number, pixelHeight : number) : ResizeAction => ({
+export const resize = (pixelWidth: number, pixelHeight: number): ResizeAction => ({
   type: 'resize',
   pixelWidth,
   pixelHeight
 });
 
-export type PanZoomAction = {
-  readonly type : 'panZoom',
-  readonly tileToViewport : (...pos : number[]) => [number, number],
-  readonly viewportToTile : (...pos : number[]) => [number, number]
+export interface PanZoomAction {
+  readonly type: 'panZoom',
+  readonly changed: TileViewPair[]
 }
-export const panZoom = (
-  tileToViewport : (...pos : number[]) => [number, number],
-  viewportToTile : (...pos : number[]) => [number, number]
-) : PanZoomAction => ({
+export const panZoom = (changed: TileViewPair[]): PanZoomAction => ({
   type: 'panZoom',
-  tileToViewport,
-  viewportToTile
+  changed
+});
+
+export interface FitBoxAction {
+  readonly type: 'fitBox',
+  readonly top: number,
+  readonly left: number,
+  readonly right: number,
+  readonly bottom: number
+}
+export const fitBox = ([top, left, right, bottom]: number[]): FitBoxAction => ({
+  type: 'fitBox',
+  top,
+  left,
+  right,
+  bottom
 });
 
 export type ViewActions =
   PanZoomAction |
-  ResizeAction;
+  ResizeAction |
+  FitBoxAction;

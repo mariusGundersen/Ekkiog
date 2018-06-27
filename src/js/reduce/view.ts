@@ -1,38 +1,38 @@
-import { vec2, mat3 } from 'gl-matrix';
-
 import {
-  ViewActions,
   Action
 } from '../actions';
+import { Perspective, initialPerspective, setViewport, transformTileToView, fitBox } from './perspective';
 
 export interface ViewState {
-  readonly pixelWidth : number,
-  readonly pixelHeight : number,
-  viewportToTile(...pos : number[]) : [number, number],
-  tileToViewport(...pos : number[]) : [number, number]
+  readonly pixelWidth: number,
+  readonly pixelHeight: number,
+  readonly perspective: Perspective
 }
 
-const initialState : ViewState = {
-  viewportToTile: () => [0,0],
-  tileToViewport: () => [0, 0],
+const initialState: ViewState = {
   pixelWidth: 100,
-  pixelHeight: 100
+  pixelHeight: 100,
+  perspective: initialPerspective
 };
 
-export default function view(state = initialState, action : Action) : ViewState {
+export default function view(state = initialState, action: Action): ViewState {
   switch(action.type){
     case 'panZoom':
       return {
         ...state,
-        viewportToTile: action.viewportToTile,
-        tileToViewport: action.tileToViewport
+        perspective: transformTileToView(state.perspective, action.changed)
       }
     case 'resize':
       return {
-        ...state,
         pixelWidth: action.pixelWidth,
-        pixelHeight: action.pixelHeight
+        pixelHeight: action.pixelHeight,
+        perspective: setViewport(state.perspective, action.pixelWidth, action.pixelHeight)
       };
+    case 'fitBox':
+      return {
+        ...state,
+        perspective: fitBox(state.perspective, action.top, action.left, action.right, action.bottom)
+      }
     default:
       return state;
   }

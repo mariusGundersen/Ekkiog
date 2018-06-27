@@ -12,6 +12,7 @@ import ContextMenu from './ContextMenu';
 import ContextMenuLoading from './ContextMenuLoading';
 import { Action } from '../actions';
 import { Forest } from 'ekkiog-editing';
+import { tileToViewport } from '../reduce/perspective';
 
 const radius = 40;
 const gap = 10;
@@ -54,7 +55,7 @@ export default (props: Props) => {
 const ContextMenuPos = (props: Props) => {
   if(props.contextMenu.type === 'load'){
     const { tx, ty } = props.contextMenu;
-    const [x, y] = props.view.tileToViewport(tx, ty);
+    const [x, y] = tileToViewport(props.view.perspective, tx, ty);
     return <ContextMenuLoading
       x={x/window.devicePixelRatio}
       y={y/window.devicePixelRatio}
@@ -62,7 +63,7 @@ const ContextMenuPos = (props: Props) => {
       radius={radius+gap} />;
   }else if(props.contextMenu.type === 'show'){
     const { tx, ty } = props.contextMenu;
-    const [x, y] = props.view.tileToViewport(tx, ty);
+    const [x, y] = tileToViewport(props.view.perspective, tx, ty);
     return <ContextMenu
       radius={radius+gap}
       width={radius+gap}

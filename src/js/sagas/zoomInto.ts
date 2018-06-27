@@ -7,6 +7,8 @@ import { State } from '../reduce';
 import { ContextState } from '../reduce/context';
 import { loadOrPull } from './loadForest';
 import * as storage from '../storage';
+import { StaticRouter } from 'react-router';
+import { viewportToTile } from '../reduce/perspective';
 
 export default function* zoomInto({x, y} : ZoomIntoAction){
   const { context, view } : State = yield select();
@@ -17,8 +19,9 @@ export default function* zoomInto({x, y} : ZoomIntoAction){
   const {repo, name} = locateRepo(areaData.data.package, context);
   const centerX = areaData.left + areaData.width/2;
   const centerY = areaData.top + areaData.height/2;
-  const [left, top] = view.viewportToTile(0, 0);
-  const [right, bottom] = view.viewportToTile(view.pixelWidth, view.pixelHeight);
+
+  const [left, top] = viewportToTile(view.perspective, 0, 0);
+  const [right, bottom] = viewportToTile(view.perspective, view.pixelWidth, view.pixelHeight);
   yield put(pushContextLoading(repo, name, {top, left, right, bottom}, centerX, centerY));
   try{
     const forest = yield* loadOrPull(repo, name, areaData.data.package.hash);

@@ -13,7 +13,7 @@ import {
   PointerUpEvent,
   CancelPanZoomEvent
 } from './types';
-import { TileViewPair } from '../Perspective';
+import { TileViewPair } from '../reduce/perspective';
 
 const empty: TileViewPair[] = [];
 

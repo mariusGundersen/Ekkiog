@@ -4,14 +4,13 @@ import { Dispatch } from 'redux';
 import style from './main.css';
 
 import {
-  resize,
   panZoom,
+  fitBox,
   Action
 } from '../actions';
 import { SelectionState } from '../reduce/selection';
-import { ContextState, ParentContextState } from '../reduce/context';
+import { ContextState } from '../reduce/context';
 
-import Perspective from '../Perspective';
 import startShell, { Config } from '../shell';
 import Engine from '../engines/Engine';
 import TouchControls from '../interaction';
@@ -22,16 +21,17 @@ import buttonHandler from '../editing/buttonHandler';
 import createRef from './createRef';
 import { fromEvent, of, merge } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
+import { viewportToTile, recalculate } from '../reduce/perspective';
+import { ViewState } from '../reduce/view';
+import { mat3 } from 'gl-matrix';
 
 export interface Props{
   readonly tickInterval: number,
   readonly step: number,
-  readonly width: number,
-  readonly height: number,
+  readonly view: ViewState,
   readonly selection: SelectionState,
   readonly contextMenu: ContextMenuState,
   readonly currentContext: ContextState,
-  readonly previousContext?: ParentContextState
   readonly dispatch: Dispatch<Action>
 }
 
@@ -40,16 +40,16 @@ export default class WebGLCanvas extends React.Component<Props, any> {
   private engine!: Engine;
   private touchControls!: TouchControls;
   private shellConfig!: Config
+  private mapToViewportMatrix!: mat3;
 
   componentDidMount(){
     if(!this.canvas.current) return
     const gl = getContext(this.canvas.current);
-    const perspective = new Perspective();
-    this.engine = new Engine(gl, this.props.width, this.props.height);
+    this.engine = new Engine(gl, this.props.view.pixelWidth, this.props.view.pixelHeight);
 
     const touches = getTouchEvents(
       this.canvas.current,
-      (x, y) => perspective.viewportToTile(x, y)
+      (x, y) => viewportToTile(this.props.view.perspective, x, y)
     );
 
     this.touchControls = new TouchControls(touches, this.props.dispatch);
@@ -63,21 +63,19 @@ export default class WebGLCanvas extends React.Component<Props, any> {
         if(ease.done){
           const changed = this.touchControls.getChangedTouches();
           if(changed.length){
-            perspective.transformTileToView(...changed);
-            this.props.dispatch(panZoom(
-              perspective.tileToViewport.bind(perspective),
-              perspective.viewportToTile.bind(perspective)
-            ));
+            this.props.dispatch(panZoom(changed));
+            return;
           }
         }else{
-          perspective.reset(arrayToBox(ease.value));
+          this.props.dispatch(fitBox(ease.value));
+          return;
         }
 
-        this.engine.render(perspective.mapToViewportMatrix);
+        this.engine.render(this.mapToViewportMatrix);
 
         if(this.props.selection.selection){
           this.engine.renderMove(
-            perspective.mapToViewportMatrix,
+            this.mapToViewportMatrix,
             this.props.selection,
             this.props.selection.dx,
             this.props.selection.dy);
@@ -86,18 +84,8 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       tick: tickCount => {
         this.engine.simulate(tickCount);
       },
-      resize: (width, height) => {
-        this.props.dispatch(resize(width, height));
-        perspective.setViewport(width, height);
-
-        this.props.dispatch(panZoom(
-          perspective.tileToViewport.bind(perspective),
-          perspective.viewportToTile.bind(perspective)
-        ));
-      }
+      resize: () => {}
     });
-
-    perspective.reset(this.props.currentContext.boundingBox);
   }
 
   componentWillReceiveProps(nextProps: Props){
@@ -119,24 +107,35 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     }
 
     this.shellConfig.tick(nextProps.step - this.props.step);
+    this.mapToViewportMatrix = recalculate(nextProps.view.perspective);
+
+    this.engine.render(this.mapToViewportMatrix);
+
+    if(nextProps.selection.selection){
+      this.engine.renderMove(
+        this.mapToViewportMatrix,
+        nextProps.selection,
+        nextProps.selection.dx,
+        nextProps.selection.dy);
+    }
   }
 
   shouldComponentUpdate(nextProps: Props){
-    return nextProps.width != this.props.width
-        || nextProps.height != this.props.height;
+    return nextProps.view.pixelWidth != this.props.view.pixelWidth
+        || nextProps.view.pixelHeight != this.props.view.pixelHeight;
   }
 
   render(){
     if(this.engine){
-      this.engine.setViewport(this.props.width, this.props.height);
+      this.engine.setViewport(this.props.view.pixelWidth, this.props.view.pixelHeight);
     }
 
     return (
       <canvas
         className={style.canvas}
         ref={this.canvas}
-        width={this.props.width}
-        height={this.props.height} />
+        width={this.props.view.pixelWidth}
+        height={this.props.view.pixelHeight} />
     );
   }
 };

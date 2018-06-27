@@ -9,24 +9,21 @@ import {
 } from '../actions';
 import { State } from '../reduce';
 import selection from './selection';
+import { viewportToTile } from '../reduce/perspective';
 
 export default function* insertComponentPackage({componentPackage} : InsertComponentPackageAction){
-  const state : State = yield select();
+  const {selection: {selection: isSelected}, view, context} : State = yield select();
 
-  if(state.selection.selection){
+  if(isSelected){
     yield put(stopSelection());
     yield put(resetEditorMenu());
   }
 
-  const tile = state.view.viewportToTile(state.view.pixelWidth/2, state.view.pixelHeight/2);
-  const centerTile = {
-    x: tile[0]|0,
-    y: tile[1]|0
-  };
+  const [x, y] = viewportToTile(view.perspective, view.pixelWidth/2, view.pixelHeight/2).map(Math.floor);
 
-  const forest = drawComponent(createForest(state.context.forest.buddyTree), centerTile.x, centerTile.y, componentPackage);
+  const forest = drawComponent(createForest(context.forest.buddyTree), x, y, componentPackage);
 
-  const item = getTileAt(forest, centerTile.x, centerTile.y);
+  const item = getTileAt(forest, x, y);
 
   const ok = yield* selection(item);
   if(ok){
