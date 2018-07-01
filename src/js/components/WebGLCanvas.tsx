@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Dispatch } from 'redux';
 
-import style from './main.css';
-
 import {
   panZoom,
   fitBox,
@@ -24,6 +22,7 @@ import { switchMap, tap } from 'rxjs/operators';
 import { viewportToTile, recalculate } from '../reduce/perspective';
 import { ViewState } from '../reduce/view';
 import { mat3 } from 'gl-matrix';
+import Canvas from './Canvas';
 
 export interface Props{
   readonly tickInterval: number,
@@ -64,27 +63,14 @@ export default class WebGLCanvas extends React.Component<Props, any> {
           const changed = this.touchControls.getChangedTouches();
           if(changed.length){
             this.props.dispatch(panZoom(changed));
-            return;
+          }else{
+            this.renderGl(this.props.selection);
           }
         }else{
           this.props.dispatch(fitBox(ease.value));
-          return;
-        }
-
-        this.engine.render(this.mapToViewportMatrix);
-
-        if(this.props.selection.selection){
-          this.engine.renderMove(
-            this.mapToViewportMatrix,
-            this.props.selection,
-            this.props.selection.dx,
-            this.props.selection.dy);
         }
       },
-      tick: tickCount => {
-        this.engine.simulate(tickCount);
-      },
-      resize: () => {}
+      tick: tickCount => this.engine.simulate(tickCount)
     });
   }
 
@@ -109,14 +95,18 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     this.shellConfig.tick(nextProps.step - this.props.step);
     this.mapToViewportMatrix = recalculate(nextProps.view.perspective);
 
+    this.renderGl(nextProps.selection);
+  }
+
+  renderGl(selection: SelectionState){
     this.engine.render(this.mapToViewportMatrix);
 
-    if(nextProps.selection.selection){
+    if(selection.selection){
       this.engine.renderMove(
         this.mapToViewportMatrix,
-        nextProps.selection,
-        nextProps.selection.dx,
-        nextProps.selection.dy);
+        selection,
+        selection.dx,
+        selection.dy);
     }
   }
 
@@ -131,8 +121,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     }
 
     return (
-      <canvas
-        className={style.canvas}
+      <Canvas
         ref={this.canvas}
         width={this.props.view.pixelWidth}
         height={this.props.view.pixelHeight} />

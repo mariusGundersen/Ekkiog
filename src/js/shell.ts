@@ -2,9 +2,6 @@ export interface Options{
   tickInterval : number;
   readonly render : (delta : number, now : number) => void;
   readonly tick : (tickCount : number) => void;
-  readonly resize : (
-    pixelWidth : number,
-    pixelHeight : number) => void;
 }
 
 export interface Config{
@@ -41,17 +38,6 @@ export default function startShell(options : Options) : Config{
     }
   }
   time(tick, onTickRequest);
-
-  /* RESIZE */
-  const onResizeRequest = () => {
-    const screenWidth = window.document.body.clientWidth;
-    const screenHeight = window.document.body.clientHeight;
-    const pixelWidth = screenWidth*window.devicePixelRatio;
-    const pixelHeight = screenHeight*window.devicePixelRatio;
-    options.resize(pixelWidth, pixelHeight);
-  };
-  window.addEventListener('resize', onResizeRequest)
-  onResizeRequest();
 
   return {
     setTickInterval(tickInterval : number){
