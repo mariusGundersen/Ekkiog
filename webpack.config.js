@@ -130,9 +130,11 @@ module.exports = {
           {
             loader:'css-loader',
             options: {
-              modules: true,
-              camelCase: true,
-              localIdentName: '_[local]-[hash:base64:16]'
+              sourceMap: true,
+              modules: {
+                localIdentName: debug ? '[local]__[path][name]' : '[hash:base64]'
+              },
+              localsConvention: 'camelCase',
             }
           },
           {
