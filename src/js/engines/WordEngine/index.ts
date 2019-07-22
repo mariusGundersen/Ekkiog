@@ -7,14 +7,14 @@ import wordFS from './wordFS.glsl';
 import { RenderContext } from '../textures/types';
 
 export default class WordEngine {
-  gl : WebGLRenderingContext;
-  shader : GlShader;
-  constructor(gl : WebGLRenderingContext) {
+  gl: WebGLRenderingContext;
+  shader: GlShader;
+  constructor(gl: WebGLRenderingContext) {
     this.gl = gl;
     this.shader = createShader(gl, wordVS, wordFS);
   }
 
-  render(context : RenderContext, matrix : mat3) {
+  render(context: RenderContext, matrix: mat3) {
     this.shader.bind();
 
     this.shader.uniforms.inverseSpriteTextureSize = context.spriteSheetTexture.inverseSize;
@@ -25,6 +25,6 @@ export default class WordEngine {
     this.shader.uniforms.spriteSheet = context.spriteSheetTexture.sampler2D(0);
     this.shader.uniforms.chargeMap = context.chargeMapTexture.sampler2D(1);
 
-    context.wordQuadList.draw();
+    context.wordQuads.draw();
   }
 }
