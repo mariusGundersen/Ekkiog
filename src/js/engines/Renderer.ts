@@ -81,11 +81,14 @@ export default class Renderer {
   test(context: RenderContext) {
     const chargeTexture = context.netChargeTextures[this.currentTick % 2];
 
+    const sample = this.currentTick % context.testResultTexture.width;//0 - (output.width-1)
+
     this.testEngine.render(
       context.testPoints,
       chargeTexture,
+      context.expectedResultTexture,
       context.testResultTexture,
-      this.currentTick);
+      sample);
   }
 
   renderView(context: RenderContext, mapToViewportMatrix: mat3) {

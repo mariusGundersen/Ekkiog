@@ -29,7 +29,7 @@ export default class PointList implements VertexBuffer {
     for (let i = 0; i < this.size; i++) {
       const v = gates[i];
       this.map.set(i, 0, 0);
-      this.map.set(i, 1, i / (this.size - 1));
+      this.map.set(i, 1, (i + 0.5) / this.size);
       this.map.set(i, 2, ((v >> 0) & 0xff));
       this.map.set(i, 3, ((v >> 8) & 0xff));
     }

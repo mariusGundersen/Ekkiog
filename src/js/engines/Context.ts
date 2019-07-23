@@ -33,6 +33,7 @@ export default class Context implements RenderContext {
   readonly tileMapTexture: RenderTexture;
   readonly chargeMapTexture: RenderTexture;
   readonly netChargeTextures: [RenderTexture, RenderTexture];
+  readonly expectedResultTexture: DataTexture;
   readonly testResultTexture: RenderTexture;
   constructor(gl: WebGLRenderingContext, bindingTracker: AtomicBind) {
     this.tileSize = TILE_SIZE;
@@ -55,7 +56,8 @@ export default class Context implements RenderContext {
       new RenderTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB)
     ];
 
-    this.testResultTexture = new RenderTexture(gl, 1024, 8);
+    this.expectedResultTexture = new DataTexture(gl, 256, 8);
+    this.testResultTexture = new RenderTexture(gl, 256, 8);
   }
 
   mutateContext(mutator: (mutableContext: MutableContext) => void) {

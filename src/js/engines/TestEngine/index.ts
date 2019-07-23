@@ -14,20 +14,19 @@ export default class TestEngine {
     this.shader = createShader(gl, testVS, testFS);
   }
 
-  clear() {
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-  }
-
-  render(vertexBuffer: VertexBuffer, chargeTexture: TextureBuffer, output: FrameBuffer, tick: number) {
+  render(vertexBuffer: VertexBuffer, chargeTexture: TextureBuffer, exectedResultTexture: TextureBuffer, output: FrameBuffer, sample: number) {
     output.bindFramebuffer();
 
     this.shader.bind();
 
-    const sample = tick % output.width;//0 - (output.width-1)
-    const posX = sample / (output.width - 1);//0 - 1
+    if (sample == 0)
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+    const posX = (sample + 0.5) / output.width;//0 - 1
 
     this.shader.uniforms['posX'] = posX;
     this.shader.uniforms['chargeTexture'] = chargeTexture.sampler2D(0);
+    this.shader.uniforms['expectedResultTexture'] = exectedResultTexture.sampler2D(1);
 
     vertexBuffer.draw();
 

@@ -32,6 +32,7 @@ export interface RenderContext {
   readonly netMapTexture: TextureBuffer;
   readonly mapTexture: TextureBuffer;
   readonly gatesTexture: TextureBuffer;
+  readonly expectedResultTexture: TextureBuffer;
   readonly testResultTexture: TextureBuffer & FrameBuffer;
 }
 
