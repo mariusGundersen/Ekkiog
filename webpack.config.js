@@ -3,39 +3,9 @@ const webpack = require('webpack');
 const OfflinePlugin = require('offline-plugin');
 const autoprefixer = require('autoprefixer');
 const nesting = require('postcss-nesting');
-const BabelMinifyPlugin = require("babel-minify-webpack-plugin");
 const Visualizer = require('webpack-visualizer-plugin');
 
 const debug = process.env.NODE_ENV !== 'production';
-
-const babelLoader = {
-  loader: 'babel-loader',
-  options: {
-    cacheDirectory: true,
-
-    presets: [
-      ["env", {
-        spec: true,
-        modules: false,
-        targets : {
-          "ios": 11,
-          "chrome": 65,
-          "firefox": 59
-        }
-      }],
-      "react"
-    ],
-    plugins: [
-      ["transform-runtime", {
-        polyfill: false,
-        regenerator: false
-      }],
-      "transform-class-properties",
-      "transform-object-rest-spread",
-      "syntax-dynamic-import"
-    ]
-  }
-};
 
 module.exports = {
   entry: {
@@ -62,23 +32,22 @@ module.exports = {
     new Visualizer(),
     ...(debug ? [
     ] : [
-      new OfflinePlugin({
-        caches: 'all',
-        ServiceWorker: {
-          events: true
-        },
-        minify: false,
-        externals: [
-          '/'
-        ]
-      }),
-      new BabelMinifyPlugin()
-    ])
+        new OfflinePlugin({
+          caches: 'all',
+          ServiceWorker: {
+            events: true
+          },
+          minify: false,
+          externals: [
+            '/'
+          ]
+        })
+      ])
   ],
   optimization: {
     namedModules: debug,
     noEmitOnErrors: debug,
-    minimize: false
+    minimize: !debug
   },
   resolve: {
     modules: [
@@ -99,14 +68,19 @@ module.exports = {
       {
         test: /\.tsx?$/,
         use: [
-          babelLoader,
+          'babel-loader',
           'ts-loader',
         ],
         exclude: /node_modules/
       },
       {
         test: /react-icons/,
-        loader: babelLoader
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            '@babel/preset-react'
+          ]
+        }
       },
       {
         test: /\.glsl$/,
@@ -128,7 +102,7 @@ module.exports = {
         use: [
           'style-loader',
           {
-            loader:'css-loader',
+            loader: 'css-loader',
             options: {
               sourceMap: true,
               modules: {
@@ -140,8 +114,8 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
-              plugins: () =>  [
-                autoprefixer({ browsers: ['iOS 9', 'last 2 versions'] }),
+              plugins: () => [
+                autoprefixer(),
                 nesting()
               ]
             }

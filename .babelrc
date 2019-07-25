@@ -1,23 +1,28 @@
 {
   "presets": [
-    ["env", {
-      "spec": true,
-      "modules": "commonjs",
-      "targets" : {
-        "ios": 11,
-        "chrome": 65,
-        "firefox": 59
+    [
+      "@babel/preset-env",
+      {
+        "spec": true,
+        "modules": "commonjs",
+        "targets": {
+          "ios": 11,
+          "chrome": 65,
+          "firefox": 59
+        }
       }
-    }],
-    "react"
+    ],
+    "@babel/preset-react"
   ],
   "plugins": [
-    ["transform-runtime", {
-      "polyfill": false,
-      "regenerator": false
-    }],
-    "transform-class-properties",
-    "transform-object-rest-spread",
-    "syntax-dynamic-import"
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "regenerator": false
+      }
+    ],
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/plugin-syntax-dynamic-import"
   ]
 }
