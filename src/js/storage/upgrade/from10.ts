@@ -1,7 +1,7 @@
-import {UpgradeDB} from 'idb';
+import { IDBPDatabase } from 'idb';
 
-export default function upgradeFrom10(db : UpgradeDB){
-  if(db.objectStoreNames.contains('components')) db.deleteObjectStore('components');
+export default function upgradeFrom10(db: IDBPDatabase<any>) {
+  if (db.objectStoreNames.contains('components')) db.deleteObjectStore('components');
 
   db.createObjectStore("objects", { keyPath: "hash" });
   db.createObjectStore("refs", { keyPath: "path" });
