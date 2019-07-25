@@ -1,30 +1,29 @@
-import { put, take, call } from 'redux-saga/effects';
+import { put } from 'redux-saga/effects';
 import Terminal from '@es-git/terminal';
 
 import { forestLoaded, newContextLoading, LoadForestAction, abortContextLoading, showPopup, hidePopup, gitProgressStatus, gitProgressMessage } from '../actions';
 import * as storage from '../storage';
 import { createForest } from 'ekkiog-editing';
 import setUrl from '../actions/router';
-import { eventChannel, delay } from 'redux-saga';
 import withProgress from './utils/withProgress';
 
-export default function* loadForest({repo, name, hash} : LoadForestAction) {
-  try{
+export default function* loadForest({ repo, name, hash }: LoadForestAction) {
+  try {
     yield put(newContextLoading(repo, name));
     const component = yield* loadOrCreate(repo, name, hash);
     yield put(setUrl(repo, name));
     yield put(forestLoaded(component, component.hash, repo.length > 0));
-  }catch(e){
+  } catch (e) {
     console.log(e);
     yield put(abortContextLoading());
   }
 };
 
-export function* loadOrCreate(repo : string, name : string, hash? : string){
-  if(repo.length === 0){
-    try{
+export function* loadOrCreate(repo: string, name: string, hash?: string) {
+  if (repo.length === 0) {
+    try {
       return yield* loadOrPull(repo, name, hash);
-    }catch(e){
+    } catch (e) {
       console.log(e);
       const forest = createForest();
       const hash = yield storage.create(name, forest);
@@ -33,26 +32,26 @@ export function* loadOrCreate(repo : string, name : string, hash? : string){
         hash
       };
     }
-  }else{
+  } else {
     return yield* loadOrPull(repo, name, hash);
   }
 }
 
-export function* loadOrPull(repo : string, name : string, hash? : string){
-  if(repo.length === 0){
+export function* loadOrPull(repo: string, name: string, hash?: string) {
+  if (repo.length === 0) {
     return yield storage.load(repo, name, hash);
-  }else{
-    try{
+  } else {
+    try {
       return yield storage.load(repo, name, hash);
-    }catch(e){
+    } catch (e) {
       return yield* pull(repo, name, hash);
     }
   }
 }
 
-function* pull(repo : string, name : string, hash? : string){
+function* pull(repo: string, name: string, hash?: string) {
   var terminal = new Terminal();
-  try{
+  try {
     yield put(gitProgressStatus('busy'));
     yield put(gitProgressMessage(terminal.logLine(`Loading ${name}\nfrom ${repo}`)));
     yield put(showPopup('GitProgress'));
@@ -60,7 +59,7 @@ function* pull(repo : string, name : string, hash? : string){
     yield put(gitProgressStatus('success'));
     yield put(hidePopup());
     return yield storage.load(repo, name, hash);
-  }catch(e){
+  } catch (e) {
     terminal.logLine();
     yield put(gitProgressStatus('failure'));
     yield put(gitProgressMessage(terminal.log(e.message)));
@@ -68,12 +67,12 @@ function* pull(repo : string, name : string, hash? : string){
   }
 }
 
-function* fetchWithProgress(repo : string, name : string, hash : string | undefined, terminal : Terminal){
-  const result : boolean = yield* withProgress(terminal, emit => storage.fetchComponent(repo, name, hash, emit));
+function* fetchWithProgress(repo: string, name: string, hash: string | undefined, terminal: Terminal) {
+  const result: boolean = yield* withProgress(terminal, emit => storage.fetchComponent(repo, name, hash, emit));
 
-  if(result){
+  if (result) {
     return;
-  }else{
+  } else {
     throw new Error(`Could not find ${name}\nin ${repo}`);
   }
 }
