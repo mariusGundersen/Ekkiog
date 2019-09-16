@@ -13,7 +13,8 @@ import {
   moveItemAt,
   saveAfter,
   resetEditorMenu,
-  Action
+  Action,
+  floodClearAt
 } from '../../actions';
 
 import IconWire from '../icons/IconWire';
@@ -27,53 +28,57 @@ import IconMove from '../icons/IconMove';
 import { ThunkDispatch } from 'redux-thunk';
 import { State } from '../../reduce';
 
-export function wireMenuItem(selectedTool : Tool, dispatch : Dispatch<Action>){
+export function wireMenuItem(selectedTool: Tool, dispatch: Dispatch<Action>) {
   return toolMenuItem('wire', <IconWire />, selectedTool, dispatch);
 }
 
-export function buttonMenuItem(selectedTool : Tool, dispatch : Dispatch<Action>){
+export function buttonMenuItem(selectedTool: Tool, dispatch: Dispatch<Action>) {
   return toolMenuItem('button', <IconButton />, selectedTool, dispatch);
 }
 
-export function gateMenuItem(selectedTool : Tool, dispatch : Dispatch<Action>){
+export function gateMenuItem(selectedTool: Tool, dispatch: Dispatch<Action>) {
   return toolMenuItem('gate', <IconGate />, selectedTool, dispatch);
 }
 
-export function underpassMenuItem(selectedTool : Tool, dispatch : Dispatch<Action>){
+export function underpassMenuItem(selectedTool: Tool, dispatch: Dispatch<Action>) {
   return toolMenuItem('underpass', <IconUnderpass />, selectedTool, dispatch);
 }
 
-export function lightMenuItem(selectedTool : Tool, dispatch : Dispatch<Action>){
+export function lightMenuItem(selectedTool: Tool, dispatch: Dispatch<Action>) {
   return toolMenuItem('light', <IconLight />, selectedTool, dispatch);
 }
 
-export function removeMenuItem(dispatch : ThunkDispatch<State, any, Action>, tx : number, ty : number){
+export function removeMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number) {
   return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(saveAfter(removeTileAt(tx, ty), 'Removed item'))));
 }
 
-export function toUnderpassMenuItem(dispatch : ThunkDispatch<State, any, Action>, tx : number, ty : number){
+export function floodClearMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number) {
+  return menuItem('floodClear', <IconRemove />, () => dispatch(hideContextMenuAfter(saveAfter(floodClearAt(tx, ty), 'Removed wire'))));
+}
+
+export function toUnderpassMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number) {
   return menuItem('toUnderpass', <IconUnderpass />, () => dispatch(hideContextMenuAfter(saveAfter(toUnderpass(tx, ty), 'Converted wire to underpass'))));
 }
-export function toWireMenuItem(dispatch : ThunkDispatch<State, any, Action>, tx : number, ty : number){
+export function toWireMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number) {
   return menuItem('toWire', <IconWire />, () => dispatch(hideContextMenuAfter(saveAfter(toWire(tx, ty), 'Converted underpass to wire'))));
 }
 
-export function acceptMenuItem(dispatch : Dispatch<Action>){
+export function acceptMenuItem(dispatch: Dispatch<Action>) {
   return menuItem('accept', <IconAccept />, () => {
     dispatch(resetEditorMenu());
     dispatch(hideContextMenu());
   });
 }
 
-export function moveMenuItem(dispatch : ThunkDispatch<State, any, Action>, tx : number, ty : number){
+export function moveMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number) {
   return menuItem('move', <IconMove />, () => dispatch(hideContextMenuAfter(moveItemAt(tx, ty))));
 }
 
-export function toolMenuItem(tool : Tool, icon : JSX.Element, selectedTool : Tool, dispatch : Dispatch<Action>){
+export function toolMenuItem(tool: Tool, icon: JSX.Element, selectedTool: Tool, dispatch: Dispatch<Action>) {
   return menuItem(tool, icon, () => dispatch(setSelectedTool(tool)), selectedTool === tool);
 }
 
-export function menuItem(key : string, icon : JSX.Element, action : () => void, selected=false, visible=true) : MenuItem{
+export function menuItem(key: string, icon: JSX.Element, action: () => void, selected = false, visible = true): MenuItem {
   return {
     itemKey: key,
     icon,
@@ -84,9 +89,9 @@ export function menuItem(key : string, icon : JSX.Element, action : () => void, 
 }
 
 export interface MenuItem {
-  itemKey : string;
-  icon : JSX.Element;
-  selected : boolean;
-  onClick() : void;
-  visible : boolean;
+  itemKey: string;
+  icon: JSX.Element;
+  selected: boolean;
+  onClick(): void;
+  visible: boolean;
 }

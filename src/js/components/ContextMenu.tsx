@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Dispatch } from 'redux';
-import { TileType, Forest, getTypeAt } from 'ekkiog-editing';
+import { TileType, Forest, getTypeAt } from 'ekkiog-editing';
 
 import { ContextMenuShowState } from '../reduce/contextMenu';
 import RadialMenu from './radialMenu';
@@ -11,7 +11,8 @@ import {
   toUnderpassMenuItem,
   toWireMenuItem,
   moveMenuItem,
-  MenuItem
+  MenuItem,
+  floodClearMenuItem
 } from './radialMenu/menuItems';
 import { Action } from '../actions';
 import PieRing from './radialMenu/PieRing';
@@ -29,16 +30,16 @@ export interface Props {
 
 export default class ContextMenu extends React.Component<Props, any>{
 
-  shouldComponentUpdate(nextProps: Props){
+  shouldComponentUpdate(nextProps: Props) {
     return nextProps.contextMenu !== this.props.contextMenu
-        || nextProps.forest !== this.props.forest
-        || nextProps.x !== this.props.x
-        || nextProps.y !== this.props.y
-        || nextProps.radius !== this.props.radius
-        || nextProps.width !== this.props.width;
+      || nextProps.forest !== this.props.forest
+      || nextProps.x !== this.props.x
+      || nextProps.y !== this.props.y
+      || nextProps.radius !== this.props.radius
+      || nextProps.width !== this.props.width;
   }
 
-  render(){
+  render() {
     return (
       <g transform={`translate(${this.props.x} ${this.props.y})`}>
         <RadialMenu cx={0} cy={0}>
@@ -53,8 +54,8 @@ export default class ContextMenu extends React.Component<Props, any>{
             key={2}
             radius={this.props.radius}
             width={this.props.width}
-            fromTurnFraction={1/8}
-            toTurnFraction={3/8}
+            fromTurnFraction={1 / 8}
+            toTurnFraction={3 / 8}
             show={true}
             menuItems={[acceptMenuItem(this.props.dispatch)]}
           />
@@ -82,24 +83,24 @@ const ContextMenuRing = pure((p, n) => p.contextMenu != n.contextMenu, (props: C
     key={1}
     radius={props.radius}
     width={props.width}
-    fromTurnFraction={(6-items.length)/8}
-    toTurnFraction={(6+items.length)/8}
+    fromTurnFraction={(6 - items.length) / 8}
+    toTurnFraction={(6 + items.length) / 8}
     show={true}
     menuItems={items}
   />
 });
 
-function *tileMenuItems(tile: TileType, tx: number, ty: number, dispatch: Dispatch<Action>){
-  if(tile == 'wire' || tile == 'empty'){
+function* tileMenuItems(tile: TileType, tx: number, ty: number, dispatch: Dispatch<Action>) {
+  if (tile == 'wire' || tile == 'empty') {
     yield toUnderpassMenuItem(dispatch, tx, ty);
+    yield floodClearMenuItem(dispatch, tx, ty);
   }
-  if(tile == 'underpass' || tile == 'empty'){
+  if (tile == 'underpass' || tile == 'empty') {
     yield toWireMenuItem(dispatch, tx, ty);
+    yield floodClearMenuItem(dispatch, tx, ty);
   }
-  if(tile == 'gate' || tile == 'component' || tile == 'light' || tile == 'button'){
+  if (tile == 'gate' || tile == 'component' || tile == 'light' || tile == 'button') {
     yield moveMenuItem(dispatch, tx, ty);
-  }
-  if(tile != 'empty'){
     yield removeMenuItem(dispatch, tx, ty);
   }
 }
