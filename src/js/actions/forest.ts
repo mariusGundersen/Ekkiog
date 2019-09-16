@@ -141,6 +141,19 @@ export const toggleButton = (net: number): ToggleButtonAction => ({
   net
 });
 
+export type RotateTileAtAction = {
+  readonly type: 'rotate-tile-at',
+  readonly x: number,
+  readonly y: number,
+  readonly direction: Direction
+}
+export const rotateTileAt = (tx: number, ty: number, direction: Direction): RotateTileAtAction => ({
+  type: 'rotate-tile-at',
+  x: tx,
+  y: ty,
+  direction
+});
+
 
 export type ForestActions =
   SetForestAction |
@@ -154,4 +167,5 @@ export type ForestActions =
   InsertComponentAction |
   InsertComponentPackageAction |
   MoveItemAtAction |
-  ToggleButtonAction;
+  ToggleButtonAction |
+  RotateTileAtAction;

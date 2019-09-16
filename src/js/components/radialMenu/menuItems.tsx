@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Dispatch } from 'redux';
-import { Tool } from 'ekkiog-editing';
+import { Tool, Direction } from 'ekkiog-editing';
 
 import {
   setSelectedTool,
@@ -14,7 +14,8 @@ import {
   saveAfter,
   resetEditorMenu,
   Action,
-  floodClearAt
+  floodClearAt,
+  rotateTileAt
 } from '../../actions';
 
 import IconWire from '../icons/IconWire';
@@ -50,6 +51,10 @@ export function lightMenuItem(selectedTool: Tool, dispatch: Dispatch<Action>) {
 
 export function removeMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number) {
   return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(saveAfter(removeTileAt(tx, ty), 'Removed item'))));
+}
+
+export function rotateMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number, direction: Direction, icon: JSX.Element) {
+  return menuItem('rotate', icon, () => dispatch(hideContextMenuAfter(saveAfter(rotateTileAt(tx, ty, direction), 'Rotated item'))));
 }
 
 export function floodClearMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number) {

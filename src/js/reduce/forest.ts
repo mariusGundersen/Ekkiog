@@ -18,7 +18,8 @@ import {
   drawComponent,
   drawLight,
   clear,
-  floodClear
+  floodClear,
+  getTileAt
 } from 'ekkiog-editing';
 
 import {
@@ -43,9 +44,21 @@ export default function editing(forest = createForest(), action: Action): Forest
       return underpassToWire(forest, action.x, action.y);
     case 'insert-component':
       return drawComponent(forest, action.position.x + (action.component.width >> 1), action.position.y + (action.component.height >> 1), action.component);
+    case 'rotate-tile-at':
+      return rotate(forest, action.x, action.y, action.direction);
     default:
       return forest;
   }
+}
+
+function rotate(forest: Forest, x: number, y: number, direction: Direction) {
+  const item = getTileAt(forest, x, y);
+  if (item.data.type === BUTTON || item.data.type === LIGHT) {
+    forest = clear(forest, x, y);
+    return tap(forest, item.data.type, direction, item.left + 1, item.top + 1);
+  }
+
+  return forest;
 }
 
 export function tap(forest: Forest, tool: Tool, direction: Direction, x: number, y: number): Forest {
