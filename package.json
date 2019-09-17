@@ -76,7 +76,7 @@
     "buddy-tree": "^2.4.0",
     "classnames": "^2.2.6",
     "connected-react-router": "^6.5.2",
-    "ekkiog-editing": "^7.1.1",
+    "ekkiog-editing": "^7.1.3",
     "ennea-tree": "^2.2.0",
     "event-saga": "^3.0.0",
     "gl-matrix": "^3.0.0",
