@@ -15,24 +15,24 @@ import style from './mainMenu.scss';
 import Statistics from './Statistics';
 
 export interface Props {
-  readonly show : boolean
-  readonly user : OauthData | null
-  startSync(e : any) : void
+  readonly show: boolean
+  readonly user: OauthData | null
+  startSync(e: any): void
 }
 
 export default pure((a, b) => a.show !== b.show,
-  (props : Props) => (
-  <CSSTransition
-    in={props.show}
-    timeout={300}
-    classNames={style as any}
-    mountOnEnter={true}
-    unmountOnExit={true}>
-    <div className={`${theme.itemList} ${style.mainMenu}`}>
-      {(props.user ? <LoggedInMenu user={props.user} startSync={props.startSync} /> : <AnonymousMenu />)}
-    </div>
-  </CSSTransition>
-));
+  (props: Props) => (
+    <CSSTransition
+      in={props.show}
+      timeout={150}
+      classNames={style as any}
+      mountOnEnter={true}
+      unmountOnExit={true}>
+      <div className={`${theme.itemList} ${style.mainMenu}`}>
+        {(props.user ? <LoggedInMenu user={props.user} startSync={props.startSync} /> : <AnonymousMenu />)}
+      </div>
+    </CSSTransition>
+  ));
 
 const AnonymousMenu = () => <>
   <div className={style.userPhoto}>
@@ -45,7 +45,7 @@ const AnonymousMenu = () => <>
   <Version />
 </>;
 
-const LoggedInMenu = (props : {user : OauthData, startSync : (e : any) => void}) => <>
+const LoggedInMenu = (props: { user: OauthData, startSync: (e: any) => void }) => <>
   <img className={style.userPhoto} src={props.user.photo} />
   <div className={style.userName}>{props.user.name}</div>
   <a className={style.userLink} target="_blank" href={`https://${props.user.server}/${props.user.username}/${props.user.repo}`}>
@@ -65,7 +65,7 @@ const LoginButton = () => (
   </a>
 );
 
-const SyncButton = (props : {startSync : (e : any) => void}) => (
+const SyncButton = (props: { startSync: (e: any) => void }) => (
   <button className={theme.item} onClick={props.startSync}>
     <span className={theme.icon}><SyncIcon /></span>
     <span className={theme.label}>Synchronize</span>

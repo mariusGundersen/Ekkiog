@@ -63,7 +63,7 @@
       & .container {
         display: flex;
         flex: 1 0 auto;
-        transition: transform .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
+        transition: transform .15s cubic-bezier(0.250, 0.460, 0.450, 0.940);
 
         & .name-box {
           flex: 1 0 calc(100% - 96px);
@@ -105,7 +105,7 @@
           & input{
             flex: 1 0 auto;
             border: none;
-            transition: flex .3s cubic-bezier(0.250, 0.460, 0.450, 0.940);
+            transition: flex .15s cubic-bezier(0.250, 0.460, 0.450, 0.940);
             background: transparent;
             color: white;
             font-size: 16px;
