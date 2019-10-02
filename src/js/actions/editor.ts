@@ -1,7 +1,7 @@
 import {
   Tool,
   Direction
-} from 'ekkiog-editing';
+} from '../editing';
 
 export type SetSelectedToolAction = {
   readonly type : 'setSelectedTool',

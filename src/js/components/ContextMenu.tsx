@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Dispatch } from 'redux';
-import { TileType, Forest, getTypeAt } from 'ekkiog-editing';
+import { TileType, Forest, getTypeAt } from '../editing';
 
 import { ContextMenuShowState } from '../reduce/contextMenu';
 import RadialMenu from './radialMenu';

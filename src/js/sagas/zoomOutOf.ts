@@ -8,7 +8,7 @@ import {
   Forest,
   packageComponent,
   getTileAt,
-} from 'ekkiog-editing';
+} from '../editing';
 import { AreaData, getIterator } from 'ennea-tree';
 import { put, select, take } from 'redux-saga/effects';
 

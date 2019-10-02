@@ -1,4 +1,4 @@
-import { Tool, Direction, Box, Forest, createForest } from 'ekkiog-editing';
+import { Tool, Direction, Box, Forest, createForest } from '../editing';
 
 import forest from './forest';
 import getComponentBoundingBox from '../utils/getComponentBoundingBox';
@@ -9,46 +9,46 @@ import ease, { noEase, Easing, easeOut, easeIn } from '../utils/ease';
 import { createButtonTree, ButtonNode, toggleButton } from './buttonTree';
 
 export interface ContextState {
-  readonly repo : string
-  readonly name : string
-  readonly isReadOnly : boolean
-  readonly hash : string
-  readonly previous? : ParentContextState
-  readonly forest : Forest
-  readonly buttonTree : ButtonNode
-  readonly boundingBox : Box
-  readonly undoStack? : Link<Forest>
-  readonly redoStack? : Link<Forest>
-  readonly loading? : LoadingState
-  readonly saving : boolean
-  readonly ease : Easing
+  readonly repo: string
+  readonly name: string
+  readonly isReadOnly: boolean
+  readonly hash: string
+  readonly previous?: ParentContextState
+  readonly forest: Forest
+  readonly buttonTree: ButtonNode
+  readonly boundingBox: Box
+  readonly undoStack?: Link<Forest>
+  readonly redoStack?: Link<Forest>
+  readonly loading?: LoadingState
+  readonly saving: boolean
+  readonly ease: Easing
 }
 
 export interface ParentContextState extends ContextState {
-  readonly centerX : number
-  readonly centerY : number
+  readonly centerX: number
+  readonly centerY: number
 }
 
 export interface Link<T> {
-  readonly next? : Link<T>
-  readonly value : T
-  readonly count : number
+  readonly next?: Link<T>
+  readonly value: T
+  readonly count: number
 }
 
 export interface LoadingState {
-  readonly repo : string
-  readonly name : string
-  readonly scaleInFrom : number
-  readonly abort : ContextState
+  readonly repo: string
+  readonly name: string
+  readonly scaleInFrom: number
+  readonly abort: ContextState
 }
 
-const initialContext : ContextState = {
+const initialContext: ContextState = {
   repo: 'to open a component',
   name: 'Click here',
   isReadOnly: true,
   hash: '0000000000000000000000000000000000000000',
   forest: createForest(),
-  buttonTree: createButtonTree(256*256),
+  buttonTree: createButtonTree(256 * 256),
   boundingBox: {
     top: 56,
     left: 56,
@@ -59,8 +59,8 @@ const initialContext : ContextState = {
   saving: false
 }
 
-export default function context(state = initialContext, action: Action) : ContextState {
-  switch(action.type){
+export default function context(state = initialContext, action: Action): ContextState {
+  switch (action.type) {
     case 'new-context-loading':
       return {
         ...state,
@@ -83,7 +83,7 @@ export default function context(state = initialContext, action: Action) : Contex
         name: state.loading.name,
         isReadOnly: action.isReadOnly,
         forest: action.forest,
-        buttonTree: createButtonTree(256*256),
+        buttonTree: createButtonTree(256 * 256),
         hash: action.hash,
         boundingBox,
         ease: ease(boxToArray(scaleBox(boundingBox, state.loading.scaleInFrom)), boxToArray(boundingBox), easeOut, 200),
@@ -138,7 +138,7 @@ export default function context(state = initialContext, action: Action) : Contex
         redoStack: {
           value: state.forest,
           next: state.redoStack,
-          count: state.redoStack ? state.redoStack.count+1 : 1
+          count: state.redoStack ? state.redoStack.count + 1 : 1
         }
       };
     case 'redo-context':
@@ -149,7 +149,7 @@ export default function context(state = initialContext, action: Action) : Contex
         undoStack: {
           value: state.forest,
           next: state.undoStack,
-          count: state.undoStack ? state.undoStack.count+1 : 1
+          count: state.undoStack ? state.undoStack.count + 1 : 1
         }
       };
     case 'toggle-button':
@@ -163,13 +163,13 @@ export default function context(state = initialContext, action: Action) : Contex
 }
 
 function combine(
-  state : ContextState,
-  action : Action,
-  reducer : (forest : Forest, action : Action) => Forest)
-   : ContextState {
+  state: ContextState,
+  action: Action,
+  reducer: (forest: Forest, action: Action) => Forest)
+  : ContextState {
   const next = reducer(state.forest, action);
 
-  if(next === state.forest) {
+  if (next === state.forest) {
     return state;
   }
 
@@ -180,24 +180,24 @@ function combine(
     undoStack: {
       next: state.undoStack,
       value: state.forest,
-      count: state.undoStack ? state.undoStack.count+1 : 1
+      count: state.undoStack ? state.undoStack.count + 1 : 1
     }
   };
 }
 
-function boxToArray({top, left, right, bottom} : Box){
+function boxToArray({ top, left, right, bottom }: Box) {
   return [top, left, right, bottom];
 }
 
-function scaleBox({top, left, right, bottom} : Box, scale : number, x = (left+right)/2, y = ((top+bottom)/2)){
-  const halfWidth = (right - left)/2;
-  const halfHeight = (bottom - top)/2;
-  const scaleX = halfHeight <= halfWidth ? scale : halfWidth/halfHeight*scale;
-  const scaleY = halfHeight >= halfWidth ? scale : halfHeight/halfWidth*scale;
+function scaleBox({ top, left, right, bottom }: Box, scale: number, x = (left + right) / 2, y = ((top + bottom) / 2)) {
+  const halfWidth = (right - left) / 2;
+  const halfHeight = (bottom - top) / 2;
+  const scaleX = halfHeight <= halfWidth ? scale : halfWidth / halfHeight * scale;
+  const scaleY = halfHeight >= halfWidth ? scale : halfHeight / halfWidth * scale;
   return {
-    top: y - halfHeight**scaleY,
-    left: x - halfWidth**scaleX,
-    right: x + halfWidth**scaleX,
-    bottom: y + halfHeight**scaleY
+    top: y - halfHeight ** scaleY,
+    left: x - halfWidth ** scaleX,
+    right: x + halfWidth ** scaleX,
+    bottom: y + halfHeight ** scaleY
   };
 }

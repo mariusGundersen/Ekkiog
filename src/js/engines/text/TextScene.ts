@@ -1,21 +1,21 @@
-import { Item, Area } from 'ekkiog-editing';
+import { Item, Area } from '../../editing';
 
 import textFromItem from './textFromItem';
 
 import QuadList from '../textures/QuadList';
 
 export type ItemTexts = {
-  next? : ItemTexts,
-  size : number,
-  item : Item
+  next?: ItemTexts,
+  size: number,
+  item: Item
 };
 
-type ItemChain = ItemTexts | {next? : ItemTexts, size : number, item : null};
+type ItemChain = ItemTexts | { next?: ItemTexts, size: number, item: null };
 
-export default class TextScene{
-  quadList : QuadList;
-  itemChain : ItemChain;
-  constructor(quadList : QuadList){
+export default class TextScene {
+  quadList: QuadList;
+  itemChain: ItemChain;
+  constructor(quadList: QuadList) {
     this.quadList = quadList;
     this.itemChain = {
       size: 0,
@@ -23,13 +23,13 @@ export default class TextScene{
     };
   }
 
-  insertItem(item : Item, area : Area){
+  insertItem(item: Item, area: Area) {
     const characters = textFromItem(item, area);
-    if(characters.length == 0) return;
+    if (characters.length == 0) return;
 
     let size = 0;
     let itemLink = this.itemChain;
-    while(itemLink.next){
+    while (itemLink.next) {
       itemLink = itemLink.next;
       size += itemLink.size;
     }
@@ -41,12 +41,12 @@ export default class TextScene{
     };
   }
 
-  removeItem(item : Item){
+  removeItem(item: Item) {
     let count = 0;
     let size = 0;
     let itemLink = this.itemChain;
-    while(itemLink.next){
-      if(itemLink.next.item === item){
+    while (itemLink.next) {
+      if (itemLink.next.item === item) {
         count = itemLink.next.size;
         itemLink.next = itemLink.next.next;
         break;
@@ -57,11 +57,11 @@ export default class TextScene{
     this.quadList.remove(size, count);
   }
 
-  updateItem(before : Item, after : Item){
+  updateItem(before: Item, after: Item) {
     let itemLink = this.itemChain;
-    while(itemLink.next){
+    while (itemLink.next) {
       itemLink = itemLink.next;
-      if(itemLink.item === before){
+      if (itemLink.item === before) {
         itemLink.item = after;
         break;
       }

@@ -1,4 +1,4 @@
-import { EnneaTree, Box } from 'ekkiog-editing';
+import { EnneaTree, Box } from '../editing';
 import { getIterator } from 'ennea-tree';
 
 export default function getComponentBoundingBox(tree : EnneaTree) : Box {

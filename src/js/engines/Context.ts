@@ -1,4 +1,4 @@
-import { MutableContext as IMutableContext, Item, Area } from 'ekkiog-editing';
+import { MutableContext as IMutableContext, Item, Area } from '../editing';
 
 import { VertexBuffer, RenderContext, AtomicBind } from './textures/types';
 

@@ -11,7 +11,7 @@ import EditorMenu from './EditorMenu';
 import ContextMenu from './ContextMenu';
 import ContextMenuLoading from './ContextMenuLoading';
 import { Action } from '../actions';
-import { Forest } from 'ekkiog-editing';
+import { Forest } from '../editing';
 import { tileToViewport } from '../reduce/perspective';
 
 const radius = 40;

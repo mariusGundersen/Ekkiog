@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect, DispatchProp } from 'react-redux';
-import reax from 'reaxjs';
+import reax, { constant } from 'reaxjs';
 
 import { fromEvent } from 'rxjs';
 
@@ -28,10 +28,11 @@ import getRepoFromUrl from '../utils/getRepoFromUrl';
 type Props = State & DispatchProp<Action>;
 
 export default connect((s: State) => s)(
-  reax({
-    sync: () => true,
-    hidePopup: () => null
-  },
+  reax(
+    {
+      sync: constant(true),
+      hidePopup: constant(null)
+    },
     (events, _, initialProps: Props) => {
       initialProps.dispatch(getFromUrl());
 
@@ -41,11 +42,7 @@ export default connect((s: State) => s)(
 
       return {}
     },
-    ({
-      events,
-      props,
-      values
-    }) => {
+    (values, events, props) => {
       return (
         <div className={style.root}>
           <WebGLCanvas

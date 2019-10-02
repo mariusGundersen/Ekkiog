@@ -4,9 +4,9 @@ import {
   drawWire,
   drawGate,
   drawLight
-} from 'ekkiog-editing';
+} from '../../editing';
 
-export default function and(){
+export default function and() {
   let forest = createForest();
   forest = drawButton(forest, 58, 62);
   forest = drawWire(forest, 60, 62);

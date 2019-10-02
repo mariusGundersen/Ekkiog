@@ -1,34 +1,32 @@
-import { Tool } from 'ekkiog-editing';
-
 export type LoadContextMenuAction = {
-  readonly type : 'loadContextMenu',
-  readonly tx : number,
-  readonly ty : number
+  readonly type: 'loadContextMenu',
+  readonly tx: number,
+  readonly ty: number
 }
-export const loadContextMenu = (tx : number, ty : number) : LoadContextMenuAction => ({
+export const loadContextMenu = (tx: number, ty: number): LoadContextMenuAction => ({
   type: 'loadContextMenu',
   tx,
   ty
 });
 
 export type AbortLoadContextMenuAction = {
-  readonly type : 'abortLoadContextMenu'
+  readonly type: 'abortLoadContextMenu'
 }
-export const abortLoadContextMenu = () : AbortLoadContextMenuAction => ({
+export const abortLoadContextMenu = (): AbortLoadContextMenuAction => ({
   type: 'abortLoadContextMenu'
 });
 
 export type ShowContextMenuAction = {
-  readonly type : 'showContextMenu'
+  readonly type: 'showContextMenu'
 }
-export const showContextMenu = () : ShowContextMenuAction => ({
+export const showContextMenu = (): ShowContextMenuAction => ({
   type: 'showContextMenu'
 });
 
 export type HideContextMenuAction = {
-  readonly type : 'hideContextMenu'
+  readonly type: 'hideContextMenu'
 }
-export const hideContextMenu = () : HideContextMenuAction => ({
+export const hideContextMenu = (): HideContextMenuAction => ({
   type: 'hideContextMenu'
 });
 

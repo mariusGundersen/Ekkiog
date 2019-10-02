@@ -1,5 +1,5 @@
 import { put, select } from 'redux-saga/effects';
-import { getTileAt } from 'ekkiog-editing';
+import { getTileAt } from '../editing';
 
 import {
   MoveItemAtAction,

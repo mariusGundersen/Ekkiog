@@ -1,4 +1,4 @@
-import { Forest, diffAndReconcile, createEnneaTree } from 'ekkiog-editing';
+import { Forest, diffAndReconcile, createEnneaTree } from '../editing';
 
 import Engine from '../engines/Engine';
 

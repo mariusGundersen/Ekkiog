@@ -1,4 +1,4 @@
-import { BUTTON, createForest, Direction, GATE, LIGHT, Tool, Forest, getTileAt } from 'ekkiog-editing';
+import { BUTTON, createForest, Direction, GATE, LIGHT, Tool, Forest, getTileAt } from '../editing';
 import { put, select } from 'redux-saga/effects';
 
 import {

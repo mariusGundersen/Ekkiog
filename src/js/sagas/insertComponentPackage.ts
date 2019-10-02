@@ -1,4 +1,4 @@
-import { createForest, drawComponent, isEmpty, getTileAt } from 'ekkiog-editing';
+import { createForest, drawComponent, isEmpty, getTileAt } from '../editing';
 import { put, select } from 'redux-saga/effects';
 
 import {

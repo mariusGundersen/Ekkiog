@@ -14,7 +14,7 @@ import {
   drawWire,
   UNDERPASS,
   drawUnderpass
-} from 'ekkiog-editing';
+} from '../editing';
 import { set, AreaData } from 'ennea-tree';
 import { put, select, take } from 'redux-saga/effects';
 

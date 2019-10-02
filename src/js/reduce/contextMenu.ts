@@ -1,4 +1,4 @@
-import { TileType } from 'ekkiog-editing';
+import { TileType } from '../editing';
 
 import {
   Action, LoadContextMenuAction

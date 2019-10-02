@@ -1,5 +1,5 @@
 import * as React from 'react';
-import reax from 'reaxjs';
+import reax, { constant } from 'reaxjs';
 import { Dispatch } from 'redux';
 import { Observable, merge, of } from 'rxjs';
 import {
@@ -12,7 +12,7 @@ import {
   delayWhen,
   delay
 } from 'rxjs/operators';
-import { Package } from 'ekkiog-editing';
+import { Package } from '../editing';
 
 import MainMenuButton from './MainMenuButton';
 import SearchResults from './SearchResults';
@@ -54,37 +54,38 @@ export interface Props {
   readonly user: OauthData | null;
 }
 
-export default reax({
-  toggleSearch: () => true,
-  toggleSimulationMenu: () => true,
-  toggleMainMenu: () => true,
-  query: (value: string) => value,
-  insertPackage: (result: Package) => result,
-  openComponent: (result: RepoName) => result,
-  createComponent: (result: string) => result,
-  onUndo: () => true,
-  onRedo: () => true,
-  onSetTickInterval: (value: number) => value,
-  onStepForward: () => true,
-  goBack: () => true,
-  sync: () => true,
-  onShare: () => true
-}, ({
-  toggleSearch,
-  toggleSimulationMenu,
-  toggleMainMenu,
-  query,
-  insertPackage,
-  openComponent,
-  createComponent,
-  onUndo,
-  onRedo,
-  onSetTickInterval,
-  onStepForward,
-  goBack,
-  sync,
-  onShare
-}, props, initialProps: Props) => {
+export default reax(
+  {
+    toggleSearch: constant(true),
+    toggleSimulationMenu: constant(true),
+    toggleMainMenu: constant(true),
+    query: (value: string) => value,
+    insertPackage: (result: Package) => result,
+    openComponent: (result: RepoName) => result,
+    createComponent: (result: string) => result,
+    onUndo: constant(true),
+    onRedo: constant(true),
+    onSetTickInterval: (value: number) => value,
+    onStepForward: constant(true),
+    goBack: constant(true),
+    sync: constant(true),
+    onShare: constant(true)
+  }, ({
+    toggleSearch,
+    toggleSimulationMenu,
+    toggleMainMenu,
+    query,
+    insertPackage,
+    openComponent,
+    createComponent,
+    onUndo,
+    onRedo,
+    onSetTickInterval,
+    onStepForward,
+    goBack,
+    sync,
+    onShare
+  }, props, initialProps: Props) => {
     insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
     openComponent.subscribe(r => initialProps.dispatch(loadForest(r.repo, r.name)));
     createComponent.subscribe(r => initialProps.dispatch(createForest(r)));
@@ -127,57 +128,54 @@ export default reax({
         is('search'),
         switchMap(ifElse(query.pipe(startWith('')), '')))
     };
-  }, ({
-    events,
-    values,
-    props
-  }) => (
-      <div className={style.navbar} data-main-menu={values.showMainMenuDelayed}>
-        <div className={style.bar} data-loading={props.isLoading}>
-          <MainMenuButton
-            isActive={values.showMainMenu}
-            onClick={events.toggleMainMenu} />
-          <SearchBar
-            currentComponentName={props.currentComponentName}
-            currentComponentRepo={props.currentComponentRepo}
-            gateCount={props.gateCount}
-            showSearch={values.showSearch}
-            toggleSearch={events.toggleSearch}
-            isSaving={props.isSaving}
-            query={events.query}
-            canGoBack={props.isChildContext}
-            goBack={events.goBack} />
-          <SimulationMenuButton
-            onClick={events.toggleSimulationMenu}
-            isActive={values.showSimulationMenu} />
-        </div>
-        <MainMenu
-          show={values.showMainMenu}
-          user={props.user}
-          startSync={events.sync} />
-        <DelayEnterExit
-          show={values.showSearch}
-          enterDelay={150}>
-          <SearchResults
-            query={values.query}
-            insertPackage={events.insertPackage}
-            openComponent={events.openComponent}
-            createComponent={events.createComponent}
-            isReadOnly={props.isReadOnly} />
-        </DelayEnterExit>
-        <SimulationMenu
-          show={values.showSimulationMenu}
-          tickInterval={props.tickInterval}
-          undoCount={props.undoCount}
-          redoCount={props.redoCount}
-          canShare={props.currentComponentRepo == '' && props.user != null}
-          setTickInterval={events.onSetTickInterval}
-          stepForward={events.onStepForward}
-          undo={events.onUndo}
-          redo={events.onRedo}
-          share={events.onShare} />
+  },
+  (values, events, props) => (
+    <div className={style.navbar} data-main-menu={values.showMainMenuDelayed}>
+      <div className={style.bar} data-loading={props.isLoading}>
+        <MainMenuButton
+          isActive={values.showMainMenu}
+          onClick={events.toggleMainMenu} />
+        <SearchBar
+          currentComponentName={props.currentComponentName}
+          currentComponentRepo={props.currentComponentRepo}
+          gateCount={props.gateCount}
+          showSearch={values.showSearch}
+          toggleSearch={events.toggleSearch}
+          isSaving={props.isSaving}
+          query={events.query}
+          canGoBack={props.isChildContext}
+          goBack={events.goBack} />
+        <SimulationMenuButton
+          onClick={events.toggleSimulationMenu}
+          isActive={values.showSimulationMenu} />
       </div>
-    ));
+      <MainMenu
+        show={values.showMainMenu}
+        user={props.user}
+        startSync={events.sync} />
+      <DelayEnterExit
+        show={values.showSearch}
+        enterDelay={150}>
+        <SearchResults
+          query={values.query}
+          insertPackage={events.insertPackage}
+          openComponent={events.openComponent}
+          createComponent={events.createComponent}
+          isReadOnly={props.isReadOnly} />
+      </DelayEnterExit>
+      <SimulationMenu
+        show={values.showSimulationMenu}
+        tickInterval={props.tickInterval}
+        undoCount={props.undoCount}
+        redoCount={props.redoCount}
+        canShare={props.currentComponentRepo == '' && props.user != null}
+        setTickInterval={events.onSetTickInterval}
+        stepForward={events.onStepForward}
+        undo={events.onUndo}
+        redo={events.onRedo}
+        share={events.onShare} />
+    </div>
+  ));
 
 function is<T>(value: T) {
   return map(x => x === value);

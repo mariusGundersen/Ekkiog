@@ -1,4 +1,4 @@
-import { EnneaTree } from 'ekkiog-editing';
+import { EnneaTree } from '../editing';
 
 import {
   Action

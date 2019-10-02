@@ -1,5 +1,5 @@
 import { mat3 } from 'gl-matrix';
-import { Item, Area, Box } from 'ekkiog-editing';
+import { Item, Area, Box } from '../editing';
 
 import Context, { MutableContext } from './Context';
 import Renderer from './Renderer';

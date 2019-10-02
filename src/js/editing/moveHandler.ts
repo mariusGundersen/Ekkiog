@@ -1,4 +1,4 @@
-import { createEnneaTree, diffAndReconcile } from 'ekkiog-editing';
+import { createEnneaTree, diffAndReconcile } from '../editing';
 
 import Engine from '../engines/Engine';
 import { SelectionState } from '../reduce/selection';

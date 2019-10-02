@@ -1,4 +1,4 @@
-import { Forest, createForest } from 'ekkiog-editing';
+import { Forest, createForest } from '../editing';
 import { mix } from '@es-git/core';
 import IdbRepo, { init } from '@es-git/idb-repo';
 import objectMixin, { Person } from '@es-git/object-mixin';

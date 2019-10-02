@@ -6,7 +6,7 @@ import {
   Item,
   BoxArea,
   BuddyTree
-} from 'ekkiog-editing';
+} from '../editing';
 
 export type SetForestAction = {
   readonly type: 'set-forest',

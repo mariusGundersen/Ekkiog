@@ -3,7 +3,7 @@ import Terminal from '@es-git/terminal';
 
 import { forestLoaded, newContextLoading, LoadForestAction, abortContextLoading, showPopup, hidePopup, gitProgressStatus, gitProgressMessage } from '../actions';
 import * as storage from '../storage';
-import { createForest } from 'ekkiog-editing';
+import { createForest } from '../editing';
 import setUrl from '../actions/router';
 import withProgress from './utils/withProgress';
 

@@ -20,7 +20,7 @@ import {
   clear,
   floodClear,
   getTileAt
-} from 'ekkiog-editing';
+} from '../editing';
 
 import {
   Action

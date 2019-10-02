@@ -1,4 +1,4 @@
-import { Tool, Direction, Box } from 'ekkiog-editing';
+import { Tool, Direction, Box } from '../editing';
 
 import {
   Action

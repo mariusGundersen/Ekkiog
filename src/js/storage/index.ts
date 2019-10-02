@@ -6,7 +6,7 @@ import {
   packageComponent,
   Forest,
   Package
-} from 'ekkiog-editing';
+} from '../editing';
 
 import Repo from './repo';
 

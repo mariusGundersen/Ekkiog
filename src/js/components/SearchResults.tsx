@@ -13,7 +13,7 @@ import {
   combineLatest,
   tap
 } from 'rxjs/operators';
-import { Package } from 'ekkiog-editing';
+import { Package } from '../editing';
 
 import SearchResultView,
 {
@@ -40,15 +40,16 @@ export interface Props {
 
 const THE_YEAR_2010 = new Date(2010, 1);
 
-export default reax(({
-  insertPackage: (result: RepoName) => result,
-  openComponent: (result: RepoName) => result,
-  toggleFavorite: (result: RepoName) => result
-}), ({
-  insertPackage,
-  openComponent,
-  toggleFavorite
-}, props, initialProps: Props) => {
+export default reax(
+  {
+    insertPackage: (result: RepoName) => result,
+    openComponent: (result: RepoName) => result,
+    toggleFavorite: (result: RepoName) => result
+  }, ({
+    insertPackage,
+    openComponent,
+    toggleFavorite
+  }, props, initialProps: Props) => {
     insertPackage.subscribe(component => storage.loadPackage(component.repo, component.name).then(initialProps.insertPackage));
     openComponent.subscribe(component => initialProps.openComponent(component));
 
@@ -83,7 +84,7 @@ export default reax(({
       searchResults,
       noExactMatch
     };
-  }, ({ events, values: { searchResults, noExactMatch, query }, props }) => (
+  }, ({ searchResults, noExactMatch, query }, events, props) => (
     <div className={style.searchResultsContainer}>
       <div className={style.searchResults}>
         {noExactMatch && <NoExactMatchView key="no-exact-match" query={query} createComponent={props.createComponent} />}

@@ -4,9 +4,9 @@ import {
   drawWire,
   drawGate,
   drawLight
-} from 'ekkiog-editing';
+} from '../../editing';
 
-export default function xor(){
+export default function xor() {
   let forest = createForest();
   forest = drawButton(forest, 58, 62);
   forest = drawButton(forest, 58, 66);
@@ -37,10 +37,10 @@ export default function xor(){
   forest = drawGate(forest, 69, 66);
 
   forest = drawWire(forest, 70, 62);
-  forest = drawWire(forest ,70, 63);
+  forest = drawWire(forest, 70, 63);
 
   forest = drawWire(forest, 70, 65);
-  forest = drawWire(forest ,70, 66);
+  forest = drawWire(forest, 70, 66);
 
   forest = drawGate(forest, 74, 64);
   forest = drawLight(forest, 76, 64);

@@ -1,13 +1,12 @@
-import { read } from 'fs';
-import { Forest, Box } from 'ekkiog-editing';
+import { Forest, Box } from '../editing';
 
 export type LoadForestAction = {
-  readonly type : 'load-forest'
-  readonly repo : string
-  readonly name : string
-  readonly hash? : string
+  readonly type: 'load-forest'
+  readonly repo: string
+  readonly name: string
+  readonly hash?: string
 }
-export const loadForest = (repo : string, name : string, hash? : string) : LoadForestAction => ({
+export const loadForest = (repo: string, name: string, hash?: string): LoadForestAction => ({
   type: 'load-forest',
   repo,
   name,
@@ -15,49 +14,49 @@ export const loadForest = (repo : string, name : string, hash? : string) : LoadF
 });
 
 export type SaveForestAction = {
-  readonly type : 'save-forest'
-  readonly message : string
+  readonly type: 'save-forest'
+  readonly message: string
 }
-export const saveForest = (message : string) : SaveForestAction => ({
+export const saveForest = (message: string): SaveForestAction => ({
   type: 'save-forest',
   message
 });
 
 
 export type CreateForestAction = {
-  readonly type : 'create-forest'
-  readonly name : string
+  readonly type: 'create-forest'
+  readonly name: string
 }
-export const createForest = (name : string) : CreateForestAction => ({
+export const createForest = (name: string): CreateForestAction => ({
   type: 'create-forest',
   name
 });
 
 export type NewContextLoadingAction = {
-  readonly type : 'new-context-loading',
-  readonly repo : string
-  readonly name : string
+  readonly type: 'new-context-loading',
+  readonly repo: string
+  readonly name: string
 }
-export const newContextLoading = (repo : string, name : string) : NewContextLoadingAction => ({
+export const newContextLoading = (repo: string, name: string): NewContextLoadingAction => ({
   type: 'new-context-loading',
   repo,
   name
 });
 
 export type AbortContextLoadingAction = {
-  readonly type : 'abort-context-loading'
+  readonly type: 'abort-context-loading'
 }
-export const abortContextLoading = () : AbortContextLoadingAction => ({
+export const abortContextLoading = (): AbortContextLoadingAction => ({
   type: 'abort-context-loading'
 });
 
 export type ForestLoadedAction = {
-  readonly type : 'forest-loaded',
-  readonly forest : Forest,
-  readonly hash : string
-  readonly isReadOnly : boolean
+  readonly type: 'forest-loaded',
+  readonly forest: Forest,
+  readonly hash: string
+  readonly isReadOnly: boolean
 }
-export const forestLoaded = (forest : Forest, hash : string, isReadOnly : boolean) : ForestLoadedAction => ({
+export const forestLoaded = (forest: Forest, hash: string, isReadOnly: boolean): ForestLoadedAction => ({
   type: 'forest-loaded',
   forest,
   hash,
@@ -65,32 +64,32 @@ export const forestLoaded = (forest : Forest, hash : string, isReadOnly : boolea
 });
 
 export type ZoomIntoAction = {
-  readonly type : 'zoom-into',
-  readonly x : number,
-  readonly y : number
+  readonly type: 'zoom-into',
+  readonly x: number,
+  readonly y: number
 }
-export const zoomInto = (x : number, y : number) : ZoomIntoAction => ({
+export const zoomInto = (x: number, y: number): ZoomIntoAction => ({
   type: 'zoom-into',
   x,
   y
 });
 
 export type ZoomOutOfAction = {
-  readonly type : 'zoom-out-of'
+  readonly type: 'zoom-out-of'
 }
-export const zoomOutOf = () : ZoomOutOfAction => ({
+export const zoomOutOf = (): ZoomOutOfAction => ({
   type: 'zoom-out-of'
 });
 
 export type PushContextLoadingAction = {
-  readonly type : 'push-context-loading',
-  readonly repo : string,
-  readonly name : string,
-  readonly boundingBox : Box,
-  readonly centerX : number,
-  readonly centerY : number
+  readonly type: 'push-context-loading',
+  readonly repo: string,
+  readonly name: string,
+  readonly boundingBox: Box,
+  readonly centerX: number,
+  readonly centerY: number
 }
-export const pushContextLoading = (repo : string, name : string, boundingBox : Box, centerX : number, centerY : number) : PushContextLoadingAction => ({
+export const pushContextLoading = (repo: string, name: string, boundingBox: Box, centerX: number, centerY: number): PushContextLoadingAction => ({
   type: 'push-context-loading',
   repo,
   name,
@@ -100,39 +99,39 @@ export const pushContextLoading = (repo : string, name : string, boundingBox : B
 });
 
 export type PopContextAction = {
-  readonly type : 'pop-context'
+  readonly type: 'pop-context'
 }
-export const popContext = () : PopContextAction => ({
+export const popContext = (): PopContextAction => ({
   type: 'pop-context'
 });
 
 export type ForestSavingAction = {
-  readonly type : 'forest-saving'
+  readonly type: 'forest-saving'
 }
-export const forestSaving = () : ForestSavingAction => ({
+export const forestSaving = (): ForestSavingAction => ({
   type: 'forest-saving'
 });
 
 export type ForestSavedAction = {
-  readonly type : 'forest-saved'
-  readonly hash : string
+  readonly type: 'forest-saved'
+  readonly hash: string
 }
-export const forestSaved = (hash : string) : ForestSavedAction => ({
+export const forestSaved = (hash: string): ForestSavedAction => ({
   type: 'forest-saved',
   hash
 });
 
 export type UndoAction = {
-  readonly type : 'undo-context'
+  readonly type: 'undo-context'
 }
-export const undo = () : UndoAction => ({
+export const undo = (): UndoAction => ({
   type: 'undo-context'
 });
 
 export type RedoAction = {
-  readonly type : 'redo-context'
+  readonly type: 'redo-context'
 }
-export const redo = () : RedoAction => ({
+export const redo = (): RedoAction => ({
   type: 'redo-context'
 });
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Dispatch } from 'redux';
-import { Tool, Direction } from 'ekkiog-editing';
+import { Tool, Direction } from '../editing';
 
 import RadialMenu from './radialMenu';
 

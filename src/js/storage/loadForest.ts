@@ -1,4 +1,4 @@
-import { Item, EnneaTree, Forest, BuddyTree, upgradeItem } from 'ekkiog-editing';
+import { Item, EnneaTree, Forest, BuddyTree, upgradeItem } from '../editing';
 import { BoxedData } from 'ennea-tree';
 
 import { Constructor, IRawRepo, Hash } from '@es-git/core';

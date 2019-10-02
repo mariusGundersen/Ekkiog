@@ -1,5 +1,5 @@
 import { mat3 } from 'gl-matrix';
-import { Box } from 'ekkiog-editing';
+import { Box } from '../editing';
 
 import ViewEngine from './ViewEngine';
 import TileMapEngine from './TileMapEngine';
