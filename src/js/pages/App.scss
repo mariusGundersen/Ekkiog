@@ -18,10 +18,12 @@
 
   &[data-menu=main] .play-area {
     transform: translateX(calc(100% - 48px));
+    transition: transform .5s cubic-bezier(.19, 1, .22, 1);
   }
 
   &[data-menu=file] .play-area {
     transform: translateX(calc(48px - 100%));
+    transition: transform .5s cubic-bezier(.19, 1, .22, 1);
   }
 
 }
