@@ -9,7 +9,8 @@ import {
   share,
   startWith,
   switchMap,
-  combineLatest
+  combineLatest,
+  filter
 } from 'rxjs/operators';
 import { Package } from '../../editing';
 
@@ -27,6 +28,7 @@ import style from './search.scss';
 
 import * as storage from '../../storage';
 import { getAllComponents, ComponentMetadata } from '../../storage';
+import classes from '../../components/classes';
 
 export interface Props {
   readonly query: string,
@@ -77,15 +79,55 @@ export default reax(
       map(([results, query]) => query.length > 0 && results.map(r => r.data.name).indexOf(query) === -1)
     );
 
+    const favoriteResults = searchResults.pipe(
+      map(r => r.filter(r => r.type === 'favorite')),
+      startWith([] as SearchResult[]),
+    );
+
+    const recentResults = searchResults.pipe(
+      map(r => r.filter(r => r.type === 'recent')),
+      startWith([] as SearchResult[]),
+    );
+
+    const otherResults = searchResults.pipe(
+      map(r => r.filter(r => r.type === 'normal')),
+      startWith([] as SearchResult[]),
+    );
+
     return {
       query,
-      searchResults,
+      favoriteResults,
+      recentResults,
+      otherResults,
       noExactMatch
     };
-  }, ({ searchResults, noExactMatch, query }, events, props) => (
+  }, ({ favoriteResults, recentResults, otherResults, noExactMatch, query }, events, props) => (
     <div className={style.searchResults}>
       {noExactMatch && <NoExactMatchView key="no-exact-match" query={query} createComponent={props.createComponent} />}
-      {searchResults.map(r => <SearchResultView
+      {favoriteResults.length > 0 && <div key="favorites-separator" className={classes(style.searchResult, style.searchSeparator)}>
+        Favorite components
+        </div>}
+      {favoriteResults.map(r => <SearchResultView
+        key={`${r.type}_${r.data.repo}_${r.data.name}`}
+        result={r}
+        canInsert={!props.isReadOnly}
+        insertPackage={events.insertPackage}
+        openComponent={events.openComponent}
+        toggleFavorite={events.toggleFavorite} />)}
+      {recentResults.length > 0 && <div key="recent-separator" className={classes(style.searchResult, style.searchSeparator)}>
+        Recent components
+        </div>}
+      {recentResults.map(r => <SearchResultView
+        key={`${r.type}_${r.data.repo}_${r.data.name}`}
+        result={r}
+        canInsert={!props.isReadOnly}
+        insertPackage={events.insertPackage}
+        openComponent={events.openComponent}
+        toggleFavorite={events.toggleFavorite} />)}
+      {otherResults.length > 0 && <div key="other-separator" className={classes(style.searchResult, style.searchSeparator)}>
+        {favoriteResults.length + recentResults.length > 0 ? 'Other' : ''} Components
+        </div>}
+      {otherResults.map(r => <SearchResultView
         key={`${r.type}_${r.data.repo}_${r.data.name}`}
         result={r}
         canInsert={!props.isReadOnly}
