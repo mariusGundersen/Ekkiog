@@ -16,6 +16,8 @@ export interface Props {
   createComponent(result: string): void;
 }
 
+export { RepoName };
+
 export default reax(
   {
     query: (value: string) => value

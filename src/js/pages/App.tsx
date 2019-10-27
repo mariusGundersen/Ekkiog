@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect, DispatchProp } from 'react-redux';
 import reax, { constant } from 'reaxjs';
 
-import { fromEvent, merge } from 'rxjs';
+import * as rx from 'rxjs';
 
 import { State } from '../reduce';
 
@@ -19,16 +19,24 @@ import style from './App.scss';
 import {
   startWith,
   map,
-  tap,
-  scan
+  scan,
+  merge
 } from 'rxjs/operators';
 import { matchPath } from 'react-router';
 
-import { hidePopup, loadForest, startSync, Action, resize, insertComponentPackage, createForest } from '../actions';
+import {
+  hidePopup,
+  loadForest,
+  startSync,
+  Action,
+  resize,
+  insertComponentPackage,
+  createForest
+} from '../actions';
 import getRepoFromUrl from '../utils/getRepoFromUrl';
 import DelayEnterExit from '../components/DelayEnterExit';
-import SearchResults from '../features/fileMenu/SearchResults';
-import FileMenu from '../features/fileMenu';
+import FileMenu, { RepoName } from '../features/fileMenu';
+import { Package } from '../editing/types';
 
 type Props = State & DispatchProp<Action>;
 
@@ -38,18 +46,36 @@ export default connect((s: State) => s)(
       sync: constant(),
       hidePopup: constant(),
       toggleMainMenu: constant(),
-      toggleSearchMenu: constant()
+      toggleSearchMenu: constant(),
+      insertPackage: (p: Package) => p,
+      openComponent: (r: RepoName) => r,
+      createComponent: (name: string) => name
     },
-    (events, _, initialProps: Props) => {
-      initialProps.dispatch(getFromUrl());
+    (events, _, { dispatch }: Props) => {
+      dispatch(getFromUrl());
 
-      events.hidePopup.subscribe(() => initialProps.dispatch(hidePopup()));
-      events.sync.subscribe(() => initialProps.dispatch(startSync()));
-      onResize().subscribe(({ pixelWidth, pixelHeight }) => initialProps.dispatch(resize(pixelWidth, pixelHeight)));
+      events.sync.subscribe(() => dispatch(startSync()));
+      events.hidePopup.subscribe(() => dispatch(hidePopup()));
+      events.insertPackage.subscribe(c => dispatch(insertComponentPackage(c)));
+      events.openComponent.subscribe(c => dispatch(loadForest(c.repo, c.name)));
+      events.createComponent.subscribe(name => dispatch(createForest(name)));
 
-      const showMainMenu = events.toggleMainMenu.pipe(toggle(false));
-      const showFileMenu = events.toggleSearchMenu.pipe(toggle(false));
-      const showMenu = merge(
+      onResize().subscribe(({ pixelWidth, pixelHeight }) => dispatch(resize(pixelWidth, pixelHeight)));
+
+      const showMainMenu = events.toggleMainMenu.pipe(
+        toggle(false)
+      );
+
+      const showFileMenu = events.toggleSearchMenu.pipe(
+        merge(
+          events.insertPackage,
+          events.openComponent,
+          events.createComponent
+        ),
+        toggle(false)
+      );
+
+      const showMenu = rx.merge(
         showMainMenu.pipe(map(s => s && 'main')),
         showFileMenu.pipe(map(s => s && 'file'))
       );
@@ -74,9 +100,9 @@ export default connect((s: State) => s)(
           exitDelay={1000}
           component={() =>
             <FileMenu
-              insertPackage={component => props.dispatch(insertComponentPackage(component))}
-              openComponent={component => props.dispatch(loadForest(component.repo, component.name))}
-              createComponent={name => props.dispatch(createForest(name))}
+              insertPackage={events.insertPackage}
+              openComponent={events.openComponent}
+              createComponent={events.createComponent}
               isReadOnly={props.context.isReadOnly} />
           } />
         <div className={style.playArea}>
@@ -145,7 +171,7 @@ export default connect((s: State) => s)(
 const toggle = (initial = false) => scan(state => !state, initial);
 
 function onResize() {
-  return fromEvent(window, 'resize').pipe(
+  return rx.fromEvent(window, 'resize').pipe(
     startWith({} as Event),
     map(() => ({
       pixelWidth: window.document.body.clientWidth * window.devicePixelRatio,
