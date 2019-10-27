@@ -37,6 +37,7 @@ import getRepoFromUrl from '../utils/getRepoFromUrl';
 import DelayEnterExit from '../components/DelayEnterExit';
 import FileMenu, { RepoName } from '../features/fileMenu';
 import { Package } from '../editing/types';
+import EditMenu from '../features/editMenu';
 
 type Props = State & DispatchProp<Action>;
 
@@ -145,6 +146,7 @@ export default connect((s: State) => s)(
             showSearchMenu={values.showFileMenu}
             toggleSearchMenu={events.toggleSearchMenu}
           />
+          <EditMenu />
         </div>
         <GitProgressPopup
           show={props.popup.show === 'GitProgress'}
