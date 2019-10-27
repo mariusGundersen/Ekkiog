@@ -11,9 +11,7 @@ interface ForwardeRefProps extends Props {
   readonly forwardedRef: any
 }
 
-const compare = (a: ForwardeRefProps, b: ForwardeRefProps) => a.width !== b.width || a.height !== b.height;
-
-const Canvas = pure(compare, props => (
+const Canvas = pure<ForwardeRefProps>(['width', 'height'], props => (
   <canvas
     className={style.canvas}
     ref={props.forwardedRef}

@@ -1,7 +1,5 @@
 import * as React from 'react';
-import UploadIcon from 'react-icons/fa/cloud-upload';
 import GithubIcon from 'react-icons/fa/github';
-import BusyIcon from 'react-icons/fa/spinner';
 import UserIcon from 'react-icons/fa/user';
 import SyncIcon from 'react-icons/fa/refresh';
 
@@ -20,7 +18,7 @@ export interface Props {
   startSync(e: any): void
 }
 
-export default pure((a, b) => a.show !== b.show,
+export default pure(['show'],
   (props: Props) => (
     <CSSTransition
       in={props.show}

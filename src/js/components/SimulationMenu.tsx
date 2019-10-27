@@ -13,34 +13,30 @@ import pure from './pure';
 import style from './simulationMenu.scss';
 
 export interface Props {
-  readonly show : boolean
-  readonly tickInterval : number
-  readonly undoCount : number
-  readonly redoCount : number
-  readonly canShare : boolean
-  setTickInterval(tickInterval : number) : void
-  stepForward(e : any) : void
-  undo(e : any) : void
-  redo(e : any) : void
-  share(e : any) : void
+  readonly show: boolean
+  readonly tickInterval: number
+  readonly undoCount: number
+  readonly redoCount: number
+  readonly canShare: boolean
+  setTickInterval(tickInterval: number): void
+  stepForward(e: any): void
+  undo(e: any): void
+  redo(e: any): void
+  share(e: any): void
 }
 
-export default pure(
-  (prev, next) => prev.show !== next.show
-               || prev.tickInterval !== next.tickInterval
-               || prev.undoCount !== next.undoCount
-               || prev.redoCount !== next.redoCount,
-  (props : Props) => (
-  <div className={style.container} >
-    <CSSTransition
-      in={props.show}
-      classNames={style as any}
-      timeout={300}
-      mountOnEnter={true}
-      unmountOnExit={true}>
-      <div
-        key="menu"
-        className={style.simulationMenu}>
+export default pure(['show', 'tickInterval', 'undoCount', 'redoCount'],
+  (props: Props) => (
+    <div className={style.container} >
+      <CSSTransition
+        in={props.show}
+        classNames={style as any}
+        timeout={300}
+        mountOnEnter={true}
+        unmountOnExit={true}>
+        <div
+          key="menu"
+          className={style.simulationMenu}>
           <button className={props.undoCount === 0 ? style.disabled : ''} onClick={props.undo}><IconUndo /></button>
           <button className={props.redoCount === 0 ? style.disabled : ''} onClick={props.redo}><IconRedo /></button>
           <div className={style.flexFill} />
@@ -48,15 +44,15 @@ export default pure(
           <div className={style.divider} />
           {props.tickInterval == Infinity
             ? <>
-              <button className={style.selected} onClick={() => props.setTickInterval(2**8)}><IconPause /></button>
+              <button className={style.selected} onClick={() => props.setTickInterval(2 ** 8)}><IconPause /></button>
               <button onClick={props.stepForward}><IconStepForward /></button>
             </> : <>
               <button onClick={() => props.setTickInterval(Infinity)}><IconPause /></button>
-              <button className={style.selected} onClick={() => props.setTickInterval(props.tickInterval == 2**8 ? 2**1 : 2**8)}>{
-                props.tickInterval == 2**8 ? <IconPlay /> : <IconFast />
+              <button className={style.selected} onClick={() => props.setTickInterval(props.tickInterval == 2 ** 8 ? 2 ** 1 : 2 ** 8)}>{
+                props.tickInterval == 2 ** 8 ? <IconPlay /> : <IconFast />
               }</button>
             </>}
-      </div>
-    </CSSTransition>
-  </div>
-));
+        </div>
+      </CSSTransition>
+    </div>
+  ));

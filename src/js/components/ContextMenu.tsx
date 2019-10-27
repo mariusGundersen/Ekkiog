@@ -11,7 +11,6 @@ import {
   toUnderpassMenuItem,
   toWireMenuItem,
   moveMenuItem,
-  MenuItem,
   floodClearMenuItem,
   rotateMenuItem
 } from './radialMenu/menuItems';
@@ -31,42 +30,28 @@ export interface Props {
   readonly y: number;
 }
 
-export default class ContextMenu extends React.Component<Props, any>{
-
-  shouldComponentUpdate(nextProps: Props) {
-    return nextProps.contextMenu !== this.props.contextMenu
-      || nextProps.forest !== this.props.forest
-      || nextProps.x !== this.props.x
-      || nextProps.y !== this.props.y
-      || nextProps.radius !== this.props.radius
-      || nextProps.width !== this.props.width;
-  }
-
-  render() {
-    return (
-      <g transform={`translate(${this.props.x} ${this.props.y})`}>
-        <RadialMenu cx={0} cy={0}>
-          <PieRing
-            key={0}
-            radius={this.props.radius}
-            width={this.props.width}
-            fromTurnFraction={1 / 8}
-            toTurnFraction={3 / 8}
-            show={true}
-            menuItems={[acceptMenuItem(this.props.dispatch)]}
-          />
-          <ContextMenuRing
-            radius={this.props.radius}
-            width={this.props.width}
-            contextMenu={this.props.contextMenu}
-            forest={this.props.forest}
-            dispatch={this.props.dispatch}
-          />
-        </RadialMenu>
-      </g>
-    );
-  }
-}
+export default pure<Props>(['contextMenu', 'forest', 'x', 'y', 'radius', 'width'], props => (
+  <g transform={`translate(${props.x} ${props.y})`}>
+    <RadialMenu cx={0} cy={0}>
+      <PieRing
+        key={0}
+        radius={props.radius}
+        width={props.width}
+        fromTurnFraction={1 / 8}
+        toTurnFraction={3 / 8}
+        show={true}
+        menuItems={[acceptMenuItem(props.dispatch)]}
+      />
+      <ContextMenuRing
+        radius={props.radius}
+        width={props.width}
+        contextMenu={props.contextMenu}
+        forest={props.forest}
+        dispatch={props.dispatch}
+      />
+    </RadialMenu>
+  </g>
+));
 
 interface ContextMenuRingProps {
   readonly radius: number,
@@ -76,7 +61,7 @@ interface ContextMenuRingProps {
   readonly dispatch: Dispatch
 }
 
-const ContextMenuRing = pure((p, n) => p.contextMenu != n.contextMenu, (props: ContextMenuRingProps) => {
+const ContextMenuRing = pure(['contextMenu'], (props: ContextMenuRingProps) => {
   const { tx, ty } = props.contextMenu;
   const tile = getTypeAt(props.forest.enneaTree, Math.floor(tx), Math.floor(ty));
   const items = [
