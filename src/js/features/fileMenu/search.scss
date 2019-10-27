@@ -1,0 +1,59 @@
+.searchResults {
+  display: flex;
+  flex-direction: column;
+  padding-top: 6px;
+  overflow: auto;
+
+  & .searchResult {
+    display: flex;
+    flex-direction: row;
+    border: none;
+    border-bottom: 1px solid #31363c;
+    color: white;
+
+    & .noExactMatch,
+    & .componentName,
+    & .openComponent,
+    & .toggleFavorite,
+    & .insertComponent {
+      outline: none;
+      background: none;
+      border: none;
+      text-align: left;
+      color: white;
+      font-size: 16px;
+      font-family: Courier Bold, Courier, monospace;
+      padding: 8px;
+    }
+
+    & .componentName {
+      padding: 0 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+
+      & .repo {
+        font-size: .6em;
+        color: #ccc;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    & .noExactMatch,
+    & .componentName {
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+
+    & .openComponent,
+    & .insertComponent,
+    & .toggleFavorite {
+      flex: 0 0 auto;
+      display: flex;
+      font-size: 24px;
+      padding: 8px;
+    }
+  }
+}

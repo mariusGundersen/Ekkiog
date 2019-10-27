@@ -9,11 +9,9 @@ import {
   share,
   startWith,
   switchMap,
-  withLatestFrom,
-  combineLatest,
-  tap
+  combineLatest
 } from 'rxjs/operators';
-import { Package } from '../editing';
+import { Package } from '../../editing';
 
 import SearchResultView,
 {
@@ -27,8 +25,8 @@ import SearchResultView,
 
 import style from './search.scss';
 
-import * as storage from '../storage';
-import { getAllComponents, ComponentMetadata } from '../storage';
+import * as storage from '../../storage';
+import { getAllComponents, ComponentMetadata } from '../../storage';
 
 export interface Props {
   readonly query: string,
@@ -85,17 +83,15 @@ export default reax(
       noExactMatch
     };
   }, ({ searchResults, noExactMatch, query }, events, props) => (
-    <div className={style.searchResultsContainer}>
-      <div className={style.searchResults}>
-        {noExactMatch && <NoExactMatchView key="no-exact-match" query={query} createComponent={props.createComponent} />}
-        {searchResults.map(r => <SearchResultView
-          key={`${r.type}_${r.data.repo}_${r.data.name}`}
-          result={r}
-          canInsert={!props.isReadOnly}
-          insertPackage={events.insertPackage}
-          openComponent={events.openComponent}
-          toggleFavorite={events.toggleFavorite} />)}
-      </div>
+    <div className={style.searchResults}>
+      {noExactMatch && <NoExactMatchView key="no-exact-match" query={query} createComponent={props.createComponent} />}
+      {searchResults.map(r => <SearchResultView
+        key={`${r.type}_${r.data.repo}_${r.data.name}`}
+        result={r}
+        canInsert={!props.isReadOnly}
+        insertPackage={events.insertPackage}
+        openComponent={events.openComponent}
+        toggleFavorite={events.toggleFavorite} />)}
     </div>
   ));
 

@@ -1,0 +1,22 @@
+.file-menu {
+  grid-area: full;
+  margin-left: 48px;
+  background: #424C57;
+
+  & .search-box {
+    display: flex;
+    flex: 0 1 auto;
+
+    & input {
+      flex: 1 0 auto;
+      border-bottom: 3px solid #03d3ff;
+      background: transparent;
+      color: white;
+      font-size: 16px;
+      font-family: Courier Bold, Courier, monospace;
+      outline: none;
+      margin: 10px;
+      padding: 10px;
+    }
+  }
+}

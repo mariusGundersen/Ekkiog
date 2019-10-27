@@ -1,43 +1,30 @@
 import * as React from 'react';
 import reax, { constant } from 'reaxjs';
 import { Dispatch } from 'redux';
-import { Observable, merge, of } from 'rxjs';
+import { merge } from 'rxjs';
 import {
   map,
   scan,
-  share,
-  startWith,
-  switchMap,
-  withLatestFrom,
-  delayWhen,
-  delay
+  share
 } from 'rxjs/operators';
-import { Package } from '../editing';
 
 import MainMenuButton from './MainMenuButton';
-import SearchResults from './SearchResults';
 import SimulationMenuButton from './SimulationMenuButton';
 import SimulationMenu from './SimulationMenu';
-import MainMenu from '../features/mainMenu';
-import SearchBar from './SearchBar';
+import SearchBar, { SearchButton } from './SearchBar';
 
 import style from './navbar.scss';
 
 import {
-  insertComponentPackage,
-  loadForest,
   setTickInterval,
   stepForward,
   undo,
   redo,
-  createForest,
   showPopup,
   zoomOutOf,
   startSync,
   Action
 } from '../actions';
-import { RepoName } from './SearchResultView';
-import DelayEnterExit from './DelayEnterExit';
 
 export interface Props {
   readonly dispatch: Dispatch<Action>;
@@ -53,17 +40,14 @@ export interface Props {
   readonly isChildContext: boolean;
   readonly user: OauthData | null;
   readonly showMainMenu: boolean;
+  readonly showSearchMenu: boolean;
   toggleMainMenu(e: any): void;
+  toggleSearchMenu(e: any): void;
 }
 
 export default reax(
   {
-    toggleSearch: constant(),
     toggleSimulationMenu: constant(),
-    query: (value: string) => value,
-    insertPackage: (result: Package) => result,
-    openComponent: (result: RepoName) => result,
-    createComponent: (result: string) => result,
     onUndo: constant(),
     onRedo: constant(),
     onSetTickInterval: (value: number) => value,
@@ -72,12 +56,7 @@ export default reax(
     sync: constant(),
     onShare: constant()
   }, ({
-    toggleSearch,
     toggleSimulationMenu,
-    query,
-    insertPackage,
-    openComponent,
-    createComponent,
     onUndo,
     onRedo,
     onSetTickInterval,
@@ -86,9 +65,6 @@ export default reax(
     sync,
     onShare
   }, _, { dispatch }: Props) => {
-    insertPackage.subscribe(r => dispatch(insertComponentPackage(r)));
-    openComponent.subscribe(r => dispatch(loadForest(r.repo, r.name)));
-    createComponent.subscribe(r => dispatch(createForest(r)));
     onUndo.subscribe(() => dispatch(undo()));
     onRedo.subscribe(() => dispatch(redo()));
     onSetTickInterval.subscribe(x => dispatch(setTickInterval(x)));
@@ -97,15 +73,7 @@ export default reax(
     sync.subscribe(() => dispatch(startSync()));
     onShare.subscribe(() => dispatch(showPopup('Share')));
 
-    const showSearch = merge(
-      toggleSearch,
-      insertPackage.pipe(map(() => true)),
-      openComponent.pipe(map(() => true)),
-      createComponent.pipe(map(() => true))
-    );
-
     const state = merge(
-      showSearch.pipe(map(_ => 'search')),
       toggleSimulationMenu.pipe(map(_ => 'simulation'))
     )
       .pipe(
@@ -117,10 +85,7 @@ export default reax(
       showSearch: state.pipe(
         is('search')),
       showSimulationMenu: state.pipe(
-        is('simulation')),
-      query: state.pipe(
-        is('search'),
-        switchMap(ifElse(query.pipe(startWith('')), '')))
+        is('simulation'))
     };
   },
   (values, events, props) => (
@@ -133,26 +98,16 @@ export default reax(
           currentComponentName={props.currentComponentName}
           currentComponentRepo={props.currentComponentRepo}
           gateCount={props.gateCount}
-          showSearch={values.showSearch}
-          toggleSearch={events.toggleSearch}
           isSaving={props.isSaving}
-          query={events.query}
           canGoBack={props.isChildContext}
           goBack={events.goBack} />
         <SimulationMenuButton
           onClick={events.toggleSimulationMenu}
           isActive={values.showSimulationMenu} />
+        <SearchButton
+          showSearch={props.showSearchMenu}
+          toggleSearch={props.toggleSearchMenu} />
       </div>
-      <DelayEnterExit
-        show={values.showSearch}
-        enterDelay={150}>
-        <SearchResults
-          query={values.query}
-          insertPackage={events.insertPackage}
-          openComponent={events.openComponent}
-          createComponent={events.createComponent}
-          isReadOnly={props.isReadOnly} />
-      </DelayEnterExit>
       <SimulationMenu
         show={values.showSimulationMenu}
         tickInterval={props.tickInterval}
@@ -171,7 +126,4 @@ function is<T>(value: T) {
   return map(x => x === value);
 }
 
-function ifElse<T>(observable: Observable<T>, fallback: T) {
-  return (condition: boolean) => condition ? observable : of(fallback);
-}
 

@@ -16,7 +16,7 @@ export interface Props {
 }
 
 export default (props: Props) => (
-  <div className={classes(theme.itemList, style.mainMenu)}>
+  <div className={classes(style.mainMenu, theme.itemList)}>
     {(props.user
       ? <LoggedInMenu user={props.user} startSync={props.startSync} />
       : <AnonymousMenu />)}

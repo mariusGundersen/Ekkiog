@@ -9,32 +9,30 @@ import MdFavorite from 'react-icons/fa/heart';
 import MdFavoriteBorder from 'react-icons/fa/heart-o';
 
 import style from './search.scss';
-import { Switch, Route } from 'react-router-dom';
-import { ComponentMetadata } from '../storage/index';
 
-export const RECENT : 'recent' = 'recent';
-export const FAVORITE : 'favorite' = 'favorite';
-export const NORMAL : 'normal' = 'normal';
+export const RECENT: 'recent' = 'recent';
+export const FAVORITE: 'favorite' = 'favorite';
+export const NORMAL: 'normal' = 'normal';
 
 export interface SearchResult {
-  readonly data : RepoName
-  readonly type : 'recent' | 'favorite' | 'normal'
+  readonly data: RepoName
+  readonly type: 'recent' | 'favorite' | 'normal'
 }
 
 export interface RepoName {
-  readonly repo : string
-  readonly name : string
+  readonly repo: string
+  readonly name: string
 }
 
 export interface SearchResultViewProps {
-  insertPackage(result : RepoName) : void;
-  openComponent(result : RepoName) : void;
-  toggleFavorite(result : RepoName) : void;
-  readonly result : SearchResult;
-  readonly canInsert : boolean;
+  insertPackage(result: RepoName): void;
+  openComponent(result: RepoName): void;
+  toggleFavorite(result: RepoName): void;
+  readonly result: SearchResult;
+  readonly canInsert: boolean;
 }
 
-export default function SearchResultView({insertPackage, openComponent, toggleFavorite, result, canInsert} : SearchResultViewProps){
+export default function SearchResultView({ insertPackage, openComponent, toggleFavorite, result, canInsert }: SearchResultViewProps) {
   return (
     <div className={style.searchResult}>
       <button
@@ -64,8 +62,8 @@ export default function SearchResultView({insertPackage, openComponent, toggleFa
   );
 }
 
-function getIcon(result : SearchResult){
-  switch(result.type){
+function getIcon(result: SearchResult) {
+  switch (result.type) {
     case 'recent':
       return <RecentComponentIcon />
     case 'favorite':
@@ -76,11 +74,11 @@ function getIcon(result : SearchResult){
 }
 
 export interface NoExactMatchViewProps {
-  readonly query : string;
-  createComponent(name : string) : void;
+  readonly query: string;
+  createComponent(name: string): void;
 }
 
-export function NoExactMatchView({query, createComponent} : NoExactMatchViewProps){
+export function NoExactMatchView({ query, createComponent }: NoExactMatchViewProps) {
   return (
     <div className={style.searchResult}>
       <button

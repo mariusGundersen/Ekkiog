@@ -1,19 +1,27 @@
 .root {
   flex: 1 0 100%;
   display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: 100vh;
   grid-template-areas: "full";
   font-size: 16px;
   font-family: Courier Bold, Courier, monospace;
+  background: #424C57;
 
   & .play-area {
     grid-area: full;
     box-shadow: 0 0 10px black;
     transition: transform .5s cubic-bezier(.18, .89, .32, 1.28);
     transform: translateX(0);
+    background: #31363D;
   }
 
   &[data-menu=main] .play-area {
-    transform: translateX(calc(100% - 40px));
+    transform: translateX(calc(100% - 48px));
+  }
+
+  &[data-menu=file] .play-area {
+    transform: translateX(calc(48px - 100%));
   }
 
 }

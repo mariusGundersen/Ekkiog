@@ -59,66 +59,35 @@
       flex: 1 0 auto;
       overflow: hidden;
 
-      & .container {
-        display: flex;
-        flex: 1 0 auto;
-        transition: transform .15s cubic-bezier(0.250, 0.460, 0.450, 0.940);
+      & .name-box {
+        flex: 1 0 calc(100% - 96px);
+        text-align: center;
+        overflow: hidden;
+        position: relative;
 
-        & .name-box {
-          flex: 1 0 calc(100% - 96px);
+        & span {
+          position: absolute;
+          left: 0;
+          right: 0;
           text-align: center;
-          overflow: hidden;
-          position: relative;
+          font-size: 16px;
+          font-family: Courier Bold, Courier, monospace;
 
-          & span {
-            position: absolute;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 16px;
-            font-family: Courier Bold, Courier, monospace;
-
-            &.name {
-              bottom: 16px;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
-
-            &.repo {
-              bottom: 4px;
-              font-size: .6em;
-              color: #ccc;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
+          &.name {
+            bottom: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
-        }
 
-        & .search-box {
-          flex: 1 0 calc(100% - 48px);
-          background: #424C57;
-          display: flex;
-
-          & input {
-            flex: 1 0 auto;
-            border: none;
-            transition: flex .15s cubic-bezier(0.250, 0.460, 0.450, 0.940);
-            background: transparent;
-            color: white;
-            font-size: 16px;
-            font-family: Courier Bold, Courier, monospace;
-            outline: none
+          &.repo {
+            bottom: 4px;
+            font-size: .6em;
+            color: #ccc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
-        }
-
-        &[data-state=name] {
-          transform: translateX(0);
-        }
-
-        &[data-state=search] {
-          transform: translateX(calc(48px - 100%));
         }
       }
     }
