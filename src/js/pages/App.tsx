@@ -13,12 +13,14 @@ import Popup from '../components/Popup';
 import GitProgressPopup from '../features/gitPopup';
 import Sync from '../features/sync';
 import Share from '../features/share';
+import MainMenu from '../features/mainMenu';
 
-import style from '../components/main.css';
+import style from './App.scss';
 import {
   startWith,
   map,
-  tap
+  tap,
+  scan
 } from 'rxjs/operators';
 import { matchPath } from 'react-router';
 
@@ -30,8 +32,9 @@ type Props = State & DispatchProp<Action>;
 export default connect((s: State) => s)(
   reax(
     {
-      sync: constant(true),
-      hidePopup: constant(null)
+      sync: constant(),
+      hidePopup: constant(),
+      toggleMainMenu: constant()
     },
     (events, _, initialProps: Props) => {
       initialProps.dispatch(getFromUrl());
@@ -40,46 +43,55 @@ export default connect((s: State) => s)(
       events.sync.subscribe(() => initialProps.dispatch(startSync()));
       onResize().subscribe(({ pixelWidth, pixelHeight }) => initialProps.dispatch(resize(pixelWidth, pixelHeight)));
 
-      return {}
+      return {
+        showMainMenu: events.toggleMainMenu.pipe(scan((state) => !state, false))
+      }
     },
     (values, events, props) => {
       return (
-        <div className={style.root}>
-          <WebGLCanvas
-            contextMenu={props.contextMenu}
-            currentContext={props.context}
-            dispatch={props.dispatch}
-            selection={props.selection}
-            tickInterval={props.simulation.tickInterval}
-            step={props.simulation.step}
-            view={props.view}
-          />
-          {props.context.isReadOnly || (
-            <Menu
+        <div className={style.root} data-menu={values.showMainMenu ? 'main' : ''}>
+          <MainMenu
+            startSync={events.sync}
+            user={props.user} />
+          <div className={style.playArea}>
+            <WebGLCanvas
               contextMenu={props.contextMenu}
+              currentContext={props.context}
               dispatch={props.dispatch}
-              forest={props.context.forest}
-              editor={props.editor}
-              editorMenu={props.editorMenu}
-              width={props.view.pixelWidth / window.devicePixelRatio}
-              height={props.view.pixelHeight / window.devicePixelRatio}
+              selection={props.selection}
+              tickInterval={props.simulation.tickInterval}
+              step={props.simulation.step}
               view={props.view}
             />
-          )}
-          <NavBar
-            dispatch={props.dispatch}
-            currentComponentName={props.context.loading ? `${props.context.loading.name}...` : props.context.name}
-            currentComponentRepo={props.context.loading ? props.context.loading.repo : props.context.repo}
-            tickInterval={props.simulation.tickInterval}
-            gateCount={props.context.loading ? 0 : (props.context.forest.buddyTree.usedSize || 2) - 2}
-            undoCount={props.context.undoStack && props.context.undoStack.count || 0}
-            redoCount={props.context.redoStack && props.context.redoStack.count || 0}
-            isLoading={props.context.loading !== undefined}
-            isSaving={props.context.saving}
-            isReadOnly={props.context.isReadOnly}
-            isChildContext={props.context.previous !== undefined}
-            user={props.user}
-          />
+            {props.context.isReadOnly || (
+              <Menu
+                contextMenu={props.contextMenu}
+                dispatch={props.dispatch}
+                forest={props.context.forest}
+                editor={props.editor}
+                editorMenu={props.editorMenu}
+                width={props.view.pixelWidth / window.devicePixelRatio}
+                height={props.view.pixelHeight / window.devicePixelRatio}
+                view={props.view}
+              />
+            )}
+            <NavBar
+              dispatch={props.dispatch}
+              currentComponentName={props.context.loading ? `${props.context.loading.name}...` : props.context.name}
+              currentComponentRepo={props.context.loading ? props.context.loading.repo : props.context.repo}
+              tickInterval={props.simulation.tickInterval}
+              gateCount={props.context.loading ? 0 : (props.context.forest.buddyTree.usedSize || 2) - 2}
+              undoCount={props.context.undoStack && props.context.undoStack.count || 0}
+              redoCount={props.context.redoStack && props.context.redoStack.count || 0}
+              isLoading={props.context.loading !== undefined}
+              isSaving={props.context.saving}
+              isReadOnly={props.context.isReadOnly}
+              isChildContext={props.context.previous !== undefined}
+              user={props.user}
+              showMainMenu={values.showMainMenu}
+              toggleMainMenu={events.toggleMainMenu}
+            />
+          </div>
           <GitProgressPopup
             show={props.popup.show === 'GitProgress'}
             state={props.gitPopup}

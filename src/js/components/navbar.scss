@@ -5,11 +5,12 @@
   top: 0;
   left: 0;
   right: 0;
-  max-height: 100%;
+  bottom: 0;
+  pointer-events: none;
   z-index: 3;
 
-  &[data-main-menu=true] {
-    bottom: 0;
+  &>* {
+    pointer-events: all;
   }
 
   & .bar {
@@ -24,15 +25,13 @@
     &[data-loading=true] {
       background-size: 80px 80px;
       animation: move 2s linear infinite;
-      background-image: linear-gradient(
-        -45deg,
-        #424C57 25%,
-        transparent 25%,
-        transparent 50%,
-        #424C57 50%,
-        #424C57 75%,
-        transparent 75%
-      )
+      background-image: linear-gradient(-45deg,
+          #424C57 25%,
+          transparent 25%,
+          transparent 50%,
+          #424C57 50%,
+          #424C57 75%,
+          transparent 75%)
     }
 
     & button.navbar-button {
@@ -102,7 +101,7 @@
           background: #424C57;
           display: flex;
 
-          & input{
+          & input {
             flex: 1 0 auto;
             border: none;
             transition: flex .15s cubic-bezier(0.250, 0.460, 0.450, 0.940);
@@ -130,6 +129,7 @@
   0% {
     background-position: 0 0;
   }
+
   100% {
     background-position: 160px 0;
   }

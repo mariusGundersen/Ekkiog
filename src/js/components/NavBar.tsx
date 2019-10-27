@@ -52,28 +52,28 @@ export interface Props {
   readonly isReadOnly: boolean;
   readonly isChildContext: boolean;
   readonly user: OauthData | null;
+  readonly showMainMenu: boolean;
+  toggleMainMenu(e: any): void;
 }
 
 export default reax(
   {
-    toggleSearch: constant(true),
-    toggleSimulationMenu: constant(true),
-    toggleMainMenu: constant(true),
+    toggleSearch: constant(),
+    toggleSimulationMenu: constant(),
     query: (value: string) => value,
     insertPackage: (result: Package) => result,
     openComponent: (result: RepoName) => result,
     createComponent: (result: string) => result,
-    onUndo: constant(true),
-    onRedo: constant(true),
+    onUndo: constant(),
+    onRedo: constant(),
     onSetTickInterval: (value: number) => value,
-    onStepForward: constant(true),
-    goBack: constant(true),
-    sync: constant(true),
-    onShare: constant(true)
+    onStepForward: constant(),
+    goBack: constant(),
+    sync: constant(),
+    onShare: constant()
   }, ({
     toggleSearch,
     toggleSimulationMenu,
-    toggleMainMenu,
     query,
     insertPackage,
     openComponent,
@@ -85,17 +85,17 @@ export default reax(
     goBack,
     sync,
     onShare
-  }, props, initialProps: Props) => {
-    insertPackage.subscribe(r => initialProps.dispatch(insertComponentPackage(r)));
-    openComponent.subscribe(r => initialProps.dispatch(loadForest(r.repo, r.name)));
-    createComponent.subscribe(r => initialProps.dispatch(createForest(r)));
-    onUndo.subscribe(() => initialProps.dispatch(undo()));
-    onRedo.subscribe(() => initialProps.dispatch(redo()));
-    onSetTickInterval.subscribe(x => initialProps.dispatch(setTickInterval(x)));
-    onStepForward.subscribe(() => initialProps.dispatch(stepForward()));
-    goBack.subscribe(() => initialProps.dispatch(zoomOutOf()));
-    sync.subscribe(() => initialProps.dispatch(startSync()));
-    onShare.pipe(withLatestFrom(props)).subscribe(([_,]) => initialProps.dispatch(showPopup('Share')));
+  }, _, { dispatch }: Props) => {
+    insertPackage.subscribe(r => dispatch(insertComponentPackage(r)));
+    openComponent.subscribe(r => dispatch(loadForest(r.repo, r.name)));
+    createComponent.subscribe(r => dispatch(createForest(r)));
+    onUndo.subscribe(() => dispatch(undo()));
+    onRedo.subscribe(() => dispatch(redo()));
+    onSetTickInterval.subscribe(x => dispatch(setTickInterval(x)));
+    onStepForward.subscribe(() => dispatch(stepForward()));
+    goBack.subscribe(() => dispatch(zoomOutOf()));
+    sync.subscribe(() => dispatch(startSync()));
+    onShare.subscribe(() => dispatch(showPopup('Share')));
 
     const showSearch = merge(
       toggleSearch,
@@ -106,8 +106,7 @@ export default reax(
 
     const state = merge(
       showSearch.pipe(map(_ => 'search')),
-      toggleSimulationMenu.pipe(map(_ => 'simulation')),
-      toggleMainMenu.pipe(map(_ => 'main'))
+      toggleSimulationMenu.pipe(map(_ => 'simulation'))
     )
       .pipe(
         scan((state, event) => state === event ? '' : event, ''),
@@ -119,22 +118,17 @@ export default reax(
         is('search')),
       showSimulationMenu: state.pipe(
         is('simulation')),
-      showMainMenu: state.pipe(
-        is('main')),
-      showMainMenuDelayed: state.pipe(
-        is('main'),
-        delayWhen(v => of(v).pipe(delay(v ? 0 : 150)))),
       query: state.pipe(
         is('search'),
         switchMap(ifElse(query.pipe(startWith('')), '')))
     };
   },
   (values, events, props) => (
-    <div className={style.navbar} data-main-menu={values.showMainMenuDelayed}>
+    <div className={style.navbar}>
       <div className={style.bar} data-loading={props.isLoading}>
         <MainMenuButton
-          isActive={values.showMainMenu}
-          onClick={events.toggleMainMenu} />
+          isActive={props.showMainMenu}
+          onClick={props.toggleMainMenu} />
         <SearchBar
           currentComponentName={props.currentComponentName}
           currentComponentRepo={props.currentComponentRepo}
@@ -149,10 +143,6 @@ export default reax(
           onClick={events.toggleSimulationMenu}
           isActive={values.showSimulationMenu} />
       </div>
-      <MainMenu
-        show={values.showMainMenu}
-        user={props.user}
-        startSync={events.sync} />
       <DelayEnterExit
         show={values.showSearch}
         enterDelay={150}>

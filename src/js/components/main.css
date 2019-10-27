@@ -1,40 +1,35 @@
-:global .react-app{
+:global .react-app {
   display: flex;
   flex: 1 0 100%;
 }
 
-.root{
-  flex: 1 0 100%;
-  display: flex;
-  font-size: 16px;
-  font-family: Courier Bold, Courier, monospace;
-}
-
-.clickable{
+.clickable {
   pointer-events: painted;
   touch-action: none;
 }
 
-.transTrans{
+.transTrans {
   transition: transform 0.5s;
 }
 
-.pieCenter{
+.pieCenter {
   transition: radius 0.5s;
 }
 
-.svg{
+.svg {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  user-select: none; /* prevent firefox on android bug */
+  user-select: none;
+  /* prevent firefox on android bug */
   z-index: 2;
-  pointer-events: none; /* touch through the svg down to the canvas below */
+  pointer-events: none;
+  /* touch through the svg down to the canvas below */
 }
 
-.canvas{
+.canvas {
   position: absolute;
   top: 0;
   left: 0;

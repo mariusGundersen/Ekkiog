@@ -4,33 +4,24 @@ import UserIcon from 'react-icons/fa/user';
 import SyncIcon from 'react-icons/fa/refresh';
 
 import TimeAgo from 'react-timeago';
-import { CSSTransition } from 'react-transition-group';
-
-import pure from '../../components/pure';
 import theme from '../../components/theme.scss';
 import DangerZone from './DangerZone';
 import style from './mainMenu.scss';
 import Statistics from './Statistics';
+import classes from '../../components/classes';
 
 export interface Props {
-  readonly show: boolean
   readonly user: OauthData | null
   startSync(e: any): void
 }
 
-export default pure(['show'],
-  (props: Props) => (
-    <CSSTransition
-      in={props.show}
-      timeout={150}
-      classNames={style as any}
-      mountOnEnter={true}
-      unmountOnExit={true}>
-      <div className={`${theme.itemList} ${style.mainMenu}`}>
-        {(props.user ? <LoggedInMenu user={props.user} startSync={props.startSync} /> : <AnonymousMenu />)}
-      </div>
-    </CSSTransition>
-  ));
+export default (props: Props) => (
+  <div className={classes(theme.itemList, style.mainMenu)}>
+    {(props.user
+      ? <LoggedInMenu user={props.user} startSync={props.startSync} />
+      : <AnonymousMenu />)}
+  </div>
+);
 
 const AnonymousMenu = () => <>
   <div className={style.userPhoto}>

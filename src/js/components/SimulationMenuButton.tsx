@@ -5,11 +5,11 @@ import MenuIcon from 'react-icons/fa/sliders';
 import style from './navbar.scss';
 
 export interface Props {
-  readonly isActive : boolean,
-  readonly onClick : (event : React.SyntheticEvent<HTMLButtonElement>) => void
+  readonly isActive: boolean,
+  onClick(event: React.SyntheticEvent<HTMLButtonElement>): void
 };
 
-export default (props : Props) => (
+export default (props: Props) => (
   <button
     className={style.navbarButton}
     onClick={props.onClick}
