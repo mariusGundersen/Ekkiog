@@ -14,6 +14,7 @@ import {
 import save from './save';
 import createForest from './createForest';
 import sync from '../features/sync/saga';
+import insertItem from './insertItem';
 
 export default function* rootSaga() {
   yield all([
@@ -26,24 +27,25 @@ export default function* rootSaga() {
     watchLatest('zoom-into', zoomInto),
     watchLatest('zoom-out-of', zoomOutOf),
     watchLatest('start-sync', sync),
-    watchLatest('double-tap-tile', doubleTap)
+    watchLatest('double-tap-tile', doubleTap),
+    watchLatest('insert-item', insertItem)
   ]);
 }
 
-function* watch<TAction extends Action>(name : TAction['type'], saga : (action : TAction) => any){
-  while(true){
+function* watch<TAction extends Action>(name: TAction['type'], saga: (action: TAction) => any) {
+  while (true) {
     yield* saga(yield take(name));
   }
 }
 
-function* watchLatest<TAction extends Action>(name : TAction['type'], saga : (action : TAction) => any){
+function* watchLatest<TAction extends Action>(name: TAction['type'], saga: (action: TAction) => any) {
   yield takeLatest(name, saga);
 }
 
-function* doubleTap({x, y}: DoubleTapTileAction){
-  if(x < 0 || y < 0 || x > 128 || y > 128){
+function* doubleTap({ x, y }: DoubleTapTileAction) {
+  if (x < 0 || y < 0 || x > 128 || y > 128) {
     yield put(zoomOut());
-  }else{
+  } else {
     yield put(zoomIn(x, y));
   }
 }

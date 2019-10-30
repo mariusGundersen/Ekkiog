@@ -4,5 +4,33 @@
   right: 0;
   bottom: 0;
   z-index: 3;
-  display: flex;
+  background: #31363c;
+  box-shadow: 0 -3px 5px #00000088;
+
+  & .tools-menu {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  & .ok-cancel-menu {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  & button.edit-button {
+    background: transparent;
+    padding: 4px;
+    margin: 0;
+    border: none;
+    font-size: 48px;
+    outline: none;
+
+    &:disabled {
+      visibility: hidden;
+    }
+
+    & span {
+      font-size: 48px;
+    }
+  }
 }

@@ -7,21 +7,22 @@ import { ContextMenuState } from '../reduce/contextMenu';
 import { EditorState } from '../reduce/editor';
 import { EditorMenuState } from '../reduce/editorMenu';
 import { ViewState } from '../reduce/view';
-import EditorMenu from './EditorMenu';
 import ContextMenu from './ContextMenu';
 import ContextMenuLoading from './ContextMenuLoading';
 import { Action } from '../actions';
-import { Forest } from '../editing';
+import { Forest, getTypeAt, getTileAt } from '../editing';
 import { tileToViewport } from '../reduce/perspective';
+import { SelectionState } from '../reduce/selection';
+import SelectionMenu from './SelectionMenu';
 
-const radius = 40;
-const gap = 10;
+export const RADIUS = 50;
 
 export interface Props {
   readonly dispatch: Dispatch<Action>,
   readonly width: number,
   readonly height: number,
   readonly contextMenu: ContextMenuState,
+  readonly selection: SelectionState,
   readonly view: ViewState,
   readonly editor: EditorState,
   readonly editorMenu: EditorMenuState
@@ -29,9 +30,6 @@ export interface Props {
 }
 
 export default (props: Props) => {
-  const cx = props.width;
-  const cy = props.height;
-
   return (
     <svg
       className={style.svg}
@@ -46,33 +44,59 @@ export default (props: Props) => {
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <EditorMenu cx={cx} cy={cy} radius={radius} gap={gap} width={radius + gap} editor={props.editor} editorMenu={props.editorMenu} dispatch={props.dispatch} />
       <ContextMenuPos {...props} />
+      <SelectionMenuPos {...props} />
     </svg>
   )
 };
 
 const ContextMenuPos = (props: Props) => {
-  if (props.contextMenu.type === 'load') {
-    const { tx, ty } = props.contextMenu;
-    const [x, y] = tileToViewport(props.view.perspective, tx, ty);
-    return <ContextMenuLoading
-      x={x / window.devicePixelRatio}
-      y={y / window.devicePixelRatio}
-      width={radius + gap}
-      radius={radius + gap} />;
-  } else if (props.contextMenu.type === 'show') {
-    const { tx, ty } = props.contextMenu;
-    const [x, y] = tileToViewport(props.view.perspective, tx, ty);
-    return <ContextMenu
-      radius={radius + gap}
-      width={radius + gap}
-      dispatch={props.dispatch}
-      contextMenu={props.contextMenu}
-      forest={props.forest}
-      x={x / window.devicePixelRatio}
-      y={y / window.devicePixelRatio} />;
-  } else {
-    return null;
+  switch (props.contextMenu.type) {
+    case 'load': {
+      const { tx, ty } = props.contextMenu;
+      const [x, y] = tileToViewport(props.view.perspective, tx, ty);
+      return <ContextMenuLoading
+        x={x / window.devicePixelRatio}
+        y={y / window.devicePixelRatio}
+      />;
+    }
+    case 'show': {
+      const { tx, ty } = props.contextMenu;
+      const tileType = getTypeAt(props.forest.enneaTree, Math.floor(tx), Math.floor(ty));
+      const [x, y] = tileToViewport(props.view.perspective, tx, ty);
+      return <ContextMenu
+        dispatch={props.dispatch}
+        tileType={tileType}
+        x={x / window.devicePixelRatio}
+        y={y / window.devicePixelRatio}
+        tx={Math.floor(tx)}
+        ty={Math.floor(ty)}
+      />;
+    }
+    default:
+      return null;
+  }
+}
+
+const SelectionMenuPos = ({ selection, dispatch, view }: Props) => {
+  if (!selection) return null;
+
+  const { data: tile } = getTileAt(selection, selection.left, selection.top);
+
+  switch (tile.type) {
+    case 'button':
+    case 'light':
+      const cx = (selection.left + selection.right) / 2 + selection.dx;
+      const cy = (selection.top + selection.bottom) / 2 + selection.dy;
+      const [x, y] = tileToViewport(view.perspective, cx, cy);
+      return <SelectionMenu
+        dispatch={dispatch}
+        tileType={tile.type}
+        direction={tile.direction}
+        x={x / window.devicePixelRatio}
+        y={y / window.devicePixelRatio}
+      />;
+    default:
+      return null;
   }
 }

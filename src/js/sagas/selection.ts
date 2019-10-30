@@ -13,7 +13,8 @@ import {
   WIRE,
   drawWire,
   UNDERPASS,
-  drawUnderpass
+  drawUnderpass,
+  getTileAt
 } from '../editing';
 import { set, AreaData } from 'ennea-tree';
 import { put, select, take } from 'redux-saga/effects';
@@ -27,36 +28,42 @@ import {
   OkCancelAction,
   MoveSelectionAction,
   setOkCancelMenuValid,
+  SetToolDirectionAction,
 } from '../actions';
 import { State } from '../reduce';
 
 export default function* selection(item: AreaData<Item>) {
   yield put(selectItem(set(createEnneaTree(), item.data, item), item));
-  const { isValid } = yield* validate(item.data);
+  const { isValid } = yield* validate();
   yield put(showOkCancelMenu(isValid));
   while (true) {
-    const action: OkCancelAction | MoveSelectionAction = yield take(['okCancel', 'moveSelection']);
-    const { isValid, forest } = yield* validate(item.data);
-    if (action.type === 'okCancel') {
-      yield put(stopSelection());
-      yield put(resetEditorMenu());
-      if (action.ok && isValid) {
-        yield put(setForest(forest));
-        return true
+    const action: OkCancelAction | MoveSelectionAction | SetToolDirectionAction = yield take(['okCancel', 'moveSelection', 'setToolDirection']);
+    const { isValid, forest } = yield* validate();
+    switch (action.type) {
+      case 'okCancel': {
+        yield put(stopSelection());
+        yield put(resetEditorMenu());
+        if (action.ok && isValid) {
+          yield put(setForest(forest));
+          return true
+        }
+        return false;
       }
-      return false;
-    } else {
-      yield put(setOkCancelMenuValid(isValid));
+      default: {
+        yield put(setOkCancelMenuValid(isValid));
+      }
     }
   }
 }
 
-function* validate(item: Item) {
+function* validate() {
   const { selection, context: { forest: oldForest } }: State = yield select();
-  if (selection.selection == false) return false;
-  const x = selection.x + selection.dx;
-  const y = selection.y + selection.dy;
-  const forest = drawItem(oldForest, item, x, y);
+  if (selection === null) return false;
+
+  const { data: item } = getTileAt(selection, selection.left, selection.top);
+  const left = selection.left + selection.dx;
+  const top = selection.top + selection.dy;
+  const forest = drawItem(oldForest, item, left, top);
   return { forest, isValid: oldForest !== forest };
 }
 

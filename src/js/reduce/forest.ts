@@ -42,8 +42,6 @@ export default function editing(forest = createForest(), action: Action): Forest
       return wireToUnderpass(forest, action.x, action.y);
     case 'convert-underpass-to-wire':
       return underpassToWire(forest, action.x, action.y);
-    case 'insert-component':
-      return drawComponent(forest, action.position.x + (action.component.width >> 1), action.position.y + (action.component.height >> 1), action.component);
     case 'rotate-tile-at':
       return rotate(forest, action.x, action.y, action.direction);
     default:

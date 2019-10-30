@@ -1,6 +1,7 @@
 import {
   EnneaTree,
-  Area
+  Area,
+  Direction
 } from '../editing';
 
 export type SelectItemAction = {

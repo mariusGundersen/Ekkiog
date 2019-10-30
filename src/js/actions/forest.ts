@@ -98,21 +98,7 @@ export const toWire = (tx: number, ty: number): ToWireAction => ({
   y: ty
 });
 
-export type InsertComponentAction = {
-  readonly type: 'insert-component',
-  readonly component: Package,
-  readonly position: {
-    readonly x: number,
-    readonly y: number
-  }
-}
-export const insertComponent = (component: Package, position: { x: number, y: number }): InsertComponentAction => ({
-  type: 'insert-component',
-  component,
-  position
-});
-
-export type InsertComponentPackageAction = {
+export interface InsertComponentPackageAction {
   readonly type: 'insert-component-package'
   readonly componentPackage: Package
 }
@@ -121,7 +107,16 @@ export const insertComponentPackage = (componentPackage: Package): InsertCompone
   componentPackage
 });
 
-export type MoveItemAtAction = {
+export interface InsertItemAction {
+  readonly type: 'insert-item'
+  readonly tool: Tool
+}
+export const insertItem = (tool: Tool): InsertItemAction => ({
+  type: 'insert-item',
+  tool
+});
+
+export interface MoveItemAtAction {
   readonly type: 'move-item-at'
   readonly tx: number
   readonly ty: number
@@ -164,8 +159,8 @@ export type ForestActions =
   FloodClearAtAction |
   ToUnderpassAction |
   ToWireAction |
-  InsertComponentAction |
   InsertComponentPackageAction |
+  InsertItemAction |
   MoveItemAtAction |
   ToggleButtonAction |
   RotateTileAtAction;

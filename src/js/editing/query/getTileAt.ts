@@ -1,6 +1,6 @@
 import { get } from "ennea-tree";
-import { Forest } from "../types";
+import { EnneaTree } from "../types";
 
-export default function getTileAt(forest: Forest, x: number, y: number) {
+export default function getTileAt(forest: { enneaTree: EnneaTree }, x: number, y: number) {
   return get(forest.enneaTree, y, x);
 }

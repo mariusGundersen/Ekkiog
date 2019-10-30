@@ -3,31 +3,31 @@ import {
 } from '../actions';
 
 export interface ContextMenuState {
-  readonly menuType : null
-  readonly previousMenu : EditorMenuState
+  readonly menuType: 'context'
+  readonly previousMenu: EditorMenuState
 }
 
 export interface ToolsMenuState {
-  readonly menuType : 'tools'
-  readonly open : boolean
+  readonly menuType: 'tools'
+  readonly open: boolean
 }
 
 export interface OkCancelMenuState {
-  readonly menuType : 'okCancel'
-  readonly open : true
-  readonly isValid : boolean
-  readonly previousMenu : EditorMenuState
+  readonly menuType: 'okCancel'
+  readonly open: true
+  readonly isValid: boolean
+  readonly previousMenu: EditorMenuState
 }
 
 export type EditorMenuState = ToolsMenuState | OkCancelMenuState | ContextMenuState;
 
-const initialState : EditorMenuState = {
+const initialState: EditorMenuState = {
   open: false,
   menuType: 'tools'
 };
 
-export default function editorMenu(state = initialState, action : Action) : EditorMenuState {
-  switch(action.type){
+export default function editorMenu(state = initialState, action: Action): EditorMenuState {
+  switch (action.type) {
     case 'toggleEditorMenu':
       return state.menuType == 'tools'
         ? {
@@ -36,7 +36,7 @@ export default function editorMenu(state = initialState, action : Action) : Edit
         } : state;
     case 'showContextMenu':
       return {
-        menuType: null,
+        menuType: 'context',
         previousMenu: state
       };
     case 'resetEditorMenu':
@@ -52,11 +52,11 @@ export default function editorMenu(state = initialState, action : Action) : Edit
       };
     case 'setOkCancelMenuValid':
       return state.menuType != 'okCancel'
-      ? state
-      : {
-        ...state,
-        isValid: action.isValid
-      };
+        ? state
+        : {
+          ...state,
+          isValid: action.isValid
+        };
     default:
       return state;
   }

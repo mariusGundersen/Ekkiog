@@ -6,7 +6,7 @@ import {
   fitBox,
   Action
 } from '../actions';
-import { SelectionState } from '../reduce/selection';
+import { SelectionState } from '../reduce/selection';
 import { ContextState } from '../reduce/context';
 
 import startShell, { Config } from '../shell';
@@ -24,7 +24,7 @@ import { ViewState } from '../reduce/view';
 import { mat3 } from 'gl-matrix';
 import Canvas from './Canvas';
 
-export interface Props{
+export interface Props {
   readonly tickInterval: number,
   readonly step: number,
   readonly view: ViewState,
@@ -41,8 +41,8 @@ export default class WebGLCanvas extends React.Component<Props, any> {
   private shellConfig!: Config
   private mapToViewportMatrix!: mat3;
 
-  componentDidMount(){
-    if(!this.canvas.current) return
+  componentDidMount() {
+    if (!this.canvas.current) return
     const gl = getContext(this.canvas.current);
     this.engine = new Engine(gl, this.props.view.pixelWidth, this.props.view.pixelHeight);
 
@@ -59,14 +59,14 @@ export default class WebGLCanvas extends React.Component<Props, any> {
       tickInterval: this.props.tickInterval,
       render: (delta: number) => {
         const ease = this.props.currentContext.ease.next(delta);
-        if(ease.done){
+        if (ease.done) {
           const changed = this.touchControls.getChangedTouches();
-          if(changed.length){
+          if (changed.length) {
             this.props.dispatch(panZoom(changed));
-          }else{
+          } else {
             this.renderGl(this.props.selection);
           }
-        }else{
+        } else {
           this.props.dispatch(fitBox(ease.value));
         }
       },
@@ -74,7 +74,7 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     });
   }
 
-  componentWillReceiveProps(nextProps: Props){
+  componentWillReceiveProps(nextProps: Props) {
     const currentContext = this.props.currentContext;
     const nextContext = nextProps.currentContext;
 
@@ -86,9 +86,9 @@ export default class WebGLCanvas extends React.Component<Props, any> {
 
     this.touchControls.setSelection(nextProps.selection);
 
-    if(nextProps.contextMenu.type === 'show' || nextProps.selection.selection){
+    if (nextProps.contextMenu.type === 'show' || nextProps.selection) {
       this.touchControls.disable();
-    }else{
+    } else {
       this.touchControls.enable();
     }
 
@@ -98,10 +98,10 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     this.renderGl(nextProps.selection);
   }
 
-  renderGl(selection: SelectionState){
+  renderGl(selection: SelectionState) {
     this.engine.render(this.mapToViewportMatrix);
 
-    if(selection.selection){
+    if (selection) {
       this.engine.renderMove(
         this.mapToViewportMatrix,
         selection,
@@ -110,13 +110,13 @@ export default class WebGLCanvas extends React.Component<Props, any> {
     }
   }
 
-  shouldComponentUpdate(nextProps: Props){
+  shouldComponentUpdate(nextProps: Props) {
     return nextProps.view.pixelWidth != this.props.view.pixelWidth
-        || nextProps.view.pixelHeight != this.props.view.pixelHeight;
+      || nextProps.view.pixelHeight != this.props.view.pixelHeight;
   }
 
-  render(){
-    if(this.engine){
+  render() {
+    if (this.engine) {
       this.engine.setViewport(this.props.view.pixelWidth, this.props.view.pixelHeight);
     }
 
@@ -131,11 +131,11 @@ export default class WebGLCanvas extends React.Component<Props, any> {
 
 function getContext(canvas: HTMLCanvasElement) {
   return canvas.getContext("webgl", {})
-      || canvas.getContext("experimental-webgl", {})
-      || (() => {throw new Error("no webgle here")})();
+    || canvas.getContext("experimental-webgl", {})
+    || (() => { throw new Error("no webgle here") })();
 }
 
-function getTouchEvents(canvas: HTMLCanvasElement, viewportToTile: (x: number, y: number) => [number, number]){
+function getTouchEvents(canvas: HTMLCanvasElement, viewportToTile: (x: number, y: number) => [number, number]) {
   return merge(
     fromEvent<TouchEvent>(canvas, 'touchstart'),
     fromEvent<TouchEvent>(canvas, 'touchmove'),
@@ -146,7 +146,7 @@ function getTouchEvents(canvas: HTMLCanvasElement, viewportToTile: (x: number, y
   );
 }
 
-function handle(viewportToTile: (x: number, y: number) => [number, number]){
+function handle(viewportToTile: (x: number, y: number) => [number, number]) {
   return (event: TouchEvent) => of(...Array.from(event.changedTouches)
     .map(touch => {
       const x = touch.pageX * window.devicePixelRatio;
@@ -163,6 +163,6 @@ function handle(viewportToTile: (x: number, y: number) => [number, number]){
     }))
 }
 
-function arrayToBox([top, left, right, bottom]: number[]){
-  return {top, left, right, bottom};
+function arrayToBox([top, left, right, bottom]: number[]) {
+  return { top, left, right, bottom };
 }

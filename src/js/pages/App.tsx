@@ -31,13 +31,15 @@ import {
   Action,
   resize,
   insertComponentPackage,
-  createForest
+  createForest,
+  insertItem
 } from '../actions';
 import getRepoFromUrl from '../utils/getRepoFromUrl';
 import DelayEnterExit from '../components/DelayEnterExit';
 import FileMenu, { RepoName } from '../features/fileMenu';
 import { Package } from '../editing/types';
 import EditMenu from '../features/editMenu';
+import { BUTTON } from '../editing';
 
 type Props = State & DispatchProp<Action>;
 
@@ -118,6 +120,7 @@ export default connect((s: State) => s)(
           />
           {props.context.isReadOnly || (
             <Menu
+              selection={props.selection}
               contextMenu={props.contextMenu}
               dispatch={props.dispatch}
               forest={props.context.forest}
@@ -146,7 +149,11 @@ export default connect((s: State) => s)(
             showSearchMenu={values.showFileMenu}
             toggleSearchMenu={events.toggleSearchMenu}
           />
-          <EditMenu />
+          <EditMenu
+            dispatch={props.dispatch}
+            editorMenu={props.editorMenu}
+            findComponent={events.toggleSearchMenu}
+          />
         </div>
         <GitProgressPopup
           show={props.popup.show === 'GitProgress'}
