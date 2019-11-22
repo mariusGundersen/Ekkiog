@@ -13,6 +13,7 @@ import TextScene from './text/TextScene';
 
 import loadImage from '../loadImage';
 import tiles from '../../img/tiles.png';
+import Rectangle from './textures/Rectangle';
 
 const MAP_SIZE = 128;
 const TILE_SIZE = 16;
@@ -35,6 +36,7 @@ export default class Context implements RenderContext {
   readonly netChargeTextures: [RenderTexture, RenderTexture];
   readonly expectedResultTexture: DataTexture;
   readonly testResultTexture: RenderTexture;
+  readonly testResultRectangle: Rectangle;
   constructor(gl: WebGLRenderingContext, bindingTracker: AtomicBind) {
     this.tileSize = TILE_SIZE;
 
@@ -58,6 +60,8 @@ export default class Context implements RenderContext {
 
     this.expectedResultTexture = new DataTexture(gl, 256, 8);
     this.testResultTexture = new RenderTexture(gl, 256, 8);
+
+    this.testResultRectangle = new Rectangle(bindingTracker, gl);
   }
 
   mutateContext(mutator: (mutableContext: MutableContext) => void) {

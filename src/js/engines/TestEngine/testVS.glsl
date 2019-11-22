@@ -11,4 +11,5 @@ void main(void) {
   gateAddress = position.zw;
   posY = position.y;
   gl_Position = vec4(pos, 0.0, 1.0);
+  gl_PointSize = 1.0;
 }

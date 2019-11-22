@@ -1,5 +1,5 @@
 import { mat3 } from 'gl-matrix';
-import { Box } from '../editing';
+import { Box } from '../editing';
 
 import ViewEngine from './ViewEngine';
 import TileMapEngine from './TileMapEngine';
@@ -11,6 +11,7 @@ import DebugEngine from './DebugEngine';
 import TestEngine from './TestEngine';
 
 import { RenderContext } from './textures/types';
+import RectangleEngine from './RectangleEngine';
 
 export default class Renderer {
   private readonly gl: WebGLRenderingContext;
@@ -23,6 +24,7 @@ export default class Renderer {
   private readonly wordEngine: WordEngine;
   private readonly debugEngine: DebugEngine;
   private readonly testEngine: TestEngine;
+  private readonly rectangleEngine: RectangleEngine;
   private width: number;
   private height: number;
   constructor(gl: WebGLRenderingContext, width: number, height: number) {
@@ -42,6 +44,7 @@ export default class Renderer {
     this.wordEngine = new WordEngine(gl);
     this.debugEngine = new DebugEngine(gl);
     this.testEngine = new TestEngine(gl);
+    this.rectangleEngine = new RectangleEngine(gl);
   }
 
   setViewport(width: number, height: number) {
@@ -95,6 +98,7 @@ export default class Renderer {
     this.gl.viewport(0, 0, this.width, this.height);
     this.viewEngine.render(context, mapToViewportMatrix);
     this.wordEngine.render(context, mapToViewportMatrix);
+    this.rectangleEngine.render(context.testResultRectangle, context.testResultTexture)
     if ((window as any)['debug']) {
       this.debugEngine.render(context.triangle, context.testResultTexture, mat3.create());
     }

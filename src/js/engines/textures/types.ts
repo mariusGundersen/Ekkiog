@@ -1,4 +1,5 @@
 import { vec2 } from 'gl-matrix';
+import Rectangle from './Rectangle';
 
 export interface VertexBuffer {
   bind(): void;
@@ -34,6 +35,7 @@ export interface RenderContext {
   readonly gatesTexture: TextureBuffer;
   readonly expectedResultTexture: TextureBuffer;
   readonly testResultTexture: TextureBuffer & FrameBuffer;
+  readonly testResultRectangle: Rectangle;
 }
 
 export interface AtomicBind {

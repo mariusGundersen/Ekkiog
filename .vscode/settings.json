@@ -4,6 +4,7 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.format.enable": true,
   "editor.formatOnSave": true,
+  "editor.tabSize": 2,
   "workbench.colorCustomizations": {
     // "activityBar.background": "#1accff",
     // "activityBar.foreground": "#15202b",
