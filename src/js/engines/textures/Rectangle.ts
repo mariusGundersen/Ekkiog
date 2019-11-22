@@ -12,10 +12,10 @@ export default class Rectangle implements VertexBuffer {
     this.indexBuffer = gl.createBuffer() || (() => { throw new Error("Could not make buffer") })();
     this.atomicBind(this);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      -1, -0.25, 0, 0,
-      +1, -0.25, 1, 0,
-      -1, +0.25, 0, 1,
-      +1, +0.25, 1, 1
+      0, 0,
+      1, 0,
+      0, 1,
+      1, 1
     ]), gl.STATIC_DRAW);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 2, 1, 3]), gl.STATIC_DRAW);
   }
@@ -23,7 +23,7 @@ export default class Rectangle implements VertexBuffer {
   bind() {
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-    this.gl.vertexAttribPointer(0, 4, this.gl.FLOAT, false, 0, 0);
+    this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0);
   }
 
   draw() {

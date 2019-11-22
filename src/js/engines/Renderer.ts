@@ -98,7 +98,7 @@ export default class Renderer {
     this.gl.viewport(0, 0, this.width, this.height);
     this.viewEngine.render(context, mapToViewportMatrix);
     this.wordEngine.render(context, mapToViewportMatrix);
-    this.rectangleEngine.render(context.testResultRectangle, context.testResultTexture)
+    this.rectangleEngine.render(context.testResultRectangle, context.testResultTexture, this.height / window.devicePixelRatio)
     if ((window as any)['debug']) {
       this.debugEngine.render(context.triangle, context.testResultTexture, mat3.create());
     }
