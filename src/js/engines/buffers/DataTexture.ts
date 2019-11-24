@@ -23,7 +23,7 @@ export default class DataTexture extends Texture {
   }
 
   update() {
-    this.bind();
+    this.bindTexture();
 
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.data);
   }

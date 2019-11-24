@@ -1,11 +1,11 @@
 import { vec2, mat3, mat2d } from 'gl-matrix';
 import createShader, { GlShader } from 'gl-shader';
 
-import { VertexBuffer, TextureBuffer, FrameBuffer } from '../textures/types';
+import { VertexBuffer, TextureBuffer, FrameBuffer } from '../buffers/types';
 
 import rectangleVS from './rectangleVS.glsl';
 import rectangleFS from './rectangleFS.glsl';
-import Rectangle from '../textures/Rectangle';
+import Rectangle from '../buffers/Rectangle';
 
 export default class RectangleEngine {
   private readonly gl: WebGLRenderingContext;
@@ -18,7 +18,7 @@ export default class RectangleEngine {
     this.matrix = mat3.create();
   }
 
-  render(rectangle: Rectangle, texture: TextureBuffer, screenHeight: number) {
+  render(rectangle: Rectangle, texture: TextureBuffer, output: FrameBuffer, screenHeight: number) {
     this.shader.bind();
 
     this.shader.uniforms['texture'] = texture.sampler2D(0);
@@ -28,6 +28,7 @@ export default class RectangleEngine {
     mat3.scale(this.matrix, this.matrix, [1, 64 / screenHeight]);
 
     this.shader.uniforms['matrix'] = this.matrix;
-    rectangle.draw();
+
+    rectangle.draw(output);
   }
 }

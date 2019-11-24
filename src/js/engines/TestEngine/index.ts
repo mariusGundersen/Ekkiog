@@ -1,7 +1,7 @@
 import { vec2, mat3 } from 'gl-matrix';
 import createShader, { GlShader } from 'gl-shader';
 
-import { VertexBuffer, TextureBuffer, FrameBuffer } from '../textures/types';
+import { VertexBuffer, TextureBuffer, FrameBuffer } from '../buffers/types';
 
 import testVS from './testVS.glsl';
 import testFS from './testFS.glsl';
@@ -15,12 +15,7 @@ export default class TestEngine {
   }
 
   render(vertexBuffer: VertexBuffer, chargeTexture: TextureBuffer, exectedResultTexture: TextureBuffer, output: FrameBuffer, sample: number) {
-    output.bindFramebuffer();
-
     this.shader.bind();
-
-    if (sample == 0)
-      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     const posX = (sample + 0.5) / output.width;//0 - 1
 
@@ -28,8 +23,6 @@ export default class TestEngine {
     this.shader.uniforms['chargeTexture'] = chargeTexture.sampler2D(0);
     this.shader.uniforms['expectedResultTexture'] = exectedResultTexture.sampler2D(1);
 
-    vertexBuffer.draw();
-
-    output.unbindFramebuffer();
+    vertexBuffer.draw(output);
   }
 }

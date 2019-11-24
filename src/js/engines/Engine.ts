@@ -1,27 +1,31 @@
 import { mat3 } from 'gl-matrix';
-import { Item, Area, Box } from '../editing';
+import { Box } from '../editing';
 
 import Context, { MutableContext } from './Context';
 import Renderer from './Renderer';
-import { VertexBuffer } from './textures/types';
+import { AtomicBind, Bindable } from './buffers/types';
+import Viewport from './buffers/Viewport';
 
 export default class Engine {
   private readonly context: Context;
   private readonly moveContext: Context;
   private readonly renderer: Renderer;
+  private readonly viewport: Viewport;
   constructor(
     gl: WebGLRenderingContext,
     width: number,
     height: number
   ) {
-    const atomicBind = makeAtomicBind();
-    this.context = new Context(gl, atomicBind);
-    this.moveContext = new Context(gl, atomicBind);
-    this.renderer = new Renderer(gl, width, height);
+    const vertexBind = makeAtomicBind();
+    const outputBind = makeAtomicBind();
+    this.context = new Context(gl, vertexBind, outputBind);
+    this.moveContext = new Context(gl, vertexBind, outputBind);
+    this.viewport = new Viewport(gl, outputBind, width, height);
+    this.renderer = new Renderer(gl, this.viewport);
   }
 
   setViewport(width: number, height: number) {
-    this.renderer.setViewport(width, height);
+    this.viewport.resize(width, height);
   }
 
   mutateContext(mutator: (context: MutableContext) => void) {
@@ -54,12 +58,12 @@ export default class Engine {
   }
 }
 
-function makeAtomicBind() {
-  let currentVBO: VertexBuffer | undefined = undefined;
-  return (vbo: VertexBuffer) => {
-    if (currentVBO === vbo) return;
+function makeAtomicBind(): AtomicBind {
+  let currentBind: Bindable | undefined = undefined;
+  return (bindable: Bindable) => () => {
+    //if (currentBind === bindable) return;
 
-    currentVBO = vbo;
-    vbo.bind();
+    currentBind = bindable;
+    bindable._bind();
   };
 }

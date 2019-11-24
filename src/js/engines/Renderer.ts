@@ -10,8 +10,9 @@ import WordEngine from './WordEngine';
 import DebugEngine from './DebugEngine';
 import TestEngine from './TestEngine';
 
-import { RenderContext } from './textures/types';
+import Context from './Context';
 import RectangleEngine from './RectangleEngine';
+import Viewport from './buffers/Viewport';
 
 export default class Renderer {
   private readonly gl: WebGLRenderingContext;
@@ -25,16 +26,11 @@ export default class Renderer {
   private readonly debugEngine: DebugEngine;
   private readonly testEngine: TestEngine;
   private readonly rectangleEngine: RectangleEngine;
-  private width: number;
-  private height: number;
-  constructor(gl: WebGLRenderingContext, width: number, height: number) {
+  private readonly viewport: Viewport;
+  constructor(gl: WebGLRenderingContext, viewport: Viewport) {
     this.gl = gl;
     this.currentTick = 0;
-    this.width = width;
-    this.height = height;
-
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-    this.gl.enable(this.gl.BLEND);
+    this.viewport = viewport;
 
     this.netChargeEngine = new NetChargeEngine(gl);
     this.chargeMapEngine = new ChargeMapEngine(gl);
@@ -47,23 +43,22 @@ export default class Renderer {
     this.rectangleEngine = new RectangleEngine(gl);
   }
 
-  setViewport(width: number, height: number) {
-    this.width = width;
-    this.height = height;
-  }
+  renderMap(context: Context) {
+    context.tileMapTexture.clear();
 
-  renderMap(context: RenderContext) {
     this.tileMapEngine.render(
       context.triangle,
       context.mapTexture,
       context.tileMapTexture);
   }
 
-  simulateTick(context: RenderContext, tick = this.currentTick) {
+  simulateTick(context: Context, tick = this.currentTick) {
     this.currentTick = tick;
 
     const prevousCharges = context.netChargeTextures[(tick + 1) % 2];
     const nextCharges = context.netChargeTextures[tick % 2];
+
+    nextCharges.clear();
 
     this.netChargeEngine.render(
       context.triangle,
@@ -73,6 +68,8 @@ export default class Renderer {
 
     const currentCharges = nextCharges;
 
+    context.chargeMapTexture.clear();
+
     this.chargeMapEngine.render(
       context.triangle,
       context.netMapTexture,
@@ -81,10 +78,14 @@ export default class Renderer {
       context.chargeMapTexture);
   }
 
-  test(context: RenderContext) {
+  test(context: Context) {
     const chargeTexture = context.netChargeTextures[this.currentTick % 2];
 
     const sample = this.currentTick % context.testResultTexture.width;//0 - (output.width-1)
+
+
+    if (sample == 0)
+      this.viewport.clear();
 
     this.testEngine.render(
       context.testPoints,
@@ -94,24 +95,24 @@ export default class Renderer {
       sample);
   }
 
-  renderView(context: RenderContext, mapToViewportMatrix: mat3) {
-    this.gl.viewport(0, 0, this.width, this.height);
-    this.viewEngine.render(context, mapToViewportMatrix);
-    this.wordEngine.render(context, mapToViewportMatrix);
-    this.rectangleEngine.render(context.testResultRectangle, context.testResultTexture, this.height / window.devicePixelRatio)
+  renderView(context: Context, mapToViewportMatrix: mat3) {
+    this.viewport.clear(0.1, 0.1, 0.1, 1);
+    this.viewEngine.render(context, this.viewport, mapToViewportMatrix);
+    this.wordEngine.render(context, this.viewport, mapToViewportMatrix);
+    this.rectangleEngine.render(context.testResultRectangle, context.testResultTexture, this.viewport, this.viewport.height / window.devicePixelRatio)
     if ((window as any)['debug']) {
-      this.debugEngine.render(context.triangle, context.testResultTexture, mat3.create());
+      this.debugEngine.render(context.triangle, context.mapTexture, this.viewport, mat3.create());
     }
   }
 
   private readonly moveMatrix = mat3.create();
-  renderMove(context: RenderContext, mapToViewportMatrix: mat3, { top, left, right, bottom }: Box, dx: number, dy: number) {
-    mat3.translate(this.moveMatrix, mapToViewportMatrix, [dx / context.tileMapTexture.size[0] * 2, dy / context.tileMapTexture.size[1] * 2]);
-    this.moveEngine.render(context, this.moveMatrix, [top, left, right, bottom]);
-    this.wordEngine.render(context, this.moveMatrix);
+  renderMove(context: Context, mapToViewportMatrix: mat3, { top, left, right, bottom }: Box, dx: number, dy: number) {
+    mat3.translate(this.moveMatrix, mapToViewportMatrix, [dx / context.tileMapTexture.halfSize[0], dy / context.tileMapTexture.halfSize[1]]);
+    this.moveEngine.render(context, this.viewport, this.moveMatrix, [top, left, right, bottom]);
+    this.wordEngine.render(context, this.viewport, this.moveMatrix);
   }
 
-  renderChargeMap(context: RenderContext, chargeContext: RenderContext) {
+  renderChargeMap(context: Context, chargeContext: Context) {
     const currentCharges = chargeContext.netChargeTextures[this.currentTick % 2];
 
     this.chargeMapEngine.render(

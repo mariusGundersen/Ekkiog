@@ -1,18 +1,17 @@
 import ndarray, { NdArray } from 'ndarray';
 
 import { VertexBuffer, AtomicBind } from './types';
-import { Quad } from '../text/types';
+import AbstractBindlable from './Bindable';
 
-export default class PointList implements VertexBuffer {
-  private readonly atomicBind: AtomicBind;
+export default class PointList extends AbstractBindlable implements VertexBuffer {
   private readonly gl: WebGLRenderingContext;
   private size: number;
   private vertices: Float32Array;
   private readonly vertexBuffer: WebGLBuffer;
   private readonly indexBuffer: WebGLBuffer;
   private readonly map: NdArray;
-  constructor(atomicBind: AtomicBind, gl: WebGLRenderingContext) {
-    this.atomicBind = atomicBind;
+  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind) {
+    super(atomicBind);
     this.gl = gl;
     this.size = 8;
     this.vertices = new Float32Array(this.size * 4);
@@ -33,19 +32,19 @@ export default class PointList implements VertexBuffer {
       this.map.set(i, 2, ((v >> 0) & 0xff));
       this.map.set(i, 3, ((v >> 8) & 0xff));
     }
-    this.atomicBind(this);
+    this.bind();
     this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
     this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(createPoints(this.size)), this.gl.STATIC_DRAW);
   }
 
-  bind() {
+  _bind() {
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     this.gl.vertexAttribPointer(0, 4, this.gl.FLOAT, false, 0, 0);
   }
 
   draw() {
-    this.atomicBind(this);
+    this.bind();
     this.gl.drawElements(this.gl.POINTS, this.size, this.gl.UNSIGNED_SHORT, 0);
   }
 }

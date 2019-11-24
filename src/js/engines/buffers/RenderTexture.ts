@@ -1,13 +1,13 @@
 import Texture from './Texture';
 
-import { FrameBuffer } from './types';
+import { FrameBuffer, AtomicBind } from './types';
 
 export default class RenderTexture extends Texture implements FrameBuffer {
   private readonly frameBuffer: WebGLFramebuffer;
   private readonly renderBuffer: WebGLRenderbuffer;
-  constructor(gl: WebGLRenderingContext, width: number, height = width, type = gl.RGBA) {
+  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind, width: number, height = width, type = gl.RGBA) {
     super(gl, width, height);
-
+    this.bind = atomicBind(this);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, type, width, height, 0, type, this.gl.UNSIGNED_BYTE, null);
 
     this.frameBuffer = gl.createFramebuffer() || (() => { throw new Error("Could not make framebuffer") })();
@@ -20,12 +20,18 @@ export default class RenderTexture extends Texture implements FrameBuffer {
     this.gl.framebufferRenderbuffer(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.RENDERBUFFER, this.renderBuffer);
   }
 
-  bindFramebuffer() {
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
-    this.gl.viewport(0, 0, this.width, this.height);
+  clear(r = 0, g = 0, b = 0, a = 1) {
+    this.bind();
+    this.gl.clearColor(r, g, b, a);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
   }
 
-  unbindFramebuffer() {
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+  _bind() {
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
+    this.gl.viewport(0, 0, this.width, this.height);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.enable(this.gl.BLEND);
   }
+
+  bind() { }
 }

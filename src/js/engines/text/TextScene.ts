@@ -2,7 +2,7 @@ import { Item, Area } from '../../editing';
 
 import textFromItem from './textFromItem';
 
-import QuadList from '../textures/QuadList';
+import QuadList from '../buffers/QuadList';
 
 export type ItemTexts = {
   next?: ItemTexts,

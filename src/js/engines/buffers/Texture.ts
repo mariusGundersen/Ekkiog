@@ -21,7 +21,7 @@ export default class Texture implements TextureBuffer {
     this.halfSize = vec2.fromValues(width / 2, height / 2);
     this.inverseSize = vec2.fromValues(1 / width, 1 / height);
 
-    this.bind();
+    this.bindTexture();
 
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
@@ -30,13 +30,13 @@ export default class Texture implements TextureBuffer {
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
   }
 
-  bind() {
+  bindTexture() {
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
   }
 
   sampler2D(target: number) {
     this.gl.activeTexture(target + this.gl.TEXTURE0);
-    this.bind();
+    this.bindTexture();
     return target;
   }
 }

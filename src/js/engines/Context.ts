@@ -1,19 +1,19 @@
 import { MutableContext as IMutableContext, Item, Area } from '../editing';
 
-import { RenderContext, AtomicBind } from './textures/types';
+import { AtomicBind } from './buffers/types';
 
-import DataTexture from './textures/DataTexture';
-import RenderTexture from './textures/RenderTexture';
-import ImageTexture from './textures/ImageTexture';
+import DataTexture from './buffers/DataTexture';
+import RenderTexture from './buffers/RenderTexture';
+import ImageTexture from './buffers/ImageTexture';
 
-import PointList from './textures/PointList';
-import Triangle from './textures/Triangle';
-import QuadList from './textures/QuadList';
+import PointList from './buffers/PointList';
+import Triangle from './buffers/Triangle';
+import QuadList from './buffers/QuadList';
 import TextScene from './text/TextScene';
 
 import loadImage from '../loadImage';
 import tiles from '../../img/tiles.png';
-import Rectangle from './textures/Rectangle';
+import Rectangle from './buffers/Rectangle';
 
 const MAP_SIZE = 128;
 const TILE_SIZE = 16;
@@ -21,7 +21,7 @@ const SQRT_NET_COUNT = 256;
 
 const SpriteSheet = loadImage(tiles);
 
-export default class Context implements RenderContext {
+export default class Context {
   readonly tileSize: number;
   readonly testPoints: PointList;
   readonly triangle: Triangle;
@@ -37,12 +37,12 @@ export default class Context implements RenderContext {
   readonly expectedResultTexture: DataTexture;
   readonly testResultTexture: RenderTexture;
   readonly testResultRectangle: Rectangle;
-  constructor(gl: WebGLRenderingContext, bindingTracker: AtomicBind) {
+  constructor(gl: WebGLRenderingContext, vertexBind: AtomicBind, frameBufferBind: AtomicBind) {
     this.tileSize = TILE_SIZE;
 
-    this.testPoints = new PointList(bindingTracker, gl);
-    this.triangle = new Triangle(bindingTracker, gl);
-    this.wordQuads = new QuadList(bindingTracker, gl);
+    this.testPoints = new PointList(gl, vertexBind);
+    this.triangle = new Triangle(gl, vertexBind);
+    this.wordQuads = new QuadList(gl, vertexBind);
     this.textScene = new TextScene(this.wordQuads);
 
     this.spriteSheetTexture = new ImageTexture(gl, SpriteSheet);
@@ -51,17 +51,17 @@ export default class Context implements RenderContext {
     this.netMapTexture = new DataTexture(gl, MAP_SIZE);
     this.gatesTexture = new DataTexture(gl, SQRT_NET_COUNT);
 
-    this.tileMapTexture = new RenderTexture(gl, MAP_SIZE);
-    this.chargeMapTexture = new RenderTexture(gl, MAP_SIZE);
+    this.tileMapTexture = new RenderTexture(gl, frameBufferBind, MAP_SIZE);
+    this.chargeMapTexture = new RenderTexture(gl, frameBufferBind, MAP_SIZE);
     this.netChargeTextures = [
-      new RenderTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB),
-      new RenderTexture(gl, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB)
+      new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB),
+      new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB)
     ];
 
     this.expectedResultTexture = new DataTexture(gl, 256, 8);
-    this.testResultTexture = new RenderTexture(gl, 256, 8);
+    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 256, 8);
 
-    this.testResultRectangle = new Rectangle(bindingTracker, gl);
+    this.testResultRectangle = new Rectangle(gl, vertexBind);
   }
 
   mutateContext(mutator: (mutableContext: MutableContext) => void) {
