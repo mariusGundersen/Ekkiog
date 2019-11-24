@@ -83,9 +83,10 @@ export default class Renderer {
 
     const sample = this.currentTick % context.testResultTexture.width;//0 - (output.width-1)
 
-
-    if (sample == 0)
-      this.viewport.clear();
+    if (sample == 0) {
+      context.testResultTexture.clear();
+      this.rectangleEngine.render(context.rectangle, context.expectedResultTexture, context.testResultTexture)
+    }
 
     this.testEngine.render(
       context.testPoints,
@@ -99,7 +100,7 @@ export default class Renderer {
     this.viewport.clear(0.1, 0.1, 0.1, 1);
     this.viewEngine.render(context, this.viewport, mapToViewportMatrix);
     this.wordEngine.render(context, this.viewport, mapToViewportMatrix);
-    this.rectangleEngine.render(context.testResultRectangle, context.testResultTexture, this.viewport, this.viewport.height / window.devicePixelRatio)
+    this.rectangleEngine.render(context.rectangle, context.testResultTexture, this.viewport, 64 * window.devicePixelRatio, 64 * window.devicePixelRatio)
     if ((window as any)['debug']) {
       this.debugEngine.render(context.triangle, context.mapTexture, this.viewport, mat3.create());
     }

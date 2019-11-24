@@ -14,6 +14,7 @@ import TextScene from './text/TextScene';
 import loadImage from '../loadImage';
 import tiles from '../../img/tiles.png';
 import Rectangle from './buffers/Rectangle';
+import CanvasTexture from './buffers/CanvasTexture';
 
 const MAP_SIZE = 128;
 const TILE_SIZE = 16;
@@ -25,6 +26,7 @@ export default class Context {
   readonly tileSize: number;
   readonly testPoints: PointList;
   readonly triangle: Triangle;
+  readonly rectangle: Rectangle;
   readonly wordQuads: QuadList;
   readonly textScene: TextScene;
   readonly spriteSheetTexture: ImageTexture;
@@ -34,14 +36,14 @@ export default class Context {
   readonly tileMapTexture: RenderTexture;
   readonly chargeMapTexture: RenderTexture;
   readonly netChargeTextures: [RenderTexture, RenderTexture];
-  readonly expectedResultTexture: DataTexture;
+  readonly expectedResultTexture: CanvasTexture;
   readonly testResultTexture: RenderTexture;
-  readonly testResultRectangle: Rectangle;
   constructor(gl: WebGLRenderingContext, vertexBind: AtomicBind, frameBufferBind: AtomicBind) {
     this.tileSize = TILE_SIZE;
 
-    this.testPoints = new PointList(gl, vertexBind);
+    this.testPoints = new PointList(gl, vertexBind, [6]);
     this.triangle = new Triangle(gl, vertexBind);
+    this.rectangle = new Rectangle(gl, vertexBind);
     this.wordQuads = new QuadList(gl, vertexBind);
     this.textScene = new TextScene(this.wordQuads);
 
@@ -58,10 +60,8 @@ export default class Context {
       new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB)
     ];
 
-    this.expectedResultTexture = new DataTexture(gl, 256, 8);
-    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 256, 8);
-
-    this.testResultRectangle = new Rectangle(gl, vertexBind);
+    this.expectedResultTexture = new CanvasTexture(gl, 16, 1);
+    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 16, 1);
   }
 
   mutateContext(mutator: (mutableContext: MutableContext) => void) {

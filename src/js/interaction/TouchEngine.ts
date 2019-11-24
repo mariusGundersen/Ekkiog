@@ -32,6 +32,7 @@ export default class TouchEngine {
 
     this.ticker = new Ticker(tickCount => {
       this.engine.simulate(tickCount);
+      this.engine.test();
     });
   }
 

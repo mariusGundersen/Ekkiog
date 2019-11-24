@@ -46,6 +46,9 @@ export default class Engine {
 
   simulate(tickCount?: number) {
     this.renderer.simulateTick(this.context, tickCount);
+  }
+
+  test() {
     this.renderer.test(this.context);
   }
 
@@ -61,7 +64,7 @@ export default class Engine {
 function makeAtomicBind(): AtomicBind {
   let currentBind: Bindable | undefined = undefined;
   return (bindable: Bindable) => () => {
-    //if (currentBind === bindable) return;
+    if (currentBind === bindable) return;
 
     currentBind = bindable;
     bindable._bind();

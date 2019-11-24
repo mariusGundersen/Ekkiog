@@ -5,6 +5,7 @@ import { VertexBuffer, TextureBuffer, FrameBuffer } from '../buffers/types';
 
 import testVS from './testVS.glsl';
 import testFS from './testFS.glsl';
+import PointList from '../buffers/PointList';
 
 export default class TestEngine {
   private readonly gl: WebGLRenderingContext;
@@ -14,7 +15,7 @@ export default class TestEngine {
     this.shader = createShader(gl, testVS, testFS);
   }
 
-  render(vertexBuffer: VertexBuffer, chargeTexture: TextureBuffer, exectedResultTexture: TextureBuffer, output: FrameBuffer, sample: number) {
+  render(points: PointList, chargeTexture: TextureBuffer, exectedResultTexture: TextureBuffer, output: FrameBuffer, sample: number) {
     this.shader.bind();
 
     const posX = (sample + 0.5) / output.width;//0 - 1
@@ -23,6 +24,6 @@ export default class TestEngine {
     this.shader.uniforms['chargeTexture'] = chargeTexture.sampler2D(0);
     this.shader.uniforms['expectedResultTexture'] = exectedResultTexture.sampler2D(1);
 
-    vertexBuffer.draw(output);
+    points.draw(output);
   }
 }

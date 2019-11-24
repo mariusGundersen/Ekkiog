@@ -1,6 +1,6 @@
 import ndarray, { NdArray } from 'ndarray';
 
-import { VertexBuffer, AtomicBind } from './types';
+import { VertexBuffer, AtomicBind, FrameBuffer } from './types';
 import AbstractBindlable from './Bindable';
 
 export default class PointList extends AbstractBindlable implements VertexBuffer {
@@ -10,15 +10,15 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
   private readonly vertexBuffer: WebGLBuffer;
   private readonly indexBuffer: WebGLBuffer;
   private readonly map: NdArray;
-  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind) {
+  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind, gates: number[]) {
     super(atomicBind);
     this.gl = gl;
-    this.size = 8;
+    this.size = gates.length;
     this.vertices = new Float32Array(this.size * 4);
     this.vertexBuffer = gl.createBuffer() || (() => { throw new Error("Could not make buffer") })();
     this.indexBuffer = gl.createBuffer() || (() => { throw new Error("Could not make buffer") })();
     this.map = ndarray(this.vertices, [this.size, 4]);
-    this.set([0, 1, 2, 3, 4, 5, 6, 7]);
+    this.set(gates);
   }
 
   set(gates: number[]) {
@@ -43,7 +43,8 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
     this.gl.vertexAttribPointer(0, 4, this.gl.FLOAT, false, 0, 0);
   }
 
-  draw() {
+  draw(output: FrameBuffer) {
+    output.bind();
     this.bind();
     this.gl.drawElements(this.gl.POINTS, this.size, this.gl.UNSIGNED_SHORT, 0);
   }

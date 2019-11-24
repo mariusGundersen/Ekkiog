@@ -18,14 +18,14 @@ export default class RectangleEngine {
     this.matrix = mat3.create();
   }
 
-  render(rectangle: Rectangle, texture: TextureBuffer, output: FrameBuffer, screenHeight: number) {
+  render(rectangle: Rectangle, texture: TextureBuffer, output: FrameBuffer, bottom = 0, height = output.height) {
     this.shader.bind();
 
     this.shader.uniforms['texture'] = texture.sampler2D(0);
 
     mat3.identity(this.matrix);
-    mat3.translate(this.matrix, this.matrix, [0, 64 / screenHeight]);
-    mat3.scale(this.matrix, this.matrix, [1, 64 / screenHeight]);
+    mat3.translate(this.matrix, this.matrix, [0, bottom / output.height]);
+    mat3.scale(this.matrix, this.matrix, [1, height / output.height]);
 
     this.shader.uniforms['matrix'] = this.matrix;
 
