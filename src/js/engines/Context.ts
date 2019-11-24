@@ -60,8 +60,8 @@ export default class Context {
       new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB)
     ];
 
-    this.expectedResultTexture = new CanvasTexture(gl, 16, 1);
-    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 16, 1);
+    this.expectedResultTexture = new CanvasTexture(gl, 16, 3);
+    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 16, 3);
   }
 
   mutateContext(mutator: (mutableContext: MutableContext) => void) {

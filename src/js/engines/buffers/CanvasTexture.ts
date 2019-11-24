@@ -17,15 +17,23 @@ export default class CanvasTexture extends Texture {
     this.ctx.fillStyle = '#333';
     this.ctx.fillRect(0, 0, width, height);
 
+    this.setExpectation('0', 1, 0, 4);
+    this.setExpectation('0', 2, 0, 4);
     this.setExpectation('x', 0, 0, 3);
     this.setExpectation('0', 0, 3, 1);
 
+    this.setExpectation('1', 1, 4, 4);
+    this.setExpectation('0', 2, 4, 4);
     this.setExpectation('x', 0, 4, 3);
     this.setExpectation('1', 0, 7, 1);
 
+    this.setExpectation('1', 1, 8, 4);
+    this.setExpectation('1', 2, 8, 4);
     this.setExpectation('x', 0, 8, 3);
     this.setExpectation('0', 0, 11, 1);
 
+    this.setExpectation('0', 1, 12, 4);
+    this.setExpectation('1', 2, 12, 4);
     this.setExpectation('x', 0, 12, 3);
     this.setExpectation('1', 0, 15, 1);
 
