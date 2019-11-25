@@ -111,7 +111,7 @@ export default connect((s: State) => s)(
         <div className={style.playArea}>
           <WebGLCanvas
             contextMenu={props.contextMenu}
-            currentContext={props.context}
+            context={props.context}
             dispatch={props.dispatch}
             selection={props.selection}
             tickInterval={props.simulation.tickInterval}

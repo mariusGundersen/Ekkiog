@@ -1,28 +1,19 @@
 import * as React from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Dispatch } from 'redux';
 
 import {
-  panZoom,
   fitBox,
   Action
 } from '../actions';
 import { SelectionState } from '../reduce/selection';
 import { ContextState } from '../reduce/context';
 
-import startShell, { Config } from '../shell';
-import Engine from '../engines/Engine';
-import TouchControls from '../interaction';
-import moveHandler from '../editing/moveHandler';
-import forestHandler from '../editing/forestHandler';
 import { ContextMenuState } from '../reduce/contextMenu';
-import buttonHandler from '../editing/buttonHandler';
-import createRef from './createRef';
-import { fromEvent, of, merge } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
-import { viewportToTile, recalculate } from '../reduce/perspective';
+import { viewportToTile } from '../reduce/perspective';
 import { ViewState } from '../reduce/view';
-import { mat3 } from 'gl-matrix';
 import Canvas from './Canvas';
+import TouchEngine from '../interaction/TouchEngine';
 
 export interface Props {
   readonly tickInterval: number,
@@ -30,139 +21,89 @@ export interface Props {
   readonly view: ViewState,
   readonly selection: SelectionState,
   readonly contextMenu: ContextMenuState,
-  readonly currentContext: ContextState,
+  readonly context: ContextState,
   readonly dispatch: Dispatch<Action>
 }
 
-export default class WebGLCanvas extends React.Component<Props, any> {
-  private canvas = createRef<HTMLCanvasElement>();
-  private engine!: Engine;
-  private touchControls!: TouchControls;
-  private shellConfig!: Config
-  private mapToViewportMatrix!: mat3;
+export default function WebGLCanvas(props: Props) {
+  const perspective = useCurrent(props.view.perspective);
+  const context = useCurrent(props.context);
+  const selection = useCurrent(props.selection);
 
-  componentDidMount() {
-    if (!this.canvas.current) return
-    const gl = getContext(this.canvas.current);
-    this.engine = new Engine(gl, this.props.view.pixelWidth, this.props.view.pixelHeight);
+  const [touchEngine, canvas] = useRefCallback((canvas: HTMLCanvasElement) => {
+    const touchEngine = new TouchEngine(canvas, (x, y) => viewportToTile(perspective.current, x, y), props.dispatch);
 
-    const touches = getTouchEvents(
-      this.canvas.current,
-      (x, y) => viewportToTile(this.props.view.perspective, x, y)
-    );
-
-    this.touchControls = new TouchControls(touches, this.props.dispatch);
-
-    forestHandler(undefined, this.props.currentContext.forest, this.engine);
-
-    this.shellConfig = startShell({
-      tickInterval: this.props.tickInterval,
-      render: (delta: number) => {
-        const ease = this.props.currentContext.ease.next(delta);
+    onAnimationFrame(delta => {
+      const ease = context.current.ease.next(delta);
         if (ease.done) {
-          const changed = this.touchControls.getChangedTouches();
-          if (changed.length) {
-            this.props.dispatch(panZoom(changed));
+        touchEngine.onAnimationFrame(perspective.current, selection.current);
           } else {
-            this.renderGl(this.props.selection);
+        props.dispatch(fitBox(ease.value));
           }
-        } else {
-          this.props.dispatch(fitBox(ease.value));
-        }
-      },
-      tick: tickCount => this.engine.simulate(tickCount)
     });
-  }
 
-  componentWillReceiveProps(nextProps: Props) {
-    const currentContext = this.props.currentContext;
-    const nextContext = nextProps.currentContext;
+    return touchEngine;
+  });
 
-    this.shellConfig.setTickInterval(nextProps.tickInterval);
+  const previousForest = usePrevious(props.context.forest);
+  const previousSelection = usePrevious(props.selection);
+  const previousButtonTree = usePrevious(props.context.buttonTree);
+  const previousStep = usePrevious(props.step);
 
-    forestHandler(currentContext.forest, nextContext.forest, this.engine);
-    moveHandler(this.props.selection, nextProps.selection, this.engine);
-    buttonHandler(currentContext.buttonTree, nextContext.buttonTree, this.engine);
+  useEffect(() => {
+    if (!touchEngine.current) return;
 
-    this.touchControls.setSelection(nextProps.selection);
+    touchEngine.current.diffForest(previousForest, props.context.forest);
+    touchEngine.current.diffMove(previousSelection, props.selection);
+    touchEngine.current.diffButton(previousButtonTree, props.context.buttonTree);
+    touchEngine.current.setTick(props.tickInterval, props.step - previousStep);
+    touchEngine.current.updateTouches(props.contextMenu.type === 'show', props.selection);
+    touchEngine.current.render(props.view.perspective, props.selection);
+  });
 
-    if (nextProps.contextMenu.type === 'show' || nextProps.selection) {
-      this.touchControls.disable();
-    } else {
-      this.touchControls.enable();
-    }
+  useEffect(() => {
+    if (!touchEngine.current) return;
 
-    this.shellConfig.tick(nextProps.step - this.props.step);
-    this.mapToViewportMatrix = recalculate(nextProps.view.perspective);
-
-    this.renderGl(nextProps.selection);
-  }
-
-  renderGl(selection: SelectionState) {
-    this.engine.render(this.mapToViewportMatrix);
-
-    if (selection) {
-      this.engine.renderMove(
-        this.mapToViewportMatrix,
-        selection,
-        selection.dx,
-        selection.dy);
-    }
-  }
-
-  shouldComponentUpdate(nextProps: Props) {
-    return nextProps.view.pixelWidth != this.props.view.pixelWidth
-      || nextProps.view.pixelHeight != this.props.view.pixelHeight;
-  }
-
-  render() {
-    if (this.engine) {
-      this.engine.setViewport(this.props.view.pixelWidth, this.props.view.pixelHeight);
-    }
+    touchEngine.current.setViewport(props.view.pixelWidth, props.view.pixelHeight);
+  }, [props.view.pixelWidth, props.view.pixelHeight, touchEngine.current]);
 
     return (
       <Canvas
-        ref={this.canvas}
-        width={this.props.view.pixelWidth}
-        height={this.props.view.pixelHeight} />
+      ref={canvas}
+      width={props.view.pixelWidth}
+      height={props.view.pixelHeight} />
     );
-  }
 };
 
-function getContext(canvas: HTMLCanvasElement) {
-  return canvas.getContext("webgl", {})
-    || canvas.getContext("experimental-webgl", {})
-    || (() => { throw new Error("no webgle here") })();
+function onAnimationFrame(render: (delta: number) => void) {
+  let earlier = window.performance.now();
+  const onFrameRequest = (now: number) => {
+    window.requestAnimationFrame(onFrameRequest);
+    render(now - earlier);
+    earlier = now;
+}
+  window.requestAnimationFrame(onFrameRequest);
 }
 
-function getTouchEvents(canvas: HTMLCanvasElement, viewportToTile: (x: number, y: number) => [number, number]) {
-  return merge(
-    fromEvent<TouchEvent>(canvas, 'touchstart'),
-    fromEvent<TouchEvent>(canvas, 'touchmove'),
-    fromEvent<TouchEvent>(canvas, 'touchend')
-  ).pipe(
-    tap(e => e.preventDefault()),
-    switchMap(handle(viewportToTile))
-  );
+function useRefCallback<In, Out>(map: (input: In) => Out): [React.MutableRefObject<Out | undefined>, (input: In) => void] {
+  const ref = useRef<Out>();
+  const callback = useCallback(input => {
+    ref.current = map(input);
+  }, []);
+
+  return [ref, callback];
 }
 
-function handle(viewportToTile: (x: number, y: number) => [number, number]) {
-  return (event: TouchEvent) => of(...Array.from(event.changedTouches)
-    .map(touch => {
-      const x = touch.pageX * window.devicePixelRatio;
-      const y = touch.pageY * window.devicePixelRatio;
-      const [tx, ty] = viewportToTile(x, y);
-      return {
-        type: event.type,
-        id: touch.identifier,
-        x,
-        y,
-        tx,
-        ty
-      };
-    }))
+function useCurrent<T>(value: T) {
+  const ref = useRef<T>(value);
+  ref.current = value;
+  return ref;
 }
 
-function arrayToBox([top, left, right, bottom]: number[]) {
-  return { top, left, right, bottom };
+function usePrevious<T>(value: T) {
+  const ref = useRef<T>(value);
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
 }
