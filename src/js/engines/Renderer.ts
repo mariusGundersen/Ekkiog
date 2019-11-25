@@ -79,8 +79,6 @@ export default class Renderer {
   }
 
   test(context: Context) {
-    const chargeTexture = context.netChargeTextures[this.currentTick % 2];
-
     const sample = this.currentTick % context.testResultTexture.width;//0 - (output.width-1)
 
     if (sample == 0) {
@@ -90,7 +88,7 @@ export default class Renderer {
 
     this.testEngine.render(
       context.testPoints,
-      chargeTexture,
+      context.chargeMapTexture,
       context.expectedResultTexture,
       context.testResultTexture,
       sample);

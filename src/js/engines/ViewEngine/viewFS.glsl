@@ -16,7 +16,7 @@ void main(void) {
   }
 
   vec4 tile = texture2D(tileMap, tileCoord);
-  vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;
+  vec2 spriteOffset = floor(tile.xy * 255.0) * tileSize;
   vec2 spriteCoord = mod(pixelCoord, tileSize);
   vec4 color = texture2D(spriteSheet, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);
 
@@ -30,7 +30,7 @@ void main(void) {
       gl_FragColor = vec4(42.0/255.0, 45.0/255.0, 48.0/255.0, 1.0);
   }else if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
     vec4 charge = texture2D(chargeMap, tileCoord);
-    gl_FragColor = charge;
+    gl_FragColor = vec4(charge.rgb, 1.0);
   }else{
     gl_FragColor = color;
   }

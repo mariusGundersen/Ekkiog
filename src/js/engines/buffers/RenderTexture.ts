@@ -5,10 +5,12 @@ import { FrameBuffer, AtomicBind } from './types';
 export default class RenderTexture extends Texture implements FrameBuffer {
   private readonly frameBuffer: WebGLFramebuffer;
   private readonly renderBuffer: WebGLRenderbuffer;
-  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind, width: number, height = width, type = gl.RGBA) {
+  private readonly blend: boolean;
+  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind, width: number, height = width, blend = false) {
     super(gl, width, height);
     this.bind = atomicBind(this);
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, type, width, height, 0, type, this.gl.UNSIGNED_BYTE, null);
+    this.blend = blend;
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, this.gl.UNSIGNED_BYTE, null);
 
     this.frameBuffer = gl.createFramebuffer() || (() => { throw new Error("Could not make framebuffer") })();
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
@@ -29,8 +31,12 @@ export default class RenderTexture extends Texture implements FrameBuffer {
   _bind() {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
     this.gl.viewport(0, 0, this.width, this.height);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-    this.gl.enable(this.gl.BLEND);
+    if (this.blend) {
+      this.gl.enable(this.gl.BLEND);
+      this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    } else {
+      this.gl.disable(this.gl.BLEND);
+    }
   }
 
   bind() { }

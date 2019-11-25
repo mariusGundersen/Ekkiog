@@ -41,7 +41,7 @@ export default class Context {
   constructor(gl: WebGLRenderingContext, vertexBind: AtomicBind, frameBufferBind: AtomicBind) {
     this.tileSize = TILE_SIZE;
 
-    this.testPoints = new PointList(gl, vertexBind, [6]);
+    this.testPoints = new PointList(gl, vertexBind, [{ x: 73, y: 60 }]);
     this.triangle = new Triangle(gl, vertexBind);
     this.rectangle = new Rectangle(gl, vertexBind);
     this.wordQuads = new QuadList(gl, vertexBind);
@@ -56,12 +56,12 @@ export default class Context {
     this.tileMapTexture = new RenderTexture(gl, frameBufferBind, MAP_SIZE);
     this.chargeMapTexture = new RenderTexture(gl, frameBufferBind, MAP_SIZE);
     this.netChargeTextures = [
-      new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB),
-      new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT, gl.RGB)
+      new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT),
+      new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT)
     ];
 
     this.expectedResultTexture = new CanvasTexture(gl, 16, 3);
-    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 16, 3);
+    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 16, 3, true);
   }
 
   mutateContext(mutator: (mutableContext: MutableContext) => void) {

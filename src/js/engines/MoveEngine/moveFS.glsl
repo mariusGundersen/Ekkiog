@@ -28,7 +28,7 @@ void main(void) {
   }
 
   vec4 tile = texture2D(tileMap, movedCoord);
-  vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;
+  vec2 spriteOffset = floor(tile.xy * 255.0) * tileSize;
   vec2 spriteCoord = mod(pixelCoord, tileSize);
   vec2 coord = (spriteOffset + spriteCoord) * inverseSpriteTextureSize;
   vec4 color = texture2D(spriteSheet, coord);
