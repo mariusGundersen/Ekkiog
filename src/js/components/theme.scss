@@ -88,6 +88,11 @@
   transition: transform .5s;
 }
 
+.icon48{
+  composes: icon;
+  font-size: 48px;
+}
+
 .spinning-icon {
   animation: spin 1s infinite steps(8, end);
 }

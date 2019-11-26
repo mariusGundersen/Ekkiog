@@ -114,8 +114,7 @@ export default connect((s: State) => s)(
             context={props.context}
             dispatch={props.dispatch}
             selection={props.selection}
-            tickInterval={props.simulation.tickInterval}
-            step={props.simulation.step}
+            simulation={props.simulation}
             view={props.view}
           />
           {props.context.isReadOnly || (
@@ -137,8 +136,6 @@ export default connect((s: State) => s)(
             currentComponentRepo={props.context.loading ? props.context.loading.repo : props.context.repo}
             tickInterval={props.simulation.tickInterval}
             gateCount={props.context.loading ? 0 : (props.context.forest.buddyTree.usedSize || 2) - 2}
-            undoCount={props.context.undoStack && props.context.undoStack.count || 0}
-            redoCount={props.context.redoStack && props.context.redoStack.count || 0}
             isLoading={props.context.loading !== undefined}
             isSaving={props.context.saving}
             isReadOnly={props.context.isReadOnly}
@@ -147,12 +144,15 @@ export default connect((s: State) => s)(
             showMainMenu={values.showMainMenu}
             toggleMainMenu={events.toggleMainMenu}
             showSearchMenu={values.showFileMenu}
+            showSimulationMenu={props.simulation.show}
             toggleSearchMenu={events.toggleSearchMenu}
           />
           <EditMenu
             dispatch={props.dispatch}
             editorMenu={props.editorMenu}
             findComponent={events.toggleSearchMenu}
+            undoCount={props.context.undoStack && props.context.undoStack.count || 0}
+            redoCount={props.context.redoStack && props.context.redoStack.count || 0}
           />
         </div>
         <GitProgressPopup

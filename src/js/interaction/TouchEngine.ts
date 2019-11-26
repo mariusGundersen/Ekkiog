@@ -32,7 +32,7 @@ export default class TouchEngine {
 
     this.ticker = new Ticker(tickCount => {
       this.engine.simulate(tickCount);
-      this.engine.test();
+      this.engine.test(tickCount);
     });
   }
 
@@ -50,12 +50,12 @@ export default class TouchEngine {
     }
   }
 
-  onAnimationFrame(perspective: Perspective, selection: SelectionState) {
+  onAnimationFrame(perspective: Perspective, selection: SelectionState, top: number) {
     const changed = this.touchControls.getChangedTouches();
     if (changed.length) {
       this.dispatch(panZoom(changed));
     } else {
-      this.render(perspective, selection);
+      this.render(perspective, selection, top);
     }
   }
 
@@ -76,9 +76,9 @@ export default class TouchEngine {
     buttonHandler(before, after, this.engine);
   }
 
-  render(perspective: Perspective, selection: SelectionState) {
+  render(perspective: Perspective, selection: SelectionState, top: number) {
     const mapToViewportMatrix = recalculate(perspective, this.matrix);
-    this.engine.render(mapToViewportMatrix);
+    this.engine.render(mapToViewportMatrix, top);
 
     if (selection) {
       this.engine.renderMove(

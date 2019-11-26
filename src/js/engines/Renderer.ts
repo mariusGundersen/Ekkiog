@@ -78,8 +78,9 @@ export default class Renderer {
       context.chargeMapTexture);
   }
 
-  test(context: Context) {
-    const sample = this.currentTick % context.testResultTexture.width;//0 - (output.width-1)
+  test(context: Context, sample: number) {
+    if (sample >= context.testResultTexture.width)
+      return;
 
     if (sample == 0) {
       context.testResultTexture.clear();
@@ -94,11 +95,11 @@ export default class Renderer {
       sample);
   }
 
-  renderView(context: Context, mapToViewportMatrix: mat3) {
+  renderView(context: Context, mapToViewportMatrix: mat3, top: number) {
     this.viewport.clear(0.1, 0.1, 0.1, 1);
     this.viewEngine.render(context, this.viewport, mapToViewportMatrix);
     this.wordEngine.render(context, this.viewport, mapToViewportMatrix);
-    this.rectangleEngine.render(context.rectangle, context.testResultTexture, this.viewport, 64 * window.devicePixelRatio, 64 * window.devicePixelRatio)
+    this.rectangleEngine.render(context.rectangle, context.testResultTexture, this.viewport, top, 64 * window.devicePixelRatio)
     if ((window as any)['debug']) {
       this.debugEngine.render(context.triangle, context.mapTexture, this.viewport, mat3.create());
     }

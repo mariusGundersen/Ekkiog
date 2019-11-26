@@ -5,6 +5,7 @@ import Context, { MutableContext } from './Context';
 import Renderer from './Renderer';
 import { AtomicBind, Bindable } from './buffers/types';
 import Viewport from './buffers/Viewport';
+import { number } from 'prop-types';
 
 export default class Engine {
   private readonly context: Context;
@@ -48,12 +49,12 @@ export default class Engine {
     this.renderer.simulateTick(this.context, tickCount);
   }
 
-  test() {
-    this.renderer.test(this.context);
+  test(sample: number) {
+    this.renderer.test(this.context, sample);
   }
 
-  render(mapToViewportMatrix: mat3) {
-    this.renderer.renderView(this.context, mapToViewportMatrix);
+  render(mapToViewportMatrix: mat3, top: number) {
+    this.renderer.renderView(this.context, mapToViewportMatrix, top);
   }
 
   renderMove(mapToViewportMatrix: mat3, box: Box, dx: number, dy: number) {

@@ -23,7 +23,8 @@ import {
   showPopup,
   zoomOutOf,
   startSync,
-  Action
+  Action,
+  toggleShow
 } from '../actions';
 
 export interface Props {
@@ -32,8 +33,6 @@ export interface Props {
   readonly currentComponentRepo: string;
   readonly tickInterval: number;
   readonly gateCount: number;
-  readonly undoCount: number;
-  readonly redoCount: number;
   readonly isLoading: boolean;
   readonly isSaving: boolean;
   readonly isReadOnly: boolean;
@@ -41,54 +40,15 @@ export interface Props {
   readonly user: OauthData | null;
   readonly showMainMenu: boolean;
   readonly showSearchMenu: boolean;
+  readonly showSimulationMenu: boolean;
   toggleMainMenu(e: any): void;
   toggleSearchMenu(e: any): void;
 }
 
-export default reax(
-  {
-    toggleSimulationMenu: constant(),
-    onUndo: constant(),
-    onRedo: constant(),
-    onSetTickInterval: (value: number) => value,
-    onStepForward: constant(),
-    goBack: constant(),
-    sync: constant(),
-    onShare: constant()
-  }, ({
-    toggleSimulationMenu,
-    onUndo,
-    onRedo,
-    onSetTickInterval,
-    onStepForward,
-    goBack,
-    sync,
-    onShare
-  }, _, { dispatch }: Props) => {
-    onUndo.subscribe(() => dispatch(undo()));
-    onRedo.subscribe(() => dispatch(redo()));
-    onSetTickInterval.subscribe(x => dispatch(setTickInterval(x)));
-    onStepForward.subscribe(() => dispatch(stepForward()));
-    goBack.subscribe(() => dispatch(zoomOutOf()));
-    sync.subscribe(() => dispatch(startSync()));
-    onShare.subscribe(() => dispatch(showPopup('Share')));
+export default function (props: Props) {
+  const dispatch = props.dispatch;
 
-    const state = merge(
-      toggleSimulationMenu.pipe(map(_ => 'simulation'))
-    )
-      .pipe(
-        scan((state, event) => state === event ? '' : event, ''),
-        share()
-      );
-
-    return {
-      showSearch: state.pipe(
-        is('search')),
-      showSimulationMenu: state.pipe(
-        is('simulation'))
-    };
-  },
-  (values, events, props) => (
+  return (
     <div className={style.navbar}>
       <div className={style.bar} data-loading={props.isLoading}>
         <MainMenuButton
@@ -100,30 +60,22 @@ export default reax(
           gateCount={props.gateCount}
           isSaving={props.isSaving}
           canGoBack={props.isChildContext}
-          goBack={events.goBack} />
+          goBack={() => dispatch(zoomOutOf())} />
         <SimulationMenuButton
-          onClick={events.toggleSimulationMenu}
-          isActive={values.showSimulationMenu} />
+          onClick={() => dispatch(toggleShow(!props.showSimulationMenu))}
+          isActive={props.showSimulationMenu} />
         <SearchButton
           showSearch={props.showSearchMenu}
           toggleSearch={props.toggleSearchMenu} />
       </div>
       <SimulationMenu
-        show={values.showSimulationMenu}
+        show={props.showSimulationMenu}
         tickInterval={props.tickInterval}
-        undoCount={props.undoCount}
-        redoCount={props.redoCount}
         canShare={props.currentComponentRepo == '' && props.user != null}
-        setTickInterval={events.onSetTickInterval}
-        stepForward={events.onStepForward}
-        undo={events.onUndo}
-        redo={events.onRedo}
-        share={events.onShare} />
+        setTickInterval={x => dispatch(setTickInterval(x))}
+        stepForward={() => dispatch(stepForward())}
+        share={() => dispatch(showPopup('Share'))} />
     </div>
-  ));
-
-function is<T>(value: T) {
-  return map(x => x === value);
+  );
 }
-
 
