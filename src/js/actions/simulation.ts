@@ -24,7 +24,25 @@ export const toggleShow = (show: boolean): ToggleShowAction => ({
   show
 });
 
+export type RewindAction = {
+  readonly type: 'rewind'
+}
+export const rewind = (): RewindAction => ({
+  type: 'rewind'
+});
+
+export type TickAction = {
+  readonly type: 'tick',
+  readonly ticks: number
+}
+export const tick = (ticks: number): TickAction => ({
+  type: 'tick',
+  ticks
+});
+
 export type SimulationActions =
   SetTickIntervalAction |
   StepForwardAction |
-  ToggleShowAction;
+  ToggleShowAction |
+  RewindAction |
+  TickAction;

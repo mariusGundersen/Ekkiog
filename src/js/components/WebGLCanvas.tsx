@@ -4,7 +4,8 @@ import { Dispatch } from 'redux';
 
 import {
   fitBox,
-  Action
+  Action,
+  tick
 } from '../actions';
 import { SelectionState } from '../reduce/selection';
 import { ContextState } from '../reduce/context';
@@ -61,17 +62,16 @@ export default function WebGLCanvas(props: Props) {
     touchEngine.current.updateTouches(props.contextMenu.type === 'show', props.selection);
   });
 
-  useInterval(() => {
+  useInterval(ticks => {
     if (!touchEngine.current) return;
-
-    touchEngine.current.onTick(props.simulation.step);
+    props.dispatch(tick(ticks));
   }, props.simulation.tickInterval);
 
   useEffect(() => {
     if (!touchEngine.current) return;
 
-    touchEngine.current.onTick(props.simulation.step);
-  }, [props.simulation.step])
+    touchEngine.current.onTick(props.simulation.tick, props.simulation.sample);
+  }, [props.simulation.tick]);
 
   useEffect(() => {
     if (!touchEngine.current) return;
@@ -120,16 +120,14 @@ function usePrevious<T>(value: T) {
   return ref.current;
 }
 
-function useInterval(effect: () => void, interval: number) {
+function useInterval(effect: (ticks: number) => void, interval: number) {
   return useEffect(() => {
     if (interval === Infinity) return;
 
     const delta = Math.max(16, interval);
 
     const intval = setInterval(() => {
-      for (let d = 0; d < delta; d += interval) {
-        effect();
-      }
+      effect(Math.floor(delta / interval));
     }, delta);
 
     return () => clearInterval(intval);

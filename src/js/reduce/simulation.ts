@@ -7,14 +7,16 @@ import ease, { Ease, noEase, Easing, easeOut } from '../utils/ease';
 
 export interface SimulationState {
   readonly tickInterval: number
-  readonly step: number
+  readonly tick: number
+  readonly sample: number
   readonly show: boolean
   readonly ease: Easing
 }
 
 const initialState: SimulationState = {
   tickInterval: 2 ** 8,
-  step: 0,
+  tick: 0,
+  sample: 0,
   show: true,
   ease: noEase()
 };
@@ -30,7 +32,8 @@ export default function view(state = initialState, action: Action): SimulationSt
       return {
         ...state,
         tickInterval: Infinity,
-        step: state.step + 1
+        tick: state.tick + 1,
+        sample: state.sample + 1
       }
     case 'toggleShow':
       return {
@@ -39,6 +42,18 @@ export default function view(state = initialState, action: Action): SimulationSt
         ease: action.show
           ? ease([0], [1], easeOut, 500)
           : ease([1], [0], easeOut, 500)
+      }
+    case 'rewind':
+      return {
+        ...state,
+        sample: 0,
+        tick: state.tick + 1
+      }
+    case 'tick':
+      return {
+        ...state,
+        tick: state.tick + 1,
+        sample: state.sample + 1
       }
     default:
       return state;

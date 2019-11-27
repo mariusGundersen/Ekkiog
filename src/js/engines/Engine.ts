@@ -45,8 +45,8 @@ export default class Engine {
     }
   }
 
-  simulate() {
-    this.renderer.simulateTick(this.context);
+  simulate(tick: number) {
+    this.renderer.simulateTick(this.context, tick);
   }
 
   test(sample: number) {

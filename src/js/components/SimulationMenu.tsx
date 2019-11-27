@@ -1,10 +1,10 @@
 import * as React from 'react';
 import IconPause from 'react-icons/fa/pause';
+import IconRewind from 'react-icons/fa/fast-backward';
 import IconStepForward from 'react-icons/fa/step-forward';
 import IconPlay from 'react-icons/fa/play';
 import IconFast from 'react-icons/fa/forward';
 import IconShare from 'react-icons/fa/paper-plane';
-import { CSSTransition } from 'react-transition-group';
 
 import pure from './pure';
 
@@ -16,6 +16,7 @@ export interface Props {
   readonly canShare: boolean
   setTickInterval(tickInterval: number): void
   stepForward(e: any): void
+  rewind(e: any): void
   share(e: any): void
 }
 
@@ -30,6 +31,9 @@ export default pure(['show', 'tickInterval'],
             <IconShare />
           </button>}
           <div className={style.divider} />
+          <button onClick={props.rewind}>
+            <IconRewind />
+          </button>
           <button onClick={() => props.setTickInterval(Infinity)} className={props.tickInterval == Infinity ? style.selected : ''}>
             <IconPause />
           </button>

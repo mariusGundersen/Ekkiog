@@ -52,19 +52,20 @@ export default class Renderer {
       context.tileMapTexture);
   }
 
-  simulateTick(context: Context) {
-    this.currentTick++;
+  simulateTick(context: Context, tick: number) {
+    this.currentTick = tick;
 
     this.renderCharges(context);
   }
 
   test(context: Context, sample: number) {
-    if (sample >= context.testResultTexture.width)
+    if (sample > context.testResultTexture.width)
       return;
 
     if (sample == 0) {
       context.testResultTexture.clear();
-      this.rectangleEngine.render(context.rectangle, context.expectedResultTexture, context.testResultTexture)
+      this.rectangleEngine.render(context.rectangle, context.expectedResultTexture, context.testResultTexture);
+      return;
     }
 
     this.testEngine.render(
@@ -72,7 +73,7 @@ export default class Renderer {
       context.chargeMapTexture,
       context.expectedResultTexture,
       context.testResultTexture,
-      sample);
+      sample - 1);
   }
 
   renderView(context: Context, mapToViewportMatrix: mat3, top: number) {

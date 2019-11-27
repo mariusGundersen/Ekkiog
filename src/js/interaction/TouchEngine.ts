@@ -49,8 +49,8 @@ export default class TouchEngine {
     this.render(perspective, selection, top);
   }
 
-  onTick(sample: number) {
-    this.engine.simulate();
+  onTick(tick: number, sample: number) {
+    this.engine.simulate(tick);
     this.engine.test(sample);
   }
 

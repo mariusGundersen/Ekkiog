@@ -18,11 +18,9 @@ import style from './navbar.scss';
 import {
   setTickInterval,
   stepForward,
-  undo,
-  redo,
+  rewind,
   showPopup,
   zoomOutOf,
-  startSync,
   Action,
   toggleShow
 } from '../actions';
@@ -74,6 +72,7 @@ export default function (props: Props) {
         canShare={props.currentComponentRepo == '' && props.user != null}
         setTickInterval={x => dispatch(setTickInterval(x))}
         stepForward={() => dispatch(stepForward())}
+        rewind={() => dispatch(rewind())}
         share={() => dispatch(showPopup('Share'))} />
     </div>
   );
