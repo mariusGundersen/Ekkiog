@@ -32,7 +32,7 @@ export default class Engine {
   mutateContext(mutator: (context: MutableContext) => void) {
     const changed = this.context.mutateContext(mutator);
     if (changed) {
-      this.simulate();
+      this.renderer.renderCharges(this.context);
       this.renderer.renderMap(this.context);
     }
   }
@@ -45,8 +45,8 @@ export default class Engine {
     }
   }
 
-  simulate(tickCount?: number) {
-    this.renderer.simulateTick(this.context, tickCount);
+  simulate() {
+    this.renderer.simulateTick(this.context);
   }
 
   test(sample: number) {

@@ -3,23 +3,19 @@ import Engine from "../engines/Engine";
 import TouchControls from "./TouchControls";
 import { Dispatch, AnyAction } from "redux";
 import { mat3 } from "gl-matrix";
-import Ticker from "./Ticker";
 import { SelectionState } from "../reduce/selection";
 import { Perspective, recalculate } from "../reduce/perspective";
 import { panZoom } from "../actions";
-import { Forest } from "../editing";
-import forestHandler from "../editing/forestHandler";
-import moveHandler from "../editing/moveHandler";
-import { ButtonNode } from "../reduce/buttonTree";
-import buttonHandler from "../editing/buttonHandler";
+import { Forest, createEnneaTree, diffAndReconcile } from "../editing";
+import { ButtonNode, diffAndReconcile as diffAndReconcileButton } from "../reduce/buttonTree";
 import { switchMap, tap } from "rxjs/operators";
+import Context from "../engines/Context";
 
 export default class TouchEngine {
   private readonly engine: Engine;
   private readonly touchControls: TouchControls;
   private readonly dispatch: Dispatch<AnyAction>;
   private readonly matrix: mat3;
-  private readonly ticker: Ticker;
   constructor(canvas: HTMLCanvasElement, viewportToTile: (x: number, y: number) => [number, number], dispatch: Dispatch<AnyAction>) {
     const gl = getContext(canvas);
     this.engine = new Engine(gl, 100, 100);
@@ -29,11 +25,6 @@ export default class TouchEngine {
     this.touchControls = new TouchControls(touches, dispatch);
     this.dispatch = dispatch;
     this.matrix = mat3.create();
-
-    this.ticker = new Ticker(tickCount => {
-      this.engine.simulate(tickCount);
-      this.engine.test(tickCount);
-    });
   }
 
   setViewport(width: number, height: number) {
@@ -54,26 +45,27 @@ export default class TouchEngine {
     const changed = this.touchControls.getChangedTouches();
     if (changed.length) {
       this.dispatch(panZoom(changed));
-    } else {
-      this.render(perspective, selection, top);
     }
+    this.render(perspective, selection, top);
   }
 
-  setTick(tickInterval: number, delta: number) {
-    this.ticker.setTickInterval(tickInterval);
-    this.ticker.tick(delta);
+  onTick(sample: number) {
+    this.engine.simulate();
+    this.engine.test(sample);
   }
 
-  diffForest(before: Forest, after: Forest) {
-    forestHandler(before, after, this.engine);
+  diff(beforeForest: Forest, beforeButton: ButtonNode, afterForest: Forest, afterButton: ButtonNode) {
+    if (beforeForest == afterForest && beforeButton === afterButton) return;
+
+    this.engine.mutateContext(context => {
+      diffAndReconcile(context, beforeForest.enneaTree, afterForest.enneaTree);
+      diffAndReconcileButton(context, beforeButton, afterButton);
+    })
   }
 
   diffMove(before: SelectionState, after: SelectionState) {
-    moveHandler(before, after, this.engine);
-  }
-
-  diffButton(before: ButtonNode, after: ButtonNode) {
-    buttonHandler(before, after, this.engine);
+    if (before === after) return;
+    this.engine.mutateMoveContext(context => diffAndReconcile(context, before ? before.enneaTree : undefined, after ? after.enneaTree : undefined));
   }
 
   render(perspective: Perspective, selection: SelectionState, top: number) {

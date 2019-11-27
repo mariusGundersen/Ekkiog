@@ -36,13 +36,14 @@ export default function WebGLCanvas(props: Props) {
 
     onAnimationFrame(delta => {
       const zoomEase = context.current.ease.next(delta);
-      const simulationMenuEase = simulation.current.ease.next(delta);
-      if (zoomEase.done) {
-        const top = simulationMenuEase.done ? (simulation.current.show ? 1 : 0) : simulationMenuEase.value[0];
-        touchEngine.onAnimationFrame(perspective.current, selection.current, (top * (64 + 48) - 64) * window.devicePixelRatio);
-      } else {
+
+      if (!zoomEase.done) {
         props.dispatch(fitBox(zoomEase.value));
       }
+
+      const simulationMenuEase = simulation.current.ease.next(delta);
+      const top = simulationMenuEase.done ? (simulation.current.show ? 1 : 0) : simulationMenuEase.value[0];
+      touchEngine.onAnimationFrame(perspective.current, selection.current, (top * (64 + 48) - 64) * window.devicePixelRatio);
     });
 
     return touchEngine;
@@ -51,18 +52,26 @@ export default function WebGLCanvas(props: Props) {
   const previousForest = usePrevious(props.context.forest);
   const previousSelection = usePrevious(props.selection);
   const previousButtonTree = usePrevious(props.context.buttonTree);
-  const previousStep = usePrevious(props.simulation.step);
 
   useEffect(() => {
     if (!touchEngine.current) return;
 
-    touchEngine.current.diffForest(previousForest, props.context.forest);
+    touchEngine.current.diff(previousForest, previousButtonTree, props.context.forest, props.context.buttonTree);
     touchEngine.current.diffMove(previousSelection, props.selection);
-    touchEngine.current.diffButton(previousButtonTree, props.context.buttonTree);
-    touchEngine.current.setTick(props.simulation.tickInterval, props.simulation.step - previousStep);
     touchEngine.current.updateTouches(props.contextMenu.type === 'show', props.selection);
-    touchEngine.current.render(props.view.perspective, props.selection, (simulation.current.show ? 48 : -64) * window.devicePixelRatio);
   });
+
+  useInterval(() => {
+    if (!touchEngine.current) return;
+
+    touchEngine.current.onTick(props.simulation.step);
+  }, props.simulation.tickInterval);
+
+  useEffect(() => {
+    if (!touchEngine.current) return;
+
+    touchEngine.current.onTick(props.simulation.step);
+  }, [props.simulation.step])
 
   useEffect(() => {
     if (!touchEngine.current) return;
@@ -109,4 +118,20 @@ function usePrevious<T>(value: T) {
     ref.current = value;
   });
   return ref.current;
+}
+
+function useInterval(effect: () => void, interval: number) {
+  return useEffect(() => {
+    if (interval === Infinity) return;
+
+    const delta = Math.max(16, interval);
+
+    const intval = setInterval(() => {
+      for (let d = 0; d < delta; d += interval) {
+        effect();
+      }
+    }, delta);
+
+    return () => clearInterval(intval);
+  }, [interval]);
 }

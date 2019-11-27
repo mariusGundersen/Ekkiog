@@ -52,30 +52,10 @@ export default class Renderer {
       context.tileMapTexture);
   }
 
-  simulateTick(context: Context, tick = this.currentTick) {
-    this.currentTick = tick;
+  simulateTick(context: Context) {
+    this.currentTick++;
 
-    const prevousCharges = context.netChargeTextures[(tick + 1) % 2];
-    const nextCharges = context.netChargeTextures[tick % 2];
-
-    nextCharges.clear();
-
-    this.netChargeEngine.render(
-      context.triangle,
-      prevousCharges,
-      context.gatesTexture,
-      nextCharges);
-
-    const currentCharges = nextCharges;
-
-    context.chargeMapTexture.clear();
-
-    this.chargeMapEngine.render(
-      context.triangle,
-      context.netMapTexture,
-      currentCharges,
-      context.spriteSheetTexture,
-      context.chargeMapTexture);
+    this.renderCharges(context);
   }
 
   test(context: Context, sample: number) {
@@ -111,6 +91,31 @@ export default class Renderer {
     this.moveEngine.render(context, this.viewport, this.moveMatrix, [top, left, right, bottom]);
     this.wordEngine.render(context, this.viewport, this.moveMatrix);
   }
+
+  renderCharges(context: Context) {
+    const prevousCharges = context.netChargeTextures[(this.currentTick + 1) % 2];
+    const nextCharges = context.netChargeTextures[this.currentTick % 2];
+
+    nextCharges.clear();
+
+    this.netChargeEngine.render(
+      context.triangle,
+      prevousCharges,
+      context.gatesTexture,
+      nextCharges);
+
+    const currentCharges = nextCharges;
+
+    context.chargeMapTexture.clear();
+
+    this.chargeMapEngine.render(
+      context.triangle,
+      context.netMapTexture,
+      currentCharges,
+      context.spriteSheetTexture,
+      context.chargeMapTexture);
+  }
+
 
   renderChargeMap(context: Context, chargeContext: Context) {
     const currentCharges = chargeContext.netChargeTextures[this.currentTick % 2];
