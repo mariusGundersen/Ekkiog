@@ -52,17 +52,20 @@ export default class Renderer {
       context.tileMapTexture);
   }
 
-  simulateTick(context: Context, tick: number) {
-    this.currentTick = tick;
+  simulateTick(context: Context, tick: number, sample: number) {
+    while (this.currentTick < tick) {
+      this.currentTick++;
 
-    this.renderCharges(context);
+      this.renderCharges(context);
+      this.test(context, sample - (tick - this.currentTick));
+    }
   }
 
   test(context: Context, sample: number) {
     if (sample > context.testResultTexture.width)
       return;
 
-    if (sample == 0) {
+    if (sample <= 0) {
       context.testResultTexture.clear();
       this.rectangleEngine.render(context.rectangle, context.expectedResultTexture, context.testResultTexture);
       return;

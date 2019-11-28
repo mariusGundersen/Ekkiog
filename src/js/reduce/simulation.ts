@@ -43,6 +43,8 @@ export default function view(state = initialState, action: Action): SimulationSt
           ? ease([0], [1], easeOut, 500)
           : ease([1], [0], easeOut, 500)
       }
+    case 'forest-loaded':
+    case 'pop-context':
     case 'rewind':
       return {
         ...state,
@@ -52,8 +54,8 @@ export default function view(state = initialState, action: Action): SimulationSt
     case 'tick':
       return {
         ...state,
-        tick: state.tick + 1,
-        sample: state.sample + 1
+        tick: state.tick + action.ticks,
+        sample: state.sample + action.ticks
       }
     default:
       return state;

@@ -45,12 +45,8 @@ export default class Engine {
     }
   }
 
-  simulate(tick: number) {
-    this.renderer.simulateTick(this.context, tick);
-  }
-
-  test(sample: number) {
-    this.renderer.test(this.context, sample);
+  simulate(tick: number, sample: number) {
+    this.renderer.simulateTick(this.context, tick, sample);
   }
 
   render(mapToViewportMatrix: mat3, top: number) {

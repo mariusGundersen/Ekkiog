@@ -50,8 +50,7 @@ export default class TouchEngine {
   }
 
   onTick(tick: number, sample: number) {
-    this.engine.simulate(tick);
-    this.engine.test(sample);
+    this.engine.simulate(tick, sample);
   }
 
   diff(beforeForest: Forest, beforeButton: ButtonNode, afterForest: Forest, afterButton: ButtonNode) {

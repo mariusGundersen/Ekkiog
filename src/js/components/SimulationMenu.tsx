@@ -34,12 +34,14 @@ export default pure(['show', 'tickInterval'],
           <button onClick={props.rewind}>
             <IconRewind />
           </button>
-          <button onClick={() => props.setTickInterval(Infinity)} className={props.tickInterval == Infinity ? style.selected : ''}>
-            <IconPause />
-          </button>
-          <button onClick={props.stepForward}>
-            <IconStepForward />
-          </button>
+          {props.tickInterval === Infinity
+            ? <button onClick={props.stepForward}>
+              <IconStepForward />
+            </button>
+            : <button onClick={() => props.setTickInterval(Infinity)}>
+              <IconPause />
+            </button>
+          }
           <button onClick={() => props.setTickInterval(2 ** 8)} className={props.tickInterval == 2 ** 8 ? style.selected : ''}>
             <IconPlay />
           </button>
