@@ -6,45 +6,57 @@ import { IObjectRepo, TreeBody } from '@es-git/object-mixin';
 import { ILoadAsRepo } from '@es-git/load-as-mixin';
 
 export interface ILoadForestRepo {
-   checkout(branch : string) : Promise<ForestWithHash>
-   checkoutCommit(hash : string) : Promise<ForestWithHash>
+  checkout(branch: string): Promise<ForestWithHash>
+  checkoutCommit(hash: string): Promise<ForestWithHash>
 }
 
 export interface ForestWithHash extends Forest {
-  readonly hash : Hash
+  readonly hash: Hash
 }
 
 type EnneaLeaf = BoxedData<Item>;
 
-export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILoadAsRepo>>(repo : T) : Constructor<ILoadForestRepo> & T {
+const DUMMY_TEST = {
+  inputs: [
+    { x: 56, y: 58, values: '0000 0000 1111 1111' },
+    { x: 56, y: 62, values: '0000 1111 1111 0000' }
+  ],
+  outputs: [
+    { x: 73, y: 60, values: 'xxx0 xxx1 xxx0 xxx1' }
+  ]
+}
+
+export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILoadAsRepo>>(repo: T): Constructor<ILoadForestRepo> & T {
   return class LoadForestRepo extends repo implements ILoadForestRepo {
-    constructor(...args : any[]){
+    constructor(...args: any[]) {
       super(...args);
     }
 
-    async checkout(branch : string){
+    async checkout(branch: string) {
       const hash = await super.getRef(branch);
-      if(!hash) throw new Error();
+      if (!hash) throw new Error();
       return await this.checkoutCommit(hash);
     }
 
-    async checkoutCommit(hash : string){
+    async checkoutCommit(hash: string): Promise<ForestWithHash> {
       const commit = await super.loadCommit(hash);
 
       const tree = await super.loadTree(commit.tree);
-      const [enneaTree, buddyTree] = await Promise.all([
+      const [enneaTree, buddyTree, testScenario] = await Promise.all([
         super.loadTree(tree['ennea'].hash).then(t => this.loadEnnea(t)),
-        super.loadTree(tree['buddy'].hash).then(t => this.loadBuddy(t))
+        super.loadTree(tree['buddy'].hash).then(t => this.loadBuddy(t)),
+        tree['test'] ? super.loadText(tree['test'].hash).then(JSON.parse) : DUMMY_TEST
       ]);
 
       return {
         hash,
         enneaTree,
-        buddyTree
+        buddyTree,
+        testScenario
       }
     }
 
-    async loadEnnea(body : TreeBody, size = 128) : Promise<EnneaTree> {
+    async loadEnnea(body: TreeBody, size = 128): Promise<EnneaTree> {
       const [
         data,
         topLeft,
@@ -58,15 +70,15 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
         bottomRight
       ] = await Promise.all([
         body['0'] ? super.loadText(body['0'].hash).then(JSON.parse).then(upgradeUnitItem) : undefined,
-        body['1'] ? super.loadTree(body['1'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
+        body['1'] ? super.loadTree(body['1'].hash).then(t => this.loadEnnea(t, size / 2)) : undefined,
         body['2'] ? super.loadTree(body['2'].hash).then(t => this.loadList(t)) : [],
-        body['3'] ? super.loadTree(body['3'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
+        body['3'] ? super.loadTree(body['3'].hash).then(t => this.loadEnnea(t, size / 2)) : undefined,
         body['4'] ? super.loadTree(body['4'].hash).then(t => this.loadList(t)) : [],
         body['5'] ? super.loadText(body['5'].hash).then(JSON.parse).then(upgradeBoxItem) : undefined,
         body['6'] ? super.loadTree(body['6'].hash).then(t => this.loadList(t)) : [],
-        body['7'] ? super.loadTree(body['7'].hash).then(t => this.loadEnnea(t, size/2)) : undefined,
+        body['7'] ? super.loadTree(body['7'].hash).then(t => this.loadEnnea(t, size / 2)) : undefined,
         body['8'] ? super.loadTree(body['8'].hash).then(t => this.loadList(t)) : [],
-        body['9'] ? super.loadTree(body['9'].hash).then(t => this.loadEnnea(t, size/2)) : undefined
+        body['9'] ? super.loadTree(body['9'].hash).then(t => this.loadEnnea(t, size / 2)) : undefined
       ] as any[]);
       return {
         size,
@@ -83,7 +95,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
       };
     }
 
-    async loadBuddy(body : TreeBody) : Promise<BuddyTree> {
+    async loadBuddy(body: TreeBody): Promise<BuddyTree> {
       const [
         data,
         left,
@@ -100,9 +112,9 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
       };
     }
 
-    async loadList(items : TreeBody) : Promise<EnneaLeaf[]> {
+    async loadList(items: TreeBody): Promise<EnneaLeaf[]> {
       const result = [] as EnneaLeaf[];
-      for(const {index, item} of await Promise.all(Object.keys(items).map(async item => ({index: parseInt(item), item: upgradeBoxItem(JSON.parse(await super.loadText(items[item].hash)))})))){
+      for (const { index, item } of await Promise.all(Object.keys(items).map(async item => ({ index: parseInt(item), item: upgradeBoxItem(JSON.parse(await super.loadText(items[item].hash))) })))) {
         result[index] = item;
       }
       return result;
@@ -110,13 +122,13 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
   }
 }
 
-function upgradeUnitItem(item : Item){
-  return upgradeItem(item, {width: 1, height: 1});
+function upgradeUnitItem(item: Item) {
+  return upgradeItem(item, { width: 1, height: 1 });
 }
 
-function upgradeBoxItem(box : EnneaLeaf){
+function upgradeBoxItem(box: EnneaLeaf) {
   return {
     ...box,
-    data: upgradeItem(box.data, {width: box.right-box.left, height: box.bottom - box.top})
+    data: upgradeItem(box.data, { width: box.right - box.left, height: box.bottom - box.top })
   }
 }

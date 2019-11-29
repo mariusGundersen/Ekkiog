@@ -5,7 +5,7 @@ import Texture from './Texture';
 export default class CanvasTexture extends Texture {
   private readonly canvas: HTMLCanvasElement;
   readonly ctx: CanvasRenderingContext2D;
-  constructor(gl: WebGLRenderingContext, width: number, height: number) {
+  constructor(gl: WebGLRenderingContext, width: number, height = width) {
     super(gl, width, height);
 
     this.canvas = document.createElement('canvas');
@@ -15,7 +15,7 @@ export default class CanvasTexture extends Texture {
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
   }
 
-  resize(width: number, height: number) {
+  resize(width: number, height = width) {
     vec2.set(this.size, width, height);
     vec2.set(this.halfSize, width / 2, height / 2);
     vec2.set(this.inverseSize, 1 / width, 1 / height);

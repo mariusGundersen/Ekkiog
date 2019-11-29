@@ -2,18 +2,7 @@ import PointList from "./buffers/PointList";
 import { AtomicBind } from "./buffers/types";
 import CanvasTexture from "./buffers/CanvasTexture";
 import RenderTexture from "./buffers/RenderTexture";
-
-export interface Input {
-  readonly x: number
-  readonly y: number
-  readonly values: string
-}
-
-export interface Output {
-  readonly x: number
-  readonly y: number
-  readonly values: string
-}
+import { TestScenario } from "../editing";
 
 export default class TestDriver {
   readonly buttonPoints: PointList;
@@ -23,11 +12,15 @@ export default class TestDriver {
   constructor(gl: WebGLRenderingContext, vertexBind: AtomicBind, frameBufferBind: AtomicBind) {
     this.buttonPoints = new PointList(gl, vertexBind);
     this.testPoints = new PointList(gl, vertexBind);
-    this.expectedResultTexture = new CanvasTexture(gl, 2, 2);
-    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 2, 2, true);
+    this.expectedResultTexture = new CanvasTexture(gl, 0);
+    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 0, 0, true);
   }
 
-  update(inputs: Input[], outputs: Output[]) {
+  get samples() {
+    return this.testResultTexture.width;
+  }
+
+  update({ inputs, outputs }: TestScenario) {
     const samples = [...inputs, ...outputs].map(i => i.values.replace(/\s/g, ''));
 
     const width = Math.max(...samples.map(s => s.length));

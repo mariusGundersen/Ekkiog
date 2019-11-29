@@ -7,9 +7,21 @@ export type Tool = 'wire' | 'gate' | 'underpass' | 'button' | 'light' | 'compone
 
 export type TileType = Tool | 'empty';
 
+export interface Probe {
+  readonly x: number
+  readonly y: number
+  readonly values: string
+}
+
+export interface TestScenario {
+  readonly inputs: Probe[]
+  readonly outputs: Probe[]
+}
+
 export interface Forest {
-  readonly buddyTree: BuddyTree,
+  readonly buddyTree: BuddyTree
   readonly enneaTree: EnneaTree
+  readonly testScenario?: TestScenario
 }
 
 export type EnneaTree = Node<Item>;

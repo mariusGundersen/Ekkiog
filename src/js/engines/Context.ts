@@ -1,4 +1,4 @@
-import { MutableContext as IMutableContext, Item, Area } from '../editing';
+import { MutableContext as IMutableContext, Item, Area, TestScenario } from '../editing';
 
 import { AtomicBind } from './buffers/types';
 
@@ -6,15 +6,12 @@ import DataTexture from './buffers/DataTexture';
 import RenderTexture from './buffers/RenderTexture';
 import ImageTexture from './buffers/ImageTexture';
 
-import PointList from './buffers/PointList';
 import Triangle from './buffers/Triangle';
-import QuadList from './buffers/QuadList';
 import TextScene from './text/TextScene';
 
 import loadImage from '../loadImage';
 import tiles from '../../img/tiles.png';
 import Rectangle from './buffers/Rectangle';
-import CanvasTexture from './buffers/CanvasTexture';
 import TestDriver from './TestDriver';
 
 const MAP_SIZE = 128;
@@ -56,15 +53,6 @@ export default class Context {
       new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT),
       new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT)
     ];
-
-    this.testDriver.update(
-      [
-        { x: 56, y: 58, values: '0000 0000 1111 1111' },
-        { x: 56, y: 62, values: '0000 1111 1111 0000' }
-      ],
-      [
-        { x: 73, y: 60, values: 'xxx0 xxx1 xxx0 xxx1' }
-      ]);
   }
 
   mutateContext(mutator: (mutableContext: MutableContext) => void) {
@@ -157,6 +145,10 @@ export class MutableContext implements IMutableContext {
   updateText(before: Item, after: Item) {
     this.context.textScene.updateItem(before, after);
     this.textChanged = true;
+  }
+
+  setTestScenario(scenario?: TestScenario) {
+    this.context.testDriver.update(scenario || { inputs: [], outputs: [] });
   }
 
   update() {

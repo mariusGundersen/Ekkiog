@@ -14,7 +14,7 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
   constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind) {
     super(atomicBind);
     this.gl = gl;
-    this.size = 2;
+    this.size = 1;
     this.vertices = new Float32Array(this.size * 4);
     this.vertexBuffer = gl.createBuffer() || (() => { throw new Error("Could not make buffer") })();
     this.indexBuffer = gl.createBuffer() || (() => { throw new Error("Could not make buffer") })();
@@ -73,7 +73,7 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
   maybeDownsize(count: number) {
     if (count >= this.size / 4) return;
 
-    const size = Math.max(8, 2 ** Math.ceil(1 + Math.log(count) / Math.log(2)));
+    const size = Math.max(1, 2 ** Math.ceil(1 + Math.log(count) / Math.log(2)));
     if (size >= this.size) return;
 
     this.size = size;

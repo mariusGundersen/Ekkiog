@@ -59,6 +59,9 @@ export default class TouchEngine {
     this.engine.mutateContext(context => {
       diffAndReconcile(context, beforeForest.enneaTree, afterForest.enneaTree);
       diffAndReconcileButton(context, beforeButton, afterButton);
+      if (beforeForest.testScenario !== afterForest.testScenario) {
+        context.setTestScenario(afterForest.testScenario);
+      }
     })
   }
 

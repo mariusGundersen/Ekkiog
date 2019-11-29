@@ -66,7 +66,10 @@ export default class Renderer {
   }
 
   test(context: Context, sample: number) {
-    if (sample > context.testDriver.testResultTexture.width)
+    if (context.testDriver.samples == 0)
+      return;
+
+    if (sample > context.testDriver.samples)
       return;
 
     if (sample <= 0) {
@@ -87,7 +90,8 @@ export default class Renderer {
     this.viewport.clear(0.1, 0.1, 0.1, 1);
     this.viewEngine.render(context, this.viewport, mapToViewportMatrix);
     this.wordEngine.render(context, this.viewport, mapToViewportMatrix);
-    this.rectangleEngine.render(context.rectangle, context.testDriver.testResultTexture, this.viewport, top, 64 * window.devicePixelRatio)
+    if (context.testDriver.samples > 0)
+      this.rectangleEngine.render(context.rectangle, context.testDriver.testResultTexture, this.viewport, top, 64 * window.devicePixelRatio)
     //if ((window as any)['debug']) {
     // const nextCharges = context.netChargeTextures[this.currentTick % 2];
     // this.debugEngine.render(context.triangle, nextCharges, this.viewport, mapToViewportMatrix);
@@ -115,7 +119,7 @@ export default class Renderer {
 
     const currentCharges = nextCharges;
 
-    if (sample != 0) {
+    if (sample != 0 && context.testDriver.samples > 0) {
       this.buttonEngine.render(
         context.testDriver.buttonPoints,
         context.netMapTexture,
