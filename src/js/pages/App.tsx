@@ -145,6 +145,7 @@ export default connect((s: State) => s)(
             toggleMainMenu={events.toggleMainMenu}
             showSearchMenu={values.showFileMenu}
             showSimulationMenu={props.simulation.show}
+            showTestScenario={props.context.forest.testScenario ? true : false}
             toggleSearchMenu={events.toggleSearchMenu}
           />
           <EditMenu

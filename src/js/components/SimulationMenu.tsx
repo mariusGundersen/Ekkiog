@@ -12,6 +12,7 @@ import style from './simulationMenu.scss';
 
 export interface Props {
   readonly show: boolean
+  readonly testScenario: boolean
   readonly tickInterval: number
   readonly canShare: boolean
   setTickInterval(tickInterval: number): void
@@ -24,16 +25,16 @@ export default pure(['show', 'tickInterval'],
   (props: Props) => (
     <div className={style.container}>
       <div className={style.simulationMenu} data-show={props.show}>
-        <div className={style.testResults}></div>
+        <div className={style.testResults} data-show={props.testScenario}></div>
         <div className={style.menuBar}>
           <div className={style.flexFill} />
           {props.canShare && <button onClick={props.share}>
             <IconShare />
           </button>}
           <div className={style.divider} />
-          <button onClick={props.rewind}>
+          {props.testScenario && <button onClick={props.rewind}>
             <IconRewind />
-          </button>
+          </button>}
           {props.tickInterval === Infinity
             ? <button onClick={props.stepForward}>
               <IconStepForward />

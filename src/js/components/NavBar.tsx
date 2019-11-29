@@ -39,6 +39,7 @@ export interface Props {
   readonly showMainMenu: boolean;
   readonly showSearchMenu: boolean;
   readonly showSimulationMenu: boolean;
+  readonly showTestScenario: boolean;
   toggleMainMenu(e: any): void;
   toggleSearchMenu(e: any): void;
 }
@@ -68,6 +69,7 @@ export default function (props: Props) {
       </div>
       <SimulationMenu
         show={props.showSimulationMenu}
+        testScenario={props.showTestScenario}
         tickInterval={props.tickInterval}
         canShare={props.currentComponentRepo == '' && props.user != null}
         setTickInterval={x => dispatch(setTickInterval(x))}

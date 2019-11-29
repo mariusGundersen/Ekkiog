@@ -44,7 +44,8 @@ export default function WebGLCanvas(props: Props) {
 
       const simulationMenuEase = simulation.current.ease.next(delta);
       const top = simulationMenuEase.done ? (simulation.current.show ? 1 : 0) : simulationMenuEase.value[0];
-      touchEngine.onAnimationFrame(perspective.current, selection.current, (top * (64 + 48) - 64) * window.devicePixelRatio);
+      const simWindow = context.current.forest.testScenario ? 64 : 0;
+      touchEngine.onAnimationFrame(perspective.current, selection.current, (top * (simWindow + 48) - simWindow) * window.devicePixelRatio);
     });
 
     return touchEngine;
