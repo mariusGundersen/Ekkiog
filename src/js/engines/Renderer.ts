@@ -66,20 +66,20 @@ export default class Renderer {
   }
 
   test(context: Context, sample: number) {
-    if (sample > context.testResultTexture.width)
+    if (sample > context.testDriver.testResultTexture.width)
       return;
 
     if (sample <= 0) {
-      context.testResultTexture.clear();
-      this.rectangleEngine.render(context.rectangle, context.expectedResultTexture, context.testResultTexture);
+      context.testDriver.testResultTexture.clear();
+      this.rectangleEngine.render(context.rectangle, context.testDriver.expectedResultTexture, context.testDriver.testResultTexture);
       return;
     }
 
     this.testEngine.render(
-      context.testPoints,
+      context.testDriver.testPoints,
       context.chargeMapTexture,
-      context.expectedResultTexture,
-      context.testResultTexture,
+      context.testDriver.expectedResultTexture,
+      context.testDriver.testResultTexture,
       sample - 1);
   }
 
@@ -87,7 +87,7 @@ export default class Renderer {
     this.viewport.clear(0.1, 0.1, 0.1, 1);
     this.viewEngine.render(context, this.viewport, mapToViewportMatrix);
     this.wordEngine.render(context, this.viewport, mapToViewportMatrix);
-    this.rectangleEngine.render(context.rectangle, context.testResultTexture, this.viewport, top, 64 * window.devicePixelRatio)
+    this.rectangleEngine.render(context.rectangle, context.testDriver.testResultTexture, this.viewport, top, 64 * window.devicePixelRatio)
     //if ((window as any)['debug']) {
     // const nextCharges = context.netChargeTextures[this.currentTick % 2];
     // this.debugEngine.render(context.triangle, nextCharges, this.viewport, mapToViewportMatrix);
@@ -117,11 +117,11 @@ export default class Renderer {
 
     if (sample != 0) {
       this.buttonEngine.render(
-        context.buttonPoints,
+        context.testDriver.buttonPoints,
         context.netMapTexture,
-        context.expectedResultTexture,
+        context.testDriver.expectedResultTexture,
         nextCharges,
-        sample);
+        sample - 1);
     }
 
     context.chargeMapTexture.clear();

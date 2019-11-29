@@ -15,6 +15,7 @@ import loadImage from '../loadImage';
 import tiles from '../../img/tiles.png';
 import Rectangle from './buffers/Rectangle';
 import CanvasTexture from './buffers/CanvasTexture';
+import TestDriver from './TestDriver';
 
 const MAP_SIZE = 128;
 const TILE_SIZE = 16;
@@ -24,12 +25,10 @@ const SpriteSheet = loadImage(tiles);
 
 export default class Context {
   readonly tileSize: number;
-  readonly buttonPoints: PointList;
-  readonly testPoints: PointList;
   readonly triangle: Triangle;
   readonly rectangle: Rectangle;
-  readonly wordQuads: QuadList;
   readonly textScene: TextScene;
+  readonly testDriver: TestDriver;
   readonly spriteSheetTexture: ImageTexture;
   readonly mapTexture: DataTexture;
   readonly netMapTexture: DataTexture;
@@ -37,17 +36,13 @@ export default class Context {
   readonly tileMapTexture: RenderTexture;
   readonly chargeMapTexture: RenderTexture;
   readonly netChargeTextures: [RenderTexture, RenderTexture];
-  readonly expectedResultTexture: CanvasTexture;
-  readonly testResultTexture: RenderTexture;
   constructor(gl: WebGLRenderingContext, vertexBind: AtomicBind, frameBufferBind: AtomicBind) {
     this.tileSize = TILE_SIZE;
 
-    this.buttonPoints = new PointList(gl, vertexBind, [{ x: 56, y: 58 }, { x: 56, y: 62 }], 1);
-    this.testPoints = new PointList(gl, vertexBind, [{ x: 73, y: 60 }]);
     this.triangle = new Triangle(gl, vertexBind);
     this.rectangle = new Rectangle(gl, vertexBind);
-    this.wordQuads = new QuadList(gl, vertexBind);
-    this.textScene = new TextScene(this.wordQuads);
+    this.textScene = new TextScene(gl, vertexBind);
+    this.testDriver = new TestDriver(gl, vertexBind, frameBufferBind);
 
     this.spriteSheetTexture = new ImageTexture(gl, SpriteSheet);
 
@@ -62,8 +57,14 @@ export default class Context {
       new RenderTexture(gl, frameBufferBind, SQRT_NET_COUNT, SQRT_NET_COUNT)
     ];
 
-    this.expectedResultTexture = new CanvasTexture(gl, 16, 3);
-    this.testResultTexture = new RenderTexture(gl, frameBufferBind, 16, 3, true);
+    this.testDriver.update(
+      [
+        { x: 56, y: 58, values: '0000 0000 1111 1111' },
+        { x: 56, y: 62, values: '0000 1111 1111 0000' }
+      ],
+      [
+        { x: 73, y: 60, values: 'xxx0 xxx1 xxx0 xxx1' }
+      ]);
   }
 
   mutateContext(mutator: (mutableContext: MutableContext) => void) {
@@ -169,7 +170,7 @@ export class MutableContext implements IMutableContext {
       this.context.gatesTexture.update();
     }
     if (this.textChanged) {
-      this.context.wordQuads.update();
+      this.context.textScene.quadList.update();
     }
   }
 }

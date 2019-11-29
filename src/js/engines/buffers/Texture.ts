@@ -42,4 +42,10 @@ export default class Texture implements TextureBuffer {
     this.bindTexture();
     return target;
   }
+
+  resize(width: number, height = width) {
+    vec2.set(this.size, width, height);
+    vec2.set(this.halfSize, width / 2, height / 2);
+    vec2.set(this.inverseSize, 1 / width, 1 / height);
+  }
 }

@@ -26,6 +26,6 @@ export default class WordEngine {
     this.shader.uniforms['spriteSheet'] = context.spriteSheetTexture.sampler2D(0);
     this.shader.uniforms['chargeMap'] = context.chargeMapTexture.sampler2D(1);
 
-    context.wordQuads.draw(output);
+    context.textScene.quadList.draw(output);
   }
 }
