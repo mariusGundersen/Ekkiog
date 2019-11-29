@@ -13,6 +13,7 @@ import TestEngine from './TestEngine';
 import Context from './Context';
 import RectangleEngine from './RectangleEngine';
 import Viewport from './buffers/Viewport';
+import ButtonEngine from './ButtonEngine';
 
 export default class Renderer {
   private readonly gl: WebGLRenderingContext;
@@ -24,6 +25,7 @@ export default class Renderer {
   private readonly moveEngine: MoveEngine;
   private readonly wordEngine: WordEngine;
   private readonly debugEngine: DebugEngine;
+  private readonly buttonEngine: ButtonEngine;
   private readonly testEngine: TestEngine;
   private readonly rectangleEngine: RectangleEngine;
   private readonly viewport: Viewport;
@@ -39,6 +41,7 @@ export default class Renderer {
     this.moveEngine = new MoveEngine(gl);
     this.wordEngine = new WordEngine(gl);
     this.debugEngine = new DebugEngine(gl);
+    this.buttonEngine = new ButtonEngine(gl);
     this.testEngine = new TestEngine(gl);
     this.rectangleEngine = new RectangleEngine(gl);
   }
@@ -56,7 +59,8 @@ export default class Renderer {
     while (this.currentTick < tick) {
       this.currentTick++;
 
-      this.renderCharges(context);
+      this.renderCharges(context, sample - (tick - this.currentTick));
+
       this.test(context, sample - (tick - this.currentTick));
     }
   }
@@ -84,9 +88,10 @@ export default class Renderer {
     this.viewEngine.render(context, this.viewport, mapToViewportMatrix);
     this.wordEngine.render(context, this.viewport, mapToViewportMatrix);
     this.rectangleEngine.render(context.rectangle, context.testResultTexture, this.viewport, top, 64 * window.devicePixelRatio)
-    if ((window as any)['debug']) {
-      this.debugEngine.render(context.triangle, context.mapTexture, this.viewport, mat3.create());
-    }
+    //if ((window as any)['debug']) {
+    // const nextCharges = context.netChargeTextures[this.currentTick % 2];
+    // this.debugEngine.render(context.triangle, nextCharges, this.viewport, mapToViewportMatrix);
+    //}
   }
 
   private readonly moveMatrix = mat3.create();
@@ -96,7 +101,7 @@ export default class Renderer {
     this.wordEngine.render(context, this.viewport, this.moveMatrix);
   }
 
-  renderCharges(context: Context) {
+  renderCharges(context: Context, sample = 0) {
     const prevousCharges = context.netChargeTextures[(this.currentTick + 1) % 2];
     const nextCharges = context.netChargeTextures[this.currentTick % 2];
 
@@ -109,6 +114,15 @@ export default class Renderer {
       nextCharges);
 
     const currentCharges = nextCharges;
+
+    if (sample != 0) {
+      this.buttonEngine.render(
+        context.buttonPoints,
+        context.netMapTexture,
+        context.expectedResultTexture,
+        nextCharges,
+        sample);
+    }
 
     context.chargeMapTexture.clear();
 

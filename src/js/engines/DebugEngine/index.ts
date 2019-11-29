@@ -16,7 +16,6 @@ export default class DebugEngine {
 
   render(vertexBuffer: VertexBuffer, texture: TextureBuffer, output: FrameBuffer, matrix: mat3) {
     this.shader.bind();
-    output.clear();
 
     this.shader.uniforms.matrix = matrix;
     this.shader.uniforms.texture = texture.sampler2D(0);

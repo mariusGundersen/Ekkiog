@@ -24,6 +24,7 @@ const SpriteSheet = loadImage(tiles);
 
 export default class Context {
   readonly tileSize: number;
+  readonly buttonPoints: PointList;
   readonly testPoints: PointList;
   readonly triangle: Triangle;
   readonly rectangle: Rectangle;
@@ -41,6 +42,7 @@ export default class Context {
   constructor(gl: WebGLRenderingContext, vertexBind: AtomicBind, frameBufferBind: AtomicBind) {
     this.tileSize = TILE_SIZE;
 
+    this.buttonPoints = new PointList(gl, vertexBind, [{ x: 10, y: 2 }, { x: 5, y: 1 }, { x: 6, y: 1 }]);
     this.testPoints = new PointList(gl, vertexBind, [{ x: 73, y: 60 }]);
     this.triangle = new Triangle(gl, vertexBind);
     this.rectangle = new Rectangle(gl, vertexBind);
