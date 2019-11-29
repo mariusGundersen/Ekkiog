@@ -10,7 +10,7 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
   private readonly vertexBuffer: WebGLBuffer;
   private readonly indexBuffer: WebGLBuffer;
   private readonly map: NdArray;
-  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind, gates: { x: number, y: number }[]) {
+  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind, gates: { x: number, y: number }[], offset = 0) {
     super(atomicBind);
     this.gl = gl;
     this.size = gates.length;
@@ -18,17 +18,17 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
     this.vertexBuffer = gl.createBuffer() || (() => { throw new Error("Could not make buffer") })();
     this.indexBuffer = gl.createBuffer() || (() => { throw new Error("Could not make buffer") })();
     this.map = ndarray(this.vertices, [this.size, 4]);
-    this.set(gates);
+    this.set(gates, offset);
   }
 
-  set(gates: { x: number, y: number }[]) {
+  set(gates: { x: number, y: number }[], offset = 0) {
     this.size = gates.length;
     this.vertices = new Float32Array(this.size * 4);
     this.map.data = this.vertices;
     for (let i = 0; i < this.size; i++) {
       const { x, y } = gates[i];
       this.map.set(i, 0, 0);
-      this.map.set(i, 1, i + 0.5);
+      this.map.set(i, 1, offset + i + 0.5);
       this.map.set(i, 2, x);
       this.map.set(i, 3, y);
     }

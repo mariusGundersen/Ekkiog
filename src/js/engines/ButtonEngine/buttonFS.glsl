@@ -2,7 +2,6 @@ precision highp float;
 
 uniform sampler2D buttonInputTexture;
 
-varying vec2 pos;
 varying vec2 buttonInputPos;
 
 void main(void) {
