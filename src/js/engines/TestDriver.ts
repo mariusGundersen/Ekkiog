@@ -20,11 +20,11 @@ export default class TestDriver {
     return this.testResultTexture.width;
   }
 
-  update({ inputs, outputs }: TestScenario) {
-    const samples = [...inputs, ...outputs].map(i => i.values.replace(/\s/g, ''));
+  update({ probes }: TestScenario) {
+    const samples = probes.map(i => i.values.replace(/\s/g, ''));
 
     const width = Math.max(...samples.map(s => s.length));
-    const height = inputs.length + outputs.length;
+    const height = probes.length;
 
     this.testResultTexture.resize(width, height);
     this.expectedResultTexture.resize(width, height);
@@ -32,16 +32,28 @@ export default class TestDriver {
     this.expectedResultTexture.ctx.fillStyle = '#8888';
     this.expectedResultTexture.ctx.fillRect(0, 0, width, height);
 
-    this.testPoints.set(0, [...outputs].reverse());
-    this.buttonPoints.set(outputs.length, [...inputs].reverse());
-
     let y = samples.length;
-    for (const input of samples) {
+    for (const sample of samples) {
       y--;
-      this.drawLines(input, y);
+      this.drawLines(sample, y);
     }
 
     this.expectedResultTexture.update();
+
+    const buttons = [];
+    const lights = [];
+    let i = probes.length;
+    for (const { type, x, y } of probes) {
+      i--;
+      if (type === 'button') {
+        buttons.push({ i, x, y });
+      } else {
+        lights.push({ i, x, y });
+      }
+    }
+
+    this.testPoints.set(lights);
+    this.buttonPoints.set(buttons);
   }
 
   drawLines(values: string, y: number) {

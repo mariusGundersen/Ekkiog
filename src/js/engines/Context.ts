@@ -148,7 +148,7 @@ export class MutableContext implements IMutableContext {
   }
 
   setTestScenario(scenario?: TestScenario) {
-    this.context.testDriver.update(scenario || { inputs: [], outputs: [] });
+    this.context.testDriver.update(scenario || { probes: [] });
   }
 
   update() {

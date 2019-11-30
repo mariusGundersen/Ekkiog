@@ -25,7 +25,7 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
     this.count = 0;
   }
 
-  set(offset: number, points: { x: number, y: number }[]) {
+  set(points: { i: number, x: number, y: number }[]) {
     if (points.length > this.size) {
       this.size = points.length;
       const old = this.vertices;
@@ -39,9 +39,9 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
     }
 
     this.count = 0;
-    for (const { x, y } of points) {
+    for (const { i, x, y } of points) {
       this.map.set(this.count, 0, 0);
-      this.map.set(this.count, 1, offset + this.count + 0.5);
+      this.map.set(this.count, 1, i + 0.5);
       this.map.set(this.count, 2, x);
       this.map.set(this.count, 3, y);
       this.count++;
