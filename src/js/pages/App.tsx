@@ -152,6 +152,7 @@ export default connect((s: State) => s)(
             dispatch={props.dispatch}
             testScenario={props.context.forest.testScenario ? true : false}
             editorMenu={props.editorMenu}
+            isReadOnly={props.context.isReadOnly}
             findComponent={events.toggleSearchMenu}
             undoCount={props.context.undoStack && props.context.undoStack.count || 0}
             redoCount={props.context.redoStack && props.context.redoStack.count || 0}

@@ -10,13 +10,17 @@ import OkCancelMenu from './OkCancelMenu';
 export interface Props {
   findComponent(e: any): void
   readonly testScenario: boolean
+  readonly isReadOnly: boolean
   readonly editorMenu: EditorMenuState
   readonly dispatch: Dispatch<Action>
   readonly undoCount: number
   readonly redoCount: number
 }
 
-export default pure(['editorMenu', 'undoCount', 'redoCount', 'testScenario'], (props: Props) => {
+export default pure(['editorMenu', 'undoCount', 'redoCount', 'testScenario', 'isReadOnly'], (props: Props) => {
+  if (props.isReadOnly)
+    return <></>;
+
   switch (props.editorMenu.menuType) {
     case 'tools':
       return (

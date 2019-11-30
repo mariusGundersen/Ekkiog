@@ -13,7 +13,7 @@ export default function* loadForest({ repo, name, hash }: LoadForestAction) {
     yield put(newContextLoading(repo, name));
     const component: ForestWithHash = yield* loadOrCreate(repo, name, hash);
     yield put(setUrl(repo, name));
-    yield put(forestLoaded(component, component.hash, repo.length > 0 || component.testScenario !== undefined));
+    yield put(forestLoaded(component, component.hash, repo.length > 0 && component.testScenario === undefined));
   } catch (e) {
     console.log(e);
     yield put(abortContextLoading());
