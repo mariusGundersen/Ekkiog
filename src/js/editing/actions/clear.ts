@@ -26,7 +26,8 @@ export default function clear(forest: Forest, x: number, y: number, width = 1, h
 
   return {
     enneaTree,
-    buddyTree
+    buddyTree,
+    testScenario: forest.testScenario
   };
 }
 

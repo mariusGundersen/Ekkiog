@@ -16,6 +16,7 @@ import { RADIUS } from './Menu';
 
 export interface Props {
   readonly tileType: TileType;
+  readonly permanent?: boolean;
   readonly dispatch: Dispatch<Action>;
   readonly direction: Direction;
   readonly x: number;
@@ -27,19 +28,21 @@ export default pure<Props>(['x', 'y', 'direction'], props => (
     <RadialMenu cx={0} cy={0}>
       <PieRing
         key={1}
-        radius={RADIUS}
+        radius={RADIUS * 2}
         width={RADIUS}
         fromTurnFraction={0.125}
         toTurnFraction={1.125}
-        spanTurnFraction={0.25}
+        spanTurnFraction={0.125}
         show={true}
-        menuItems={[...rotateMenuItems(props.tileType, props.direction, props.dispatch)]}
+        menuItems={[...rotateMenuItems(props.tileType, props.permanent || false, props.direction, props.dispatch)]}
       />
     </RadialMenu>
   </g>
 ));
 
-function* rotateMenuItems(tile: TileType, direction: Direction, dispatch: Dispatch<Action>) {
+function* rotateMenuItems(tile: TileType, permanent: boolean, direction: Direction, dispatch: Dispatch<Action>) {
+  if (permanent)
+    return;
   if (tile == 'light') {
     yield rotateSelectionMenuItem(dispatch, 'downwards', direction, <IconLight rotate={90} />);
     yield rotateSelectionMenuItem(dispatch, 'leftwards', direction, <IconLight rotate={180} />);

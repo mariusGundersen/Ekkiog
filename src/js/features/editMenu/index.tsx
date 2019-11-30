@@ -9,18 +9,20 @@ import OkCancelMenu from './OkCancelMenu';
 
 export interface Props {
   findComponent(e: any): void
+  readonly testScenario: boolean
   readonly editorMenu: EditorMenuState
   readonly dispatch: Dispatch<Action>
   readonly undoCount: number
   readonly redoCount: number
 }
 
-export default pure(['editorMenu', 'undoCount', 'redoCount'], (props: Props) => {
+export default pure(['editorMenu', 'undoCount', 'redoCount', 'testScenario'], (props: Props) => {
   switch (props.editorMenu.menuType) {
     case 'tools':
       return (
         <div className={style.editMenu}>
           <ToolsMenu
+            testScenario={props.testScenario}
             insertButton={() => props.dispatch(insertItem('button'))}
             insertGate={() => props.dispatch(insertItem('gate'))}
             insertLight={() => props.dispatch(insertItem('light'))}

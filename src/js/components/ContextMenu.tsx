@@ -10,18 +10,16 @@ import {
   toUnderpassMenuItem,
   toWireMenuItem,
   moveMenuItem,
-  floodClearMenuItem,
-  rotateMenuItem
+  floodClearMenuItem
 } from './radialMenu/menuItems';
 import { Action } from '../actions';
 import PieRing from './radialMenu/PieRing';
 import pure from './pure';
-import IconLight from './icons/IconLight';
-import IconButton from './icons/IconButton';
 import { RADIUS } from './Menu';
 
 export interface Props {
   readonly tileType: TileType;
+  readonly permanent?: boolean;
   readonly dispatch: Dispatch<Action>;
   readonly x: number;
   readonly y: number;
@@ -43,6 +41,7 @@ export default pure<Props>(['x', 'y'], props => (
       />
       <ContextMenuRing
         tileType={props.tileType}
+        permanent={props.permanent || false}
         dispatch={props.dispatch}
         tx={props.tx}
         ty={props.ty}
@@ -53,13 +52,14 @@ export default pure<Props>(['x', 'y'], props => (
 
 interface ContextMenuRingProps {
   readonly tileType: TileType,
+  readonly permanent: boolean,
   readonly tx: number,
   readonly ty: number,
   readonly dispatch: Dispatch
 }
 
 const ContextMenuRing = pure(['tx', 'ty', 'tileType'], (props: ContextMenuRingProps) => {
-  const items = [...tileMenuItems(props.tileType, props.tx, props.ty, props.dispatch)];
+  const items = [...tileMenuItems(props.tileType, props.permanent, props.tx, props.ty, props.dispatch)];
 
   return (
     <PieRing
@@ -74,7 +74,7 @@ const ContextMenuRing = pure(['tx', 'ty', 'tileType'], (props: ContextMenuRingPr
   );
 });
 
-function* tileMenuItems(tile: TileType, tx: number, ty: number, dispatch: Dispatch<Action>) {
+function* tileMenuItems(tile: TileType, permanent: boolean, tx: number, ty: number, dispatch: Dispatch<Action>) {
   if (tile == 'wire' || tile == 'empty') {
     yield toUnderpassMenuItem(dispatch, tx, ty);
   }
@@ -92,24 +92,8 @@ function* tileMenuItems(tile: TileType, tx: number, ty: number, dispatch: Dispat
     yield removeMenuItem(dispatch, tx, ty);
   }
 
-  if (tile == 'light' || tile == 'button') {
+  if ((tile == 'light' || tile == 'button') && !permanent) {
     yield moveMenuItem(dispatch, tx, ty);
     yield removeMenuItem(dispatch, tx, ty);
-  }
-}
-
-function* rotateMenuItems(tile: TileType, tx: number, ty: number, dispatch: Dispatch<Action>) {
-  if (tile == 'light') {
-    yield rotateMenuItem(dispatch, tx, ty, 'downwards', <IconLight rotate={90} />);
-    yield rotateMenuItem(dispatch, tx, ty, 'leftwards', <IconLight rotate={180} />);
-    yield rotateMenuItem(dispatch, tx, ty, 'upwards', <IconLight rotate={270} />);
-    yield rotateMenuItem(dispatch, tx, ty, 'rightwards', <IconLight rotate={0} />);
-  }
-
-  if (tile == 'button') {
-    yield rotateMenuItem(dispatch, tx, ty, 'upwards', <IconButton rotate={270} />);
-    yield rotateMenuItem(dispatch, tx, ty, 'rightwards', <IconButton rotate={0} />);
-    yield rotateMenuItem(dispatch, tx, ty, 'downwards', <IconButton rotate={90} />);
-    yield rotateMenuItem(dispatch, tx, ty, 'leftwards', <IconButton rotate={180} />);
   }
 }

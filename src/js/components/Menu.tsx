@@ -10,7 +10,7 @@ import { ViewState } from '../reduce/view';
 import ContextMenu from './ContextMenu';
 import ContextMenuLoading from './ContextMenuLoading';
 import { Action } from '../actions';
-import { Forest, getTypeAt, getTileAt } from '../editing';
+import { Forest, getTypeAt, getTileAt, EMPTY } from '../editing';
 import { tileToViewport } from '../reduce/perspective';
 import { SelectionState } from '../reduce/selection';
 import SelectionMenu from './SelectionMenu';
@@ -62,11 +62,13 @@ const ContextMenuPos = (props: Props) => {
     }
     case 'show': {
       const { tx, ty } = props.contextMenu;
-      const tileType = getTypeAt(props.forest.enneaTree, Math.floor(tx), Math.floor(ty));
+      const tile = getTileAt(props.forest, Math.floor(tx), Math.floor(ty));
+      const tileType = tile && tile.data && tile.data.type || EMPTY;
       const [x, y] = tileToViewport(props.view.perspective, tx, ty);
       return <ContextMenu
         dispatch={props.dispatch}
         tileType={tileType}
+        permanent={(tile && tile.data && tile.data as any).permanent}
         x={x / window.devicePixelRatio}
         y={y / window.devicePixelRatio}
         tx={Math.floor(tx)}
@@ -91,6 +93,7 @@ const SelectionMenuPos = ({ selection, dispatch, view }: Props) => {
       const [x, y] = tileToViewport(view.perspective, cx, cy);
       return <SelectionMenu
         dispatch={dispatch}
+        permanent={tile.permanent}
         tileType={tile.type}
         direction={tile.direction}
         x={x / window.devicePixelRatio}

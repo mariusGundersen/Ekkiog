@@ -10,12 +10,13 @@ import IconPackage from '../../components/icons/IconPackage';
 import classes from '../../components/classes';
 
 export interface ToolsMenuProps {
+  readonly testScenario: boolean;
   insertButton(): void;
   insertGate(): void;
   insertLight(): void;
   findComponent(): void;
-  undoCount: number;
-  redoCount: number;
+  readonly undoCount: number;
+  readonly redoCount: number;
   undo(): void;
   redo(): void;
 };
@@ -34,33 +35,29 @@ export default function ToolsMenu(props: ToolsMenuProps) {
         </span>
       </button>
     </span>
-    <button className={style.editButton} onClick={props.insertButton}>
-      <span className={theme.icon48}>
-        <svg viewBox="-24 -24 48 48" width="1em" height="1em">
-          <IconButton />
-        </svg>
-      </span>
-    </button>
-    <button className={style.editButton} onClick={props.insertGate}>
-      <span className={theme.icon48}>
-        <svg viewBox="-24 -24 48 48" width="1em" height="1em">
-          <IconGate />
-        </svg>
-      </span>
-    </button>
-    <button className={style.editButton} onClick={props.insertLight}>
-      <span className={theme.icon48}>
-        <svg viewBox="-24 -24 48 48" width="1em" height="1em">
-          <IconLight />
-        </svg>
-      </span>
-    </button>
-    <button className={style.editButton} onClick={props.findComponent}>
-      <span className={theme.icon48}>
-        <svg viewBox="-24 -24 48 48" width="1em" height="1em">
-          <IconPackage />
-        </svg>
-      </span>
-    </button>
+    {props.testScenario ? undefined : <SvgButton onClick={props.insertButton}>
+      <IconButton />
+    </SvgButton>}
+    <SvgButton onClick={props.insertGate}>
+      <IconGate />
+    </SvgButton>
+    {props.testScenario ? undefined : <SvgButton onClick={props.insertLight}>
+      <IconLight />
+    </SvgButton>}
+    <SvgButton onClick={props.findComponent}>
+      <IconPackage />
+    </SvgButton>
   </div>);
+}
+
+function SvgButton(props: { onClick(): void, children?: JSX.Element }) {
+  return (
+    <button className={style.editButton} onClick={props.onClick}>
+      <span className={theme.icon48}>
+        <svg viewBox="-24 -24 48 48" width="1em" height="1em">
+          {props.children}
+        </svg>
+      </span>
+    </button>
+  );
 }

@@ -117,9 +117,7 @@ export default class Renderer {
       context.gatesTexture,
       nextCharges);
 
-    const currentCharges = nextCharges;
-
-    if (sample != 0 && context.testDriver.samples > 0) {
+    if (sample != 0 && context.testDriver.samples > 0 && sample <= context.testDriver.samples) {
       this.buttonEngine.render(
         context.testDriver.buttonPoints,
         context.netMapTexture,
@@ -133,7 +131,7 @@ export default class Renderer {
     this.chargeMapEngine.render(
       context.triangle,
       context.netMapTexture,
-      currentCharges,
+      nextCharges,
       context.spriteSheetTexture,
       context.chargeMapTexture);
   }

@@ -15,7 +15,6 @@ import {
   drawGate,
   drawUnderpass,
   drawButton,
-  drawComponent,
   drawLight,
   clear,
   floodClear,

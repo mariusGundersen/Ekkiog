@@ -150,6 +150,7 @@ export default connect((s: State) => s)(
           />
           <EditMenu
             dispatch={props.dispatch}
+            testScenario={props.context.forest.testScenario ? true : false}
             editorMenu={props.editorMenu}
             findComponent={events.toggleSearchMenu}
             undoCount={props.context.undoStack && props.context.undoStack.count || 0}

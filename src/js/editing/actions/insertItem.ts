@@ -12,7 +12,7 @@ export default function insertItem(forest: Forest, buddyTree: buddy.Node, data: 
   }
 
   try {
-    return floodFill({ enneaTree, buddyTree }, data, box);
+    return floodFill({ ...forest, enneaTree, buddyTree }, data, box);
   } catch (e) {
     return forest;
   }

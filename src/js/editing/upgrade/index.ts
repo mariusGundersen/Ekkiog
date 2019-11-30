@@ -6,11 +6,11 @@ import {
 import upgradeComponent from './component';
 
 export interface UpgradableItem {
-  type : Tool
+  type: Tool
 }
 
-export default function upgrade(item : UpgradableItem, size : {width : number, height : number}) : Item {
-  switch(item.type){
+export default function upgrade(item: UpgradableItem, size: { width: number, height: number }): Item {
+  switch (item.type) {
     case 'component':
       return upgradeComponent(item as any, size);
     default:
