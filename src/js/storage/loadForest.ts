@@ -16,16 +16,6 @@ export interface ForestWithHash extends Forest {
 
 type EnneaLeaf = BoxedData<Item>;
 
-const DUMMY_TEST = {
-  inputs: [
-    { x: 56, y: 58, values: '0000 0000 1111 1111' },
-    { x: 56, y: 62, values: '0000 1111 1111 0000' }
-  ],
-  outputs: [
-    { x: 73, y: 60, values: 'xxx0 xxx1 xxx0 xxx1' }
-  ]
-}
-
 export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILoadAsRepo>>(repo: T): Constructor<ILoadForestRepo> & T {
   return class LoadForestRepo extends repo implements ILoadForestRepo {
     constructor(...args: any[]) {
@@ -45,7 +35,7 @@ export default function mixin<T extends Constructor<IRawRepo & IObjectRepo & ILo
       const [enneaTree, buddyTree, testScenario] = await Promise.all([
         super.loadTree(tree['ennea'].hash).then(t => this.loadEnnea(t)),
         super.loadTree(tree['buddy'].hash).then(t => this.loadBuddy(t)),
-        tree['test'] ? super.loadText(tree['test'].hash).then(JSON.parse) : DUMMY_TEST
+        tree['testScenario'] ? super.loadText(tree['testScenario'].hash).then(JSON.parse) : undefined
       ]);
 
       return {

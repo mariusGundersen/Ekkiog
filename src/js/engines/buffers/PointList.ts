@@ -26,8 +26,17 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
   }
 
   set(offset: number, points: { x: number, y: number }[]) {
-    this.maybeUpsize(points.length);
-    this.maybeDownsize(points.length);
+    if (points.length > this.size) {
+      this.size = points.length;
+      const old = this.vertices;
+      this.vertices = new Float32Array(this.size * 4);
+      this.vertices.set(old, 0);
+      this.map.data = this.vertices;
+    } else if (points.length < this.size) {
+      this.size = points.length;
+      this.vertices = new Float32Array(this.vertices.buffer, 0, this.size * 4);
+      this.map.data = this.vertices;
+    }
 
     this.count = 0;
     for (const { x, y } of points) {
@@ -48,7 +57,8 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
   }
 
   update() {
-    this.bind()
+    this.bind();
+    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(createPoints(this.size)), this.gl.STATIC_DRAW);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
   }
 
@@ -56,31 +66,6 @@ export default class PointList extends AbstractBindlable implements VertexBuffer
     output.bind();
     this.bind();
     this.gl.drawElements(this.gl.POINTS, this.count, this.gl.UNSIGNED_SHORT, 0);
-  }
-
-  maybeUpsize(count: number) {
-    if (count <= this.size) return;
-
-    this.size *= 2;
-    const old = this.vertices;
-    this.vertices = new Float32Array(this.size * 16);
-    this.vertices.set(old, 0);
-    this.map.data = this.vertices;
-    this.update();
-    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(createPoints(this.size)), this.gl.STATIC_DRAW);
-  }
-
-  maybeDownsize(count: number) {
-    if (count >= this.size / 4) return;
-
-    const size = Math.max(1, 2 ** Math.ceil(1 + Math.log(count) / Math.log(2)));
-    if (size >= this.size) return;
-
-    this.size = size;
-    this.vertices = new Float32Array(this.vertices.buffer, 0, this.size * 16);
-    this.map.data = this.vertices;
-    this.update();
-    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(createPoints(this.size)), this.gl.STATIC_DRAW);
   }
 }
 

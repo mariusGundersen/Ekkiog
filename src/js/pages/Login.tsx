@@ -29,7 +29,7 @@ export default reax(
     return {
     };
   },
-  ({ events, props }) => (
+  (values, events, props) => (
     <>
       <Popup show={true} onCoverClicked={events.onCoverClicked}>
         <SelectRepo
