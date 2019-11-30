@@ -54,10 +54,6 @@ export function removeMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: 
   return menuItem('remove', <IconRemove />, () => dispatch(hideContextMenuAfter(saveAfter(removeTileAt(tx, ty), 'Removed item'))));
 }
 
-export function rotateMenuItem(dispatch: ThunkDispatch<State, any, Action>, tx: number, ty: number, direction: Direction, icon: JSX.Element) {
-  return menuItem('rotate-' + direction, icon, () => dispatch(hideContextMenuAfter(saveAfter(rotateTileAt(tx, ty, direction), 'Rotated item'))));
-}
-
 export function rotateSelectionMenuItem(dispatch: ThunkDispatch<State, any, Action>, direction: Direction, current: Direction, icon: JSX.Element) {
   return menuItem('rotate-' + direction, icon, () => dispatch(setToolDirection(direction)), direction === current);
 }

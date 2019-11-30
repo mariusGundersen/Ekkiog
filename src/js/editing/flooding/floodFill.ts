@@ -33,10 +33,11 @@ import {
 
 import { makeFloodQueue } from './make';
 
-export default function floodFill({ enneaTree, buddyTree }: Forest, item: Item, pos: BoxArea): Forest {
+export default function floodFill({ enneaTree, buddyTree, testScenario }: Forest, item: Item, pos: BoxArea): Forest {
   return {
     enneaTree: floodFillInternal(enneaTree, false, [item, pos]),
-    buddyTree
+    buddyTree,
+    testScenario
   };
 }
 

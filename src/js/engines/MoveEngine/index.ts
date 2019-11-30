@@ -1,20 +1,21 @@
-import {vec2, mat3} from 'gl-matrix';
-import createShader, {GlShader} from 'gl-shader';
+import { vec2, mat3 } from 'gl-matrix';
+import createShader, { GlShader } from 'gl-shader';
 
-import { RenderContext } from '../textures/types';
+import Context from '../Context';
 
 import moveVS from './moveVS.glsl';
 import moveFS from './moveFS.glsl';
+import { FrameBuffer } from '../buffers/types';
 
 export default class MoveEngine {
-  gl : WebGLRenderingContext;
-  shader : GlShader;
-  constructor(gl : WebGLRenderingContext) {
+  gl: WebGLRenderingContext;
+  shader: GlShader;
+  constructor(gl: WebGLRenderingContext) {
     this.gl = gl;
     this.shader = createShader(gl, moveVS, moveFS);
   }
 
-  render(context : RenderContext, matrix : mat3, [top, left, right, bottom] : number[]) {
+  render(context: Context, output: FrameBuffer, matrix: mat3, [top, left, right, bottom]: number[]) {
     this.shader.bind();
 
     this.shader.uniforms['spriteTextureSize'] = context.spriteSheetTexture.size;
@@ -28,12 +29,12 @@ export default class MoveEngine {
     this.shader.uniforms['tileMap'] = context.tileMapTexture.sampler2D(2);
 
     this.shader.uniforms['boundingBox'] = [
-      top-1,
-      left-1,
+      top - 1,
+      left - 1,
       right,
       bottom
     ];
 
-    context.triangle.draw();
+    context.triangle.draw(output);
   }
 }

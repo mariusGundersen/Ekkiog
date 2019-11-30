@@ -1,64 +1,69 @@
 import { mat3 } from 'gl-matrix';
-import { Item, Area, Box } from '../editing';
+import { Box } from '../editing';
 
 import Context, { MutableContext } from './Context';
 import Renderer from './Renderer';
-import { VertexBuffer } from './textures/types';
+import { AtomicBind, Bindable } from './buffers/types';
+import Viewport from './buffers/Viewport';
+import { number } from 'prop-types';
 
 export default class Engine {
-  private readonly context : Context;
-  private readonly moveContext : Context;
-  private readonly renderer : Renderer;
+  private readonly context: Context;
+  private readonly moveContext: Context;
+  private readonly renderer: Renderer;
+  private readonly viewport: Viewport;
   constructor(
-    private readonly gl : WebGLRenderingContext,
-    width : number,
-    height : number
+    gl: WebGLRenderingContext,
+    width: number,
+    height: number
   ) {
-    const atomicBind = makeAtomicBind();
-    this.context = new Context(gl, atomicBind);
-    this.moveContext = new Context(gl, atomicBind);
-    this.renderer = new Renderer(gl, width, height);
+    const vertexBind = makeAtomicBind();
+    const outputBind = makeAtomicBind();
+    this.context = new Context(gl, vertexBind, outputBind);
+    this.moveContext = new Context(gl, vertexBind, outputBind);
+    this.viewport = new Viewport(gl, outputBind, width, height);
+    this.renderer = new Renderer(gl, this.viewport);
   }
 
-  setViewport(width : number, height : number){
-    this.renderer.setViewport(width, height);
+  setViewport(width: number, height: number) {
+    this.viewport.resize(width, height);
   }
 
-  mutateContext(mutator : (context : MutableContext) => void){
+  mutateContext(mutator: (context: MutableContext) => void) {
     const changed = this.context.mutateContext(mutator);
-    if(changed){
-      this.simulate();
+    if (changed) {
+      this.renderer.renderCharges(this.context);
       this.renderer.renderMap(this.context);
     }
   }
 
-  mutateMoveContext(mutator : (context : MutableContext) => void){
+  mutateMoveContext(mutator: (context: MutableContext) => void) {
     const changed = this.moveContext.mutateContext(mutator);
-    if(changed){
+    if (changed) {
       this.renderer.renderChargeMap(this.moveContext, this.context);
       this.renderer.renderMap(this.moveContext);
     }
   }
 
-  simulate(tickCount? : number){
-    this.renderer.simulateTick(this.context, tickCount);
+  simulate(tick: number, sample: number) {
+    this.renderer.simulateTick(this.context, tick, sample);
   }
 
-  render(mapToViewportMatrix : mat3) {
-    this.renderer.renderView(this.context, mapToViewportMatrix);
+  render(mapToViewportMatrix: mat3, top: number) {
+    this.renderer.renderView(this.context, mapToViewportMatrix, top);
   }
 
-  renderMove(mapToViewportMatrix : mat3, box : Box, dx : number, dy : number){
+  renderMove(mapToViewportMatrix: mat3, box: Box, dx: number, dy: number) {
     this.renderer.renderMove(this.moveContext, mapToViewportMatrix, box, dx, dy);
   }
 }
 
-function makeAtomicBind(){
-  let currentVBO : VertexBuffer | undefined = undefined;
-  return (vbo : VertexBuffer) => {
-    if(currentVBO === vbo) return;
+function makeAtomicBind(): AtomicBind {
+  let currentBind: Bindable | undefined = undefined;
+  return (bindable: Bindable) => () => {
+    if (currentBind === bindable) return;
 
-    currentVBO = vbo;
-    vbo.bind();
+    currentBind = bindable;
+    bindable._bind();
   };
 }

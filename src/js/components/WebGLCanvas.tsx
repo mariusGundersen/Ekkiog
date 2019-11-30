@@ -4,7 +4,8 @@ import { Dispatch } from 'redux';
 
 import {
   fitBox,
-  Action
+  Action,
+  tick
 } from '../actions';
 import { SelectionState } from '../reduce/selection';
 import { ContextState } from '../reduce/context';
@@ -14,10 +15,10 @@ import { viewportToTile } from '../reduce/perspective';
 import { ViewState } from '../reduce/view';
 import Canvas from './Canvas';
 import TouchEngine from '../interaction/TouchEngine';
+import { SimulationState } from '../reduce/simulation';
 
 export interface Props {
-  readonly tickInterval: number,
-  readonly step: number,
+  readonly simulation: SimulationState,
   readonly view: ViewState,
   readonly selection: SelectionState,
   readonly contextMenu: ContextMenuState,
@@ -29,17 +30,22 @@ export default function WebGLCanvas(props: Props) {
   const perspective = useCurrent(props.view.perspective);
   const context = useCurrent(props.context);
   const selection = useCurrent(props.selection);
+  const simulation = useCurrent(props.simulation);
 
   const [touchEngine, canvas] = useRefCallback((canvas: HTMLCanvasElement) => {
     const touchEngine = new TouchEngine(canvas, (x, y) => viewportToTile(perspective.current, x, y), props.dispatch);
 
     onAnimationFrame(delta => {
-      const ease = context.current.ease.next(delta);
-        if (ease.done) {
-        touchEngine.onAnimationFrame(perspective.current, selection.current);
-          } else {
-        props.dispatch(fitBox(ease.value));
-          }
+      const zoomEase = context.current.ease.next(delta);
+
+      if (!zoomEase.done) {
+        props.dispatch(fitBox(zoomEase.value));
+      }
+
+      const simulationMenuEase = simulation.current.ease.next(delta);
+      const top = simulationMenuEase.done ? (simulation.current.show ? 1 : 0) : simulationMenuEase.value[0];
+      const simWindow = context.current.forest.testScenario ? 64 : 0;
+      touchEngine.onAnimationFrame(perspective.current, selection.current, (top * (simWindow + 48) - simWindow) * window.devicePixelRatio);
     });
 
     return touchEngine;
@@ -48,18 +54,25 @@ export default function WebGLCanvas(props: Props) {
   const previousForest = usePrevious(props.context.forest);
   const previousSelection = usePrevious(props.selection);
   const previousButtonTree = usePrevious(props.context.buttonTree);
-  const previousStep = usePrevious(props.step);
 
   useEffect(() => {
     if (!touchEngine.current) return;
 
-    touchEngine.current.diffForest(previousForest, props.context.forest);
+    touchEngine.current.diff(previousForest, previousButtonTree, props.context.forest, props.context.buttonTree);
     touchEngine.current.diffMove(previousSelection, props.selection);
-    touchEngine.current.diffButton(previousButtonTree, props.context.buttonTree);
-    touchEngine.current.setTick(props.tickInterval, props.step - previousStep);
     touchEngine.current.updateTouches(props.contextMenu.type === 'show', props.selection);
-    touchEngine.current.render(props.view.perspective, props.selection);
   });
+
+  useInterval(ticks => {
+    if (!touchEngine.current) return;
+    props.dispatch(tick(ticks));
+  }, props.simulation.tickInterval);
+
+  useEffect(() => {
+    if (!touchEngine.current) return;
+
+    touchEngine.current.onTick(props.simulation.tick, props.simulation.sample);
+  }, [props.simulation.tick]);
 
   useEffect(() => {
     if (!touchEngine.current) return;
@@ -67,12 +80,12 @@ export default function WebGLCanvas(props: Props) {
     touchEngine.current.setViewport(props.view.pixelWidth, props.view.pixelHeight);
   }, [props.view.pixelWidth, props.view.pixelHeight, touchEngine.current]);
 
-    return (
-      <Canvas
+  return (
+    <Canvas
       ref={canvas}
       width={props.view.pixelWidth}
       height={props.view.pixelHeight} />
-    );
+  );
 };
 
 function onAnimationFrame(render: (delta: number) => void) {
@@ -81,7 +94,7 @@ function onAnimationFrame(render: (delta: number) => void) {
     window.requestAnimationFrame(onFrameRequest);
     render(now - earlier);
     earlier = now;
-}
+  }
   window.requestAnimationFrame(onFrameRequest);
 }
 
@@ -106,4 +119,18 @@ function usePrevious<T>(value: T) {
     ref.current = value;
   });
   return ref.current;
+}
+
+function useInterval(effect: (ticks: number) => void, interval: number) {
+  return useEffect(() => {
+    if (interval === Infinity) return;
+
+    const delta = Math.max(16, interval);
+
+    const intval = setInterval(() => {
+      effect(Math.floor(delta / interval));
+    }, delta);
+
+    return () => clearInterval(intval);
+  }, [interval]);
 }

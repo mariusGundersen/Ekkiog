@@ -6,6 +6,11 @@
   z-index: 3;
   background: #31363c;
   box-shadow: 0 -3px 5px #00000088;
+  color: white;
+
+  & .button-group {
+    display: flex;
+  }
 
   & .tools-menu {
     display: flex;
@@ -24,13 +29,15 @@
     border: none;
     font-size: 48px;
     outline: none;
+    color: white;
+
+    &.disabled,
+    &.disabled:active {
+      color: #4d5a70;
+    }
 
     &:disabled {
       visibility: hidden;
-    }
-
-    & span {
-      font-size: 48px;
     }
   }
 }

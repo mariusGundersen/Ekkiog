@@ -2,7 +2,9 @@ import { Item, Area } from '../../editing';
 
 import textFromItem from './textFromItem';
 
-import QuadList from '../textures/QuadList';
+import QuadList from '../buffers/QuadList'
+
+import { AtomicBind } from '../buffers/types';
 
 export type ItemTexts = {
   next?: ItemTexts,
@@ -13,10 +15,10 @@ export type ItemTexts = {
 type ItemChain = ItemTexts | { next?: ItemTexts, size: number, item: null };
 
 export default class TextScene {
-  quadList: QuadList;
-  itemChain: ItemChain;
-  constructor(quadList: QuadList) {
-    this.quadList = quadList;
+  readonly quadList: QuadList;
+  private readonly itemChain: ItemChain;
+  constructor(gl: WebGLRenderingContext, atomicBind: AtomicBind) {
+    this.quadList = new QuadList(gl, atomicBind);
     this.itemChain = {
       size: 0,
       item: null

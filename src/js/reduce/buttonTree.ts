@@ -1,38 +1,40 @@
+import { MutableContext } from "../engines/Context";
+
 export interface ButtonLeaf {
-  readonly halfSize : 0
-  readonly state : boolean
+  readonly halfSize: 0
+  readonly state: boolean
 }
 
 export interface ButtonNode {
-  readonly left? : ButtonNode | ButtonLeaf
-  readonly right? : ButtonNode | ButtonLeaf
-  readonly halfSize : number
+  readonly left?: ButtonNode | ButtonLeaf
+  readonly right?: ButtonNode | ButtonLeaf
+  readonly halfSize: number
 }
 
 export interface ButtonState {
-  readonly net : number
-  readonly state : boolean
+  readonly net: number
+  readonly state: boolean
 }
 
-export function createButtonTree(size : number) : ButtonNode {
+export function createButtonTree(size: number): ButtonNode {
   return {
-    halfSize: size>>1
+    halfSize: size >> 1
   };
 }
 
-export function toggleButton(tree : ButtonLeaf | ButtonNode, net : number) : ButtonNode | ButtonLeaf {
-  if(isLeaf(tree)){
+export function toggleButton(tree: ButtonLeaf | ButtonNode, net: number): ButtonNode | ButtonLeaf {
+  if (isLeaf(tree)) {
     return {
       ...tree,
       state: !tree.state
     };
-  }else{
-    if(net < tree.halfSize){
+  } else {
+    if (net < tree.halfSize) {
       return {
         ...tree,
         left: toggleButton(tree.left || createButtonTree(tree.halfSize), net)
       }
-    }else{
+    } else {
       return {
         ...tree,
         right: toggleButton(tree.right || createButtonTree(tree.halfSize), net - tree.halfSize)
@@ -41,32 +43,40 @@ export function toggleButton(tree : ButtonLeaf | ButtonNode, net : number) : But
   }
 }
 
-export function* diff(before : ButtonLeaf | ButtonNode | undefined, after : ButtonLeaf | ButtonNode | undefined, address = 0) : IterableIterator<ButtonState> {
-  if(before === after) return;
-  if(after){
-    if(before){
-      if(isLeaf(before) && isLeaf(after)) {
-        if(before.state !== after.state){
+export function diffAndReconcile(context: MutableContext, before: ButtonLeaf | ButtonNode | undefined, after: ButtonLeaf | ButtonNode | undefined) {
+  if (before === after) return;
+  for (const { net, state } of diff(before, after)) {
+    const v = state ? 0 : 1;
+    context.setGate(net, v, v);
+  }
+}
+
+export function* diff(before: ButtonLeaf | ButtonNode | undefined, after: ButtonLeaf | ButtonNode | undefined, address = 0): IterableIterator<ButtonState> {
+  if (before === after) return;
+  if (after) {
+    if (before) {
+      if (isLeaf(before) && isLeaf(after)) {
+        if (before.state !== after.state) {
           yield {
             net: address,
             state: after.state
           };
         }
-      }else if(!isLeaf(before) && !isLeaf(after)){
+      } else if (!isLeaf(before) && !isLeaf(after)) {
         yield* diff(before.left, after.left, address);
         yield* diff(before.right, after.right, address + before.halfSize);
-      }else{
+      } else {
         //this never happens if before and after are the same size
       }
-    }else{
-      if(isLeaf(after)){
-        if(after.state){
+    } else {
+      if (isLeaf(after)) {
+        if (after.state) {
           yield {
             net: address,
             state: after.state
           };
         }
-      }else{
+      } else {
         yield* diff(before, after && after.left, address);
         yield* diff(before, after && after.right, address + after.halfSize);
       }
@@ -74,6 +84,6 @@ export function* diff(before : ButtonLeaf | ButtonNode | undefined, after : Butt
   }
 }
 
-function isLeaf(node : ButtonLeaf | ButtonNode) : node is ButtonLeaf {
+function isLeaf(node: ButtonLeaf | ButtonNode): node is ButtonLeaf {
   return node.halfSize === 0;
 }

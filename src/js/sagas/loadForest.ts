@@ -6,13 +6,14 @@ import * as storage from '../storage';
 import { createForest } from '../editing';
 import setUrl from '../actions/router';
 import withProgress from './utils/withProgress';
+import { ForestWithHash } from '../storage/loadForest';
 
 export default function* loadForest({ repo, name, hash }: LoadForestAction) {
   try {
     yield put(newContextLoading(repo, name));
-    const component = yield* loadOrCreate(repo, name, hash);
+    const component: ForestWithHash = yield* loadOrCreate(repo, name, hash);
     yield put(setUrl(repo, name));
-    yield put(forestLoaded(component, component.hash, repo.length > 0));
+    yield put(forestLoaded(component, component.hash, repo.length > 0 && component.testScenario === undefined));
   } catch (e) {
     console.log(e);
     yield put(abortContextLoading());
