@@ -74,7 +74,7 @@ export function tap(forest: Forest, tool: Tool, direction: Direction, x: number,
       return drawUnderpassWithWires(forest, x, y);
     }
   } else if (tool === GATE) {
-    return drawGate(forest, x, y);
+    return drawGate(forest, x + 2, y);
   } else if (tool === BUTTON) {
     return drawButton(forest, x, y, direction);
   } else if (tool === LIGHT) {
