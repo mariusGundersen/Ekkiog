@@ -14,14 +14,14 @@ export interface OkCancelMenuProps {
 export default pure(['isValid'], (props: OkCancelMenuProps) => (
   <div className={style.okCancelMenu}>
     <button className={style.editButton} onClick={props.ok} disabled={!props.isValid}>
-      <span className={theme.icon}>
+      <span className={theme.icon48}>
         <svg viewBox="-24 -24 48 48" width="1em" height="1em">
           <IconAccept />
         </svg>
       </span>
     </button>
     <button className={style.editButton} onClick={props.cancel}>
-      <span className={theme.icon}>
+      <span className={theme.icon48}>
         <svg viewBox="-24 -24 48 48" width="1em" height="1em">
           <IconCancel />
         </svg>
