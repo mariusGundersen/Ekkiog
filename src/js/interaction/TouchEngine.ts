@@ -49,8 +49,8 @@ export default class TouchEngine {
     this.render(perspective, selection, top);
   }
 
-  onTick(tick: number, sample: number) {
-    this.engine.simulate(tick, sample);
+  onTick(tick: number, sample: number, loop: boolean) {
+    this.engine.simulate(tick, sample, loop);
   }
 
   diff(beforeForest: Forest, beforeButton: ButtonNode, afterForest: Forest, afterButton: ButtonNode) {

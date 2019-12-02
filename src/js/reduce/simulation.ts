@@ -11,6 +11,7 @@ export interface SimulationState {
   readonly sample: number
   readonly show: boolean
   readonly ease: Easing
+  readonly looping: boolean
 }
 
 const initialState: SimulationState = {
@@ -18,7 +19,8 @@ const initialState: SimulationState = {
   tick: 0,
   sample: 0,
   show: false,
-  ease: noEase()
+  ease: noEase(),
+  looping: false
 };
 
 export default function view(state = initialState, action: Action): SimulationState {
@@ -56,13 +58,21 @@ export default function view(state = initialState, action: Action): SimulationSt
         sample: 0,
         tick: state.tick + 1,
         show: action.forest.testScenario ? true : false,
-        ease: ease([state.show ? 1 : 0], [action.forest.testScenario ? 1 : 0], easeOut, 500)
+        ease: ease([state.show ? 1 : 0], [action.forest.testScenario ? 1 : 0], easeOut, 500),
+        looping: action.forest.testScenario ? true : false
       }
     case 'tick':
       return {
         ...state,
         tick: state.tick + action.ticks,
         sample: state.sample + action.ticks
+      }
+    case 'toggle-loop':
+      return {
+        ...state,
+        looping: !state.looping,
+        sample: 0,
+        tick: state.tick + 1
       }
     default:
       return state;

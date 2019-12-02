@@ -156,7 +156,15 @@ export default function context(state = initialContext, action: Action): Context
       return {
         ...state,
         buttonTree: toggleButton(state.buttonTree, action.net)
-      }
+      };
+    case 'set-test-scenario':
+      return {
+        ...state,
+        forest: {
+          ...state.forest,
+          testScenario: action.testScenario
+        }
+      };
     default:
       return combine(state, action, forest);
   }

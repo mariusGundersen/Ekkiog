@@ -31,15 +31,13 @@ import {
   Action,
   resize,
   insertComponentPackage,
-  createForest,
-  insertItem
+  createForest
 } from '../actions';
 import getRepoFromUrl from '../utils/getRepoFromUrl';
 import DelayEnterExit from '../components/DelayEnterExit';
 import FileMenu, { RepoName } from '../features/fileMenu';
 import { Package } from '../editing/types';
 import EditMenu from '../features/editMenu';
-import { BUTTON } from '../editing';
 
 type Props = State & DispatchProp<Action>;
 
@@ -135,6 +133,7 @@ export default connect((s: State) => s)(
             currentComponentName={props.context.loading ? `${props.context.loading.name}...` : props.context.name}
             currentComponentRepo={props.context.loading ? props.context.loading.repo : props.context.repo}
             tickInterval={props.simulation.tickInterval}
+            looping={props.simulation.looping}
             gateCount={props.context.loading ? 0 : (props.context.forest.buddyTree.usedSize || 2) - 2}
             isLoading={props.context.loading !== undefined}
             isSaving={props.context.saving}

@@ -22,7 +22,8 @@ import {
   showPopup,
   zoomOutOf,
   Action,
-  toggleShow
+  toggleShow,
+  toggleLoop
 } from '../actions';
 
 export interface Props {
@@ -30,6 +31,7 @@ export interface Props {
   readonly currentComponentName: string;
   readonly currentComponentRepo: string;
   readonly tickInterval: number;
+  readonly looping: boolean;
   readonly gateCount: number;
   readonly isLoading: boolean;
   readonly isSaving: boolean;
@@ -72,10 +74,12 @@ export default function (props: Props) {
         testScenario={props.showTestScenario}
         tickInterval={props.tickInterval}
         canShare={props.currentComponentRepo == '' && props.user != null}
+        looping={props.looping}
         setTickInterval={x => dispatch(setTickInterval(x))}
         stepForward={() => dispatch(stepForward())}
         rewind={() => dispatch(rewind())}
-        share={() => dispatch(showPopup('Share'))} />
+        share={() => dispatch(showPopup('Share'))}
+        loop={() => dispatch(toggleLoop())} />
     </div>
   );
 }

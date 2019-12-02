@@ -40,9 +40,17 @@ export const tick = (ticks: number): TickAction => ({
   ticks
 });
 
+export type ToggleLoopAction = {
+  readonly type: 'toggle-loop'
+}
+export const toggleLoop = (): ToggleLoopAction => ({
+  type: 'toggle-loop'
+});
+
 export type SimulationActions =
   SetTickIntervalAction |
   StepForwardAction |
   ToggleShowAction |
   RewindAction |
-  TickAction;
+  TickAction |
+  ToggleLoopAction;

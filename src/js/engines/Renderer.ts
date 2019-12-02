@@ -55,13 +55,15 @@ export default class Renderer {
       context.tileMapTexture);
   }
 
-  simulateTick(context: Context, tick: number, sample: number) {
+  simulateTick(context: Context, tick: number, sample: number, loop: boolean) {
     while (this.currentTick < tick) {
       this.currentTick++;
 
-      this.renderCharges(context, sample - (tick - this.currentTick));
+      const s = sample - (tick - this.currentTick);
+      const t = loop ? s % (context.testDriver.samples + 1) : s;
+      this.renderCharges(context, t);
 
-      this.test(context, sample - (tick - this.currentTick));
+      this.test(context, t);
     }
   }
 

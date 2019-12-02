@@ -1,4 +1,4 @@
-import { Forest, Box } from '../editing';
+import { Forest, Box, TestScenario } from '../editing';
 
 export type LoadForestAction = {
   readonly type: 'load-forest'
@@ -135,6 +135,11 @@ export const redo = (): RedoAction => ({
   type: 'redo-context'
 });
 
+export type SetTestScenario = {
+  readonly type: 'set-test-scenario'
+  readonly testScenario: TestScenario
+}
+
 export type ContextActions =
   LoadForestAction |
   SaveForestAction |
@@ -149,4 +154,5 @@ export type ContextActions =
   ForestSavedAction |
   ForestSavingAction |
   UndoAction |
-  RedoAction;
+  RedoAction |
+  SetTestScenario;
