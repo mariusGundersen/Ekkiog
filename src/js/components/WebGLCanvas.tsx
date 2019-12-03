@@ -71,7 +71,7 @@ export default function WebGLCanvas(props: Props) {
   useEffect(() => {
     if (!touchEngine.current) return;
 
-    touchEngine.current.onTick(props.simulation.tick, props.simulation.sample, props.simulation.looping);
+    touchEngine.current.onTick(props.simulation.tick, props.simulation.sample);
   }, [props.simulation.tick]);
 
   useEffect(() => {
