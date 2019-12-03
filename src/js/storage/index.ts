@@ -1,4 +1,4 @@
-import { openDB, DBSchema } from 'idb';
+import { openDB, DBSchema, deleteDB } from 'idb';
 import { } from 'idb/lib/async-iterators';
 import { Observable } from 'rxjs';
 
@@ -400,5 +400,5 @@ export async function deleteAllData() {
   setUser(null as any);
   const db = await _db;
   db.close();
-  await idb.delete('ekkiog').then(() => console.log('deleted'), e => console.error(e));
+  await deleteDB('ekkiog').then(() => console.log('deleted'), e => console.error(e));
 }
