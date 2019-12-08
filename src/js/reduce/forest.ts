@@ -24,6 +24,7 @@ import {
 import {
   Action
 } from '../actions';
+import { update } from 'ennea-tree';
 
 export { Forest };
 
@@ -43,6 +44,10 @@ export default function editing(forest = createForest(), action: Action): Forest
       return underpassToWire(forest, action.x, action.y);
     case 'rotate-tile-at':
       return rotate(forest, action.x, action.y, action.direction);
+    case 'make-permanent':
+      return makePermanent(forest, action);
+    case 'set-test-scenario':
+      return makePermanent(forest, ...action.testScenario.probes);
     default:
       return forest;
   }
@@ -116,4 +121,32 @@ function underpassToWire(forest: Forest, x: number, y: number) {
   if (result === tempForest) return forest;
 
   return result;
+}
+
+function makePermanent(forest: Forest, ...positions: { x: number, y: number }[]) {
+  const updater = update(forest.enneaTree, item => {
+    switch (item.type) {
+      case 'button':
+      case 'light':
+        return {
+          ...item,
+          permanent: true
+        };
+      default:
+        return item;
+    }
+  });
+  for (const { x, y } of positions) {
+    updater.update({ top: y, left: x }, {});
+  }
+
+  const enneaTree = updater.result();
+
+  if (enneaTree == forest.enneaTree)
+    return forest;
+
+  return {
+    ...forest,
+    enneaTree
+  };
 }

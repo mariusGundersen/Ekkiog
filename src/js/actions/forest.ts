@@ -149,6 +149,11 @@ export const rotateTileAt = (tx: number, ty: number, direction: Direction): Rota
   direction
 });
 
+export type MakePermanent = {
+  readonly type: 'make-permanent',
+  readonly x: number,
+  readonly y: number
+}
 
 export type ForestActions =
   SetForestAction |
@@ -163,4 +168,5 @@ export type ForestActions =
   InsertItemAction |
   MoveItemAtAction |
   ToggleButtonAction |
-  RotateTileAtAction;
+  RotateTileAtAction |
+  MakePermanent;

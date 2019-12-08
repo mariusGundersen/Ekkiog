@@ -67,7 +67,9 @@ export default function view(state = initialState, action: Action): SimulationSt
     case 'set-test-scenario':
       return {
         ...state,
-        show: true
+        show: true,
+        sample: 0,
+        samples: Math.max(...action.testScenario.probes.map(i => i.values.replace(/\s/g, '')).map(s => s.length)),
       }
     case 'tick':
       return {
