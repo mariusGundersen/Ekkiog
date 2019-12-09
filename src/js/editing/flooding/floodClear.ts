@@ -12,15 +12,14 @@ import gate from './gate';
 import component from './component';
 
 export default function floodClear(forest: Forest, x: number, y: number): Forest {
-  const { enneaTree, buddyTree } = forest;
-  const item = get(enneaTree, y, x);
+  const item = get(forest.enneaTree, y, x);
 
   switch (item.data.type) {
     case WIRE:
     case UNDERPASS:
       return {
-        enneaTree: floodClearInternal(clear(enneaTree, item).tree, [item.data, item]),
-        buddyTree
+        ...forest,
+        enneaTree: floodClearInternal(clear(forest.enneaTree, item).tree, [item.data, item])
       };
     default:
       return forest
