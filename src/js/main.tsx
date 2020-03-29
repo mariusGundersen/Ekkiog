@@ -5,6 +5,7 @@ import { Store } from 'redux';
 import { ConnectedRouter } from 'connected-react-router';
 import { Switch, Route } from 'react-router';
 import { History } from 'history';
+import ErrorBoundary from 'react-error-boundary';
 
 import { State } from './reduce';
 
@@ -14,15 +15,17 @@ const App = async<any>(() => import(/* webpackChunkName: "app" */ './pages/App')
 
 export default function main(store: Store<State>, history: History) {
   render(
-    <Provider store={store}>
-      <ConnectedRouter history={history}>
-        <Switch>
-          <Route path="/github/callback" render={Login} />
-          <Route path="/sandbox" render={Sandbox} />
-          <Route path="/" render={App} />
-        </Switch>
-      </ConnectedRouter>
-    </Provider>,
+    <ErrorBoundary>
+      <Provider store={store}>
+        <ConnectedRouter history={history}>
+          <Switch>
+            <Route path="/github/callback" render={Login} />
+            <Route path="/sandbox" render={Sandbox} />
+            <Route path="/" render={App} />
+          </Switch>
+        </ConnectedRouter>
+      </Provider>
+    </ErrorBoundary>,
     document.querySelector('.react-app')
   );
 }

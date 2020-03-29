@@ -30,19 +30,22 @@ export { Area, Box, BoxArea, BuddyTree };
 
 export interface Wire {
   readonly type: 'wire',
-  readonly net: number
+  readonly net: number,
+  readonly permanent?: boolean
 }
 
 export interface Gate {
   readonly type: 'gate',
   readonly net: number,
   readonly inputA: number,
-  readonly inputB: number
+  readonly inputB: number,
+  readonly permanent?: boolean
 }
 
 export interface Underpass {
   readonly type: 'underpass',
-  readonly net: number
+  readonly net: number,
+  readonly permanent?: boolean
 }
 
 export interface Button {
@@ -59,7 +62,8 @@ export interface Component {
   readonly inputs: ComponentInputPin[],
   readonly outputs: ComponentPin[],
   readonly net: number,
-  readonly package: Package
+  readonly package: Package,
+  readonly permanent?: boolean
 }
 
 export interface ComponentInputPin extends ComponentPin {

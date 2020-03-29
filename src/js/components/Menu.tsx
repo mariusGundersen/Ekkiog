@@ -63,12 +63,12 @@ const ContextMenuPos = (props: Props) => {
     case 'show': {
       const { tx, ty } = props.contextMenu;
       const tile = getTileAt(props.forest, Math.floor(tx), Math.floor(ty));
-      const tileType = tile && tile.data && tile.data.type || EMPTY;
+      const tileType = tile?.data?.type ?? EMPTY;
       const [x, y] = tileToViewport(props.view.perspective, tx, ty);
       return <ContextMenu
         dispatch={props.dispatch}
         tileType={tileType}
-        permanent={(tile && tile.data && tile.data as any).permanent}
+        permanent={tile?.data?.permanent}
         x={x / window.devicePixelRatio}
         y={y / window.devicePixelRatio}
         tx={Math.floor(tx)}
