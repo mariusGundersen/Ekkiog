@@ -3,6 +3,7 @@ import { connect, DispatchProp } from 'react-redux';
 import reax, { constant } from 'reaxjs';
 
 import * as rx from 'rxjs';
+import Div100vh from 'react-div-100vh';
 
 import { State } from '../reduce';
 
@@ -87,7 +88,7 @@ export default connect((s: State) => s)(
       }
     },
     (values, events, props) => (
-      <div className={style.root} data-menu={values.showMenu}>
+      <Div100vh className={style.root} data-menu={values.showMenu}>
         <DelayEnterExit
           exitDelay={1000}
           show={values.showMainMenu}
@@ -175,7 +176,7 @@ export default connect((s: State) => s)(
             hidePopup={events.hidePopup}
             startSync={events.sync} />
         </Popup>
-      </div>
+      </Div100vh>
     )
   ));
 
@@ -185,8 +186,8 @@ function onResize() {
   return rx.fromEvent(window, 'resize').pipe(
     startWith({} as Event),
     map(() => ({
-      pixelWidth: window.document.body.clientWidth * window.devicePixelRatio,
-      pixelHeight: window.document.body.clientHeight * window.devicePixelRatio
+      pixelWidth: (window.document.body.clientWidth || window.innerWidth) * window.devicePixelRatio,
+      pixelHeight: (window.document.body.clientHeight || window.innerHeight) * window.devicePixelRatio
     })));
 }
 

@@ -1,4 +1,4 @@
-module.exports = function htmlPage(model = null){
+module.exports = function htmlPage(model = null) {
   return `<!doctype html>
     <html lang="en">
       <head>
@@ -9,14 +9,9 @@ module.exports = function htmlPage(model = null){
           html, body {
             margin: 0;
             padding: 0;
-            height: 100%;
           }
 
           body {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            touch-action: none;
             overflow: hidden; /* prevent scrollbars */
             background: #31363c;
           }

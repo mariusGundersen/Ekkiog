@@ -1,8 +1,7 @@
 .root {
-  flex: 1 0 100%;
   display: grid;
   grid-template-columns: 100vw;
-  grid-template-rows: 100vh;
+  grid-template-rows: 100%;
   grid-template-areas: "full";
   font-size: 16px;
   font-family: Courier Bold, Courier, monospace;
